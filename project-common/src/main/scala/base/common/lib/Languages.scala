@@ -1,0 +1,205 @@
+/*
+ * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * This file is proprietary and confidential.
+ * Last modified by rconrad, 12/24/14 4:37 PM
+ */
+
+package base.common.lib
+
+/**
+ * Languages supported by the service
+ *  NB: MUST BE IN SYNC WITH DB CHECK ON LANGUAGE FIELDS
+ *  Uses language spec ISO 639.2
+ * @author rconrad
+ */
+object Languages extends Enumeration {
+  type Language = Value
+  implicit def asString(c: Language) = c.toString
+
+  val aar = Value
+  val abk = Value
+  val afr = Value
+  val aka = Value
+  val alb = Value
+  val amh = Value
+  val ara = Value
+  val arg = Value
+  val arm = Value
+  val asm = Value
+  val ava = Value
+  val ave = Value
+  val aym = Value
+  val aze = Value
+  val bak = Value
+  val bam = Value
+  val baq = Value
+  val bel = Value
+  val ben = Value
+  val bih = Value
+  val bis = Value
+  val bos = Value
+  val bre = Value
+  val bul = Value
+  val bur = Value
+  val cat = Value
+  val cha = Value
+  val che = Value
+  val chi = Value
+  val chu = Value
+  val chv = Value
+  val cor = Value
+  val cos = Value
+  val cre = Value
+  val cze = Value
+  val dan = Value
+  val div = Value
+  val dut = Value
+  val dzo = Value
+  val eng = Value
+  val epo = Value
+  val est = Value
+  val ewe = Value
+  val fao = Value
+  val fij = Value
+  val fin = Value
+  val fre = Value
+  val fry = Value
+  val ful = Value
+  val geo = Value
+  val ger = Value
+  val gla = Value
+  val gle = Value
+  val glg = Value
+  val glv = Value
+  val gre = Value
+  val grn = Value
+  val guj = Value
+  val hat = Value
+  val hau = Value
+  val heb = Value
+  val her = Value
+  val hin = Value
+  val hmo = Value
+  val hrv = Value
+  val hun = Value
+  val ibo = Value
+  val ice = Value
+  val ido = Value
+  val iii = Value
+  val iku = Value
+  val ile = Value
+  val ina = Value
+  val ind = Value
+  val ipk = Value
+  val ita = Value
+  val jav = Value
+  val jpn = Value
+  val kal = Value
+  val kan = Value
+  val kas = Value
+  val kau = Value
+  val kaz = Value
+  val khm = Value
+  val kik = Value
+  val kin = Value
+  val kir = Value
+  val kom = Value
+  val kon = Value
+  val kor = Value
+  val kua = Value
+  val kur = Value
+  val lao = Value
+  val lat = Value
+  val lav = Value
+  val lim = Value
+  val lin = Value
+  val lit = Value
+  val ltz = Value
+  val lub = Value
+  val lug = Value
+  val mac = Value
+  val mah = Value
+  val mal = Value
+  val mao = Value
+  val mar = Value
+  val may = Value
+  val mlg = Value
+  val mlt = Value
+  val mon = Value
+  val nau = Value
+  val nav = Value
+  val nbl = Value
+  val nde = Value
+  val ndo = Value
+  val nep = Value
+  val nno = Value
+  val nob = Value
+  val nor = Value
+  val nya = Value
+  val oci = Value
+  val oji = Value
+  val ori = Value
+  val orm = Value
+  val oss = Value
+  val pan = Value
+  val per = Value
+  val pli = Value
+  val pol = Value
+  val por = Value
+  val pus = Value
+  val que = Value
+  val roh = Value
+  val rum = Value
+  val run = Value
+  val rus = Value
+  val sag = Value
+  val san = Value
+  val sin = Value
+  val slo = Value
+  val slv = Value
+  val sme = Value
+  val smo = Value
+  val sna = Value
+  val snd = Value
+  val som = Value
+  val sot = Value
+  val spa = Value
+  val srd = Value
+  val srp = Value
+  val ssw = Value
+  val sun = Value
+  val swa = Value
+  val swe = Value
+  val tah = Value
+  val tam = Value
+  val tat = Value
+  val tel = Value
+  val tgk = Value
+  val tgl = Value
+  val tha = Value
+  val tib = Value
+  val tir = Value
+  val ton = Value
+  val tsn = Value
+  val tso = Value
+  val tuk = Value
+  val tur = Value
+  val twi = Value
+  val uig = Value
+  val ukr = Value
+  val urd = Value
+  val uzb = Value
+  val ven = Value
+  val vie = Value
+  val vol = Value
+  val wel = Value
+  val wln = Value
+  val wol = Value
+  val xho = Value
+  val yid = Value
+  val yor = Value
+  val zha = Value
+  val zul = Value
+
+}

@@ -1,0 +1,72 @@
+<!--
+  ~ Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+  ~ Unauthorized copying of this file, via any medium is strictly prohibited.
+  ~ This file is proprietary and confidential.
+  ~ Last modified by rconrad, 12/24/14 6:26 PM
+  -->
+
+<configuration>
+
+    <property name="LOG_HOME" value="log" scope="context" />
+    <property name="LOG_ARCHIVE" value="${LOG_HOME}/archive" scope="context" />
+
+    <appender name="FILE_DEFAULT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/default.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_ARCHIVE}/default/default.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>180</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date %level %.25thread %logger{10} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_ARCHIVE}/warn/warn.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>365</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <pattern>%date %level %.25thread %logger{10} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_REST_REQUEST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/rest-requests.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_ARCHIVE}/rest-responses/rest-requests.%d{yyyy-MM-dd}.json</fileNamePattern>
+            <maxHistory>365</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+
+        <encoder>
+            <pattern>%date %level %.25thread %logger{10} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="FILE_DEFAULT" />
+        <appender-ref ref="FILE_WARN" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="RestRequestRecorder">
+        <appender-ref ref="FILE_REST_REQUEST" />
+    </logger>
+
+    <logger name="scala.slick" level="INFO" />
+
+</configuration>
