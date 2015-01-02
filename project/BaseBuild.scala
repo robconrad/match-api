@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 12:01 PM
+ * Last modified by rconrad, 12/27/14 11:48 AM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -78,6 +78,7 @@ object BaseBuild extends Build {
       libraryDependencies ++=
         Dependencies.coreBundle ++
         Dependencies.json ++
+        Dependencies.redis ++
         Dependencies.slick ++
         Dependencies.sprayCaching ++
         Dependencies.sprayHttp ++

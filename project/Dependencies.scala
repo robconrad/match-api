@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 12:02 PM
+ * Last modified by rconrad, 12/27/14 11:48 AM
  */
 
 import sbt._
@@ -52,6 +52,9 @@ object Dependencies {
 
   lazy val log = Seq(
     "ch.qos.logback" % "logback-classic" % "1.1.2" % "compile")
+
+  lazy val redis = Seq(
+    "com.github.spullara.redis" % "client" % "0.7")
 
   lazy val slick = Seq(
     "com.typesafe.slick" %% "slick" % "2.1.0-M2",

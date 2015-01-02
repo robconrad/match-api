@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 5:56 PM
+ * Last modified by rconrad, 1/1/15 5:04 PM
  */
 
 package base.entity.user.impl
@@ -31,23 +31,23 @@ class UserServiceImplTest extends EntityServiceTest with DateTimeHelper with Bef
     UserDataFactory.cleanup()
   }
 
-  test("create") {
+  ignore("create") {
     fail("not implemented")
   }
 
-  test("get") {
+  ignore("get") {
     fail("not implemented")
   }
 
-  test("update") {
+  ignore("update") {
 
   }
 
-  test("resetInitiate") {
+  ignore("resetInitiate") {
 
   }
 
-  test("resetComplete") {
+  ignore("resetComplete") {
 
   }
 
