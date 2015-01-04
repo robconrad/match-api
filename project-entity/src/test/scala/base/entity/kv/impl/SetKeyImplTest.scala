@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 9:19 PM
+ * Last modified by rconrad, 1/3/15 2:04 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.model.{ SetModel, SetObject }
+import base.entity.kv.mock.KeyLoggerMock
 
 /**
  * {{ Describe the high level purpose of IntModelTest here. }}
@@ -15,19 +15,14 @@ import base.entity.kv.model.{ SetModel, SetObject }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class SetModelTest extends ModelTest {
+class SetKeyImplTest extends KeyImplTest {
 
-  val id = "id"
+  private val val1 = "value1"
+  private val val2 = "value2"
 
-  val val1 = "value1"
-  val val2 = "value2"
-  val val3 = "value3"
+  val model = new SetKeyImpl(getClass.getSimpleName, KeyLoggerMock)
 
-  val obj = new SetObject {
-    val CHANNEL = "channel"
-  }
-
-  val model = new SetModel(obj, id) {}
+  def create = model.add(val1).await()
 
   test("members") {
     assert(model.members().await() == Set())
@@ -63,23 +58,11 @@ class SetModelTest extends ModelTest {
   }
 
   test("move") {
-    val dest = new SetModel(obj, "destination") {}
+    val dest = new SetKeyImpl("destination", KeyLoggerMock)
     assert(model.add(val1).await())
     assert(model.move(dest, val1).await())
     assert(dest.members().await() == Set(val1))
     assert(model.members().await() == Set())
-  }
-
-  test("remove multi") {
-
-  }
-
-  test("count") {
-
-  }
-
-  test("unionStore") {
-
   }
 
 }

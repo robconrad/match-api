@@ -2,39 +2,40 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 8:22 PM
+ * Last modified by rconrad, 1/3/15 1:15 PM
  */
 
-package base.entity.kv.model
+package base.entity.kv.impl
+
+import base.entity.kv.Key.Pipeline
+import base.entity.kv.{ IntKey, KeyLogger }
 
 /**
  * Base model for standard keys
- *
- * @param id unique identifier of the key
  */
 // scalastyle:off null
-abstract class IntModel(_OBJECT: IntObject, id: String) extends RedisModel(_OBJECT, id) {
+private[kv] final class IntKeyImpl(val key: String, protected val logger: KeyLogger) extends KeyImpl with IntKey {
 
-  def incr() = {
+  def incr()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("INCR (start)")
-    pipeline.incr(key).map { v =>
+    p.incr(key).map { v =>
       val res = v.data().toInt
       if (isDebugEnabled) log("INCR (finish)", s"value: $res")
       res
     }
   }
 
-  def set(v: Int) = {
+  def set(v: Int)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SET (start)", s"value: $v")
-    pipeline.set(key, v).map { v =>
+    p.set(key, v).map { v =>
       if (isDebugEnabled) log("SET (finish)", s"value: $v")
       true
     }
   }
 
-  def get() = {
+  def get()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("GET (start)")
-    pipeline.get(key).map {
+    p.get(key).map {
       case null                      => None
       case res if res.data() == null => None
       case res                       => Option(res.asAsciiString().toInt)
@@ -46,6 +47,3 @@ abstract class IntModel(_OBJECT: IntObject, id: String) extends RedisModel(_OBJE
 
 }
 
-abstract class IntObject extends RedisObject {
-
-}

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 12:31 PM
+ * Last modified by rconrad, 1/3/15 1:02 PM
  */
 
 package base.entity.kv.impl
@@ -10,6 +10,8 @@ package base.entity.kv.impl
 import base.common.service.ServiceImpl
 import base.entity.kv.KvService
 import redis.client.RedisClient
+
+import scala.util.Random
 
 /**
  * {{ Describe the high level purpose of KvServiceImpl here. }}
@@ -20,15 +22,17 @@ import redis.client.RedisClient
 class KvServiceImpl(clientCount: Int, host: String, port: Int) extends ServiceImpl with KvService {
 
   private val PING_RESPONSE = "PONG"
+  private val random = new Random()
 
-  private val clients = List.fill(clientCount)(makeClient())
+  private lazy val clients = List.fill(clientCount)(makeClient())
 
-  private var pointer = 0
+  def client = clients(random.nextInt(clientCount))
 
-  def client = {
-    pointer = (pointer + 1) % clientCount
-    clients(pointer)
-  }
+  def pipeline = client.pipeline()
+
+  def makeHashKeyFactory(ch: KeyChannel) = new HashKeyFactoryImpl(ch)
+  def makeIntKeyFactory(ch: KeyChannel) = new IntKeyFactoryImpl(ch)
+  def makeSetKeyFactory(ch: KeyChannel) = new SetKeyFactoryImpl(ch)
 
   private def makeClient() = {
     try {

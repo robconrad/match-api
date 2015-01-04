@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 8:46 PM
+ * Last modified by rconrad, 1/3/15 2:04 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.model.{ IntModel, IntObject }
+import base.entity.kv.mock.KeyLoggerMock
 
 /**
  * {{ Describe the high level purpose of IntModelTest here. }}
@@ -15,17 +15,13 @@ import base.entity.kv.model.{ IntModel, IntObject }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class IntModelTest extends ModelTest {
+class IntKeyImplTest extends KeyImplTest {
 
-  val id = "id"
+  private val int = 10
 
-  val int = 10
+  val model = new IntKeyImpl(getClass.getSimpleName, KeyLoggerMock)
 
-  val obj = new IntObject {
-    val CHANNEL = "channel"
-  }
-
-  val model = new IntModel(obj, id) {}
+  def create = model.set(int).await()
 
   test("incr") {
     assert(model.get().await() == None)

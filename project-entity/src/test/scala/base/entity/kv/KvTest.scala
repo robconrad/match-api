@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 8:24 PM
+ * Last modified by rconrad, 1/3/15 1:13 PM
  */
 
-package base.entity.kv.impl
+package base.entity.kv
 
-import base.entity.kv.KvService
 import base.entity.test.EntityBaseSuite
 import org.scalatest.BeforeAndAfterEach
 
@@ -17,7 +16,9 @@ import org.scalatest.BeforeAndAfterEach
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class ModelTest extends EntityBaseSuite with BeforeAndAfterEach {
+abstract class KvTest extends EntityBaseSuite with BeforeAndAfterEach {
+
+  implicit val p = KvService().client.pipeline()
 
   override def beforeEach() {
     super.beforeEach()
