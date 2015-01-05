@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 1:27 PM
+ * Last modified by rconrad, 1/4/15 4:11 PM
  */
 
 package base.entity.service
@@ -29,7 +29,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
   /**
    * Registration of services, see classes for details on these parameters
    */
-  lazy val registered = dbRegistered && otherRegistered
+  lazy val registered = dbRegistered && kvRegistered && otherRegistered
 
   /**
    * Register DB services (must come first)
@@ -48,6 +48,11 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new EvolutionServiceImpl(
       Keys(DB, "evolution")
     ))
+
+    true
+  }
+
+  lazy val kvRegistered = {
 
     Services.register(new KvServiceImpl(
       Keys(KV, "clientCount"),

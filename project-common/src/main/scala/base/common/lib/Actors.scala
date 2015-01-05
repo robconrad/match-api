@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:28 PM
+ * Last modified by rconrad, 1/4/15 1:55 PM
  */
 
 package base.common.lib
 
 import akka.actor.{ ExtendedActorSystem, Extension, ExtensionKey }
-import base.common.server.ServerService
+import base.common.service.CommonService
 
 /**
  * Configuration of the actor system
@@ -17,7 +17,7 @@ import base.common.server.ServerService
 object Actors {
 
   // global default actor system
-  val actorSystem = ServerService().makeActorSystem()
+  val actorSystem = CommonService().makeActorSystem()
   val actorSystemAddress = BaseExtension(actorSystem).address
 
   // global default dispatcher manual reference

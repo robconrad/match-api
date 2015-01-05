@@ -1,27 +1,27 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 4:16 PM
  */
 
-package base.rest.server
+package base.rest.api.impl
 
 import base.common.lib.{ Actors, Dispatchable }
 import base.common.logging.Loggable
 import base.common.test.Tags
-import base.rest.route.{ RouteTest, RestVersionsRoute }
+import base.rest.api.RestApiService
+import base.rest.route.{ RestVersionsRoute, RouteTest }
 import base.rest.test.RestBaseSuite
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization
 import spray.client.pipelining._
-import spray.httpx.encoding.Gzip
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
  * @author rconrad
  */
-class ServerTest extends RestBaseSuite with Dispatchable with Loggable {
+class RestApiServiceImplTest extends RestBaseSuite with Dispatchable with Loggable {
 
   implicit def json4sFormats = DefaultFormats
 
@@ -31,10 +31,10 @@ class ServerTest extends RestBaseSuite with Dispatchable with Loggable {
 
     val expected = Serialization.write(RestVersionsRoute.nakedResponse)
 
-    Server.start()
+    assert(RestApiService().start().await())
 
     val pipeline = sendReceive
-    val response = pipeline(Get(RestServerService().url)).awaitLong()
+    val response = pipeline(Get(RestApiService().url)).awaitLong()
 
     assert(RouteTest.decompressed(response.entity) == expected)
   }

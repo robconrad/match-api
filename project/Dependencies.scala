@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 11:48 AM
+ * Last modified by rconrad, 1/3/15 4:51 PM
  */
 
 import sbt._
@@ -52,6 +52,9 @@ object Dependencies {
 
   lazy val log = Seq(
     "ch.qos.logback" % "logback-classic" % "1.1.2" % "compile")
+
+  lazy val netty = Seq(
+    "io.netty" % "netty-all" % "4.0.12.Final")
 
   lazy val redis = Seq(
     "com.github.spullara.redis" % "client" % "0.7")

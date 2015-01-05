@@ -1,8 +1,8 @@
 <!--
-  ~ Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+  ~ Copyright (c) 2015 Robert Conrad - All Rights Reserved.
   ~ Unauthorized copying of this file, via any medium is strictly prohibited.
   ~ This file is proprietary and confidential.
-  ~ Last modified by rconrad, 12/24/14 6:26 PM
+  ~ Last modified by rconrad, 1/4/15 4:01 PM
   -->
 
 <configuration>
@@ -68,5 +68,7 @@
     </logger>
 
     <logger name="scala.slick" level="INFO" />
+    <logger name="com.wordnik.swagger" level="INFO" />
+    <logger name="com.gettyimages" level="INFO" />
 
 </configuration>

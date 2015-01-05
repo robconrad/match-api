@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 3:58 PM
  */
 
 package base.common.service
 
 import base.common.random.impl.RandomServiceImpl
-import base.common.server.impl.ServerServiceImpl
+import base.common.service.impl.CommonServiceImpl
 import base.common.time.impl.TimeServiceImpl
 
 /**
@@ -24,7 +24,7 @@ object CommonServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new RandomServiceImpl())
 
-    Services.register(new ServerServiceImpl(
+    Services.register(new CommonServiceImpl(
       Keys(AKKA, "host"),
       Keys(AKKA, "port"),
       Keys(AKKA, "defaultTimeout")

@@ -14,8 +14,12 @@
             <option value="$PROJECT_DIR$/project-entity/project" />
             <option value="$PROJECT_DIR$/project-rest" />
             <option value="$PROJECT_DIR$/project-rest/project" />
+            <option value="$PROJECT_DIR$/project-server" />
+            <option value="$PROJECT_DIR$/project-server/project" />
             <option value="$PROJECT_DIR$/project-slick" />
             <option value="$PROJECT_DIR$/project-slick/project" />
+            <option value="$PROJECT_DIR$/project-socket" />
+            <option value="$PROJECT_DIR$/project-socket/project" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

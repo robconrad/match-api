@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 1:55 PM
  */
 
-package base.common.server
+package base.common.service
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
-import base.common.service.{ Service, ServiceCompanion }
 
 import scala.concurrent.duration.Duration
 
@@ -17,9 +16,9 @@ import scala.concurrent.duration.Duration
  * Server-level configuration and operations
  * @author rconrad
  */
-trait ServerService extends Service {
+trait CommonService extends Service {
 
-  final def serviceManifest = manifest[ServerService]
+  final def serviceManifest = manifest[CommonService]
 
   /**
    * Default timeout for futures, actors, etc. across the system
@@ -34,4 +33,4 @@ trait ServerService extends Service {
 
 }
 
-object ServerService extends ServiceCompanion[ServerService]
+object CommonService extends ServiceCompanion[CommonService]

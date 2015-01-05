@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:05 PM
+ * Last modified by rconrad, 1/4/15 1:55 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.lib.{ Dispatchable, GuavaFutures }
 import base.common.logging.Loggable
-import base.common.server.ServerService
+import base.common.service.CommonService
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.{ Key, KeyLogger }
 
@@ -20,7 +20,7 @@ import base.entity.kv.{ Key, KeyLogger }
 // scalastyle:off null
 private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable with Dispatchable {
 
-  implicit val timeout = ServerService().defaultTimeout
+  implicit val timeout = CommonService().defaultTimeout
 
   protected val logger: KeyLogger
 

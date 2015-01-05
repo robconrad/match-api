@@ -1,17 +1,16 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:28 PM
+ * Last modified by rconrad, 1/4/15 3:43 PM
  */
 
-package base.common.server.impl
+package base.common.service.impl
 
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import base.common.lib.BaseConfig
-import base.common.server.ServerService
-import base.common.service.ServiceImpl
+import base.common.service.{ CommonService, ServiceImpl }
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration.FiniteDuration
@@ -23,9 +22,9 @@ import scala.concurrent.duration.FiniteDuration
  * @param defaultDuration default timeout for futures, actors, etc. across the system
  * @author rconrad
  */
-private[common] class ServerServiceImpl(akkaHost: String,
+private[common] class CommonServiceImpl(akkaHost: String,
                                         akkaPort: Int,
-                                        val defaultDuration: FiniteDuration) extends ServiceImpl with ServerService {
+                                        val defaultDuration: FiniteDuration) extends ServiceImpl with CommonService {
 
   implicit val defaultTimeout = new Timeout(defaultDuration)
 

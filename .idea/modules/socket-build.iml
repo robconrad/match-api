@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.path="$MODULE_DIR$/../../project-entity/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="sbt._, Keys._,   import _root_.org.jetbrains.sbt.StructurePlugin._, _root_.sbtassembly.Plugin._, _root_.com.typesafe.sbt.SbtScalariform._, _root_.org.sbtidea.SbtIdeaPlugin._, _root_.scoverage.ScoverageSbtPlugin._, _root_.net.virtualvoid.sbt.graph.Plugin._, _root_.org.scalastyle.sbt.ScalastylePlugin._, BaseBuild._&#10;      , _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin" type="SBT_MODULE" version="4">
+<module external.linked.project.path="$MODULE_DIR$/../../project-socket/project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="sbt._, Keys._,   import _root_.org.jetbrains.sbt.StructurePlugin._, _root_.sbtassembly.Plugin._, _root_.com.typesafe.sbt.SbtScalariform._, _root_.org.sbtidea.SbtIdeaPlugin._, _root_.scoverage.ScoverageSbtPlugin._, _root_.net.virtualvoid.sbt.graph.Plugin._, _root_.org.scalastyle.sbt.ScalastylePlugin._, BaseBuild._&#10;      , _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../project-entity/project/target/idea-classes" />
-    <output-test url="file://$MODULE_DIR$/../../project-entity/project/target/idea-test-classes" />
+    <output url="file://$MODULE_DIR$/../../project-socket/project/target/idea-classes" />
+    <output-test url="file://$MODULE_DIR$/../../project-socket/project/target/idea-test-classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../project-entity/project">
-      <sourceFolder url="file://$MODULE_DIR$/../../project-entity/project" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/../../project-entity/project/project/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../project-entity/project/target" />
+    <content url="file://$MODULE_DIR$/../../project-socket/project">
+      <sourceFolder url="file://$MODULE_DIR$/../../project-socket/project" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../project-socket/project/project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../project-socket/project/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

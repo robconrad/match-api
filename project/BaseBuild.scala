@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 11:48 AM
+ * Last modified by rconrad, 1/4/15 3:13 PM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -25,6 +25,8 @@ object BaseBuild extends Build {
     final val common = "common"
     final val entity = "entity"
     final val rest = "rest"
+    final val server = "server"
+    final val socket = "socket"
     final val slick = "slick"
     final val top = "base-api"
   }
@@ -34,6 +36,8 @@ object BaseBuild extends Build {
     final val common = project(Names.common)
     final val entity = project(Names.entity)
     final val rest = project(Names.rest)
+    final val server = project(Names.server)
+    final val socket = project(Names.socket)
     final val slick = project(Names.slick)
     final val top = "."
   }
@@ -109,6 +113,40 @@ object BaseBuild extends Build {
       entityProject % "test->test;compile->compile")
 
   /**
+   * Socket API
+   */
+  lazy val socketProject = Project(
+    id = Names.socket,
+    base = file(Dirs.socket),
+    settings = baseSettings ++ Seq(
+      name := Names.socket,
+      libraryDependencies ++=
+        Dependencies.coreBundle ++
+        Dependencies.json ++
+        Dependencies.netty
+    )
+  ).dependsOn(
+      commonProject % "test->test;compile->compile",
+      entityProject % "test->test;compile->compile")
+
+  /**
+   * Server to run REST and/or Socket APIs
+   */
+  lazy val serverProject = Project(
+    id = Names.server,
+    base = file(Dirs.server),
+    settings = baseSettings ++ Seq(
+      name := Names.server,
+      libraryDependencies ++=
+        Dependencies.coreBundle
+    )
+  ).dependsOn(
+      commonProject % "test->test;compile->compile",
+      entityProject % "test->test;compile->compile",
+      restProject % "test->test;compile->compile",
+      socketProject % "test->test;compile->compile")
+
+  /**
    * Top level project (integrates all sub-projects, builds fatjar, etc.)
    */
   lazy val integrationProject = Project(
@@ -116,15 +154,17 @@ object BaseBuild extends Build {
     base = file(Dirs.top),
     settings = baseSettings ++ Seq(
       name := Names.top,
-      mainClass := Some("base.rest.server.Server"),
+      mainClass := Some("base.server.Server"),
       AssemblyKeys.jarName in AssemblyKeys.assembly := Names.top + "-" + ("git describe --always" !!).trim + ".jar"
     )
   ).dependsOn(
       // the reason for all the dependencies is to get scalatest to run tests from every sub-project (should be a way around this but I haven't looked into it yet)
       commonProject % "test->test;compile->compile",
       entityProject % "test->test;compile->compile",
-      restProject % "test->test;compile->compile")
-    .aggregate(commonProject, entityProject, restProject)
+      restProject % "test->test;compile->compile",
+      socketProject % "test->test;compile->compile",
+      serverProject % "test->test;compile->compile")
+    .aggregate(commonProject, entityProject, restProject, socketProject, serverProject)
 
   // code formatting preferences
   lazy val scalariformPreferences = FormattingPreferences()

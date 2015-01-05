@@ -2,34 +2,36 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:12 PM
+ * Last modified by rconrad, 1/4/15 3:43 PM
  */
 
-package base.rest.service
+package base.server.service
 
 import base.common.service.{ Services, ServicesBootstrap }
-import base.rest.api.impl.RestApiServiceImpl
+import base.server.service.impl.ServerServiceImpl
 
 /**
  * Injects configuration into Services and boots them up. If it's configurable, it belongs here.
  * @author rconrad
  */
-object RestServicesBootstrap extends ServicesBootstrap {
+object ServerServicesBootstrap extends ServicesBootstrap {
 
   /**
    * Config Sections
    */
-  private val REST = "rest"
+  private val SERVER = "server"
+  private val START = Keys(SERVER, "start")
 
   /**
    * Registration of services, see classes for details on these parameters
    */
   lazy val registered = {
 
-    Services.register(new RestApiServiceImpl(
-      Keys(REST, "protocol"),
-      Keys(REST, "host"),
-      Keys(REST, "port")))
+    Services.register(new ServerServiceImpl(
+      Keys(START, "kv"),
+      Keys(START, "db"),
+      Keys(START, "rest"),
+      Keys(START, "socket")))
 
     true
   }
