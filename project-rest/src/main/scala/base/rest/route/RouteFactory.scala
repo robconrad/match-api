@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.route
 
 import akka.actor.ActorRefFactory
-import base.rest.Versions._
+import base.entity.api.ApiVersions
+import ApiVersions._
 import spray.routing.Route
 
 import scala.reflect.runtime.universe.Type
@@ -22,11 +23,11 @@ private[rest] trait RouteFactory {
   /**
    * Create the complete route for which this factory is responsible for the specified API version
    */
-  def buildRoute(actors: ActorRefFactory, version: Version): Route
+  def buildRoute(actors: ActorRefFactory, version: ApiVersion): Route
 
   /**
    * Contains reflected type data for the route(s) served by the specified API version
    */
-  def getTypes(version: Version): Set[Type]
+  def getTypes(version: ApiVersion): Set[Type]
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 7:16 PM
+ * Last modified by rconrad, 1/4/15 9:36 PM
  */
 
 package base.rest.user
@@ -15,7 +15,7 @@ import base.entity.auth.AuthTypeSets
 import base.entity.auth.context.{ AuthContext, UserAuthContext }
 import base.entity.error.ApiError
 import base.entity.perm.Perms
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
+import base.entity.user.model.{ ResetUserModel, RegisterModel, UpdateUserModel, UserModel }
 import base.entity.user.UserService
 import base.rest.Endpoint._
 import base.rest.route.{ RestVersionsRoute, VersionedRestRoute }
@@ -54,7 +54,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
     path(USERS) {
       post {
         auth(AuthTypeSets.USER_OR_KEY, Perms.USER_CREATE) { authCtx =>
-          entity(as[PostUserRequest]) { input =>
+          entity(as[RegisterModel]) { input =>
             completeEither(UserService().create(authCtx, input))
           }
         }
@@ -78,7 +78,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
     path(USERS / JavaUUID) { userId =>
       put {
         auth(AuthTypeSets.USER_OR_KEY, Perms.USER_UPDATE) { authCtx =>
-          entity(as[PutUserRequest]) { input =>
+          entity(as[UpdateUserModel]) { input =>
             completeEither(UserService().update(authCtx, userId, input))
           }
         }
@@ -133,7 +133,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
   def resetInitiate =
     path(USERS_RESET) {
       post {
-        entity(as[PostResetRequest]) { input =>
+        entity(as[ResetUserModel]) { input =>
           completeEither(UserService().resetInitiate(input))
         }
       } ~

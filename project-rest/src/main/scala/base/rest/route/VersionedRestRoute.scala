@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.route
 
-import base.rest.Versions._
+import base.entity.api.ApiVersions
+import ApiVersions._
 
 /**
  * Base class for all /rest/$version/ routes, provides rest-specific directives
@@ -27,6 +28,6 @@ private[rest] trait VersionedRestRoute extends RestRoute {
    *    Often routes will specify this method in an anonymous implementation in a factory
    *    because there is no difference in the behavior of the route between versions.
    */
-  def version: Version
+  def version: ApiVersion
 
 }

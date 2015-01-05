@@ -1,17 +1,18 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:33 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.route
 
 import base.common.lib.Dispatchable
 import base.common.logging.Loggable
+import base.entity.api.ApiVersions
 import base.entity.json.JsonFormats
 import base.rest.Locations._
-import base.rest.Versions._
+import ApiVersions._
 import org.json4s.Formats
 import shapeless.HNil
 import spray.httpx.Json4sSupport
@@ -28,7 +29,7 @@ private[rest] trait BaseRoute extends HttpService with Json4sSupport with Dispat
   implicit val json4sFormats: Formats = JsonFormats.default
 
   // allow implicit conversion of api location types throughout all routes
-  implicit def versionToPathMatcher(restVersion: Version): PathMatcher0 = restVersion.toString
+  implicit def versionToPathMatcher(restVersion: ApiVersion): PathMatcher0 = restVersion.toString
   implicit def locationToPathMatcher(restLocation: Location): PathMatcher0 = restLocation.toString
 
   /**
@@ -46,7 +47,7 @@ private[rest] trait BaseRoute extends HttpService with Json4sSupport with Dispat
    * Given an API version produce a directive that requires that version be the next segment
    *  of the path
    */
-  def pathBase(version: Version) = new Directive0 {
+  def pathBase(version: ApiVersion) = new Directive0 {
     def happly(f: HNil => Route): Route =
       pathBaseTop {
         pathPrefix(version).happly(f)

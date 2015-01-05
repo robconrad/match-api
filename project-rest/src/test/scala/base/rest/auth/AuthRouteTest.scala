@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 10:13 AM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.auth
 
 import base.common.service.{ Services, ServicesBeforeAndAfterAll }
+import base.entity.api.ApiVersions
 import base.entity.apiKey.ApiKeyTypes
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.auth.mock.AuthServiceMock
 import base.rest.Endpoint._
-import base.rest.Versions
 import base.rest.route.{ RouteTest, RouteTestCompanion }
 import spray.http.{ BasicHttpCredentials, StatusCodes }
 
@@ -22,7 +22,7 @@ import spray.http.{ BasicHttpCredentials, StatusCodes }
  */
 class AuthRouteTest extends RouteTest(AuthRouteTest) with AuthRoute with ServicesBeforeAndAfterAll {
 
-  val version = Versions.latest
+  val version = ApiVersions.latest
 
   private val authMock = new AuthServiceMock()
   private val keyAuthCtx = AuthContextDataFactory.emptyKeyAuth

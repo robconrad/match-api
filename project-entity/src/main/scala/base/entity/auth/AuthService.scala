@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:11 PM
+ * Last modified by rconrad, 1/4/15 9:59 PM
  */
 
 package base.entity.auth
 
 import base.common.service.{ Service, ServiceCompanion }
-import base.entity.auth.context.{ AuthContextParams, KeyAuthContext, UserAuthContext }
-import base.entity.model.Email
+import base.entity.auth.context.UserAuthContext
 
 import scala.concurrent.Future
 
@@ -24,15 +23,7 @@ trait AuthService extends Service {
   /**
    * Accept auth of the allowed types and return proper AuthContext in response
    */
-  def authByUser(email: Email,
-                 password: String,
-                 contextParams: AuthContextParams = AuthContextParams()): Future[Option[UserAuthContext]]
-
-  /**
-   * Accept auth of the allowed types and return proper AuthContext in response
-   */
-  def authByKey(key: String,
-                contextParams: AuthContextParams = AuthContextParams()): Future[Option[KeyAuthContext]]
+  def auth(token: String, deviceId: String): Future[Option[UserAuthContext]]
 
 }
 

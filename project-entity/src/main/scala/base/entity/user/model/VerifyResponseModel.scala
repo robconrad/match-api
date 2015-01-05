@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:57 PM
  */
 
 package base.entity.user.model
 
+import java.util.UUID
+
 import base.entity.ApiStrings.User._
-import base.entity.model.Email
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
@@ -19,8 +20,10 @@ import scala.annotation.meta.field
  * @author rconrad
  */
 // format: OFF
-@ApiModel(description = resetInitRequestDesc)
-case class PostResetRequest(
-  @(ApiModelProperty @field)(required = true, value = emailDesc) email: Email
-)
-// format: ON
+@ApiModel(description = createRequestDesc)
+case class VerifyResponseModel(
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  token: UUID) {
+  // format: ON
+
+}
+

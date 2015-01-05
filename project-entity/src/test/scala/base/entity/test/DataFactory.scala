@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:07 PM
+ * Last modified by rconrad, 1/4/15 10:04 PM
  */
 
 package base.entity.test
@@ -11,7 +11,6 @@ import base.common.lib.Dispatchable
 import base.common.test.PimpMyFutures
 import base.common.time.DateTimeHelper
 import base.entity.Tables.profile.simple._
-import base.entity.apiKey.ApiKeyDataFactory
 import base.entity.db.DbService
 import base.entity.user.UserDataFactory
 
@@ -44,8 +43,7 @@ object DataFactory extends Dispatchable with PimpMyFutures {
    * Registry of factories - MUST be in order of FK chain in order for deletes to work properly
    */
   val factories = List(
-    UserDataFactory,
-    ApiKeyDataFactory
+    UserDataFactory
   )
 
   /**

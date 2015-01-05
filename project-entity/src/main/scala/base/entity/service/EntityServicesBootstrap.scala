@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:11 PM
+ * Last modified by rconrad, 1/4/15 9:59 PM
  */
 
 package base.entity.service
 
 import base.common.service.{ Services, ServicesBootstrap }
-import base.entity.apiKey.impl.ApiKeysServiceImpl
 import base.entity.auth.impl.AuthServiceImpl
 import base.entity.db.impl.{ DbConfigServiceImpl, DbServiceImpl, EvolutionServiceImpl }
 import base.entity.kv.impl.KvServiceImpl
@@ -70,8 +69,6 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new AuthServiceImpl())
 
     Services.register(new UserServiceImpl())
-
-    Services.register(new ApiKeysServiceImpl())
 
     true
   }

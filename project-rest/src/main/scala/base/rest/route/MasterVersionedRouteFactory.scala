@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 10:53 AM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.route
 
 import akka.actor.ActorRefFactory
-import base.rest.Versions.Version
+import base.entity.api.ApiVersions
+import ApiVersions.ApiVersion
 import base.rest.apiKey.ApiKeysRouteFactory
 import base.rest.auth.AuthRouteFactory
 import base.rest.swagger.{ SwaggerDocsRouteFactory, SwaggerRestRouteFactory }
@@ -35,14 +36,14 @@ private[rest] object MasterVersionedRouteFactory extends RouteConcatenation {
   /**
    * Create a master route including subroutes for all specified versions
    */
-  def apply(actors: ActorRefFactory, versions: Version*): Route = {
+  def apply(actors: ActorRefFactory, versions: ApiVersion*): Route = {
     versions.map(apply(actors, _)).reduce((a, b) => a ~ b)
   }
 
   /**
    * Create a master route for the specified version
    */
-  def apply(actors: ActorRefFactory, version: Version): Route = {
+  def apply(actors: ActorRefFactory, version: ApiVersion): Route = {
     routeFactories.map(_.buildRoute(actors, version)).reduce((a, b) => a ~ b)
   }
 

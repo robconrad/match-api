@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 10:53 AM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.swagger
 
-import base.rest.Versions.Version
+import base.entity.api.ApiVersions
+import ApiVersions.ApiVersion
 import base.rest.route.DocsRoute
 import spray.http.{ StatusCodes, Uri }
 
@@ -17,7 +18,7 @@ import spray.http.{ StatusCodes, Uri }
  */
 private[rest] trait SwaggerDocsRoute extends DocsRoute {
 
-  def version: Version
+  def version: ApiVersion
 
   // format: OFF
   def routes =

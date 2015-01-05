@@ -5,22 +5,25 @@
  * Last modified by rconrad, 1/4/15 9:57 PM
  */
 
-package base.entity.user.model
-
-import java.util.UUID
+package base.entity.model
 
 import base.entity.ApiStrings.User._
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
 
+
 /**
- * API describable Response
+ * API describable model
  * @author rconrad
  */
 // format: OFF
-@ApiModel(description = userResponse)
-case class UserModel(
-  @(ApiModelProperty @field)(required = true,  value = idDesc)    id: UUID,
-  @(ApiModelProperty @field)(required = true,  value = emailDesc) label: String)
-// format: ON
+@ApiModel(description = createRequestDesc)
+case class ErrorModel(
+  @(ApiModelProperty @field)(required = true, value = emailDesc)    errorStatus: Int,
+  @(ApiModelProperty @field)(required = true, value = emailDesc)    errorCode: Option[String],
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) errorMessage: Option[String]) {
+  // format: ON
+
+}
+

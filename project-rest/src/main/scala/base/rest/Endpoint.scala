@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest
 
+import base.entity.api.ApiVersions
 import base.rest.Locations.Location
-import base.rest.Versions._
+import ApiVersions._
 
 /**
  * Representation of a REST endpoint (should be avoided for anything version-sensitive
@@ -18,10 +19,10 @@ import base.rest.Versions._
 private[rest] case class Endpoint(location: Option[Location], endpoint: String) {
 
   override def toString = toString(latest)
-  def toString(version: Version) = VersionedEndpoint(version, location, endpoint).toString
+  def toString(version: ApiVersion) = VersionedEndpoint(version, location, endpoint).toString
 
   def toPathMatcherLatest = toPathMatcher(latest)
-  def toPathMatcher(version: Version) = VersionedEndpoint(version, location, endpoint).toPathMatcher
+  def toPathMatcher(version: ApiVersion) = VersionedEndpoint(version, location, endpoint).toPathMatcher
 
 }
 

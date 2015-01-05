@@ -1,16 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 5:14 PM
+ * Last modified by rconrad, 1/4/15 9:09 PM
  */
 
 package base.entity.auth.context
 
 import base.common.logging.LoggerToken
 import base.entity.Tables.UserRow
-import base.entity.auth.AuthRoles.AuthRole
-import base.entity.auth.AuthTypes.AuthType
 import base.entity.perm.PermSetGroup
 import base.entity.perm.Perms.Perm
 
@@ -41,16 +39,6 @@ trait AuthContext {
   def user: Option[UserRow]
 
   /**
-   * What role of authentication does this context represent
-   */
-  def authRole: AuthRole
-
-  /**
-   * What type of authentication was used to obtain this AuthContext
-   */
-  def authType: AuthType
-
-  /**
    * The unique identifier of the type of authentication used to obtain this auth context
    */
   def authTypeId: Option[Long]
@@ -68,10 +56,7 @@ trait AuthContext {
   /**
    * Short unique description of this AuthContext useful for prefixing log events associated with it
    */
-  final lazy val toLogPrefix =
-    "AuthCtx(%s: %s)".format(
-      authType.toPrefix,
-      authTypeId.getOrElse(-1L))
+  final lazy val toLogPrefix = "AuthCtx(%s)".format(authTypeId.getOrElse(-1L))
 
 }
 

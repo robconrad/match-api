@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 7:32 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest
 
+import base.entity.api.ApiVersions
 import base.rest.Locations.Location
-import base.rest.Versions._
+import ApiVersions._
 import spray.routing.directives.PathDirectives
 
 /**
@@ -16,7 +17,7 @@ import spray.routing.directives.PathDirectives
  *  always requires a location)
  * @author rconrad
  */
-private[rest] case class VersionedEndpoint(version: Version,
+private[rest] case class VersionedEndpoint(version: ApiVersion,
                                            location: Option[Location],
                                            endpoint: String) extends PathDirectives {
   // render endpoints as URLs
@@ -36,11 +37,11 @@ private[rest] case class VersionedEndpoint(version: Version,
 
 private[rest] object VersionedEndpoint {
 
-  def apply(version: Version, location: Location): VersionedEndpoint = {
+  def apply(version: ApiVersion, location: Location): VersionedEndpoint = {
     apply(version, Option(location), "")
   }
 
-  def apply(version: Version, endpoint: String): VersionedEndpoint = {
+  def apply(version: ApiVersion, endpoint: String): VersionedEndpoint = {
     apply(version, None, endpoint)
   }
 
@@ -51,7 +52,7 @@ private[rest] object VersionedEndpoint {
   val ADMIN_LATEST = apply(latest, "admin")
   val INVOICES_LATEST = apply(latest, "invoices")
 
-  val restAvailable = Versions.available.map(apply(_, ""))
+  val restAvailable = ApiVersions.available.map(apply(_, ""))
 
   private val baseAvailable = Set(DOCS_LATEST, INVOICES_LATEST)
   val available = Map(
@@ -60,10 +61,10 @@ private[rest] object VersionedEndpoint {
 
   available.foreach {
     case (version, available) =>
-      assert(Versions.available.contains(version))
+      assert(ApiVersions.available.contains(version))
   }
 
-  Versions.available.foreach { version =>
+  ApiVersions.available.foreach { version =>
     assert(available.keys.toSet.contains(version))
   }
 

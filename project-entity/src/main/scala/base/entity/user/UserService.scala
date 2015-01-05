@@ -2,18 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 7:16 PM
+ * Last modified by rconrad, 1/4/15 10:04 PM
  */
 
 package base.entity.user
 
-import java.util.UUID
-
 import base.common.service.{ Service, ServiceCompanion }
-import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
-import base.entity.user.UserService.ErrorOrUser
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
+import base.entity.user.model._
 
 import scala.concurrent.Future
 
@@ -25,39 +21,12 @@ trait UserService extends Service {
 
   final def serviceManifest = manifest[UserService]
 
-  /**
-   * Create a new User in the database and get a UserResponse
-   */
-  def create(implicit authCtx: AuthContext, input: PostUserRequest): Future[ErrorOrUser]
+  def register(input: RegisterModel): Future[Either[ApiError, RegisterResponseModel]]
 
-  /**
-   * Update an User in the database and get a UserResponse
-   */
-  def update(implicit authCtx: AuthContext, id: UUID, input: PutUserRequest): Future[ErrorOrUser]
+  def verify(input: VerifyModel): Future[Either[ApiError, VerifyResponseModel]]
 
-  /**
-   * Get an User Response from the database
-   */
-  def get(implicit authCtx: AuthContext, id: UUID): Future[ErrorOrUser]
-
-  /**
-   * Begin the process of resetting a user's password. Will create a reset code and send an email
-   *  to the user with a link to hit resetComplete with that code
-   */
-  def resetInitiate(input: PostResetRequest): Future[ErrorOrUser]
-
-  /**
-   * Complete the process of resetting a user's password. Users will have received a code in their
-   *  email which they supply to this function in order to finally set their password to whatever
-   *  it was assigned in the email
-   */
-  def resetComplete(resetCode: String): Future[ErrorOrUser]
+  def login(input: LoginModel): Future[Either[ApiError, LoginResponseModel]]
 
 }
 
-object UserService extends ServiceCompanion[UserService] {
-
-  // the Invoice endpoint always returns either a EntityError or an InvoiceResponse
-  type ErrorOrUser = Either[ApiError, UserModel]
-
-}
+object UserService extends ServiceCompanion[UserService]

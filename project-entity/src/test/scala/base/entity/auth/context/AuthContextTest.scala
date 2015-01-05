@@ -2,15 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 5:04 PM
+ * Last modified by rconrad, 1/4/15 10:04 PM
  */
 
 package base.entity.auth.context
 
-import base.entity.auth.AuthRoles.AuthRole
-import base.entity.auth.AuthTypes.AuthType
 import base.entity.auth.context.AuthContext.ExceptionStrings
-import base.entity.auth.{ AuthRoles, AuthTypes }
 import base.entity.perm.{ PermException, PermSetGroup, PermSetGroups }
 import base.entity.test.EntityBaseSuite
 import base.entity.user.UserDataFactory
@@ -40,21 +37,16 @@ class AuthContextTest extends EntityBaseSuite {
   // scalastyle:off cyclomatic.complexity
   private def assertContext(
     ctx: AuthContext,
-    authRole: AuthRole,
-    authType: AuthType,
     authTypeId: Option[Long],
     perms: PermSetGroup) {
 
-    val isUser = authType == AuthTypes.USER
-    val isKey = authType == AuthTypes.KEY
-
-    val hasUser = isUser
+    val isUser = true
+    val hasUser = true
 
     perms.permSet.set.foreach(perm => assert(ctx.has(perm)))
     assert(ctx.perms == perms)
 
     assert(ctx.isInstanceOf[UserAuthContext] == isUser)
-    assert(ctx.isInstanceOf[KeyAuthContext] == isKey)
 
     assert(ctx.isUser == isUser)
 
@@ -72,31 +64,17 @@ class AuthContextTest extends EntityBaseSuite {
 
     interceptPermException(hasUser, ctx.userThrows, ExceptionStrings.userThrows)
 
-    assert(ctx.authRole == authRole)
-    assert(ctx.authType == authType)
     assert(ctx.authTypeId == authTypeId)
   }
   // scalastyle:on parameter.number
   // scalastyle:on method.length
   // scalastyle:on cyclomatic.complexity
 
-  private implicit def authType2Option(authType: AuthType) = Option(authType)
   private implicit def authId2Option(authId: Long) = Option(authId)
 
   test("UserAuthContext") {
     assertContext(
       AuthContextDataFactory.emptyUserAuth,
-      AuthRoles.PUBLIC,
-      AuthTypes.USER,
-      superUser.id,
-      PermSetGroups.god)
-  }
-
-  test("KeyAuthContext") {
-    assertContext(
-      AuthContextDataFactory.emptyKeyAuth,
-      AuthRoles.PUBLIC,
-      AuthTypes.KEY,
       superUser.id,
       PermSetGroups.god)
   }

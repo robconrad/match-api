@@ -1,4 +1,4 @@
-match-api updated
+match-api
 ===========
 
  - start server with ```./sbt run```

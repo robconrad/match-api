@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/27/14 10:45 AM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.swagger
 
 import akka.actor.ActorRefFactory
-import base.rest.Versions.Version
+import base.entity.api.ApiVersions
+import ApiVersions.ApiVersion
 import base.rest.route.RouteFactory
 
 /**
@@ -17,12 +18,12 @@ import base.rest.route.RouteFactory
  */
 private[rest] object SwaggerDocsRouteFactory extends RouteFactory {
 
-  def buildRoute(actors: ActorRefFactory, currentVersion: Version) = new SwaggerDocsRoute {
+  def buildRoute(actors: ActorRefFactory, currentVersion: ApiVersion) = new SwaggerDocsRoute {
     def version = currentVersion
     def actorRefFactory = actors
   }.routes
 
   // swagger endpoints are not themselves included in API docs
-  def getTypes(version: Version) = Set()
+  def getTypes(version: ApiVersion) = Set()
 
 }

@@ -1,15 +1,13 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:59 PM
  */
 
 package base.entity.model
 
 import java.util.UUID
-
-import base.entity.auth.context.AuthContext
 
 /**
  * Swagger is a piece of shit so we convert everything to dumbest possible type in order to keep it's shitty UI usable
@@ -28,9 +26,5 @@ trait ModelImplicits {
   implicit def optionField2String(f: Option[Field[_]]) = f.map(_.toString)
 
   implicit def field2String(f: Field[_]) = f.toString
-
-  def hideIfPublic[T](o: T)(implicit authCtx: AuthContext): Option[T] = hideIfPublic(Option(o))
-
-  def hideIfPublic[T](o: Option[T])(implicit authCtx: AuthContext): Option[T] = authCtx.authType.hideIfPublic(o)
 
 }

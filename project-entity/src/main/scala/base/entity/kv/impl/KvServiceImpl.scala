@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:02 PM
+ * Last modified by rconrad, 1/4/15 8:13 PM
  */
 
 package base.entity.kv.impl
@@ -26,13 +26,15 @@ class KvServiceImpl(clientCount: Int, host: String, port: Int) extends ServiceIm
 
   private lazy val clients = List.fill(clientCount)(makeClient())
 
+  implicit def string2KeyChannel(s: String) = KeyChannel(s)
+
   def client = clients(random.nextInt(clientCount))
 
   def pipeline = client.pipeline()
 
-  def makeHashKeyFactory(ch: KeyChannel) = new HashKeyFactoryImpl(ch)
-  def makeIntKeyFactory(ch: KeyChannel) = new IntKeyFactoryImpl(ch)
-  def makeSetKeyFactory(ch: KeyChannel) = new SetKeyFactoryImpl(ch)
+  def makeHashKeyFactory(ch: String) = new HashKeyFactoryImpl(ch)
+  def makeIntKeyFactory(ch: String) = new IntKeyFactoryImpl(ch)
+  def makeSetKeyFactory(ch: String) = new SetKeyFactoryImpl(ch)
 
   private def makeClient() = {
     try {

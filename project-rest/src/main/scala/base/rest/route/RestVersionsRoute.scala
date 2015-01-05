@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.route
 
-import base.rest.{ Locations, VersionedEndpoint, Versions }
+import base.entity.api.ApiVersions
+import base.rest.{ Locations, VersionedEndpoint }
 import org.json4s.DefaultFormats
 import spray.httpx.Json4sSupport
 import spray.httpx.marshalling.ToResponseMarshallable
@@ -41,7 +42,7 @@ private[rest] trait RestVersionsRoute extends RestRoute {
     }
   }
 
-  val endpointRoutes = Versions.available.map { version =>
+  val endpointRoutes = ApiVersions.available.map { version =>
     pathBase(version) {
       pathEndOrSingleSlash {
         get {
@@ -75,7 +76,7 @@ private[rest] object RestVersionsRoute extends Json4sSupport {
 
   // response to the /rest endpoint                \
   val versionsResponse = Map(
-    VERSIONS -> Versions.available.map(_.toString).toList,
+    VERSIONS -> ApiVersions.available.map(_.toString).toList,
     ENDPOINTS -> VersionedEndpoint.restAvailable.map(_.toString))
   val versionsResponseMarshallable: ToResponseMarshallable = versionsResponse
 

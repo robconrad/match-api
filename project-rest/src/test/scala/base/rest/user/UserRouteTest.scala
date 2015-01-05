@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 7:16 PM
+ * Last modified by rconrad, 1/4/15 9:45 PM
  */
 
 package base.rest.user
@@ -11,15 +11,15 @@ import base.common.random.RandomService
 import base.common.service.{ Services, ServicesBeforeAndAfterAll }
 import base.common.time.DateTimeHelper
 import base.common.time.mock.TimeServiceConstantMock
+import base.entity.api.ApiVersions
 import base.entity.apiKey.ApiKeyTypes
 import base.entity.auth.context.{ AuthContextDataFactory, StandardUserAuthContext }
 import base.entity.auth.mock.AuthServiceMock
 import base.entity.model.ModelImplicits
 import base.entity.user.UserDataFactory
 import base.entity.user.mock.UserServiceMock
-import base.entity.user.model.{ PostUserRequest, UserModel }
+import base.entity.user.model.{ RegisterModel, UserModel }
 import base.rest.Endpoint._
-import base.rest.Versions
 import base.rest.route.{ RouteTest, RouteTestCompanion }
 import org.json4s.native.Serialization
 import org.scalatest.BeforeAndAfterEach
@@ -33,7 +33,7 @@ import spray.http.{ BasicHttpCredentials, StatusCodes }
 class UserRouteTest extends RouteTest(UserRouteTest)
     with UserRoute with ServicesBeforeAndAfterAll with DateTimeHelper with ModelImplicits with BeforeAndAfterEach {
 
-  val version = Versions.latest
+  val version = ApiVersions.latest
 
   private implicit val authContext = AuthContextDataFactory.emptyKeyAuth
 
@@ -42,7 +42,7 @@ class UserRouteTest extends RouteTest(UserRouteTest)
 
   private val userUuid = userMock.getNextUserUUID
   private val email = "email@foo.com"
-  private val postUser = PostUserRequest(email, "password")
+  private val postUser = RegisterModel(email, "password")
 
   private lazy val user = UserDataFactory(email, "password")
 

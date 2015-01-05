@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 10:32 AM
+ * Last modified by rconrad, 1/4/15 10:04 PM
  */
 
 package base.entity.user
@@ -43,14 +43,12 @@ object UserDataFactory extends DataFactory {
   def makeRow(email: String,
               password: String,
               active: Boolean): UserRow = {
-    val passwordSalt = AuthServiceImpl.getPasswordSalt
-    val passwordHash = AuthServiceImpl.getPasswordHash(password, passwordSalt)
     val user = UserRow(
       id = 0L,
       uuid = RandomService().uuid,
       email = email,
-      passwordHash = passwordHash,
-      passwordSalt = passwordSalt,
+      passwordHash = "",
+      passwordSalt = "",
       resetCode = None,
       resetExpiresAt = None,
       createdAt = now,
