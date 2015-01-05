@@ -2,13 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 3:45 PM
+ * Last modified by rconrad, 1/4/15 10:19 PM
  */
 
 package base.socket.handler
 
-import base.socket.message.Command
-import base.socket.message.user.{ LoginUserClientMessage, UserClientCommands }
+import base.entity.user.model.LoginModel
+import base.socket._
+import base.socket.command.Command
+import base.socket.command.user.UserClientCommands
 import io.netty.channel._
 import io.netty.channel.group.DefaultChannelGroup
 import io.netty.util.concurrent.GlobalEventExecutor
@@ -24,6 +26,8 @@ object AuthenticationHandler extends BaseHandler {
   // commands to register this handler for (receiving any other will result in disconnect)
   val commands = Command.map(
     // login commands, will remove AuthenticationHandler from pipeline and add appropriate new handler
+    UserClientCommands.Register,
+    UserClientCommands.Verify,
     UserClientCommands.Login,
     UserClientCommands.Heartbeat)
 
@@ -93,7 +97,7 @@ object AuthenticationHandler extends BaseHandler {
     }
   }
 
-  def handleUserLogin()(implicit ctx: ChannelHandlerContext, input: LoginUserClientMessage) {
+  def handleUserLogin()(implicit ctx: ChannelHandlerContext, input: LoginModel) {
     writeToChannelHandlerContext(AuthenticationHandler, ctx, result = true)
   }
 

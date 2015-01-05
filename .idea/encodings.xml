@@ -7,17 +7,17 @@
     <file url="file://$PROJECT_DIR$/project-entity/src/main/scala/base/entity/kv/impl/KeyFactoryImpl.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-entity/src/main/scala/base/entity/kv/impl/KeyImpl.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-entity/src/main/scala/base/entity/kv/impl/SetKeyImpl.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/Command.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/JsonServerMessage.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/JsonServerMessageImplicits.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/Message.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/user/UserClientCommands.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/user/UserClientMessage.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/user/UserServerCommands.scala" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/command/user/UserServerMessage.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/handler/AuthenticationHandler.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/handler/BaseHandler.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/handler/ExceptionHandler.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/Command.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/JsonServerMessage.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/JsonServerMessageImplicits.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/Message.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/user/UserClientCommands.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/user/UserClientMessage.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/user/UserServerCommands.scala" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/message/user/UserServerMessage.scala" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/project-socket/src/main/scala/base/socket/package.scala" charset="UTF-8" />
   </component>
 </project>

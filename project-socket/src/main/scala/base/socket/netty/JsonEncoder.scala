@@ -2,19 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:37 PM
+ * Last modified by rconrad, 1/4/15 10:34 PM
  */
 
 package base.socket.netty
 
 import base.common.lib.Tryo
+import base.entity.json.JsonFormats
 import base.socket._
 import base.socket.logging.SocketLoggable
-import base.socket.message.{ CommandMessage, Message }
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.{ ChannelHandlerContext, ChannelOutboundHandlerAdapter, ChannelPromise }
 import io.netty.util.CharsetUtil
+import org.json4s.native.Serialization
 
 /**
  * {{ Describe the high level purpose of JsonEncoder here. }}
@@ -24,12 +25,11 @@ import io.netty.util.CharsetUtil
  */
 @Sharable
 object JsonEncoder extends ChannelOutboundHandlerAdapter with SocketLoggable {
+
+  implicit val formats = JsonFormats.withEnumsAndFields
+
   override def write(ctx: ChannelHandlerContext, msg: Object, promise: ChannelPromise) {
-    val json = msg match {
-      case msg: CommandMessage => Tryo(Message.write(msg))
-      case _                   => Some(msg.toString)
-    }
-    json match {
+    Tryo(Serialization.write(msg)) match {
       case Some(json: String) =>
         if (isDebugEnabled) debug(ctx.channel, "message sent: " + json)
         val terminated = json.length > 0 && json.last == '\n' match {

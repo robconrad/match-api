@@ -1,31 +1,26 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 10:15 AM
+ * Last modified by rconrad, 1/4/15 10:29 PM
  */
 
 package base.rest.route
 
 import base.entity.ApiStrings
-import base.entity.apiKey.ApiKeyTypes
-import base.entity.auth.context.{ AuthContext, AuthContextParams }
-import base.entity.auth.{ AuthService, AuthTypeSet }
 import base.entity.error.ApiError
 import base.entity.json.JsonFormats
-import base.entity.perm.Perms.Perm
 import base.rest.Endpoint
 import base.rest.Locations._
 import org.json4s.DefaultFormats
-import spray.http.HttpHeaders.Authorization
-import spray.http.{ BasicHttpCredentials, StatusCodes }
+import spray.http.StatusCodes
 import spray.httpx.Json4sSupport
 import spray.httpx.marshalling.{ ToResponseMarshallable, ToResponseMarshaller }
 import spray.routing.AuthenticationFailedRejection.{ CredentialsMissing, CredentialsRejected }
 import spray.routing._
 
 import scala.concurrent.Future
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Success }
 
 /**
  * Base class for all /rest/ routes, provides rest-specific directives
@@ -79,54 +74,54 @@ private[rest] trait RestRoute extends BaseRoute {
    * Key authenticated requests expect one of the custom headers to be supplied with the key as the value, e.g.
    *  X-Base-Key: MYKEYHERE
    */
-  def auth(authTypes: AuthTypeSet, perms: Perm*): Directive1[AuthContext] = {
-    extract { ctx =>
-      // format: OFF
-      val headers                 = ctx.request.headers
-      val userAuth                = headers.find(_.is(Authorization.lowercaseName))
-      val keyAuth                 = headers.find(_.is(ApiKeyTypes.API.lowercaseName))
-      val contextParams           = AuthContextParams()
-      // format: ON
-
-      val result: Future[Either[Any, Option[AuthContext]]] = (userAuth, keyAuth) match {
-        case (Some(Authorization(BasicHttpCredentials(user, pass))), _) =>
-          AuthService().authByUser(user, pass, contextParams).map(Right(_))
-        case (_, Some(keyAuth)) =>
-          AuthService().authByKey(keyAuth.value, contextParams).map(Right(_))
-        case _ =>
-          Future.successful(Left())
-      }
-      result
-    }.flatMap(onComplete(_).flatMap(validateAuthContext(authTypes, perms, _)))
-  }
+//  def auth(authTypes: AuthTypeSet, perms: Perm*): Directive1[AuthContext] = {
+//    extract { ctx =>
+//      // format: OFF
+//      val headers                 = ctx.request.headers
+//      val userAuth                = headers.find(_.is(Authorization.lowercaseName))
+//      val keyAuth                 = headers.find(_.is(ApiKeyTypes.API.lowercaseName))
+//      val contextParams           = AuthContextParams()
+//      // format: ON
+//
+//      val result: Future[Either[Any, Option[AuthContext]]] = (userAuth, keyAuth) match {
+//        case (Some(Authorization(BasicHttpCredentials(user, pass))), _) =>
+//          AuthService().authByUser(user, pass, contextParams).map(Right(_))
+//        case (_, Some(keyAuth)) =>
+//          AuthService().authByKey(keyAuth.value, contextParams).map(Right(_))
+//        case _ =>
+//          Future.successful(Left())
+//      }
+//      result
+//    }.flatMap(onComplete(_).flatMap(validateAuthContext(authTypes, perms, _)))
+//  }
 
   /**
    * Decide whether the AuthContext produced by the provided credentials satisfies the requirements of this request
    */
-  private def validateAuthContext(authTypes: AuthTypeSet,
-                                  perms: Seq[Perm],
-                                  authCtx: Try[Either[Any, Option[AuthContext]]]): Directive1[AuthContext] =
-    authCtx match {
-      case Success(Right(Some(authCtx))) =>
-        val authTypeExpected = authTypes.contains(authCtx.authType)
-        val authHasPerms = perms.map(authCtx.has).reduceLeft(_ && _)
-        authTypeExpected && authHasPerms match {
-          case true => provide(authCtx)
-          case false =>
-            debug("rejecting auth (authTypeExpected: %s, authHasPerms: %s) with credentials %s and required perms %s",
-              authTypeExpected, authHasPerms, authCtx, perms)
-            rejectAuthCredentialsNotAuthorized.toDirective
-        }
-      case Success(Right(None)) =>
-        debug("auth credentials did not authenticate")
-        rejectAuthCredentialsRejected.toDirective
-      case Success(Left(a)) =>
-        debug("auth credentials missing")
-        rejectAuthCredentialsMissing.toDirective
-      case x =>
-        debug("auth credentials failed with %s", x)
-        rejectAuthCredentialsRejected.toDirective
-    }
+//  private def validateAuthContext(authTypes: AuthTypeSet,
+//                                  perms: Seq[Perm],
+//                                  authCtx: Try[Either[Any, Option[AuthContext]]]): Directive1[AuthContext] =
+//    authCtx match {
+//      case Success(Right(Some(authCtx))) =>
+//        val authTypeExpected = authTypes.contains(authCtx.authType)
+//        val authHasPerms = perms.map(authCtx.has).reduceLeft(_ && _)
+//        authTypeExpected && authHasPerms match {
+//          case true => provide(authCtx)
+//          case false =>
+//            debug("rejecting auth (authTypeExpected: %s, authHasPerms: %s) with credentials %s and required perms %s",
+//              authTypeExpected, authHasPerms, authCtx, perms)
+//            rejectAuthCredentialsNotAuthorized.toDirective
+//        }
+//      case Success(Right(None)) =>
+//        debug("auth credentials did not authenticate")
+//        rejectAuthCredentialsRejected.toDirective
+//      case Success(Left(a)) =>
+//        debug("auth credentials missing")
+//        rejectAuthCredentialsMissing.toDirective
+//      case x =>
+//        debug("auth credentials failed with %s", x)
+//        rejectAuthCredentialsRejected.toDirective
+//    }
 
   /**
    * Issue a rejection based on credentials

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 3:45 PM
+ * Last modified by rconrad, 1/4/15 10:22 PM
  */
 
 package base.socket.handler
@@ -10,9 +10,9 @@ package base.socket.handler
 import base.common.lib.Dispatchable
 import base.common.logging.Loggable
 import base.socket._
+import base.socket.command.ProcessableCommand
+import base.socket.command.user.UserServerCommands
 import base.socket.logging.SocketLoggable
-import base.socket.message.user.UserServerCommands
-import base.socket.message.{ Message, ProcessableCommand }
 import io.netty.channel._
 import org.json4s.JsonAST._
 
@@ -27,7 +27,7 @@ abstract class BaseHandler extends ChannelInboundHandlerAdapter with SocketLogga
   protected def isProcessingMessages(implicit ctx: ChannelHandlerContext) = true
 
   // commands to register this handler for (receiving any other will result in disconnect)
-  val commands: Map[String, ProcessableCommand[_ <: Message]]
+  val commands: Map[String, ProcessableCommand[_]]
 
   final def stop() {
     running = false

@@ -2,13 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:36 PM
+ * Last modified by rconrad, 1/4/15 10:46 PM
  */
 
 package base.entity.user.model
 
 import base.entity.ApiStrings.User._
-import com.wordnik.swagger.annotations.ApiModel
+import com.wordnik.swagger.annotations.{ ApiModelProperty, ApiModel }
+
+import scala.annotation.meta.field
 
 
 /**
@@ -17,7 +19,8 @@ import com.wordnik.swagger.annotations.ApiModel
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
-case class RegisterResponseModel() {
+case class RegisterResponseModel(
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  cmd: String = "registerResponse") {
   // format: ON
 
 }

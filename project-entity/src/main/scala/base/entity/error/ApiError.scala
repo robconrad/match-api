@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 10:25 AM
+ * Last modified by rconrad, 1/4/15 10:48 PM
  */
 
 package base.entity.error
@@ -27,6 +27,8 @@ import scala.concurrent.duration._
 // format: OFF
 @ApiModel(description = errorObject)
 case class ApiError(
+  @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  cmd: String = "apiError",
+  @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  errorCmd: String,
   @(ApiModelProperty @field)(required = true,   value = errorStatusDesc)    status: Int,
   @(ApiModelProperty @field)(required = false,  value = errorDescCodeDesc)  code: Option[String],
   @(ApiModelProperty @field)(required = false,  value = errorParamDesc)     param: Option[String],
@@ -68,7 +70,13 @@ object ApiError extends Dispatchable with Loggable {
             code: Option[ErrorCode],
             param: Option[String],
             uniqueIdSeed: String): ApiError = {
-    val error = apply(status, code.map(_.toString), None, message, getUniqueId(uniqueIdSeed))
+    val error = apply(
+      status = status,
+      errorCmd = "errorCmd field not yet implemented",
+      code = code.map(_.toString),
+      param = None,
+      message = message,
+      uniqueId = getUniqueId(uniqueIdSeed))
     debug("%s: %s", error, uniqueIdSeed)
     error
   }

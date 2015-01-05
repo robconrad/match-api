@@ -2,16 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:45 PM
+ * Last modified by rconrad, 1/4/15 10:30 PM
  */
 
 package base.rest.route
 
 import akka.actor.ActorRefFactory
-import base.entity.api.ApiVersions
-import ApiVersions.ApiVersion
-import base.rest.apiKey.ApiKeysRouteFactory
-import base.rest.auth.AuthRouteFactory
+import base.entity.api.ApiVersions.ApiVersion
 import base.rest.swagger.{ SwaggerDocsRouteFactory, SwaggerRestRouteFactory }
 import base.rest.user.UserRouteFactory
 import spray.routing.{ Route, RouteConcatenation }
@@ -26,8 +23,6 @@ private[rest] object MasterVersionedRouteFactory extends RouteConcatenation {
   // registry of RouteFactories, used by this factory to produce the final routes and
   //  by Swagger to get the reflections added to each
   val routeFactories = Set[RouteFactory](
-    AuthRouteFactory,
-    ApiKeysRouteFactory,
     UserRouteFactory,
     SwaggerDocsRouteFactory,
     SwaggerRestRouteFactory
