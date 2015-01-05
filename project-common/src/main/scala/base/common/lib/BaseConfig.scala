@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:30 PM
+ * Last modified by rconrad, 1/4/15 6:07 PM
  */
 
 package base.common.lib
@@ -37,43 +37,25 @@ private[common] class BaseConfig(conf: Config) {
     new PeriodFormatterBuilder().appendMillis().appendSuffix(" milliseconds").toFormatter)
 
   // scalastyle:off line.size.limit
-  def getOptionString(name: String) = Tryo(conf.getString(name))
-  def getString(name: String, fallback: String) = getOptionString(name) getOrElse fallback
+  def getString(name: String) = Tryo(conf.getString(name))
+  def getStringList(name: String): Option[List[String]] = Tryo(conf.getStringList(name)).map(_.toList)
+  def getInt(name: String) = Tryo(conf.getInt(name))
+  def getIntList(name: String): Option[List[Int]] = Tryo(conf.getIntList(name)).map(_.toList.map(_.toInt))
+  def getLong(name: String) = Tryo(conf.getLong(name))
+  def getLongList(name: String): Option[List[Long]] = Tryo(conf.getLongList(name)).map(_.toList.map(_.toLong))
+  def getFloat(name: String) = Tryo(conf.getDouble(name).toFloat)
+  def getFloatList(name: String): Option[List[Float]] = Tryo(conf.getDoubleList(name).toList.map(_.toFloat))
+  def getDouble(name: String) = Tryo(conf.getDouble(name))
+  def getDoubleList(name: String): Option[List[Double]] = Tryo(conf.getDoubleList(name).toList.map(_.toDouble))
+  def getBool(name: String) = Tryo(conf.getBoolean(name))
+  def getBoolList(name: String): Option[List[Boolean]] = Tryo(conf.getBooleanList(name).toList.map(_.booleanValue()))
 
-  def getOptionStringList(name: String): Option[List[String]] = Tryo(conf.getStringList(name)).map(_.toList)
-  def getStringList(name: String, fallback: List[String]): List[String] = getOptionStringList(name) getOrElse fallback
+  def getObjectList(name: String) = Tryo(conf.getObjectList(name).toList.map(o => mapAsScalaMap(o.unwrapped())))
+  def getConfigList(name: String): Option[List[Config]] = Tryo(conf.getConfigList(name).asInstanceOf[java.util.List[Config]]).map(_.toList)
 
-  def getOptionInt(name: String) = Tryo(conf.getInt(name))
-  def getInt(name: String, fallback: Int) = getOptionInt(name) getOrElse fallback
-
-  def getOptionIntList(name: String): Option[List[Int]] = Tryo(conf.getIntList(name)).map(_.toList.map(_.toInt))
-  def getIntList(name: String, fallback: List[Int]): List[Int] = getOptionIntList(name) getOrElse fallback
-
-  def getOptionLong(name: String) = Tryo(conf.getLong(name))
-  def getLong(name: String, fallback: Long) = getOptionLong(name) getOrElse fallback
-
-  def getOptionLongList(name: String): Option[List[Long]] = Tryo(conf.getLongList(name)).map(_.toList.map(_.toLong))
-  def getLongList(name: String, fallback: List[Long]): List[Long] = getOptionLongList(name) getOrElse fallback
-
-  def getOptionFloat(name: String) = Tryo(conf.getDouble(name).toFloat)
-  def getFloat(name: String, fallback: Double) = getOptionDouble(name) getOrElse fallback
-
-  def getOptionDouble(name: String) = Tryo(conf.getDouble(name))
-  def getDouble(name: String, fallback: Double) = getOptionDouble(name) getOrElse fallback
-
-  def getOptionBool(name: String) = Tryo(conf.getBoolean(name))
-  def getBool(name: String, fallback: Boolean) = getOptionBool(name) getOrElse fallback
-
-  def getMap(name: String, fallback: Map[String, Any]) = Tryo(mapAsScalaMap(conf.getObject(name).unwrapped()), fallback)
-
-  def getOptionObjectList(name: String) = Tryo(conf.getObjectList(name).toList.map(o => mapAsScalaMap(o.unwrapped())))
-
-  def getOptionConfigList(name: String): Option[List[Config]] = Tryo(conf.getConfigList(name).asInstanceOf[java.util.List[Config]]).map(_.toList)
-
-  def getDoubleList(name: String) = Tryo(conf.getDoubleList(name))
   // scalastyle:on line.size.limit
 
-  def getOptionPeriod(name: String) = getOptionString(name).map { value =>
+  def getOptionPeriod(name: String) = getString(name).map { value =>
     var ret: Option[Period] = None
     for (i <- 0 until periodFormats.length) {
       try {

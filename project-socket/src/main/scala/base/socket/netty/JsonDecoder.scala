@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 2:41 PM
+ * Last modified by rconrad, 1/4/15 4:30 PM
  */
 
 package base.socket.netty
 
 import base.common.lib.Tryo
+import base.socket._
 import base.socket.logging.SocketLoggable
 import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandler.Sharable

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 6:35 PM
  */
 
 package base.common.lib
@@ -14,6 +14,7 @@ import akka.actor.Actor
 import akka.pattern.ask
 import akka.testkit.TestActorRef
 import base.common.lib.Exceptions.{ RestartActorRuntimeException, ResumeActorRuntimeException, StopActorRuntimeException }
+import base.common.test.TestExceptions.TestRuntimeException
 import base.common.test.{ BaseSuite, TestTiming }
 
 import scala.concurrent.Await
@@ -32,6 +33,7 @@ class ActorSupervisorTest extends BaseSuite with TestTiming {
   case object ThrowRestartableSocketTimeout
   case object ThrowRestartableIllegalArgument
   case object ThrowRestartableNullPointer
+  case object ThrowRestartableTestRuntime
   case object ThrowResumable
   case object ThrowStoppable
 
@@ -47,6 +49,7 @@ class ActorSupervisorTest extends BaseSuite with TestTiming {
       case ThrowRestartableSocketTimeout   => throw new SocketTimeoutException("Failed!")
       case ThrowRestartableIllegalArgument => throw new IllegalArgumentException("Failed!")
       case ThrowRestartableNullPointer     => throw new NullPointerException("Failed!")
+      case ThrowRestartableTestRuntime     => throw new TestRuntimeException("Failed!")
       case ThrowResumable                  => throw new ResumeActorRuntimeException("Failed!")
       case ThrowStoppable                  => throw new StopActorRuntimeException("Failed!")
     }
@@ -68,6 +71,7 @@ class ActorSupervisorTest extends BaseSuite with TestTiming {
     assertRestartable(ThrowRestartableSocketTimeout)
     assertRestartable(ThrowRestartableIllegalArgument)
     assertRestartable(ThrowRestartableNullPointer)
+    assertRestartable(ThrowRestartableTestRuntime)
   }
 
   test(s"$response is returned after causing resumable throw") {

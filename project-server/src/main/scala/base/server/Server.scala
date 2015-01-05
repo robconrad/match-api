@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:04 PM
+ * Last modified by rconrad, 1/4/15 4:37 PM
  */
 
 package base.server
 
-import akka.util.Timeout
 import base.common.lib.Dispatchable
 import base.common.logging.Loggable
 import base.common.service.CommonService

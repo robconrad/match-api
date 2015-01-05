@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 3:45 PM
+ * Last modified by rconrad, 1/4/15 4:37 PM
  */
 
 package base.socket.netty
 
 import base.common.lib.Tryo
+import base.socket._
 import base.socket.logging.SocketLoggable
 import base.socket.message.{ CommandMessage, Message }
 import io.netty.buffer.Unpooled
