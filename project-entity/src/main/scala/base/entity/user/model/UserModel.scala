@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 5:15 PM
+ * Last modified by rconrad, 1/4/15 7:42 PM
  */
 
 package base.entity.user.model
@@ -23,20 +23,20 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = userResponse)
-case class User(
+case class UserModel(
   @(ApiModelProperty @field)(required = true,  value = idDesc)                            id: String,
   @(ApiModelProperty @field)(required = true,  value = emailDesc)                         email: String,
   @(ApiModelProperty @field)(required = true,  value = activeDesc)                        active: Boolean,
   @(ApiModelProperty @field)(required = true,  value = createdAtDesc)                     createdAt: String)
 // format: ON
 
-object User extends ModelImplicits with DateTimeHelper {
+object UserModel extends ModelImplicits with DateTimeHelper {
 
   /**
    * Given raw db input, marshall it into an Response
    */
-  def apply(user: UserRow)(implicit authCtx: AuthContext): model.User =
-    model.User(
+  def apply(user: UserRow)(implicit authCtx: AuthContext): model.UserModel =
+    model.UserModel(
       user.uuid,
       user.email,
       user.active,

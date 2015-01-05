@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (c) 2014 Coinposit, Inc. - All Rights Reserved.
+  ~ Unauthorized copying of this file, via any medium is strictly prohibited.
+  ~ This file is proprietary and confidential.
+  ~ Last modified by rconrad, 8/5/14 11:12 PM
+  -->
+
+<script>
+var qp = null;
+if(window.location.hash) {
+  qp = location.hash.substring(1);
+}
+else {
+  qp = location.search.substring(1);
+}
+qp = qp ? JSON.parse('{"' + qp.replace(/&/g, '","').replace(/=/g,'":"') + '"}',
+  function(key, value) {
+    return key===""?value:decodeURIComponent(value) }
+  ):{}
+window.opener.onOAuthComplete(qp);
+window.close();
+</script>

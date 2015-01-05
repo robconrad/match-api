@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 7:32 PM
  */
 
 package base.rest
@@ -55,7 +55,7 @@ private[rest] object VersionedEndpoint {
 
   private val baseAvailable = Set(DOCS_LATEST, INVOICES_LATEST)
   val available = Map(
-    V03 -> baseAvailable.map(_.copy(version = V03))
+    V01 -> baseAvailable.map(_.copy(version = V01))
   )
 
   available.foreach {

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/25/14 11:17 AM
+ * Last modified by rconrad, 1/4/15 7:16 PM
  */
 
 package base.rest.user
@@ -17,7 +17,7 @@ import base.entity.auth.mock.AuthServiceMock
 import base.entity.model.ModelImplicits
 import base.entity.user.UserDataFactory
 import base.entity.user.mock.UserServiceMock
-import base.entity.user.model.{ PostUserRequest, User }
+import base.entity.user.model.{ PostUserRequest, UserModel }
 import base.rest.Endpoint._
 import base.rest.Versions
 import base.rest.route.{ RouteTest, RouteTestCompanion }
@@ -47,7 +47,7 @@ class UserRouteTest extends RouteTest(UserRouteTest)
   private lazy val user = UserDataFactory(email, "password")
 
   private lazy val userResponseJson = Serialization.write(
-    User(userUuid, email, active = true, now))
+    UserModel(userUuid, email, active = true, now))
 
   override def beforeAll() {
     super.beforeAll()
@@ -83,7 +83,7 @@ class UserRouteTest extends RouteTest(UserRouteTest)
     authMock.setAuthContext(authContext)
     Get(USERS_ME) ~> addCredentials(BasicHttpCredentials("user", "pass")) ~> sealedRoute ~> check {
       assert(response.status == StatusCodes.OK, "status code")
-      assert(decompressed == Serialization.write(User(authContext.userThrows)))
+      assert(decompressed == Serialization.write(UserModel(authContext.userThrows)))
     }
   }
 

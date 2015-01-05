@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 5:13 PM
+ * Last modified by rconrad, 1/4/15 7:16 PM
  */
 
 package base.entity.user.impl
@@ -21,7 +21,7 @@ import base.entity.db.DbService
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudServiceImplHelper
 import base.entity.user.UserService
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, User }
+import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
 import spray.http.StatusCodes._
 
 /**
@@ -29,7 +29,7 @@ import spray.http.StatusCodes._
  * @author rconrad
  */
 private[entity] class UserServiceImpl
-    extends ServiceImpl with UserService with CrudServiceImplHelper[User] with AuthLoggable with DateTimeHelper {
+    extends ServiceImpl with UserService with CrudServiceImplHelper[UserModel] with AuthLoggable with DateTimeHelper {
 
   def create(implicit authCtx: AuthContext, input: PostUserRequest) = {
     debug("attempting to create user with email: %s", input.email)
@@ -44,7 +44,7 @@ private[entity] class UserServiceImpl
           val newRow = row.copy(id = userId)
           debug("user creation succeeded with: %s", newRow)
 
-          User(newRow)
+          UserModel(newRow)
         } catch {
           case e: SQLException if e.getMessage.contains("u_users_email_provider_id") =>
             (emailUniqueErrorDesc, BadRequest)
@@ -67,7 +67,7 @@ private[entity] class UserServiceImpl
         if u.uuid === uuid
       } yield u
       val user = q.list.headOption.map {
-        case user => User(user)
+        case user => UserModel(user)
       }
       user match {
         case Some(user) => user

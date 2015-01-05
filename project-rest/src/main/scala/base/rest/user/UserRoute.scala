@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:10 PM
+ * Last modified by rconrad, 1/4/15 7:16 PM
  */
 
 package base.rest.user
@@ -15,7 +15,7 @@ import base.entity.auth.AuthTypeSets
 import base.entity.auth.context.{ AuthContext, UserAuthContext }
 import base.entity.error.ApiError
 import base.entity.perm.Perms
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, User }
+import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
 import base.entity.user.UserService
 import base.rest.Endpoint._
 import base.rest.route.{ RestVersionsRoute, VersionedRestRoute }
@@ -45,7 +45,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
     new ApiImplicitParam(name = email,            dataType = stringDataType,      paramType = formParamType, value = emailDesc,     required = true),
     new ApiImplicitParam(name = password,         dataType = stringDataType,      paramType = formParamType, value = passwordDesc,  required = true)))
   @ApiResponses(Array(
-    new ApiResponse(code = OKCode,                message = createOKDesc,         response = classOf[User]),
+    new ApiResponse(code = OKCode,                message = createOKDesc,         response = classOf[UserModel]),
     new ApiResponse(code = errorCode,             message = createErrorDesc,      response = classOf[ApiError]),
     new ApiResponse(code = authErrorCode,         message = authErrorCodeDesc,    response = classOf[ApiError]),
     new ApiResponse(code = mediaErrorCode,        message = mediaErrorCodeDesc,   response = classOf[ApiError]),
@@ -68,7 +68,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
     new ApiImplicitParam(name = password,         dataType = stringDataType,      paramType = formParamType, value = passwordDesc),
     new ApiImplicitParam(name = active,           dataType = stringDataType,      paramType = formParamType, value = activeDesc)))
   @ApiResponses(Array(
-    new ApiResponse(code = OKCode,                message = updateOKDesc,         response = classOf[User]),
+    new ApiResponse(code = OKCode,                message = updateOKDesc,         response = classOf[UserModel]),
     new ApiResponse(code = errorCode,             message = updateErrorDesc,      response = classOf[ApiError]),
     new ApiResponse(code = authErrorCode,         message = authErrorCodeDesc,    response = classOf[ApiError]),
     new ApiResponse(code = notFoundCode,          message = updateNotFoundDesc,   response = classOf[ApiError]),
@@ -90,7 +90,7 @@ private[rest] trait UserRoute extends VersionedRestRoute {
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = id,               dataType = uuidDataType,        paramType = pathParamType, value = idDesc,        required = true)))
   @ApiResponses(Array(
-    new ApiResponse(code = OKCode,                message = readOKDesc,           response = classOf[User]),
+    new ApiResponse(code = OKCode,                message = readOKDesc,           response = classOf[UserModel]),
     new ApiResponse(code = authErrorCode,         message = authErrorCodeDesc,    response = classOf[ApiError]),
     new ApiResponse(code = notFoundCode,          message = readNotFoundDesc,     response = classOf[ApiError]),
     new ApiResponse(code = serverErrorCode,       message = serverErrorCodeDesc,  response = classOf[ApiError])))
@@ -107,14 +107,14 @@ private[rest] trait UserRoute extends VersionedRestRoute {
   @Path(Names.PATH_USERS_ME)
   @ApiOperation(value = readMeDesc, notes = userAuthNote, httpMethod = getMethod)
   @ApiResponses(Array(
-    new ApiResponse(code = OKCode, message = readOKDesc, response = classOf[User]),
+    new ApiResponse(code = OKCode, message = readOKDesc, response = classOf[UserModel]),
     new ApiResponse(code = authErrorCode, message = authErrorCodeDesc, response = classOf[ApiError]),
     new ApiResponse(code = serverErrorCode, message = serverErrorCodeDesc, response = classOf[ApiError])))
   def readMe =
     path(USERS_ME) {
       get {
         auth(AuthTypeSets.USER, Perms.USER_READ_ME) { implicit authCtx =>
-          completeResponse(User(authCtx.userThrows))
+          completeResponse(UserModel(authCtx.userThrows))
         }
       } ~
       corsOptions

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/4/15 7:16 PM
  */
 
 package base.entity.user
@@ -13,7 +13,7 @@ import base.common.service.{ Service, ServiceCompanion }
 import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
 import base.entity.user.UserService.ErrorOrUser
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, User }
+import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
 
 import scala.concurrent.Future
 
@@ -58,6 +58,6 @@ trait UserService extends Service {
 object UserService extends ServiceCompanion[UserService] {
 
   // the Invoice endpoint always returns either a EntityError or an InvoiceResponse
-  type ErrorOrUser = Either[ApiError, User]
+  type ErrorOrUser = Either[ApiError, UserModel]
 
 }

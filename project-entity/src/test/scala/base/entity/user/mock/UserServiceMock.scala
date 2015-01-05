@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:06 PM
+ * Last modified by rconrad, 1/4/15 7:16 PM
  */
 
 package base.entity.user.mock
@@ -16,13 +16,13 @@ import base.entity.Tables.UserRow
 import base.entity.auth.context.AuthContext
 import base.entity.service.CrudServiceImplHelper
 import base.entity.user.UserService
-import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, User }
+import base.entity.user.model.{ PostResetRequest, PostUserRequest, PutUserRequest, UserModel }
 
 /**
  * Fake UserService will do whatever you like
  * @author rconrad
  */
-class UserServiceMock() extends ServiceImpl with UserService with CrudServiceImplHelper[User] with DateTimeHelper {
+class UserServiceMock() extends ServiceImpl with UserService with CrudServiceImplHelper[UserModel] with DateTimeHelper {
 
   private var userUUID = RandomService().uuid
   private var users = Map[UUID, UserRow]()
@@ -34,7 +34,7 @@ class UserServiceMock() extends ServiceImpl with UserService with CrudServiceImp
     val uuid = nextUserUUID
     val row = input.toRow(now).copy(uuid = uuid)
     users += uuid -> row
-    User(row)
+    UserModel(row)
   }
 
   /**
