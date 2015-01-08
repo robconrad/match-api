@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:46 PM
+ * Last modified by rconrad, 1/6/15 9:01 PM
  */
 
 package base.socket.command.user
 
 import base.entity.error.ApiError
-import base.entity.user.model.{LoginResponseModel, RegisterResponseModel, VerifyResponseModel}
-import base.socket.command.{CommandObject, UserServerCommand}
+import base.entity.user.model.{ LoginResponseModel, RegisterResponseModel, VerifyResponseModel }
+import base.socket.command.{ CommandObject, UserServerCommand }
 
 object UserServerCommands extends CommandObject {
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:13 PM
+ * Last modified by rconrad, 1/7/15 10:35 PM
  */
 
 package base.socket.api.impl
@@ -10,14 +10,13 @@ package base.socket.api.impl
 import java.net.InetSocketAddress
 
 import base.common.service.ServiceImpl
+import base.socket.api.{ SocketApiService, SocketApiStats, SocketApiStatsService }
 import base.socket.handler.AuthenticationHandler
-import base.socket.netty.{ JsonDecoder, JsonEncoder }
-import base.socket.api.SocketApiService
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.channel.{ ChannelHandlerContext, ChannelInitializer, ChannelOption }
+import io.netty.channel.{ ChannelHandler, ChannelHandlerContext, ChannelInitializer, ChannelOption }
 import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
 import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
 import io.netty.util.concurrent.GenericFutureListener
@@ -34,11 +33,18 @@ import scala.util.{ Failure, Success }
  */
 class SocketApiServiceImpl(val host: String,
                            val port: Int,
-                           shutdownTime: FiniteDuration) extends ServiceImpl with SocketApiService {
+                           connectionsAllowed: Int,
+                           shutdownTime: FiniteDuration,
+                           encoder: ChannelHandler,
+                           decoder: ChannelHandler) extends ServiceImpl with SocketApiService {
 
   private lazy val eventLoop1 = new NioEventLoopGroup
   private lazy val eventLoop2 = new NioEventLoopGroup
   private lazy val eventLoops = Set(eventLoop1, eventLoop2)
+
+  def isConnectionAllowed = {
+    SocketApiStatsService().get(SocketApiStats.CONNECTIONS) > connectionsAllowed
+  }
 
   def start() = {
     val p = Promise[Boolean]()
@@ -61,8 +67,8 @@ class SocketApiServiceImpl(val host: String,
             val maxFrameLength = 8192
             pipeline.addLast("framer", new DelimiterBasedFrameDecoder(maxFrameLength, Delimiters.lineDelimiter: _*))
 
-            pipeline.addLast("decoder", JsonDecoder)
-            pipeline.addLast("encoder", JsonEncoder)
+            pipeline.addLast("decoder", encoder)
+            pipeline.addLast("encoder", decoder)
 
             val readWriteIdleTime = 0
             val allIdleTime = 60

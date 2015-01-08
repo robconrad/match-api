@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:34 PM
+ * Last modified by rconrad, 1/7/15 10:35 PM
  */
 
-package base.socket.netty
+package base.socket.api.impl
 
 import base.common.lib.Tryo
 import base.entity.json.JsonFormats
@@ -43,4 +43,5 @@ object JsonEncoder extends ChannelOutboundHandlerAdapter with SocketLoggable {
       case _ => error(s"failed to encode message: $msg")
     }
   }
+
 }

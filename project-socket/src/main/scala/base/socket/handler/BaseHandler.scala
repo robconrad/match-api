@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:22 PM
+ * Last modified by rconrad, 1/6/15 10:12 PM
  */
 
 package base.socket.handler
@@ -38,19 +38,22 @@ abstract class BaseHandler extends ChannelInboundHandlerAdapter with SocketLogga
     ctx.close
   }
 
+  // expecting { "cmd": "$name", "body": { $body } }
   final override def channelRead(ctx: ChannelHandlerContext, msg: Object) {
     if (running && isProcessingMessages(ctx)) {
-      val myMsg = msg.asInstanceOf[Option[JObject]]
-
-      myMsg.map(_ \ "cmd") match {
-        case Some(cmd: JString) if commands.isDefinedAt(cmd.values) =>
-          process(ctx, cmd.values, myMsg.get)
-        case Some(cmd: JString) =>
-          disconnect(ctx, s"'$cmd' is not a valid command for this handler")
-        case Some(cmd) =>
-          disconnect(ctx, s"unable to parse cmd from message: $msg")
-        case _ =>
-          disconnect(ctx, "no json received in message")
+      msg match {
+        case Some(msg: JObject) =>
+          msg \ "cmd" match {
+            case cmd: JString if commands.isDefinedAt(cmd.values) =>
+              msg \ "body" match {
+                case body: JObject => process(ctx, cmd.values, body)
+                case _             => disconnect(ctx, s"unable to parse body from message: $msg")
+              }
+            case cmd: JString => disconnect(ctx, s"'$cmd' is not a valid command for this handler")
+            case _            => disconnect(ctx, s"unable to parse cmd from message: $msg")
+          }
+        case Some(msg) => disconnect(ctx, s"unable to parse object from message: $msg")
+        case _         => disconnect(ctx, "no json received in message")
       }
     }
   }

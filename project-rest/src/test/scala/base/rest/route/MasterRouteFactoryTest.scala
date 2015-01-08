@@ -1,14 +1,12 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:21 PM
+ * Last modified by rconrad, 1/7/15 10:34 PM
  */
 
 package base.rest.route
 
-import base.rest.apiKey.ApiKeysRouteTest
-import base.rest.auth.AuthRouteTest
 import base.rest.user.UserRouteTest
 
 /**
@@ -26,8 +24,6 @@ class MasterRouteFactoryTest extends RouteTest(MasterRouteFactoryTest) {
 private object MasterRouteFactoryTest extends RouteTestCompanion {
 
   val CORS_ENDPOINTS = List(
-    ApiKeysRouteTest,
-    AuthRouteTest,
     RestVersionsRouteTest,
     UserRouteTest
   ).map(_.CORS_ENDPOINTS).reduce(_ ++ _)

@@ -45,6 +45,7 @@
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/api-0.13.5.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/task-system-0.13.5.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/completion-0.13.5.jar!/" />
+          <root url="file://$MODULE_DIR$/../../project/target/scala-2.10/sbt-0.13/classes" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/cache-0.13.5.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/sbinary_2.10-0.4.2.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/ivy-0.13.5.jar!/" />
@@ -57,7 +58,6 @@
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scalastyle/scalastyle_2.10/jars/scalastyle_2.10-0.6.0.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/incremental-compiler-0.13.5.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/compiler-integration-0.13.5.jar!/" />
-          <root url="file://$MODULE_DIR$/../../project/target/scala-2.10/sbt-0.13/classes" />
           <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/com.eed3si9n/sbt-assembly/jars/sbt-assembly-0.11.2.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/tracking-0.13.5.jar!/" />
           <root url="jar://$USER_HOME$/Library/Caches/IdeaIC13/SBT/boot/scala-2.10.4/org.scala-sbt/sbt/0.13.5/persist-0.13.5.jar!/" />

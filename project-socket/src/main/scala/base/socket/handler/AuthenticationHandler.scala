@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:19 PM
+ * Last modified by rconrad, 1/7/15 10:35 PM
  */
 
 package base.socket.handler
 
 import base.entity.user.model.LoginModel
 import base.socket._
+import base.socket.api.{ SocketApiService, SocketApiStats, SocketApiStatsService }
 import base.socket.command.Command
 import base.socket.command.user.UserClientCommands
 import io.netty.channel._
@@ -44,29 +45,25 @@ object AuthenticationHandler extends BaseHandler {
   }
 
   protected override def isProcessingMessages(implicit ctx: ChannelHandlerContext) = {
-    //    if (ServerStats.CONNECTIONS.get() > ServerService().getConnectionCountMax) {
-    //      // cut logging to 10% since we are already in a high volume situation
-    //      if (System.nanoTime() % 10 == 0) {
-    //        warn(ctx.channel, "currentConnectionCount has exceeded maximum value")
-    //      }
-    //      ctx.channel.write(UserServerJson.BUSY_MSG_JSON).addListener(ChannelFutureListener.CLOSE)
-    //      false
-    //    }
+    if (SocketApiService().isConnectionAllowed) {
+      // cut logging to 10% since we are already in a high volume situation
+      if (System.nanoTime() % 10 == 0) {
+        warn(ctx.channel, "currentConnectionCount has exceeded maximum value")
+      }
+      // TODO lol json
+      ctx.channel.write("busy!").addListener(ChannelFutureListener.CLOSE)
+      false
+    }
     true
   }
 
   private def channelCreateSideEffects(ctx: ChannelHandlerContext) {
-    //    ServerStats.CONNECTIONS.incr()
+    SocketApiStatsService().increment(SocketApiStats.CONNECTIONS)
     allChannels.add(ctx.channel)
   }
 
   private def channelDestroySideEffects(channelFuture: ChannelFuture) {
-    //    channelFuture.channel.userSafe match {
-    //      // user exists on session, have them leave whatever room they are in (if they are in one)
-    //      case Some(user) => user.leaveRoom(channelFuture.channel).foreach(v => ServerStats.CONNECTIONS.decr())
-    //      // no user on session, no other side effects
-    //      case _          => ServerStats.CONNECTIONS.decr()
-    //    }
+    SocketApiStatsService().decrement(SocketApiStats.CONNECTIONS)
   }
 
   // This method is used to send the request asynchronously upstream

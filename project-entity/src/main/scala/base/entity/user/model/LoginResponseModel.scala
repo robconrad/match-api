@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:44 PM
+ * Last modified by rconrad, 1/6/15 9:35 PM
  */
 
 package base.entity.user.model
@@ -25,7 +25,6 @@ import scala.annotation.meta.field
 // format: OFF
 @ApiModel(description = createRequestDesc)
 case class LoginResponseModel(
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  cmd: String = "loginResponse",
   @(ApiModelProperty @field)(required = true, value = emailDesc)     userId: UUID,
   @(ApiModelProperty @field)(required = false, value = passwordDesc) pairs: List[PairModel],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  appVersion: String,

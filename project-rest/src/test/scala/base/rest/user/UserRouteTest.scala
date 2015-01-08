@@ -2,28 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:45 PM
+ * Last modified by rconrad, 1/7/15 10:34 PM
  */
 
 package base.rest.user
 
 import base.common.random.RandomService
-import base.common.service.{ Services, ServicesBeforeAndAfterAll }
+import base.common.service.ServicesBeforeAndAfterAll
 import base.common.time.DateTimeHelper
-import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.apiKey.ApiKeyTypes
-import base.entity.auth.context.{ AuthContextDataFactory, StandardUserAuthContext }
-import base.entity.auth.mock.AuthServiceMock
 import base.entity.model.ModelImplicits
-import base.entity.user.UserDataFactory
-import base.entity.user.mock.UserServiceMock
-import base.entity.user.model.{ RegisterModel, UserModel }
 import base.rest.Endpoint._
 import base.rest.route.{ RouteTest, RouteTestCompanion }
-import org.json4s.native.Serialization
 import org.scalatest.BeforeAndAfterEach
-import spray.http.{ BasicHttpCredentials, StatusCodes }
 
 /**
  * Tests the UserRoute and route-level validation - not an exhaustive test of users overall,
@@ -35,57 +26,57 @@ class UserRouteTest extends RouteTest(UserRouteTest)
 
   val version = ApiVersions.latest
 
-  private implicit val authContext = AuthContextDataFactory.emptyKeyAuth
-
-  private val authMock = new AuthServiceMock(authContext)
-  private val userMock = new UserServiceMock()
-
-  private val userUuid = userMock.getNextUserUUID
-  private val email = "email@foo.com"
-  private val postUser = RegisterModel(email, "password")
-
-  private lazy val user = UserDataFactory(email, "password")
-
-  private lazy val userResponseJson = Serialization.write(
-    UserModel(userUuid, email, active = true, now))
-
-  override def beforeAll() {
-    super.beforeAll()
-    Services.register(authMock)
-    Services.register(userMock)
-    Services.register(TimeServiceConstantMock)
-  }
-
-  override def beforeEach() {
-    super.beforeEach()
-    authMock.setAuthContext(authContext)
-  }
-
-  test("create user - good payload") {
-    authMock.setAuthContext(authContext)
-    Post(USERS, postUser) ~> addHeader(ApiKeyTypes.API.header, "foo") ~> sealedRoute ~> check {
-      assert(status == StatusCodes.OK)
-      assert(decompressed == userResponseJson, "good response returned")
-      assertCorsHeaders(response)
-    }
-  }
-
-  test("create user - bad payload") {
-    authMock.setAuthContext(authContext)
-    Post(USERS, "{}") ~> addHeader(ApiKeyTypes.API.header, "foo") ~> sealedRoute ~> check {
-      assert(status == StatusCodes.BadRequest)
-      assertCorsHeaders(response)
-    }
-  }
-
-  test("get user me") {
-    implicit val authContext = StandardUserAuthContext(user)
-    authMock.setAuthContext(authContext)
-    Get(USERS_ME) ~> addCredentials(BasicHttpCredentials("user", "pass")) ~> sealedRoute ~> check {
-      assert(response.status == StatusCodes.OK, "status code")
-      assert(decompressed == Serialization.write(UserModel(authContext.userThrows)))
-    }
-  }
+  //  private implicit val authContext = AuthContextDataFactory.emptyKeyAuth
+  //
+  //  private val authMock = new AuthServiceMock(authContext)
+  //  private val userMock = new UserServiceMock()
+  //
+  //  private val userUuid = userMock.getNextUserUUID
+  //  private val email = "email@foo.com"
+  //  private val postUser = RegisterModel(email, "password")
+  //
+  //  private lazy val user = UserDataFactory(email, "password")
+  //
+  //  private lazy val userResponseJson = Serialization.write(
+  //    UserModel(userUuid, email, active = true, now))
+  //
+  //  override def beforeAll() {
+  //    super.beforeAll()
+  //    Services.register(authMock)
+  //    Services.register(userMock)
+  //    Services.register(TimeServiceConstantMock)
+  //  }
+  //
+  //  override def beforeEach() {
+  //    super.beforeEach()
+  //    authMock.setAuthContext(authContext)
+  //  }
+  //
+  //  test("create user - good payload") {
+  //    authMock.setAuthContext(authContext)
+  //    Post(USERS, postUser) ~> addHeader(ApiKeyTypes.API.header, "foo") ~> sealedRoute ~> check {
+  //      assert(status == StatusCodes.OK)
+  //      assert(decompressed == userResponseJson, "good response returned")
+  //      assertCorsHeaders(response)
+  //    }
+  //  }
+  //
+  //  test("create user - bad payload") {
+  //    authMock.setAuthContext(authContext)
+  //    Post(USERS, "{}") ~> addHeader(ApiKeyTypes.API.header, "foo") ~> sealedRoute ~> check {
+  //      assert(status == StatusCodes.BadRequest)
+  //      assertCorsHeaders(response)
+  //    }
+  //  }
+  //
+  //  test("get user me") {
+  //    implicit val authContext = StandardUserAuthContext(user)
+  //    authMock.setAuthContext(authContext)
+  //    Get(USERS_ME) ~> addCredentials(BasicHttpCredentials("user", "pass")) ~> sealedRoute ~> check {
+  //      assert(response.status == StatusCodes.OK, "status code")
+  //      //assert(decompressed == Serialization.write(UserModel(authContext.userThrows)))
+  //    }
+  //  }
 
 }
 

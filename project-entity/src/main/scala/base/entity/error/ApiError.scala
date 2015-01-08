@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:48 PM
+ * Last modified by rconrad, 1/6/15 9:37 PM
  */
 
 package base.entity.error
@@ -27,11 +27,10 @@ import scala.concurrent.duration._
 // format: OFF
 @ApiModel(description = errorObject)
 case class ApiError(
-  @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  cmd: String = "apiError",
-  @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  errorCmd: String,
+  @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  command: Option[String] = None,
   @(ApiModelProperty @field)(required = true,   value = errorStatusDesc)    status: Int,
-  @(ApiModelProperty @field)(required = false,  value = errorDescCodeDesc)  code: Option[String],
-  @(ApiModelProperty @field)(required = false,  value = errorParamDesc)     param: Option[String],
+  @(ApiModelProperty @field)(required = false,  value = errorDescCodeDesc)  code: Option[String] = None,
+  @(ApiModelProperty @field)(required = false,  value = errorParamDesc)     param: Option[String] = None,
   @(ApiModelProperty @field)(required = true,   value = errorMessageDesc)   message: String,
   @(ApiModelProperty @field)(required = true,   value = errorUniqueIdDesc)  uniqueId: String
 )
@@ -72,9 +71,7 @@ object ApiError extends Dispatchable with Loggable {
             uniqueIdSeed: String): ApiError = {
     val error = apply(
       status = status,
-      errorCmd = "errorCmd field not yet implemented",
       code = code.map(_.toString),
-      param = None,
       message = message,
       uniqueId = getUniqueId(uniqueIdSeed))
     debug("%s: %s", error, uniqueIdSeed)

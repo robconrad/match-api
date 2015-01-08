@@ -2,10 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:20 PM
+ * Last modified by rconrad, 1/7/15 10:51 PM
  */
 
 package base.socket.api.impl
+
+import java.io.{ InputStreamReader, BufferedReader, PrintWriter }
+import java.net.Socket
 
 import base.common.lib.{ Actors, Dispatchable }
 import base.common.logging.Loggable
@@ -24,11 +27,22 @@ class SocketApiServiceImplTest extends SocketBaseSuite with Dispatchable with Lo
 
   test("server startup", Tags.SLOW) {
     implicit val system = Actors.actorSystem
-    implicit val timeout = longTimeout
 
     assert(SocketApiService().start().await())
 
-    fail("need to connect to server and send a heartbeat or ping/pong or something")
+    val socket = new Socket(SocketApiService().host, SocketApiService().port)
+    socket.setSoTimeout(timeout.duration.toMillis.toInt)
+
+    val out = new PrintWriter(socket.getOutputStream, true)
+    val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+
+    val cmd = "{\"cmd\":\"register\"," +
+      "\"body\":{\"apiVersion\":\"0.1\",\"name\":\"Bob\",\"gender\":\"male\",\"phone\":\"555-343-1231\"}}\r\n"
+
+    out.write(cmd)
+    out.flush()
+
+    assert(in.readLine().contains("not implemented"))
   }
 
 }

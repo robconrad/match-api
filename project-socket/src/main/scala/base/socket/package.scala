@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 2:41 PM
+ * Last modified by rconrad, 1/7/15 9:05 PM
  */
 
 package base
 
+import base.socket.api.impl.ChannelAttributes
 import base.socket.logging.LoggableChannelInfo
-import base.socket.netty.ChannelAttributes
 import io.netty.channel._
 
 package object socket {

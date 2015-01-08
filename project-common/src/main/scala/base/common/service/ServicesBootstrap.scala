@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 6:07 PM
+ * Last modified by rconrad, 1/7/15 9:28 PM
  */
 
 package base.common.service
@@ -72,6 +72,7 @@ trait ServicesBootstrap extends Loggable with Dispatchable {
   implicit protected def getOptionDoubleList(k: Key)(implicit config: BaseConfig) = config.getDoubleList(k.s)
   implicit protected def getPeriod(k: Key)(implicit config: BaseConfig) = get(k, config.getOptionPeriod)
   implicit protected def getFiniteDuration(k: Key)(implicit config: BaseConfig) = get(k, config.getOptionFiniteDuration)
+  implicit protected def getOptionFiniteDuration(k: Key)(implicit config: BaseConfig) = config.getOptionFiniteDuration(k.s)
   implicit protected def getObjectList(k: Key)(implicit config: BaseConfig) = get(k, config.getObjectList)
   implicit protected def getConfigList(k: Key)(implicit config: BaseConfig) = get(k, config.getConfigList)
   // scalastyle:on
