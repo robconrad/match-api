@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 10:45 AM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.entity.json
 
 import base.common.lib.{ Genders, Currencies, Languages }
-import base.entity.ApiErrorCodes
-import base.entity.api.ApiVersions
+import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.model.{ Email, Identifier, Name, Url }
 import org.json4s.DefaultFormats
 import org.json4s.ext.EnumNameSerializer

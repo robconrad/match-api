@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 10:34 AM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.entity.error
 
 import base.common.lib.Encoding
-import base.entity.ApiErrorCodes
+import base.entity.api.ApiErrorCodes
 import base.entity.test.EntityBaseSuite
 import com.google.common.hash.Hashing
 import spray.http.StatusCodes

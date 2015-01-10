@@ -2,15 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 10:37 AM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.entity.error
 
 import base.common.lib.{ Encoding, Dispatchable }
 import base.common.logging.Loggable
-import base.entity.ApiErrorCodes.ErrorCode
-import base.entity.ApiStrings._
+import base.entity.api.{ ApiStrings, ApiErrorCodes }
+import ApiErrorCodes.ErrorCode
+import ApiStrings._
 import com.google.common.hash.Hashing
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 import spray.caching.LruCache

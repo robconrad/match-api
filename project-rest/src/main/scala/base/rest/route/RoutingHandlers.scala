@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.rest.route
 
 import base.common.logging.Loggable
-import base.entity.ApiStrings
+import base.entity.api.ApiStrings
 import base.entity.error.{ ApiException, ApiError }
 import base.entity.perm.PermException
 import org.json4s.native.Serialization

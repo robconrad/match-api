@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 11:49 AM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.entity.json
@@ -13,8 +13,7 @@ import java.util.UUID
 import base.common.lib.{ Languages, Currencies, Genders }
 import base.common.logging.Loggable
 import base.common.random.RandomService
-import base.entity.ApiErrorCodes
-import base.entity.api.ApiVersions
+import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.api.ApiVersions.ApiVersion
 import base.entity.json.JsonFormats._
 import base.entity.model.{ Url, Identifier, Name, Email }

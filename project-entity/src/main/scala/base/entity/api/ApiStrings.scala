@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:32 PM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
-package base.entity
+package base.entity.api
 
 /**
  * Container for strings used in API Documentation, specifically in the annotations used
@@ -103,44 +103,6 @@ object ApiStrings {
    */
   object Auth {
     final val failedDesc = "Authorization failed."
-  }
-
-  /**
-   * Keys
-   */
-  object Keys {
-    // common
-    final val keysResponse = "Keys Response."
-
-    // endpoint
-    final val endpointDesc = "Retrieve API keys."
-
-    // read
-    final val readDesc = endpointDesc
-    final val readOKDesc = "API key retrieval succeeded."
-
-    // refresh
-    final val refreshDesc = "Deactivate all existing API keys, create new ones and retrieve them. WARNING: existing integrations will fail until updated."
-    final val refreshOKDesc = "Successfully created new API keys."
-    final val refreshErrorDesc = "Failed to create new API keys."
-
-    // objects
-    final val keysDesc = "List of API keys for the authenticated account."
-    final val keyDesc = "Representation of an API key."
-
-    // fields
-    final val id = "id"
-    final val idDesc = "Unique identifier of the API key."
-
-    final val key = "apiKey"
-    final val keyValueDesc = "API Key."
-
-    final val active = "active"
-    final val activeDesc = "Whether the API key is marked active. Inactive API keys will not be able to authenticate."
-
-    final val createdAt = "createdAt"
-    final val createdAtDesc = "When the API key was created. ISO_8601 datetime format ([YYYY]-[MM]-[DD]T[hh]:[mm]:[ss])."
-
   }
 
   /**

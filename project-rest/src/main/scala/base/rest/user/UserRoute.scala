@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:29 PM
+ * Last modified by rconrad, 1/10/15 2:42 PM
  */
 
 package base.rest.user
 
-import base.entity.ApiStrings.User._
-import base.entity.ApiStrings._
+import base.entity.api.ApiStrings
+import ApiStrings.User._
+import ApiStrings._
 import base.entity.error.ApiError
 import base.entity.user.model.UserModel
 import base.rest.Endpoint._
