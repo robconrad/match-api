@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/6/15 10:12 PM
+ * Last modified by rconrad, 1/8/15 5:52 PM
  */
 
 package base.socket.handler
 
 import base.common.lib.Dispatchable
 import base.common.logging.Loggable
+import base.entity.auth.context.NoAuthContext
 import base.socket._
 import base.socket.command.ProcessableCommand
 import base.socket.command.user.UserServerCommands
@@ -19,6 +20,7 @@ import org.json4s.JsonAST._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
+// scalastyle:off null
 abstract class BaseHandler extends ChannelInboundHandlerAdapter with SocketLoggable with Dispatchable {
   implicit val timeout: FiniteDuration = 10.seconds
 
@@ -61,6 +63,9 @@ abstract class BaseHandler extends ChannelInboundHandlerAdapter with SocketLogga
   // future off the processing of the message to keep the netty threads free of any non-connection-handling work
   private def process(ctx: ChannelHandlerContext, cmd: String, msg: JObject) {
     Future {
+      if (ctx.channel.authCtx == None) {
+        ctx.channel.authCtx = NoAuthContext
+      }
       commands(cmd).process(ctx, msg)
     } onFailure {
       case e => exceptionCaught(ctx, e)
@@ -72,14 +77,6 @@ abstract class BaseHandler extends ChannelInboundHandlerAdapter with SocketLogga
   }
 
   protected final def disconnect(ctx: ChannelHandlerContext, reason: Option[String] = None) {
-    //    if (ServerService().isDebug) {
-    //      if (isDebugEnabled)
-    //        debug(ctx.channel, "disconnect " + ctx.channel + " for: " + reason + ": " +
-    //          UserServerJson.BAD_INPUT_MSG_JSON)
-    //      ctx.channel.write(UserServerJson.BAD_INPUT_MSG_JSON)
-    //    } else {
-    //      ctx.close
-    //    }
     ctx.close()
     reason.foreach(r => warn(ctx.channel, s"disconnect: $r"))
   }

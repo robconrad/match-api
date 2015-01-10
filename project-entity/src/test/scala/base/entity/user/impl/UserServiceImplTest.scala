@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/1/15 5:04 PM
+ * Last modified by rconrad, 1/8/15 5:36 PM
  */
 
 package base.entity.user.impl
 
 import base.common.time.DateTimeHelper
 import base.entity.service.EntityServiceTest
-import base.entity.user.UserDataFactory
 import org.json4s.DefaultFormats
 import org.scalatest.BeforeAndAfterEach
 
@@ -20,15 +19,12 @@ import org.scalatest.BeforeAndAfterEach
  */
 class UserServiceImplTest extends EntityServiceTest with DateTimeHelper with BeforeAndAfterEach {
 
-  override protected val shouldSetupAndCleanDb = true
-
   val service = new UserServiceImpl
 
   implicit val formats = DefaultFormats
 
   override def afterEach() {
     super.afterEach()
-    UserDataFactory.cleanup()
   }
 
   ignore("create") {

@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/8/15 5:24 PM
  */
 
 package base.entity.model
@@ -10,14 +10,12 @@ package base.entity.model
 import base.entity.error.ApiError
 import spray.http.StatusCodes
 
-import scala.slick.lifted.MappedTo
-
 /**
  * A strongly typed field allows us to maintain type safety all the way from database to API response. By including
  *  json serializers and slick serializers we can avoid "stringly" typed field (and same for ints, doubles, etc.)
  * @author rconrad
  */
-private[model] trait Field[T] extends MappedTo[T] {
+private[model] trait Field[T] {
 
   /**
    * The primary purpose of a Field is to contain a Value v

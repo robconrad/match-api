@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/8/15 5:24 PM
  */
 
 package base.entity.service
 
 import base.common.lib.Dispatchable
-import base.entity.Tables.profile.simple._
 import base.entity.error.ApiError
 import spray.http.StatusCode
 
@@ -20,14 +19,6 @@ import scala.concurrent.Future
  * @author rconrad
  */
 private[entity] trait CrudServiceImplHelper[T] extends Dispatchable {
-
-  /**
-   * Provides a one-line rollback transaction and return error command
-   */
-  protected def rollback(result: Either[ApiError, T])(implicit s: Session) = {
-    s.rollback()
-    result
-  }
 
   /**
    * Convenience implicits for wrapping responses in Either[] and formatting EntityError

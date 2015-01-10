@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:13 PM
+ * Last modified by rconrad, 1/8/15 5:38 PM
  */
 
 package base.server.service.impl
 
 import base.common.service.{ CommonServicesBootstrap, ServiceImpl }
-import base.entity.db.EvolutionService
 import base.entity.service.EntityServicesBootstrap
 import base.rest.api.RestApiService
 import base.rest.service.RestServicesBootstrap
@@ -42,43 +41,30 @@ class ServerServiceImpl(kv: Boolean,
     // initialize base.common services (e.g. akka)
     CommonServicesBootstrap.registered
 
-    // initialize database services
-    //  (must be before all other service types since many may depend on DbService or KvService being present)
-    if (db) {
-      EntityServicesBootstrap.dbRegistered
-    }
+    // initialize kv services
+    //  (must be before all other service types since many may depend on KvService being present)
     if (kv) {
       EntityServicesBootstrap.kvRegistered
     }
 
-    // once we are finished getting the database up-to-current, register all remaining services and setup the API
-    val evolutionFuture = db match {
-      case true  => EvolutionService().evolve()
-      case false => Future.successful()
+    // business logic layer services are first
+    EntityServicesBootstrap.otherRegistered
+
+    val results = services.map { service =>
+      // register services for the given API
+      bootstraps(service).registered
+
+      info("Starting API %s", service().name)
+
+      // start the given API
+      service().start().map { result =>
+        info("Started API %s with result %s", service().name, result)
+        result
+      }
     }
 
-    // once the db is evolved (if necessary), boot up business logic service then start APIs
-    evolutionFuture.flatMap { u =>
-
-      // business logic layer services are first
-      EntityServicesBootstrap.otherRegistered
-
-      val results = services.map { service =>
-        // register services for the given API
-        bootstraps(service).registered
-
-        info("Starting API %s", service().name)
-
-        // start the given API
-        service().start().map { result =>
-          info("Started API %s with result %s", service().name, result)
-          result
-        }
-      }
-
-      Future.sequence(results).map { results =>
-        !results.contains(false)
-      }
+    Future.sequence(results).map { results =>
+      !results.contains(false)
     }
   }
 

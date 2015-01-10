@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:36 PM
+ * Last modified by rconrad, 1/8/15 5:51 PM
  */
 
 package base.socket.command
@@ -63,7 +63,8 @@ abstract class CommandObject {
 
   implicit def command2JValue(cmd: Cmd) = cmd.toJValue
   implicit def ctx2ch(ctx: ChannelHandlerContext) = ctx.channel
-  implicit def ctx2UserId(ctx: ChannelHandlerContext) = ctx.channel.userId
+  implicit def ctx2AuthCtx(ctx: ChannelHandlerContext) =
+    ctx.channel.authCtx.getOrElse(throw new RuntimeException("AuthContext must always be present"))
 
   val cmds: Set[Cmd]
 

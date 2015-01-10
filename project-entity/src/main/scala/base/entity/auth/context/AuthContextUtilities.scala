@@ -1,14 +1,15 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 5:47 PM
+ * Last modified by rconrad, 1/8/15 5:59 PM
  */
 
 package base.entity.auth.context
 
 import base.entity.auth.context.AuthContext.ExceptionStrings
 import base.entity.perm.PermException
+import base.entity.perm.Perms.Perm
 
 /**
  * Generally useful methods that extend the functionality of AuthContexts
@@ -28,6 +29,13 @@ case class AuthContextUtilities(authCtx: AuthContext) {
    * Whether this is associated with a user
    */
   final def hasUser = user.isDefined
+
+  /**
+   * Throw if not has perm
+   */
+  final def assertHas(perm: Perm) {
+    assert(has(perm))
+  }
 
   /**
    * Throw if not user

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:26 PM
+ * Last modified by rconrad, 1/8/15 5:37 PM
  */
 
 package base.socket.command.user
@@ -19,22 +19,19 @@ object UserClientCommands extends CommandObject {
 
   case object Register extends UserClientCommand[RegisterModel]("register") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: RegisterModel) {
-      //AuthenticationHandler.handleUserLogin()
-      UserService().register(msg).foreach(ctx.channel().write)
+      UserService().register(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 
   case object Verify extends UserClientCommand[VerifyModel]("verify") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: VerifyModel) {
-      //AuthenticationHandler.handleUserLogin()
-      UserService().verify(msg).foreach(ctx.channel().write)
+      UserService().verify(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 
   case object Login extends UserClientCommand[LoginModel]("login") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: LoginModel) {
-      //AuthenticationHandler.handleUserLogin()
-      UserService().login(msg).foreach(ctx.channel().write)
+      UserService().login(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 

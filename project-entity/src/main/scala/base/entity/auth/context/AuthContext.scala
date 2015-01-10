@@ -2,15 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:09 PM
+ * Last modified by rconrad, 1/8/15 5:15 PM
  */
 
 package base.entity.auth.context
 
 import base.common.logging.LoggerToken
-import base.entity.Tables.UserRow
 import base.entity.perm.PermSetGroup
 import base.entity.perm.Perms.Perm
+import base.entity.user.User
 
 /**
  * Context passed around with API requests indicating authentication status and related info
@@ -36,7 +36,7 @@ trait AuthContext {
   /**
    * The user associated with the AuthContext
    */
-  def user: Option[UserRow]
+  def user: Option[User]
 
   /**
    * The unique identifier of the type of authentication used to obtain this auth context

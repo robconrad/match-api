@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 1:26 PM
+ * Last modified by rconrad, 1/8/15 5:54 PM
  */
 
 package base.socket.logging
@@ -16,6 +16,10 @@ import base.common.logging.Loggable
  * @author rconrad
  */
 trait SocketLoggable extends Loggable {
+
+  protected def trace(ch: LoggableChannelInfo, msg: String, x: Any*) {
+    if (isTraceEnabled) trace(format(ch, msg, x: _*))
+  }
 
   protected def debug(ch: LoggableChannelInfo, msg: String, x: Any*) {
     if (isDebugEnabled) debug(format(ch, msg, x: _*))
@@ -40,6 +44,6 @@ trait SocketLoggable extends Loggable {
   }
 
   private def format(ch: LoggableChannelInfo, msg: String, x: Any*): String =
-    format(s"User:${ch.userId} Addr:${ch.remoteAddress} $msg", x: _*)
+    format(s"User:${ch.authCtx.map(_.user.map(_.id)).flatten} Addr:${ch.remoteAddress} $msg", x: _*)
 
 }

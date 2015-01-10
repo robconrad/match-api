@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 4:51 PM
+ * Last modified by rconrad, 1/8/15 5:18 PM
  */
 
 import sbt._
@@ -58,13 +58,6 @@ object Dependencies {
 
   lazy val redis = Seq(
     "com.github.spullara.redis" % "client" % "0.7")
-
-  lazy val slick = Seq(
-    "com.typesafe.slick" %% "slick" % "2.1.0-M2",
-    "com.h2database" % "h2" % "1.4.179",
-    "postgresql" % "postgresql" % "9.1-901.jdbc4",
-    "org.joda" % "joda-convert" % "1.6",
-    "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0")
 
   private val sprayVersion = "1.3.1"
   lazy val sprayClient = Seq(

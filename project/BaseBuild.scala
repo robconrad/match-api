@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 3:13 PM
+ * Last modified by rconrad, 1/8/15 5:19 PM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -59,18 +59,6 @@ object BaseBuild extends Build {
   )
 
   /**
-   * Standalone project invoked only during development to generate tables code for Slick
-   */
-  lazy val slickCodegenProject = Project(
-    id = Names.slick,
-    base = file(Dirs.slick),
-    settings = baseSettings ++ Seq(
-      name := Names.slick,
-      libraryDependencies ++= Dependencies.slick
-    )
-  )
-
-  /**
    * Base business logic layer
    */
   lazy val entityProject = Project(
@@ -83,13 +71,11 @@ object BaseBuild extends Build {
         Dependencies.coreBundle ++
         Dependencies.json ++
         Dependencies.redis ++
-        Dependencies.slick ++
         Dependencies.sprayCaching ++
         Dependencies.sprayHttp ++
         Dependencies.swaggerAnnotations
     )
   ).dependsOn(
-      slickCodegenProject,
       commonProject % "test->test;compile->compile")
 
   /**
@@ -104,7 +90,6 @@ object BaseBuild extends Build {
       libraryDependencies ++=
         Dependencies.coreBundle ++
         Dependencies.json ++
-        Dependencies.slick ++
         Dependencies.spray ++
         Dependencies.spraySwagger
     )
