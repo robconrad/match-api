@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 10:35 PM
+ * Last modified by rconrad, 1/10/15 2:41 PM
  */
 
 package base.socket.api.impl
@@ -19,7 +19,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.channel.{ ChannelHandler, ChannelHandlerContext, ChannelInitializer, ChannelOption }
 import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
 import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
-import io.netty.util.concurrent.GenericFutureListener
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Future, Promise }
@@ -102,17 +101,11 @@ class SocketApiServiceImpl(val host: String,
     Thread.sleep(shutdownTime.toMillis)
 
     // Shut down all event loops to terminate all threads.
-    val f = eventLoops.map(_.shutdownGracefully()).map { f =>
-      val p = Promise[Boolean]()
-      f.addListener(new GenericFutureListener[Nothing] {
-        def operationComplete(future: Nothing) {
-          p success true
-        }
-      })
-      p.future
+    val set = eventLoops.map(_.shutdownGracefully()).map { f =>
+      f.awaitUninterruptibly(shutdownTime.toMillis)
     }
 
-    Future.sequence(f).map(set => !set.contains(false))
+    Future.successful(!set.contains(false))
   }
 
 }

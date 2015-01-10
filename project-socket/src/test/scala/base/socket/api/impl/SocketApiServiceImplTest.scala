@@ -2,20 +2,24 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 10:51 PM
+ * Last modified by rconrad, 1/10/15 2:40 PM
  */
 
 package base.socket.api.impl
 
-import java.io.{ InputStreamReader, BufferedReader, PrintWriter }
+import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
 import java.net.Socket
 
-import base.common.lib.{ Actors, Dispatchable }
+import base.common.lib.{ Actors, Dispatchable, Genders }
 import base.common.logging.Loggable
 import base.common.test.Tags
+import base.entity.api.ApiVersions
+import base.entity.json.JsonFormats
+import base.entity.user.model.RegisterModel
 import base.socket.api.SocketApiService
+import base.socket.model.CommandModel
 import base.socket.test.SocketBaseSuite
-import org.json4s.DefaultFormats
+import org.json4s.native.Serialization
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
@@ -23,26 +27,34 @@ import org.json4s.DefaultFormats
  */
 class SocketApiServiceImplTest extends SocketBaseSuite with Dispatchable with Loggable {
 
-  implicit def json4sFormats = DefaultFormats
+  implicit def json4sFormats = JsonFormats.withEnumsAndFields
 
   test("server startup", Tags.SLOW) {
     implicit val system = Actors.actorSystem
 
-    assert(SocketApiService().start().await())
+    try {
+      assert(SocketApiService().start().await())
 
-    val socket = new Socket(SocketApiService().host, SocketApiService().port)
-    socket.setSoTimeout(timeout.duration.toMillis.toInt)
+      val socket = new Socket(SocketApiService().host, SocketApiService().port)
+      socket.setSoTimeout(timeout.duration.toMillis.toInt)
 
-    val out = new PrintWriter(socket.getOutputStream, true)
-    val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+      val out = new PrintWriter(socket.getOutputStream, true)
+      val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
 
-    val cmd = "{\"cmd\":\"register\"," +
-      "\"body\":{\"apiVersion\":\"0.1\",\"name\":\"Bob\",\"gender\":\"male\",\"phone\":\"555-343-1231\"}}\r\n"
+      val cmd = CommandModel("register", RegisterModel(ApiVersions.V01, "bob", Genders.male, "555-5555"))
+      val json = Serialization.write(cmd) + "\r\n"
 
-    out.write(cmd)
-    out.flush()
+      out.write(json)
+      out.flush()
 
-    assert(in.readLine().contains("not implemented"))
+      assert(in.readLine().contains("not implemented"))
+
+      assert(SocketApiService().stop().await())
+    } catch {
+      case e: Exception =>
+        SocketApiService().stop().await()
+        throw e
+    }
   }
 
 }

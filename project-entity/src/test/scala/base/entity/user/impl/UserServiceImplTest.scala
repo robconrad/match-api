@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 8:48 PM
+ * Last modified by rconrad, 1/10/15 1:16 PM
  */
 
 package base.entity.user.impl
@@ -26,23 +26,15 @@ class UserServiceImplTest extends EntityServiceTest with BeforeAndAfterEach {
     super.afterEach()
   }
 
-  ignore("create") {
-    fail("not implemented")
-  }
-
-  ignore("get") {
-    fail("not implemented")
-  }
-
-  ignore("update") {
+  test("register") {
 
   }
 
-  ignore("resetInitiate") {
+  test("verify") {
 
   }
 
-  ignore("resetComplete") {
+  test("login") {
 
   }
 
