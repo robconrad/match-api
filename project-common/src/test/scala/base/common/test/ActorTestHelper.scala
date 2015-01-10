@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/9/15 8:45 PM
  */
 
 package base.common.test
@@ -10,7 +10,6 @@ package base.common.test
 import base.common.lib.Dispatchable
 import base.common.service.ServicesBeforeAndAfterAll
 import base.common.test.TestExceptions.TestRuntimeException
-import base.common.time.DateTimeHelper
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.AsyncAssertions.Waiter
 
@@ -23,7 +22,7 @@ import scala.util.{ Failure, Success, Try }
  * @author rconrad
  */
 trait ActorTestHelper extends ServicesBeforeAndAfterAll
-    with BeforeAndAfterEach with TestTiming with Dispatchable with DateTimeHelper {
+    with BeforeAndAfterEach with TestTiming with Dispatchable {
 
   /**
    * onComplete handler designed to work with a Waiter to synchronously block on test results

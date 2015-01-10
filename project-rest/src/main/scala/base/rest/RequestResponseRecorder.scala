@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/9/15 8:55 PM
  */
 
 package base.rest
 
 import base.common.logging.Loggable
-import base.common.time.DateTimeHelper
+import base.common.time.TimeService
 import base.entity.json.JsonFormats
 import org.json4s.JsonAST.JString
 import org.json4s.JsonDSL._
@@ -30,7 +30,7 @@ import spray.routing.{ Rejected, Rejection, TransformationRejection }
  * @author rconrad
  */
 // $COVERAGE-OFF$
-private[rest] object RequestResponseRecorder extends Loggable with DateTimeHelper {
+private[rest] object RequestResponseRecorder extends Loggable {
 
   implicit val formats = JsonFormats.withHttpData
 
@@ -55,7 +55,7 @@ private[rest] object RequestResponseRecorder extends Loggable with DateTimeHelpe
     val requestRecord = composeRequest(request)
     val responseRecord = composeResponse(response)
     val uri = request.uri.toRelative.toString()
-    val time: String = now
+    val time = TimeService().asString()
     val record = RequestRecord(formatJson, uri, time, requestRecord, responseRecord)
 
     lazy val fallbackRecord: JObject =

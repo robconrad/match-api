@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:59 PM
+ * Last modified by rconrad, 1/9/15 8:47 PM
  */
 
 package base.entity.user.impl
 
 import base.common.service.ServiceImpl
-import base.common.time.DateTimeHelper
 import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
 import base.entity.logging.AuthLoggable
@@ -24,7 +23,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 private[entity] class UserServiceImpl
-    extends ServiceImpl with UserService with CrudServiceImplHelper[UserModel] with AuthLoggable with DateTimeHelper {
+    extends ServiceImpl with UserService with CrudServiceImplHelper[UserModel] with AuthLoggable {
 
   def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.REGISTER)

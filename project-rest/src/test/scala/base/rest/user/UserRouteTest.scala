@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 10:34 PM
+ * Last modified by rconrad, 1/9/15 8:55 PM
  */
 
 package base.rest.user
 
 import base.common.random.RandomService
 import base.common.service.ServicesBeforeAndAfterAll
-import base.common.time.DateTimeHelper
 import base.entity.api.ApiVersions
 import base.entity.model.ModelImplicits
 import base.rest.Endpoint._
@@ -22,7 +21,7 @@ import org.scalatest.BeforeAndAfterEach
  * @author rconrad
  */
 class UserRouteTest extends RouteTest(UserRouteTest)
-    with UserRoute with ServicesBeforeAndAfterAll with DateTimeHelper with ModelImplicits with BeforeAndAfterEach {
+    with UserRoute with ServicesBeforeAndAfterAll with ModelImplicits with BeforeAndAfterEach {
 
   val version = ApiVersions.latest
 
