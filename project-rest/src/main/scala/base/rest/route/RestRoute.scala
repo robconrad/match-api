@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 10:29 PM
+ * Last modified by rconrad, 1/10/15 12:47 PM
  */
 
 package base.rest.route
@@ -178,7 +178,7 @@ private[rest] trait RestRoute extends BaseRoute {
   def completeError(error: ApiError) =
     compressResponse() {
       error.status match {
-        case StatusCodes.Unauthorized.intValue => rejectAuthCredentialsRejected
+        case StatusCodes.Unauthorized => rejectAuthCredentialsRejected
         case status =>
           respondWithStatus(status).apply {
             respondWithHeaders(RoutingActor.corsHeaders).apply { ctx =>

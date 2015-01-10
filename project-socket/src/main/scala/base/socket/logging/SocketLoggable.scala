@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 10:01 PM
+ * Last modified by rconrad, 1/10/15 12:59 PM
  */
 
 package base.socket.logging
 
 import base.common.logging.Loggable
 import base.socket._
-import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.{ Channel, ChannelHandlerContext }
 
 /**
  * {{ Describe the high level purpose of SocketLoggable here. }}
@@ -19,7 +19,8 @@ import io.netty.channel.ChannelHandlerContext
  */
 trait SocketLoggable extends Loggable {
 
-  protected implicit def ctx2channel(ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
+  protected implicit def ctx2Channel(ctx: ChannelHandlerContext): Channel = ctx.channel
+  protected implicit def ctx2Loggable(ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
 
   protected def trace(msg: String, x: Any*)(implicit ch: LoggableChannelInfo) {
     if (isTraceEnabled) super.trace(format(msg, x: _*))

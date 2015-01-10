@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 8:55 PM
+ * Last modified by rconrad, 1/10/15 12:56 PM
  */
 
 package base.rest.user
@@ -81,6 +81,6 @@ class UserRouteTest extends RouteTest(UserRouteTest)
 
 object UserRouteTest extends RouteTestCompanion {
 
-  val CORS_ENDPOINTS = List[String](USERS, USERS + "/" + RandomService().uuid, USERS_ME, USERS_RESET)
+  lazy val CORS_ENDPOINTS = List[String](USERS /*, USERS + "/" + RandomService().uuid, USERS_ME, USERS_RESET*/ )
 
 }
