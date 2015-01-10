@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/6/15 9:37 PM
+ * Last modified by rconrad, 1/10/15 10:37 AM
  */
 
 package base.entity.error
@@ -28,8 +28,8 @@ import scala.concurrent.duration._
 @ApiModel(description = errorObject)
 case class ApiError(
   @(ApiModelProperty @field)(required = true,   value = errorDescCodeDesc)  command: Option[String] = None,
-  @(ApiModelProperty @field)(required = true,   value = errorStatusDesc)    status: Int,
-  @(ApiModelProperty @field)(required = false,  value = errorDescCodeDesc)  code: Option[String] = None,
+  @(ApiModelProperty @field)(required = true,   value = errorStatusDesc)    status: StatusCode,
+  @(ApiModelProperty @field)(required = false,  value = errorDescCodeDesc)  code: Option[ErrorCode] = None,
   @(ApiModelProperty @field)(required = false,  value = errorParamDesc)     param: Option[String] = None,
   @(ApiModelProperty @field)(required = true,   value = errorMessageDesc)   message: String,
   @(ApiModelProperty @field)(required = true,   value = errorUniqueIdDesc)  uniqueId: String
@@ -40,8 +40,6 @@ object ApiError extends Dispatchable with Loggable {
 
   private val CACHE_SIZE = 1000
   private val cache = LruCache[String](maxCapacity = CACHE_SIZE, initialCapacity = CACHE_SIZE)
-
-  implicit def statusCode2Int(s: StatusCode) = s.intValue
 
   /**
    * Default the uniqueId to be seeded from the message returned to the user
@@ -71,8 +69,9 @@ object ApiError extends Dispatchable with Loggable {
             uniqueIdSeed: String): ApiError = {
     val error = apply(
       status = status,
-      code = code.map(_.toString),
+      code = code,
       message = message,
+      param = param,
       uniqueId = getUniqueId(uniqueIdSeed))
     debug("%s: %s", error, uniqueIdSeed)
     error

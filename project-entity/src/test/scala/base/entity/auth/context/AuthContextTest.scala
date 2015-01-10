@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:36 PM
+ * Last modified by rconrad, 1/10/15 10:17 AM
  */
 
 package base.entity.auth.context
 
 import base.entity.auth.context.AuthContext.ExceptionStrings
-import base.entity.perm.{ PermException, PermSetGroup }
+import base.entity.perm.{ PermSetGroups, PermException, PermSetGroup }
 import base.entity.test.EntityBaseSuite
 
 /**
@@ -34,13 +34,17 @@ class AuthContextTest extends EntityBaseSuite {
   private def assertContext(
     ctx: AuthContext,
     authTypeId: Option[Long],
-    perms: PermSetGroup) {
+    perms: PermSetGroup,
+    isUser: Boolean = true,
+    hasUser: Boolean = true) {
 
-    val isUser = true
-    val hasUser = true
-
-    perms.permSet.set.foreach(perm => assert(ctx.has(perm)))
+    perms.permSet.set.foreach { perm =>
+      assert(ctx.has(perm))
+      ctx.assertHas(perm)
+    }
     assert(ctx.perms == perms)
+
+    ctx.assertIsValid()
 
     assert(ctx.isInstanceOf[UserAuthContext] == isUser)
 
@@ -59,6 +63,12 @@ class AuthContextTest extends EntityBaseSuite {
     }
 
     interceptPermException(hasUser, ctx.userThrows, ExceptionStrings.userThrows)
+    interceptPermException(hasUser, ctx.userId, ExceptionStrings.userThrows)
+
+    authTypeId match {
+      case Some(id) => assert(ctx.userIdOrElse == id)
+      case None     => assert(ctx.userIdOrElse == -1)
+    }
 
     assert(ctx.authTypeId == authTypeId)
   }
@@ -69,14 +79,19 @@ class AuthContextTest extends EntityBaseSuite {
   private implicit def authId2Option(authId: Long) = Option(authId)
 
   test("UserAuthContext") {
-    //    assertContext(
-    //      AuthContextDataFactory.emptyUserAuth,
-    //      superUser.id,
-    //      PermSetGroups.god)
+    assertContext(
+      AuthContextDataFactory.userAuth,
+      AuthContextDataFactory.userAuth.user.map(_.id),
+      PermSetGroups.user)
   }
 
-  ignore("any other auth context") {
-    fail("not implemented")
+  test("NoAuthContext") {
+    assertContext(
+      NoAuthContext,
+      None,
+      PermSetGroups.public,
+      isUser = false,
+      hasUser = false)
   }
 
 }
