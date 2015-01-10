@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/9/15 9:44 PM
  */
 
 package base.common.logging
@@ -18,6 +18,13 @@ trait TokenLoggable extends Loggable {
   private def prependAuthCtx(x: Seq[Any])(implicit token: LoggerToken) = x.+:(token.s)
 
   protected def token = LoggerToken()
+
+  /**
+   * Prints a message on trace.
+   */
+  protected def trace(msg: String, x: Any*)(implicit token: LoggerToken) {
+    super.trace("%s: " + msg, prependAuthCtx(x): _*)
+  }
 
   /**
    * Prints a message on debug.

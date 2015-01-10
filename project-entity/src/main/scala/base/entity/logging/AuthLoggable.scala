@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/9/15 9:55 PM
  */
 
 package base.entity.logging
@@ -18,6 +18,13 @@ import base.entity.auth.context.AuthContext
 trait AuthLoggable extends TokenLoggable {
 
   private def prependAuthCtx(x: Seq[Any])(implicit authCtx: AuthContext) = x.+:(authCtx.toLogPrefix)
+
+  /**
+   * Prints a message on trace.
+   */
+  protected def trace(msg: String, x: Any*)(implicit authCtx: AuthContext) {
+    super.trace("%s: " + msg, prependAuthCtx(x): _*)(authCtx.token)
+  }
 
   /**
    * Prints a message on debug.

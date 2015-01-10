@@ -2,7 +2,7 @@
   ~ Copyright (c) 2015 Robert Conrad - All Rights Reserved.
   ~ Unauthorized copying of this file, via any medium is strictly prohibited.
   ~ This file is proprietary and confidential.
-  ~ Last modified by rconrad, 1/4/15 4:01 PM
+  ~ Last modified by rconrad, 1/9/15 9:38 PM
   -->
 
 <configuration>
@@ -49,7 +49,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
+            <level>TRACE</level>
         </filter>
 
         <encoder>
@@ -57,7 +57,7 @@
         </encoder>
     </appender>
 
-    <root level="debug">
+    <root level="trace">
         <appender-ref ref="FILE_DEFAULT" />
         <appender-ref ref="FILE_WARN" />
         <appender-ref ref="STDOUT" />

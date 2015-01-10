@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 10:35 PM
+ * Last modified by rconrad, 1/9/15 10:03 PM
  */
 
 package base.socket.handler
@@ -48,7 +48,7 @@ object AuthenticationHandler extends BaseHandler {
     if (SocketApiService().isConnectionAllowed) {
       // cut logging to 10% since we are already in a high volume situation
       if (System.nanoTime() % 10 == 0) {
-        warn(ctx.channel, "currentConnectionCount has exceeded maximum value")
+        warn("currentConnectionCount has exceeded maximum value")(ctx)
       }
       // TODO lol json
       ctx.channel.write("busy!").addListener(ChannelFutureListener.CLOSE)
@@ -59,7 +59,7 @@ object AuthenticationHandler extends BaseHandler {
 
   private def channelCreateSideEffects(ctx: ChannelHandlerContext) {
     SocketApiStatsService().increment(SocketApiStats.CONNECTIONS)
-    allChannels.add(ctx.channel)
+    allChannels.add(ctx)
   }
 
   private def channelDestroySideEffects(channelFuture: ChannelFuture) {
@@ -68,10 +68,10 @@ object AuthenticationHandler extends BaseHandler {
 
   // This method is used to send the request asynchronously upstream
   private def writeToChannelHandlerContext(handler: BaseHandler, ctx: ChannelHandlerContext, result: Boolean) {
-    if (isDebugEnabled) debug(ctx.channel, s"writeToChannelHandlerContext result: $result")
+    if (isDebugEnabled) debug(s"writeToChannelHandlerContext result: $result")(ctx)
 
     def removeAndFire() {
-      if (isDebugEnabled) debug(ctx.channel, "removeAndFire " + ctx.channel + " result: " + result)
+      if (isDebugEnabled) debug("removeAndFire " + ctx.channel + " result: " + result)(ctx)
       if (!result) {
         disconnect(ctx, "Unable to login")
       } else {

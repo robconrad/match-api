@@ -2,28 +2,28 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 9:51 PM
+ * Last modified by rconrad, 1/9/15 9:41 PM
  */
 
-package base.entity.logging
+package base.common.logging
 
-import base.common.logging._
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
-import base.entity.test.EntityBaseSuite
+import base.common.test.BaseSuite
+import base.common.test.TestExceptions.TestRuntimeException
 
 /**
- * Test the AuthLoggable context imprint extension to the base logger to ensure it properly adds the
- *  identifying AuthContext prefix to all log levels
+ * {{ Describe the high level purpose of LoggableTest here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class AuthLoggableTest extends EntityBaseSuite with AuthLoggable {
+class TokenLoggableTest extends BaseSuite with TokenLoggable {
 
-  private implicit val authCtx = AuthContextDataFactory.emptyUserAuth
-  private val t = new RuntimeException("error!")
+  private val t = new TestRuntimeException("test")
+  private implicit val myToken = token
 
-  private def logAndAssert(logger: (String, String) => Unit)(implicit authCtx: AuthContext) {
+  private def logAndAssert(logger: (String, String) => Unit)(implicit token: LoggerToken) {
     LoggableTestUtil.logAndAssert(logger, () => {
-      assert(LoggableTestUtil.lastDefault.contains(authCtx.toLogPrefix))
+      assert(LoggableTestUtil.lastDefault.contains(token.s))
     })
   }
 

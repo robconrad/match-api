@@ -5,10 +5,9 @@
  * Last modified by rconrad, 1/9/15 9:51 PM
  */
 
-package base.entity.logging
+package base.socket.logging
 
-import base.common.logging._
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
+import base.common.logging.LoggableTestUtil
 import base.entity.test.EntityBaseSuite
 
 /**
@@ -16,14 +15,17 @@ import base.entity.test.EntityBaseSuite
  *  identifying AuthContext prefix to all log levels
  * @author rconrad
  */
-class AuthLoggableTest extends EntityBaseSuite with AuthLoggable {
+class SocketLoggableTest extends EntityBaseSuite with SocketLoggable {
 
-  private implicit val authCtx = AuthContextDataFactory.emptyUserAuth
+  private implicit val ch = new LoggableChannelInfo {
+    def authCtx = None
+    def remoteAddress = "123 fake street"
+  }
   private val t = new RuntimeException("error!")
 
-  private def logAndAssert(logger: (String, String) => Unit)(implicit authCtx: AuthContext) {
+  private def logAndAssert(logger: (String, String) => Unit)(implicit ch: LoggableChannelInfo) {
     LoggableTestUtil.logAndAssert(logger, () => {
-      assert(LoggableTestUtil.lastDefault.contains(authCtx.toLogPrefix))
+      assert(LoggableTestUtil.lastDefault.contains(ch.remoteAddress))
     })
   }
 
