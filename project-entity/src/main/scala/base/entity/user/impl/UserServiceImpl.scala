@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 11:53 AM
+ * Last modified by rconrad, 1/10/15 3:05 PM
  */
 
 package base.entity.user.impl
@@ -10,6 +10,7 @@ package base.entity.user.impl
 import base.common.service.ServiceImpl
 import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
+import base.entity.kv.KvService
 import base.entity.logging.AuthLoggable
 import base.entity.perm.Perms
 import base.entity.user.UserService
@@ -21,8 +22,7 @@ import scala.concurrent.Future
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class UserServiceImpl
-    extends ServiceImpl with UserService with AuthLoggable {
+private[entity] class UserServiceImpl extends ServiceImpl with UserService with AuthLoggable {
 
   def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.REGISTER)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:15 PM
+ * Last modified by rconrad, 1/10/15 2:50 PM
  */
 
 package base.entity.auth.context
@@ -68,6 +68,7 @@ object AuthContext {
 
     val assertIsUser = "assert isUser failed"
     val assertHasNoUser = "assert !hasUser failed"
+    val assertHasPerm = "assert has(%s) failed"
     val userThrows = "user missing"
 
   }

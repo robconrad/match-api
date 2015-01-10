@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:59 PM
+ * Last modified by rconrad, 1/10/15 2:50 PM
  */
 
 package base.entity.auth.context
@@ -34,7 +34,9 @@ case class AuthContextUtilities(authCtx: AuthContext) {
    * Throw if not has perm
    */
   final def assertHas(perm: Perm) {
-    assert(has(perm))
+    if (!has(perm)) {
+      throw new PermException(ExceptionStrings.assertHasPerm.format(perm))
+    }
   }
 
   /**
