@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:04 PM
+ * Last modified by rconrad, 1/10/15 3:53 PM
  */
 
 package base.entity.kv
@@ -21,7 +21,7 @@ import scala.concurrent.Future
  */
 trait Key {
 
-  def key: String
+  def token: String
 
   def exists()(implicit p: Pipeline): Future[Boolean]
 
@@ -29,13 +29,15 @@ trait Key {
 
   def expire(seconds: Long)(implicit p: Pipeline): Future[Boolean]
 
-  override def toString = s"${getClass.getSimpleName}($key)"
+  override def toString = s"${getClass.getSimpleName}($token)"
 
 }
 
 object Key {
 
   type Pipeline = RedisClient#Pipeline
+  type Prop = KeyProp[_]
+  type Id = KeyId[_]
 
   val ID = "id"
   val PREFIX_DELIM = "-"

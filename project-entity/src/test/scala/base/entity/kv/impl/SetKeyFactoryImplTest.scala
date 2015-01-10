@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:34 PM
+ * Last modified by rconrad, 1/10/15 3:51 PM
  */
 
 package base.entity.kv.impl
+
+import base.entity.kv.{ KeyId, KeyChannel }
 
 /**
  * {{ Describe the high level purpose of SetKeyFactoryImplTest here. }}
@@ -15,9 +17,9 @@ package base.entity.kv.impl
  */
 class SetKeyFactoryImplTest extends KeyFactoryImplTest {
 
-  private val id = "id"
-  private val id2 = "id2"
-  private val id3 = "id3"
+  private val id = KeyId("id")
+  private val id2 = KeyId("id2")
+  private val id3 = KeyId("id3")
 
   private val val1 = "value1"
   private val val2 = "value2"

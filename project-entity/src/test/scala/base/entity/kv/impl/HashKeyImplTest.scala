@@ -2,11 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:18 PM
+ * Last modified by rconrad, 1/10/15 3:57 PM
  */
 
 package base.entity.kv.impl
 
+import base.entity.kv.Key.Prop
+import base.entity.kv.KeyProp
 import base.entity.kv.mock.KeyLoggerMock
 
 import scala.language.reflectiveCalls
@@ -20,15 +22,15 @@ import scala.language.reflectiveCalls
 // scalastyle:off null
 class HashKeyImplTest extends KeyImplTest {
 
-  private val prop = "prop"
-  private val prop2 = "prop2"
+  private val prop = KeyProp("prop")
+  private val prop2 = KeyProp("prop2")
   private val string = "value"
   private val string2 = "value2"
   private val int = 1
   private val long = 1L
   private val flagOn = true
   private val flagOff = false
-  private val map = Map(prop -> string, prop2 -> string)
+  private val map = Map[Prop, String](prop -> string, prop2 -> string)
 
   val model = new HashKeyImpl(getClass.getSimpleName, KeyLoggerMock)
 
@@ -80,9 +82,9 @@ class HashKeyImplTest extends KeyImplTest {
   }
 
   test("getKeys") {
-    assert(model.getKeys.await() == List())
+    assert(model.getProps.await() == List())
     assert(model.set(map).await())
-    assert(model.getKeys.await().sorted == map.keys.toList.sorted)
+    assert(model.getProps.await().map(_.toString).sorted == map.keys.toList.map(_.toString).sorted)
   }
 
   test("setNx") {

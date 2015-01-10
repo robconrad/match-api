@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:05 PM
+ * Last modified by rconrad, 1/10/15 3:28 PM
  */
 
 package base.entity.user.impl
@@ -24,8 +24,16 @@ import scala.concurrent.Future
  */
 private[entity] class UserServiceImpl extends ServiceImpl with UserService with AuthLoggable {
 
+  private val phoneFactory = KvService().makeHashKeyFactory("phone")
+
   def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.REGISTER)
+    implicit val p = KvService().pipeline
+    //    val phone = phoneFactory.make(input.phone)
+    //    phone.exists().map {
+    //      case true  =>
+    //      case false =>
+    //    }
     Future.successful(Left(ApiError("not implemented")))
   }
 

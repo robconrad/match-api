@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 8:13 PM
+ * Last modified by rconrad, 1/10/15 3:24 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.service.ServiceImpl
-import base.entity.kv.KvService
+import base.entity.kv.{ KeyChannel, KvService }
 import redis.client.RedisClient
 
 import scala.util.Random

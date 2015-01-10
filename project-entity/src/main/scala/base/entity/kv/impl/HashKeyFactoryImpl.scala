@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:15 PM
+ * Last modified by rconrad, 1/10/15 3:47 PM
  */
 
 package base.entity.kv.impl
@@ -10,7 +10,7 @@ package base.entity.kv.impl
 import java.nio.charset.Charset
 
 import base.entity.kv.Key._
-import base.entity.kv.{ HashKeyFactory, KvService }
+import base.entity.kv._
 
 import scala.collection.JavaConversions._
 import scala.collection.breakOut
@@ -26,9 +26,9 @@ import scala.concurrent.Future
 private[kv] final class HashKeyFactoryImpl(protected val keyChannel: KeyChannel)
     extends KeyFactoryImpl with HashKeyFactory {
 
-  def make(id: String) = new HashKeyImpl(getKey(id), this)
+  def make(id: Id) = new HashKeyImpl(getKey(id), this)
 
-  def getMulti(prop: String, ids: Iterable[String])(implicit p: Pipeline): Future[Map[String, Option[String]]] = {
+  def getMulti(prop: Prop, ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Option[String]]] = {
     if (isDebugEnabled) log("HGET-MULTI", s"prop: $prop, ids: $ids")
     ids.size > 0 match {
       case true =>
@@ -37,19 +37,16 @@ private[kv] final class HashKeyFactoryImpl(protected val keyChannel: KeyChannel)
           guavaFutureToAkka(p.hget(getKey(id), prop))
         }).toList // has to be list or gets interpreted as set later, killing duplicate results
         Future.sequence(futures).map { v =>
-          ids.zip(v.map(_.asAsciiString())).toMap.map {
-            case (key, value) => value match {
-              case null => (key, None)
-              case _    => (key, Some(value))
-            }
-          }
+          ids.zip(v).map {
+            case (key, value) => key -> Option(value.asAsciiString())
+          }.toMap
         }
       case false => Future.successful(Map())
     }
   }
 
-  def mGetMulti(props: Array[String],
-                ids: Iterable[String])(implicit p: Pipeline): Future[Map[String, Map[String, Option[String]]]] = {
+  def mGetMulti(props: Array[Prop],
+                ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Map[Prop, Option[String]]]] = {
     if (isDebugEnabled) log("HMGET-MULTI (start)", "props: " + props.map(_.toString).toList + s" ids: $ids")
     ids.size > 0 match {
       case true =>
@@ -61,12 +58,9 @@ private[kv] final class HashKeyFactoryImpl(protected val keyChannel: KeyChannel)
         Future.sequence(futures).map { v =>
           val res = v.map { reply =>
             val res = reply.asStringList(Charset.defaultCharset()).toList
-            (props zip res)(breakOut).toMap.map {
-              case (key, value) => value match {
-                case null => (key, None)
-                case _    => (key, Some(value))
-              }
-            }
+            (props zip res)(breakOut).map {
+              case (key, value) => key -> Option(value)
+            }.toMap[Prop, Option[String]]
           }
           val ret = (ids zip res).toMap
           if (isDebugEnabled) {
@@ -78,7 +72,7 @@ private[kv] final class HashKeyFactoryImpl(protected val keyChannel: KeyChannel)
     }
   }
 
-  def incrbyMulti(prop: String, values: Map[String, Long])(implicit p: Pipeline): Future[Map[String, Long]] = {
+  def incrbyMulti(prop: Prop, values: Map[Id, Long])(implicit p: Pipeline): Future[Map[Id, Long]] = {
     if (isDebugEnabled) log("HINCRBY-MULTI", s"prop: $prop, values: $values")
     val keys = values.keys.toList
 

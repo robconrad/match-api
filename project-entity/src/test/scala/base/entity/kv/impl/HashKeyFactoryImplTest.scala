@@ -2,10 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:15 PM
+ * Last modified by rconrad, 1/10/15 3:56 PM
  */
 
 package base.entity.kv.impl
+
+import base.entity.kv.Key.{ Id, Prop }
+import base.entity.kv.{ KeyProp, KeyId, KeyChannel }
 
 /**
  * {{ Describe the high level purpose of HashKeyFactoryImplTest here. }}
@@ -15,13 +18,13 @@ package base.entity.kv.impl
  */
 class HashKeyFactoryImplTest extends KeyFactoryImplTest {
 
-  private val id = "id"
-  private val id2 = "id2"
+  private val id = KeyId("id")
+  private val id2 = KeyId("id2")
   private val ids = Set(id, id2)
 
-  private val prop = "prop"
-  private val prop2 = "prop2"
-  private val props = Array(prop, prop2)
+  private val prop = KeyProp("prop")
+  private val prop2 = KeyProp("prop2")
+  private val props = Array[Prop](prop, prop2)
   private val string = "value"
   private val long = 1L
 
@@ -62,7 +65,7 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("incrByMulti") {
-    val input = Map(id -> long, id2 -> long)
+    val input = Map[Id, Long](id -> long, id2 -> long)
     assert(factory.incrbyMulti(prop, Map()).await() == Map())
     assert(factory.getMulti(prop, ids).await() == Map(id -> None, id2 -> None))
     assert(factory.incrbyMulti(prop, input).await() == input)

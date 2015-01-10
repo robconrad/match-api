@@ -2,13 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:31 PM
+ * Last modified by rconrad, 1/10/15 3:28 PM
  */
 
 package base.entity.kv
 
-import base.entity.kv.impl.KeyChannel
-import redis.client.RedisClient
 import base.entity.kv.Key._
 
 import scala.concurrent.Future
@@ -25,9 +23,9 @@ trait KeyFactory extends KeyLogger {
   final protected val CHANNEL = keyChannel.ch
   final protected val PREFIX = CHANNEL + PREFIX_DELIM
 
-  private[kv] def getKey(token: String): String
+  private[kv] def getKey(id: Id): String
 
-  def make(id: String): Key
+  def make(id: Id): Key
 
   def del(items: Iterable[Key])(implicit p: Pipeline): Future[Int]
 

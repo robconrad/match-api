@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:53 PM
+ * Last modified by rconrad, 1/10/15 3:48 PM
  */
 
 package base.entity.kv
@@ -20,7 +20,7 @@ import scala.concurrent.Future
  */
 trait SetKeyFactory extends KeyFactory {
 
-  def make(id: String): SetKey
+  def make(id: Id): SetKey
 
   def remove(sets: List[SetKey], value: Any)(implicit p: Pipeline): Future[Map[SetKey, Boolean]]
 

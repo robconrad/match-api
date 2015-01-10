@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:35 PM
+ * Last modified by rconrad, 1/10/15 3:23 PM
  */
 
 package base.entity.kv.impl
@@ -19,11 +19,11 @@ import scala.collection.JavaConversions._
  * Base model for set keys
  */
 // scalastyle:off null
-private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLogger) extends KeyImpl with SetKey {
+private[kv] final class SetKeyImpl(val token: String, protected val logger: KeyLogger) extends KeyImpl with SetKey {
 
   def members()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SMEMBERS (start)")
-    p.smembers(key).map { v =>
+    p.smembers(token).map { v =>
       val res = v.asStringSet(Charset.defaultCharset()).toSet
       if (isDebugEnabled) log("SMEMBERS (finish)", "props: " + res.toString)
       res
@@ -32,7 +32,7 @@ private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLog
 
   def isMember(value: Any)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SISMEMBER (start)", s"value: $value")
-    p.sismember(key, value).map { v =>
+    p.sismember(token, value).map { v =>
       val isMember = v.data() == 1L
       if (isDebugEnabled) log("SISMEMBER (finish)", s"value: $value res: $isMember")
       isMember
@@ -42,7 +42,7 @@ private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLog
   // note will only work for 1 randmember with this impl
   def rand()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SRANDMEMBER (start)")
-    p.srandmember_(key).map { v =>
+    p.srandmember_(token).map { v =>
       val res = v match {
         case v if v == null || v.data() == null => None
         case v                                  => Some(v.asInstanceOf[BulkReply].asAsciiString())
@@ -54,7 +54,7 @@ private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLog
 
   def pop()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SPOP (start)")
-    p.spop(key).map { v =>
+    p.spop(token).map { v =>
       val res = v.asAsciiString()
       if (isDebugEnabled) log("SPOP (finish)", s"result: $res")
       res match {
@@ -64,21 +64,21 @@ private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLog
     }
   }
 
-  def add(value: Any)(implicit p: Pipeline) = p.sadd_(key, value.asInstanceOf[AnyRef]).map { v =>
+  def add(value: Any)(implicit p: Pipeline) = p.sadd_(token, value.asInstanceOf[AnyRef]).map { v =>
     val res = v.data().toInt > 0
     if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
     res
   }
 
-  def remove(value: Any)(implicit p: Pipeline) = p.srem_(key, value.asInstanceOf[AnyRef]).map { v =>
+  def remove(value: Any)(implicit p: Pipeline) = p.srem_(token, value.asInstanceOf[AnyRef]).map { v =>
     val res = v.data().toInt > 0
     if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
     res
   }
 
   def move(to: SetKey, member: Any)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SMOVE", s" to: ${to.key} value: $member")
-    p.smove(key, to.key, member).map(_.data().toInt > 0)
+    if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member")
+    p.smove(token, to.token, member).map(_.data().toInt > 0)
   }
 
 }

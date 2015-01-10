@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 1:55 PM
+ * Last modified by rconrad, 1/10/15 3:23 PM
  */
 
 package base.entity.kv.impl
@@ -26,21 +26,21 @@ private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable
 
   def exists()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("EXISTS")
-    p.exists(key).map(_.data().intValue() == 1)
+    p.exists(token).map(_.data().intValue() == 1)
   }
 
   def del()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("DEL")
-    p.del_(key).map(_.data().intValue() == 1)
+    p.del_(token).map(_.data().intValue() == 1)
   }
 
   def expire(seconds: Long)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("EXPIRE", s"$seconds seconds")
-    p.expire(key, seconds).map(_.data().intValue() == 1)
+    p.expire(token, seconds).map(_.data().intValue() == 1)
   }
 
   private[impl] def log(cmd: String, msg: String = "") {
-    logger.log(cmd, key, msg)
+    logger.log(cmd, token, msg)
   }
 
 }

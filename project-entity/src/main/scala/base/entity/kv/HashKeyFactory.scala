@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:13 PM
+ * Last modified by rconrad, 1/10/15 3:26 PM
  */
 
 package base.entity.kv
@@ -19,13 +19,13 @@ import scala.concurrent.Future
  */
 trait HashKeyFactory extends KeyFactory {
 
-  def make(id: String): HashKey
+  def make(id: Id): HashKey
 
-  def getMulti(prop: String, ids: Iterable[String])(implicit p: Pipeline): Future[Map[String, Option[String]]]
+  def getMulti(prop: Prop, ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Option[String]]]
 
-  def mGetMulti(props: Array[String],
-                ids: Iterable[String])(implicit p: Pipeline): Future[Map[String, Map[String, Option[String]]]]
+  def mGetMulti(props: Array[Prop],
+                ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Map[Prop, Option[String]]]]
 
-  def incrbyMulti(prop: String, values: Map[String, Long])(implicit p: Pipeline): Future[Map[String, Long]]
+  def incrbyMulti(prop: Prop, values: Map[Id, Long])(implicit p: Pipeline): Future[Map[Id, Long]]
 
 }

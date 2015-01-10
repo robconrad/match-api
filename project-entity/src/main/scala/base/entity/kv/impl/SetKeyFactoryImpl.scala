@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:59 PM
+ * Last modified by rconrad, 1/10/15 3:25 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key._
-import base.entity.kv.{ SetKey, KvService, SetKeyFactory }
+import base.entity.kv.{ KeyChannel, SetKey, KvService, SetKeyFactory }
 
 import scala.concurrent.Future
 
@@ -21,14 +21,14 @@ import scala.concurrent.Future
 private[kv] final class SetKeyFactoryImpl(protected val keyChannel: KeyChannel)
     extends KeyFactoryImpl with SetKeyFactory {
 
-  def make(id: String) = new SetKeyImpl(getKey(id), this)
+  def make(id: Id) = new SetKeyImpl(getKey(id), this)
 
   def remove(sets: List[SetKey], value: Any)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SREM-MULTI", s"sets: ${sets.map(s => s.key)}, value: $value")
+    if (isDebugEnabled) log("SREM-MULTI", s"sets: ${sets.map(s => s.token)}, value: $value")
     sets.length > 0 match {
       case true =>
         val futures = sets.map { set =>
-          guavaFutureToAkka(p.srem_(set.key, value.asInstanceOf[AnyRef])).map(r => set -> r)
+          guavaFutureToAkka(p.srem_(set.token, value.asInstanceOf[AnyRef])).map(r => set -> r)
         }
         Future.sequence(futures).map(_.map { case (set, res) => set -> (res.data().intValue() > 0) }).map(_.toMap)
       case false =>
@@ -37,10 +37,10 @@ private[kv] final class SetKeyFactoryImpl(protected val keyChannel: KeyChannel)
   }
 
   def count(sets: List[SetKey])(implicit p: Pipeline): Future[Map[SetKey, Int]] = {
-    if (isDebugEnabled) log("SCARD-MULTI", s"sets: ${sets.map(s => s.key)}")
+    if (isDebugEnabled) log("SCARD-MULTI", s"sets: ${sets.map(s => s.token)}")
     sets.length > 0 match {
       case true =>
-        val futures = sets.map(set => guavaFutureToAkka(p.scard(set.key)))
+        val futures = sets.map(set => guavaFutureToAkka(p.scard(set.token)))
         Future.sequence(futures).map { v =>
           sets.zip(v.map(_.data().intValue())).toMap
         }
@@ -52,7 +52,7 @@ private[kv] final class SetKeyFactoryImpl(protected val keyChannel: KeyChannel)
   def unionStore(destination: SetKey, sets: SetKey*)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SUNIONSTORE", s"destination: $destination, sets: $sets")
     sets.length > 0 match {
-      case true  => p.sunionstore(destination.key, sets.map(_.key): _*).map(_.data().intValue())
+      case true  => p.sunionstore(destination.token, sets.map(_.token): _*).map(_.data().intValue())
       case false => Future.successful(0)
     }
   }
