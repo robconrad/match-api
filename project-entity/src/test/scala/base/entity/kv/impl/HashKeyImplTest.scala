@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:04 PM
+ * Last modified by rconrad, 1/10/15 12:18 PM
  */
 
 package base.entity.kv.impl
@@ -97,6 +97,13 @@ class HashKeyImplTest extends KeyImplTest {
     assert(model.set(prop, string).await())
     assert(model.del(prop).await())
     assert(model.getString(prop).await() == None)
+  }
+
+  test("del-multi") {
+    assert(model.set(map).await())
+    assert(model.del(List(prop, prop2)).await())
+    assert(model.getString(prop).await() == None)
+    assert(model.getString(prop2).await() == None)
   }
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:15 PM
+ * Last modified by rconrad, 1/10/15 12:20 PM
  */
 
 package base.entity.kv.impl
@@ -106,7 +106,8 @@ private[kv] final class HashKeyImpl(val key: String, protected val logger: KeyLo
 
   def del(props: List[String])(implicit p: Pipeline) = {
     if (isDebugEnabled) log("HDEL", "props: " + props)
-    p.hdel(key, props.toArray).map(_.data().intValue() == props.size)
+    val args = key +: props
+    p.hdel_(args: _*).map(_.data().intValue() == props.size)
   }
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:15 PM
+ * Last modified by rconrad, 1/10/15 12:35 PM
  */
 
 package base.entity.kv.impl
@@ -44,9 +44,8 @@ private[kv] final class SetKeyImpl(val key: String, protected val logger: KeyLog
     if (isDebugEnabled) log("SRANDMEMBER (start)")
     p.srandmember_(key).map { v =>
       val res = v match {
-        case null                  => None
-        case v if v.data() == null => None
-        case v                     => Some(v.asInstanceOf[BulkReply].asAsciiString())
+        case v if v == null || v.data() == null => None
+        case v                                  => Some(v.asInstanceOf[BulkReply].asAsciiString())
       }
       if (isDebugEnabled) log("SRANDMEMBER (finish)", s"result: $res")
       res

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:06 PM
+ * Last modified by rconrad, 1/10/15 12:32 PM
  */
 
 package base.entity.kv.impl
@@ -28,6 +28,12 @@ abstract class KeyImplTest extends KvTest {
     assert(model.exists().await())
     assert(model.del().await())
     assert(!model.exists().await())
+  }
+
+  test("expire") {
+    assert(!model.expire(Long.MaxValue).await())
+    assert(create)
+    assert(model.expire(Long.MaxValue).await())
   }
 
 }

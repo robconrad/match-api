@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:15 PM
+ * Last modified by rconrad, 1/10/15 12:26 PM
  */
 
 package base.entity.kv.impl
@@ -36,9 +36,8 @@ private[kv] final class IntKeyImpl(val key: String, protected val logger: KeyLog
   def get()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("GET (start)")
     p.get(key).map {
-      case null                      => None
-      case res if res.data() == null => None
-      case res                       => Option(res.asAsciiString().toInt)
+      case res if res == null || res.data() == null => None
+      case res                                      => Option(res.asAsciiString().toInt)
     }.map { res =>
       if (isDebugEnabled) log("GET (finish)", s"value: $res")
       res

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:27 PM
+ * Last modified by rconrad, 1/10/15 12:15 PM
  */
 
 package base.entity.kv.impl
@@ -36,6 +36,7 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("getMulti") {
+    assert(factory.getMulti(prop, List()).await() == Map())
     assert(factory.getMulti(prop, ids).await() == Map(id -> None, id2 -> None))
     assert(model1.set(prop, string).await())
     assert(factory.getMulti(prop, ids).await() == Map(id -> Option(string), id2 -> None))
@@ -44,6 +45,7 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("mGetMulti") {
+    assert(factory.mGetMulti(props, List()).await() == Map())
     assert(factory.mGetMulti(props, ids).await() == Map(
       id -> Map(prop -> None, prop2 -> None),
       id2 -> Map(prop -> None, prop2 -> None)))
@@ -61,6 +63,7 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
 
   test("incrByMulti") {
     val input = Map(id -> long, id2 -> long)
+    assert(factory.incrbyMulti(prop, Map()).await() == Map())
     assert(factory.getMulti(prop, ids).await() == Map(id -> None, id2 -> None))
     assert(factory.incrbyMulti(prop, input).await() == input)
     assert(factory.incrbyMulti(prop, input).await() == Map(id -> long * 2, id2 -> long * 2))

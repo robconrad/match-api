@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 2:27 PM
+ * Last modified by rconrad, 1/10/15 12:34 PM
  */
 
 package base.entity.kv.impl
@@ -35,6 +35,8 @@ class SetKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("remove multi") {
+    assert(factory.remove(List(), val1).await() == Map())
+
     assert(factory.remove(models, val1).await() == Map(model1 -> false, model2 -> false))
 
     assert(model1.add(val1).await())
@@ -51,6 +53,8 @@ class SetKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("count") {
+    assert(factory.count(List()).await() == Map())
+
     assert(factory.count(models).await() == Map(model1 -> 0, model2 -> 0))
 
     assert(model1.add(val1).await())
@@ -60,6 +64,8 @@ class SetKeyFactoryImplTest extends KeyFactoryImplTest {
   }
 
   test("unionStore") {
+    assert(factory.unionStore(dest).await() == 0)
+
     assert(model1.add(val1).await())
     assert(model1.add(val2).await())
     assert(model2.add(val2).await())
