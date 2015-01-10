@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:07 PM
+ * Last modified by rconrad, 1/10/15 12:13 PM
  */
 
 package base.entity.service
@@ -21,13 +21,12 @@ import scala.concurrent.Future
  */
 class CrudImplicitsTest extends EntityBaseSuite {
 
-  type Result = Either[ApiError, Int]
+  private def assertImplicits[T](value: T)(implicit m: Manifest[T]) {
+    type Result = Either[ApiError, T]
 
-  test("int implicits") {
-    val foo = CrudImplicits[Int]
-    import foo._
+    val implicits = CrudImplicits[T]
+    import implicits._
 
-    val value = 1
     val error = "api error"
     val status = StatusCodes.Forbidden
     val seed = "error seed"
@@ -46,6 +45,16 @@ class CrudImplicitsTest extends EntityBaseSuite {
 
     val future: Future[Result] = value
     assert(future.await() == Right(value))
+  }
+
+  test("Int implicits") {
+    assertImplicits(1)
+    assertImplicits(2)
+  }
+
+  test("String implicits") {
+    assertImplicits("foo")
+    assertImplicits("bar")
   }
 
 }
