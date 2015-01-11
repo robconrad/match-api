@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:40 PM
+ * Last modified by rconrad, 1/11/15 9:36 AM
  */
 
 package base.socket.api.impl
@@ -41,7 +41,7 @@ class SocketApiServiceImplTest extends SocketBaseSuite with Dispatchable with Lo
       val out = new PrintWriter(socket.getOutputStream, true)
       val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
 
-      val cmd = CommandModel("register", RegisterModel(ApiVersions.V01, "bob", Genders.male, "555-5555"))
+      val cmd = CommandModel("register", RegisterModel(ApiVersions.V01, "555-5555"))
       val json = Serialization.write(cmd) + "\r\n"
 
       out.write(json)

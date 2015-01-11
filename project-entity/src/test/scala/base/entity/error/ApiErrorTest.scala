@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 1/10/15 6:25 PM
  */
 
 package base.entity.error
@@ -60,6 +60,16 @@ class ApiErrorTest extends EntityBaseSuite {
     assert(e.param == None)
     assert(e.message == msg)
     assert(e.uniqueId == uniqueId(s"$status, $msg"))
+  }
+
+  test("apply(message: String, status: StatusCode, code: ErrorCode)") {
+    val e = ApiError(msg, status, code)
+    assert(e.command == None)
+    assert(e.status == status)
+    assert(e.code == Option(code))
+    assert(e.param == None)
+    assert(e.message == msg)
+    assert(e.uniqueId == uniqueId(s"$status, $code"))
   }
 
   test("apply(message: String, status: StatusCode, uniqueIdSeed: Throwable)") {

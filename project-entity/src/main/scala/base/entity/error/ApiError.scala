@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 1/10/15 5:23 PM
  */
 
 package base.entity.error
@@ -56,6 +56,9 @@ object ApiError extends Dispatchable with Loggable {
 
   def apply(message: String, status: StatusCode): ApiError =
     apply(message, status, s"$status, $message")
+
+  def apply(message: String, status: StatusCode, code: ErrorCode): ApiError =
+    apply(message, status, Option(code), None, s"$status, $code")
 
   def apply(message: String, status: StatusCode, uniqueIdSeed: Throwable): ApiError =
     apply(message, status, s"$status, $uniqueIdSeed")
