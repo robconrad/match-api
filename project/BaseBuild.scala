@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:19 PM
+ * Last modified by rconrad, 1/10/15 4:07 PM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -73,7 +73,8 @@ object BaseBuild extends Build {
         Dependencies.redis ++
         Dependencies.sprayCaching ++
         Dependencies.sprayHttp ++
-        Dependencies.swaggerAnnotations
+        Dependencies.swaggerAnnotations ++
+        Dependencies.twilio
     )
   ).dependsOn(
       commonProject % "test->test;compile->compile")

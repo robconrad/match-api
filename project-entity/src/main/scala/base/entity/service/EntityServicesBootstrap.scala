@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:24 PM
+ * Last modified by rconrad, 1/10/15 5:03 PM
  */
 
 package base.entity.service
@@ -10,6 +10,7 @@ package base.entity.service
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.auth.impl.AuthServiceImpl
 import base.entity.kv.impl.KvServiceImpl
+import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl.UserServiceImpl
 
 /**
@@ -23,6 +24,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   protected val DB = "db"
   protected val KV = "kv"
+  protected val TWILIO = "twilio"
 
   /**
    * Registration of services, see classes for details on these parameters
@@ -48,6 +50,11 @@ object EntityServicesBootstrap extends ServicesBootstrap {
   lazy val otherRegistered = {
 
     Services.register(new AuthServiceImpl())
+
+    Services.register(new TwilioSmsServiceImpl(
+      Keys(TWILIO, "sid"),
+      Keys(TWILIO, "token"),
+      Keys(TWILIO, "from")))
 
     Services.register(new UserServiceImpl())
 
