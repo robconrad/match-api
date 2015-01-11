@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:51 PM
+ * Last modified by rconrad, 1/11/15 1:39 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.KeyId
+import base.entity.kv._
 import base.entity.service.EntityServiceTest
 import redis.client.RedisClient
 
@@ -25,9 +25,8 @@ class KvServiceImplTest extends EntityServiceTest {
 
   val service = new KvServiceImpl(clientCount, host, port)
 
-  private val channel = "channel"
   private val id = KeyId("id")
-  private val token = s"$channel-$id"
+  private def token(prefix: String) = s"$prefix-$id"
 
   test("client") {
     assert(service.client.isInstanceOf[RedisClient])
@@ -38,9 +37,13 @@ class KvServiceImplTest extends EntityServiceTest {
   }
 
   test("make*Factory") {
-    assert(service.makeHashKeyFactory(channel).make(id).token == token)
-    assert(service.makeIntKeyFactory(channel).make(id).token == token)
-    assert(service.makeSetKeyFactory(channel).make(id).token == token)
+    assert(service.makeHashKeyFactory(new KeyFactoryLocator[HashKeyFactory]("hash") {}).make(id).token == token("hash"))
+    assert(service.makeIntKeyFactory(new KeyFactoryLocator[IntKeyFactory]("int") {}).make(id).token == token("int"))
+    assert(service.makeSetKeyFactory(new KeyFactoryLocator[SetKeyFactory]("set") {}).make(id).token == token("set"))
+    // duplicate prefix should throw
+    intercept[RuntimeException] {
+      service.makeSetKeyFactory(new KeyFactoryLocator[SetKeyFactory]("set") {}).make(id).token == token("set")
+    }
   }
 
 }

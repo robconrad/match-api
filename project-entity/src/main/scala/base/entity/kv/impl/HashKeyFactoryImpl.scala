@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:47 PM
+ * Last modified by rconrad, 1/11/15 1:28 PM
  */
 
 package base.entity.kv.impl
@@ -23,7 +23,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-private[kv] final class HashKeyFactoryImpl(protected val keyChannel: KeyChannel)
+private[kv] final class HashKeyFactoryImpl(protected val locator: KeyFactoryLocator[HashKeyFactory])
     extends KeyFactoryImpl with HashKeyFactory {
 
   def make(id: Id) = new HashKeyImpl(getKey(id), this)

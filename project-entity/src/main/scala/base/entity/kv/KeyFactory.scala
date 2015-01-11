@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:28 PM
+ * Last modified by rconrad, 1/11/15 1:28 PM
  */
 
 package base.entity.kv
@@ -10,6 +10,7 @@ package base.entity.kv
 import base.entity.kv.Key._
 
 import scala.concurrent.Future
+import scala.reflect.Manifest
 
 /**
  * {{ Describe the high level purpose of KeyFactory here. }}
@@ -19,8 +20,10 @@ import scala.concurrent.Future
  */
 trait KeyFactory extends KeyLogger {
 
-  protected val keyChannel: KeyChannel
-  final protected val CHANNEL = keyChannel.ch
+  def factoryManifest: Manifest[_]
+
+  protected def locator: KeyFactoryLocator[_ <: KeyFactory]
+  final protected val CHANNEL = locator.prefix
   final protected val PREFIX = CHANNEL + PREFIX_DELIM
 
   private[kv] def getKey(id: Id): String

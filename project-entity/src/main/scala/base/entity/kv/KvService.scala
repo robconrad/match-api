@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:24 PM
+ * Last modified by rconrad, 1/11/15 1:31 PM
  */
 
 package base.entity.kv
@@ -24,9 +24,9 @@ private[entity] trait KvService extends Service {
   private[kv] def client: RedisClient
   def pipeline: Pipeline
 
-  def makeHashKeyFactory(ch: String): HashKeyFactory
-  def makeIntKeyFactory(ch: String): IntKeyFactory
-  def makeSetKeyFactory(ch: String): SetKeyFactory
+  def makeHashKeyFactory(locator: KeyFactoryLocator[HashKeyFactory]): HashKeyFactory
+  def makeIntKeyFactory(locator: KeyFactoryLocator[IntKeyFactory]): IntKeyFactory
+  def makeSetKeyFactory(locator: KeyFactoryLocator[SetKeyFactory]): SetKeyFactory
 
 }
 

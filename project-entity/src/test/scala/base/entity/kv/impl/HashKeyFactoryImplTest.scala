@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:56 PM
+ * Last modified by rconrad, 1/11/15 1:37 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key.{ Id, Prop }
-import base.entity.kv.{ KeyProp, KeyId, KeyChannel }
+import base.entity.kv.{ HashKeyFactory, KeyFactoryLocator, KeyId, KeyProp }
 
 /**
  * {{ Describe the high level purpose of HashKeyFactoryImplTest here. }}
@@ -28,7 +28,7 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
   private val string = "value"
   private val long = 1L
 
-  val factory = new HashKeyFactoryImpl(KeyChannel(getClass.getSimpleName))
+  val factory = new HashKeyFactoryImpl(new KeyFactoryLocator[HashKeyFactory](getClass.getSimpleName) {})
   private val model1 = factory.make(id)
   private val model2 = factory.make(id2)
 

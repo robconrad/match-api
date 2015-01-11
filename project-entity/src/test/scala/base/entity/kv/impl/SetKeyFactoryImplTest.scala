@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:51 PM
+ * Last modified by rconrad, 1/11/15 1:37 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.{ KeyId, KeyChannel }
+import base.entity.kv.{ KeyFactoryLocator, KeyId, SetKeyFactory }
 
 /**
  * {{ Describe the high level purpose of SetKeyFactoryImplTest here. }}
@@ -24,7 +24,7 @@ class SetKeyFactoryImplTest extends KeyFactoryImplTest {
   private val val1 = "value1"
   private val val2 = "value2"
 
-  val factory = new SetKeyFactoryImpl(KeyChannel(getClass.getSimpleName))
+  val factory = new SetKeyFactoryImpl(new KeyFactoryLocator[SetKeyFactory](getClass.getSimpleName) {})
   private val model1 = factory.make(id)
   private val model2 = factory.make(id2)
   private val dest = factory.make(id3)

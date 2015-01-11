@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:25 PM
+ * Last modified by rconrad, 1/11/15 1:31 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyChannel, SetKey, KvService, SetKeyFactory }
+import base.entity.kv.{ KeyFactoryLocator, SetKey, SetKeyFactory }
 
 import scala.concurrent.Future
 
@@ -18,7 +18,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-private[kv] final class SetKeyFactoryImpl(protected val keyChannel: KeyChannel)
+private[kv] final class SetKeyFactoryImpl(protected val locator: KeyFactoryLocator[SetKeyFactory])
     extends KeyFactoryImpl with SetKeyFactory {
 
   def make(id: Id) = new SetKeyImpl(getKey(id), this)

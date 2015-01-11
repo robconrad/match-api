@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 12:23 PM
+ * Last modified by rconrad, 1/11/15 1:37 PM
  */
 
 package base.entity.user.impl
@@ -15,6 +15,7 @@ import base.entity.kv.mock.{ HashKeyMock, IntKeyMock, KeyMock }
 import base.entity.kv.{ KeyId, KvService, KvTest }
 import base.entity.service.EntityServiceTest
 import base.entity.sms.mock.SmsServiceMock
+import base.entity.user.UserKeyFactories.PhoneCooldownKeyFactory
 import base.entity.user.impl.RegisterServiceImpl._
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 
@@ -52,7 +53,7 @@ class RegisterServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("phone cooldown in effect") {
-    assert(service.phoneCooldownFactory.make(KeyId(registerModel.phone)).set(1).await())
+    assert(PhoneCooldownKeyFactory().make(KeyId(registerModel.phone)).set(1).await())
     assert(service.phoneCooldownExists().await() == externalErrorPhoneResponse.await())
   }
 

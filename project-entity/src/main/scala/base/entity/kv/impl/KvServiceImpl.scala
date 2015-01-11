@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:24 PM
+ * Last modified by rconrad, 1/11/15 1:31 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.service.ServiceImpl
-import base.entity.kv.{ KeyChannel, KvService }
+import base.entity.kv._
 import redis.client.RedisClient
 
 import scala.util.Random
@@ -26,15 +26,13 @@ class KvServiceImpl(clientCount: Int, host: String, port: Int) extends ServiceIm
 
   private lazy val clients = List.fill(clientCount)(makeClient())
 
-  implicit def string2KeyChannel(s: String) = KeyChannel(s)
-
   def client = clients(random.nextInt(clientCount))
 
   def pipeline = client.pipeline()
 
-  def makeHashKeyFactory(ch: String) = new HashKeyFactoryImpl(ch)
-  def makeIntKeyFactory(ch: String) = new IntKeyFactoryImpl(ch)
-  def makeSetKeyFactory(ch: String) = new SetKeyFactoryImpl(ch)
+  def makeHashKeyFactory(locator: KeyFactoryLocator[HashKeyFactory]) = new HashKeyFactoryImpl(locator)
+  def makeIntKeyFactory(locator: KeyFactoryLocator[IntKeyFactory]) = new IntKeyFactoryImpl(locator)
+  def makeSetKeyFactory(locator: KeyFactoryLocator[SetKeyFactory]) = new SetKeyFactoryImpl(locator)
 
   private def makeClient() = {
     try {

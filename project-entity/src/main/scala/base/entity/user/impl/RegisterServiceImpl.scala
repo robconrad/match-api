@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 12:23 PM
+ * Last modified by rconrad, 1/11/15 1:24 PM
  */
 
 package base.entity.user.impl
@@ -23,6 +23,7 @@ import base.entity.service.CrudImplicits
 import base.entity.sms.SmsService
 import base.entity.user.RegisterService
 import base.entity.user.RegisterService.RegisterResponse
+import base.entity.user.UserKeyFactories.{ PhoneCooldownKeyFactory, PhoneKeyFactory }
 import base.entity.user.impl.RegisterServiceImpl._
 import base.entity.user.model._
 import spray.http.StatusCodes._
@@ -43,9 +44,6 @@ private[entity] class RegisterServiceImpl(phoneCooldown: FiniteDuration,
   private val crudImplicits = CrudImplicits[RegisterResponseModel]
   import crudImplicits._
 
-  private[impl] val phoneCooldownFactory = KvService().makeIntKeyFactory("phoneCooldown")
-  private[impl] val phoneFactory = KvService().makeHashKeyFactory("phone")
-
   private[impl] val CODE = KeyProp("code")
 
   def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
@@ -55,7 +53,7 @@ private[entity] class RegisterServiceImpl(phoneCooldown: FiniteDuration,
 
   private[impl] def phoneCooldownExists()(implicit input: RegisterModel,
                                           p: Pipeline): RegisterResponse = {
-    val phoneCooldownKey = phoneCooldownFactory.make(KeyId(input.phone))
+    val phoneCooldownKey = PhoneCooldownKeyFactory().make(KeyId(input.phone))
     phoneCooldownKey.exists().flatMap {
       case true  => externalErrorPhoneResponse
       case false => phoneCooldownSet(phoneCooldownKey)
@@ -80,7 +78,7 @@ private[entity] class RegisterServiceImpl(phoneCooldown: FiniteDuration,
 
   private[impl] def phoneKeySetNx()(implicit input: RegisterModel,
                                     p: Pipeline): RegisterResponse = {
-    val phoneKey = phoneFactory.make(KeyId(input.phone))
+    val phoneKey = PhoneKeyFactory().make(KeyId(input.phone))
     phoneKey.setNx(CREATED, TimeService().asString()).flatMap { exists =>
       phoneKeySet(phoneKey: HashKey)
     }
