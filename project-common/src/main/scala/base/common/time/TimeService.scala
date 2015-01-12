@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 8:54 PM
+ * Last modified by rconrad, 1/11/15 4:46 PM
  */
 
 package base.common.time
@@ -21,6 +21,8 @@ trait TimeService extends Service {
   def now: DateTime
 
   def asString(d: DateTime = now): String
+
+  def fromString(s: String): DateTime
 
 }
 

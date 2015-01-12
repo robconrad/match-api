@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:23 PM
+ * Last modified by rconrad, 1/11/15 4:40 PM
  */
 
 package base.entity.kv.impl
@@ -37,6 +37,14 @@ private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable
   def expire(seconds: Long)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("EXPIRE", s"$seconds seconds")
     p.expire(token, seconds).map(_.data().intValue() == 1)
+  }
+
+  def ttl()(implicit p: Pipeline) = {
+    if (isDebugEnabled) log("TTL")
+    p.ttl(token).map(_.data().longValue() match {
+      case n if n < 0 => None
+      case n          => Option(n)
+    })
   }
 
   private[impl] def log(cmd: String, msg: String = "") {

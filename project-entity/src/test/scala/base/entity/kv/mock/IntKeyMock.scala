@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 12:02 PM
+ * Last modified by rconrad, 1/11/15 4:36 PM
  */
 
 package base.entity.kv.mock
@@ -34,6 +34,8 @@ class IntKeyMock(val token: String = RandomService().md5.toString,
   def exists()(implicit p: Pipeline) = keyMock.exists()
 
   def expire(seconds: Long)(implicit p: Pipeline) = keyMock.expire(seconds)
+
+  def ttl()(implicit p: Pipeline) = keyMock.ttl()
 
   def del()(implicit p: Pipeline) = keyMock.del()
 

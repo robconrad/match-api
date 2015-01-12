@@ -2,14 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 12:12 PM
+ * Last modified by rconrad, 1/11/15 4:53 PM
  */
 
 package base.entity.kv.mock
 
+import java.util.UUID
+
 import base.common.random.RandomService
 import base.entity.kv.Key.{ Prop, Pipeline }
 import base.entity.kv.{ HashKey, Key }
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
@@ -21,6 +24,8 @@ import scala.concurrent.Future
  */
 class HashKeyMock(val token: String = RandomService().md5.toString,
                   getStringResult: Future[Option[String]] = Future.successful(None),
+                  getDateTimeResult: Future[Option[DateTime]] = Future.successful(None),
+                  getIdResult: Future[Option[UUID]] = Future.successful(None),
                   getIntResult: Future[Option[Int]] = Future.successful(None),
                   getLongResult: Future[Option[Long]] = Future.successful(None),
                   getFlagResult: Future[Boolean] = Future.successful(true),
@@ -37,6 +42,10 @@ class HashKeyMock(val token: String = RandomService().md5.toString,
                   keyMock: Key = new KeyMock()) extends HashKey {
 
   def getString(prop: Prop)(implicit p: Pipeline) = getStringResult
+
+  def getDateTime(prop: Prop)(implicit p: Pipeline) = getDateTimeResult
+
+  def getId(prop: Prop)(implicit p: Pipeline) = getIdResult
 
   def getInt(prop: Prop)(implicit p: Pipeline) = getIntResult
 
@@ -67,6 +76,8 @@ class HashKeyMock(val token: String = RandomService().md5.toString,
   def exists()(implicit p: Pipeline) = keyMock.exists()
 
   def expire(seconds: Long)(implicit p: Pipeline) = keyMock.expire(seconds)
+
+  def ttl()(implicit p: Pipeline) = keyMock.ttl()
 
   def del()(implicit p: Pipeline) = keyMock.del()
 

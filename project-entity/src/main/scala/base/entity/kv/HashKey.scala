@@ -2,12 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:28 PM
+ * Last modified by rconrad, 1/11/15 4:46 PM
  */
 
 package base.entity.kv
 
+import java.util.UUID
+
 import base.entity.kv.Key.{ Prop, Pipeline }
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
@@ -20,6 +23,8 @@ import scala.concurrent.Future
 trait HashKey extends Key {
 
   def getString(prop: Prop)(implicit p: Pipeline): Future[Option[String]]
+  def getDateTime(prop: Prop)(implicit p: Pipeline): Future[Option[DateTime]]
+  def getId(prop: Prop)(implicit p: Pipeline): Future[Option[UUID]]
   def getInt(prop: Prop)(implicit p: Pipeline): Future[Option[Int]]
   def getLong(prop: Prop)(implicit p: Pipeline): Future[Option[Long]]
   def getFlag(prop: Prop)(implicit p: Pipeline): Future[Boolean]

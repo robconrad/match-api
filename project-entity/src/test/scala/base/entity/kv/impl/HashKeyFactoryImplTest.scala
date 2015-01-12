@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 1:37 PM
+ * Last modified by rconrad, 1/11/15 3:53 PM
  */
 
 package base.entity.kv.impl
@@ -22,8 +22,8 @@ class HashKeyFactoryImplTest extends KeyFactoryImplTest {
   private val id2 = KeyId("id2")
   private val ids = Set(id, id2)
 
-  private val prop = KeyProp("prop")
-  private val prop2 = KeyProp("prop2")
+  private val prop = new KeyProp("prop") {}
+  private val prop2 = new KeyProp("prop2") {}
   private val props = Array[Prop](prop, prop2)
   private val string = "value"
   private val long = 1L

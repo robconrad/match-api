@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 1:24 PM
+ * Last modified by rconrad, 1/11/15 3:24 PM
  */
 
 package base.entity.user
@@ -15,8 +15,10 @@ import base.entity.kv.{ KeyFactoryLocator, IntKeyFactory, HashKeyFactory }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object UserKeyFactories {
+private[user] object UserKeyFactories {
 
+  object DeviceKeyFactory extends KeyFactoryLocator[HashKeyFactory]("device")
+  object UserKeyFactory extends KeyFactoryLocator[HashKeyFactory]("user")
   object PhoneKeyFactory extends KeyFactoryLocator[HashKeyFactory]("phone")
   object PhoneCooldownKeyFactory extends KeyFactoryLocator[IntKeyFactory]("phoneCooldown")
 

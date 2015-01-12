@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 7:00 PM
+ * Last modified by rconrad, 1/11/15 2:39 PM
  */
 
 package base.entity.user.model
@@ -26,8 +26,8 @@ import scala.annotation.meta.field
 @ApiModel(description = createRequestDesc)
 case class VerifyModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     apiVersion: ApiVersion,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  name: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  gender: Gender,
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  name: Option[String],
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  gender: Option[Gender],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  phone: String,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  deviceUuid: UUID,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  code: String) {

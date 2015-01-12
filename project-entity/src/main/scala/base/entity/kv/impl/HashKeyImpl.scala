@@ -2,16 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:47 PM
+ * Last modified by rconrad, 1/11/15 4:46 PM
  */
 
 package base.entity.kv.impl
 
 import java.nio.charset.Charset
+import java.util.UUID
 
 import base.common.lib.{ Ifo, Tryo }
+import base.common.time.TimeService
 import base.entity.kv.Key.{ Prop, Pipeline }
 import base.entity.kv.{ KeyProp, HashKey, Key, KeyLogger }
+import org.joda.time.format.ISODateTimeFormat
 
 import scala.collection.JavaConversions._
 import scala.collection.breakOut
@@ -26,6 +29,12 @@ private[kv] final class HashKeyImpl(val token: String, protected val logger: Key
 
   def getString(prop: Prop)(implicit p: Pipeline) =
     get_(prop).map(v => Ifo(v, v != null && v.length > 0))
+
+  def getDateTime(prop: Prop)(implicit p: Pipeline) =
+    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(TimeService().fromString(v))))
+
+  def getId(prop: Prop)(implicit p: Pipeline) =
+    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(UUID.fromString(v))))
 
   def getInt(prop: Prop)(implicit p: Pipeline) =
     get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(v.toInt)))
@@ -45,10 +54,9 @@ private[kv] final class HashKeyImpl(val token: String, protected val logger: Key
   def get(implicit p: Pipeline) = p.hgetall(token).map { v =>
     val res = v.asStringMap(Charset.defaultCharset()).toMap
     if (isDebugEnabled) log("HGETALL", s"props: $res")
-    res.map {
-      case (k, v) =>
-        (KeyProp(k), v)
-    }
+    res.collect {
+      case (k, v) if KeyProp(k).isDefined => (KeyProp(k).get, v)
+    }.toMap
   }
 
   // note that an empty result is null for this
@@ -67,7 +75,9 @@ private[kv] final class HashKeyImpl(val token: String, protected val logger: Key
   def getProps(implicit p: Pipeline) = p.hkeys(token).map { v =>
     val res = v.asStringSet(Charset.defaultCharset()).toList
     if (isDebugEnabled) log("HKEYS", s"value: $res")
-    res.map(KeyProp.apply)
+    res.collect {
+      case f if KeyProp(f).isDefined => KeyProp(f).get
+    }
   }
 
   def setFlag(prop: Prop, value: Boolean)(implicit p: Pipeline) =

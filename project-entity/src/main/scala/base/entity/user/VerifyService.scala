@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 9:49 AM
+ * Last modified by rconrad, 1/11/15 2:21 PM
  */
 
 package base.entity.user
@@ -24,6 +24,12 @@ trait VerifyService extends Service {
   final def serviceManifest = manifest[VerifyService]
 
   def verify(input: VerifyModel)(implicit authCtx: AuthContext): VerifyResponse
+
+  def sendVerifySms(phone: String, code: String): Future[Boolean]
+
+  def makeVerifyCode(): String
+
+  def validateVerifyCodes(code1: String, code2: String): Boolean
 
 }
 

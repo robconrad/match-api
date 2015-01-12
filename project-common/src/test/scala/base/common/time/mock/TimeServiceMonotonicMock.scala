@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 9:01 PM
+ * Last modified by rconrad, 1/11/15 4:46 PM
  */
 
 package base.common.time.mock
@@ -25,6 +25,8 @@ object TimeServiceMonotonicMock extends TimeService {
   }
 
   def asString(d: DateTime) = TimeServiceImpl.asString(d)
+
+  def fromString(s: String) = TimeServiceImpl.fromString(s)
 
   def nowNoUpdate = dateTime
 
