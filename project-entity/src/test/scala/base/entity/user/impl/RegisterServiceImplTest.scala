@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 5:46 PM
+ * Last modified by rconrad, 1/11/15 7:08 PM
  */
 
 package base.entity.user.impl
@@ -94,8 +94,9 @@ class RegisterServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("phone cooldown in effect") {
-    assert(PhoneCooldownKeyFactory().make(KeyId(registerModel.phone)).set(1).await())
-    assert(service.phoneCooldownExists().await() == externalErrorPhoneResponse.await())
+    val key = PhoneCooldownKeyFactory().make(KeyId(registerModel.phone))
+    assert(key.set(1).await())
+    assert(service.phoneCooldownExists(key).await() == externalErrorPhoneResponse.await())
   }
 
   test("failed to set phone cooldown") {

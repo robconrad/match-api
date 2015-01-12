@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 6:18 PM
+ * Last modified by rconrad, 1/11/15 7:08 PM
  */
 
 package base.entity.user.impl
@@ -43,6 +43,7 @@ class VerifyServiceImplTest extends EntityServiceTest with KvTest {
   private val name = "bob"
   private val gender = Genders.male
   private val device = RandomService().uuid
+  private val userId = RandomService().uuid
 
   private val randomMock = new RandomServiceMock()
 
@@ -81,10 +82,12 @@ class VerifyServiceImplTest extends EntityServiceTest with KvTest {
     assert(deviceKey.getDateTime(CreatedProp).await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getDateTime(UpdatedProp).await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getId(TokenProp).await().contains(token))
+    assert(deviceKey.getId(UserIdProp).await().contains(userId))
   }
 
   test("failed to get phone verification code") {
-    assert(service.phoneKeyGet().await() == externalErrorNoCodeResponse.await())
+    val key = new HashKeyMock()
+    assert(service.phoneKeyGet(key).await() == externalErrorNoCodeResponse.await())
   }
 
   test("failed to validate phone verification code") {
@@ -101,23 +104,23 @@ class VerifyServiceImplTest extends EntityServiceTest with KvTest {
   test("failed to provide name on first verify") {
     val myModel = model.copy(name = None)
     val key = new HashKeyMock(getMultiResult = Future.successful(Map(GenderProp -> Option(gender.toString))))
-    assert(service.userKeyGet(key)(myModel, p).await() == externalErrorRequiredParamsResponse.await())
+    assert(service.userKeyGet(userId, key)(myModel, p).await() == externalErrorRequiredParamsResponse.await())
   }
 
   test("failed to provide gender on first verify") {
     val myModel = model.copy(gender = None)
     val key = new HashKeyMock(getMultiResult = Future.successful(Map(NameProp -> Option(name))))
-    assert(service.userKeyGet(key)(myModel, p).await() == externalErrorRequiredParamsResponse.await())
+    assert(service.userKeyGet(userId, key)(myModel, p).await() == externalErrorRequiredParamsResponse.await())
   }
 
   test("failed to set user attributes") {
     val key = new HashKeyMock(setMultiResult = Future.successful(false))
-    assert(service.userKeySet(key, name, gender).await() == internalErrorSetUserFailedResponse.await())
+    assert(service.userKeySet(userId, key, name, gender).await() == internalErrorSetUserFailedResponse.await())
   }
 
   test("failed to set device attributes") {
     val key = new HashKeyMock(setMultiResult = Future.successful(false))
-    assert(service.deviceKeySet(key).await() == internalErrorSetDeviceFailedResponse.await())
+    assert(service.deviceKeySet(userId, key).await() == internalErrorSetDeviceFailedResponse.await())
   }
 
   test("send verify sms") {

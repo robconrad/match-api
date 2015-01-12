@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 5:31 PM
+ * Last modified by rconrad, 1/11/15 7:06 PM
  */
 
 package base.entity.user.impl
@@ -52,12 +52,11 @@ private[entity] class RegisterServiceImpl(phoneCooldown: FiniteDuration)
    */
   def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.REGISTER)
-    phoneCooldownExists()(input, KvService().pipeline)
+    phoneCooldownExists(PhoneCooldownKeyFactory().make(KeyId(input.phone)))(input, KvService().pipeline)
   }
 
-  private[impl] def phoneCooldownExists()(implicit input: RegisterModel,
-                                          p: Pipeline): RegisterResponse = {
-    val phoneCooldownKey = PhoneCooldownKeyFactory().make(KeyId(input.phone))
+  private[impl] def phoneCooldownExists(phoneCooldownKey: IntKey)(implicit input: RegisterModel,
+                                                                  p: Pipeline): RegisterResponse = {
     phoneCooldownKey.exists().flatMap {
       case true  => externalErrorPhoneResponse
       case false => phoneCooldownSet(phoneCooldownKey)

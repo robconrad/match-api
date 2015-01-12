@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 6:19 PM
+ * Last modified by rconrad, 1/11/15 7:06 PM
  */
 
 package base.entity.user.impl
+
+import java.util.UUID
 
 import base.common.lib.Dispatchable
 import base.common.random.RandomService
@@ -53,7 +55,7 @@ private[entity] class VerifyServiceImpl(codeLength: Int,
    */
   def verify(input: VerifyModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.VERIFY)
-    phoneKeyGet()(input, KvService().pipeline)
+    phoneKeyGet(PhoneKeyFactory().make(KeyId(input.phone)))(input, KvService().pipeline)
   }
 
   def sendVerifySms(phone: String, code: String) = {
@@ -69,9 +71,8 @@ private[entity] class VerifyServiceImpl(codeLength: Int,
     normalize(code1) == normalize(code2)
   }
 
-  private[impl] def phoneKeyGet()(implicit input: VerifyModel,
-                                  p: Pipeline): VerifyResponse = {
-    val phoneKey = PhoneKeyFactory().make(KeyId(input.phone))
+  private[impl] def phoneKeyGet(phoneKey: HashKey)(implicit input: VerifyModel,
+                                                   p: Pipeline): VerifyResponse = {
     phoneKey.getString(CodeProp).flatMap {
       case Some(code) => phoneKeyVerify(phoneKey, code)
       case None       => externalErrorNoCodeResponse
@@ -89,14 +90,14 @@ private[entity] class VerifyServiceImpl(codeLength: Int,
   private[impl] def userIdGet(phoneKey: HashKey)(implicit input: VerifyModel,
                                                  p: Pipeline): VerifyResponse = {
     phoneKey.getId(UserIdProp).flatMap {
-      case Some(userId) => userKeyGet(UserKeyFactory().make(KeyId(userId)))
+      case Some(userId) => userKeyGet(userId, UserKeyFactory().make(KeyId(userId)))
       case None         => internalErrorNoUserIdResponse
     }
   }
 
   private val userKeyGetProps = Array[Prop](NameProp, GenderProp)
-  private[impl] def userKeyGet(userKey: HashKey)(implicit input: VerifyModel,
-                                                 p: Pipeline): VerifyResponse = {
+  private[impl] def userKeyGet(userId: UUID, userKey: HashKey)(implicit input: VerifyModel,
+                                                               p: Pipeline): VerifyResponse = {
     userKey.get(userKeyGetProps).flatMap { props =>
       val name = props.get(NameProp).flatten
       val gender = props.get(GenderProp).flatten
@@ -107,30 +108,34 @@ private[entity] class VerifyServiceImpl(codeLength: Int,
           // TODO this is weird get rid of it
           val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
           val g = input.gender.map(_.toString).getOrElse(gender.getOrElse(throw new RuntimeException("missing gender")))
-          userKeySet(userKey, n, g)
+          userKeySet(userId, userKey, n, g)
       }
     }
   }
 
-  private[impl] def userKeySet(userKey: HashKey, name: String, gender: String)(implicit input: VerifyModel,
-                                                                               p: Pipeline): VerifyResponse = {
+  private[impl] def userKeySet(userId: UUID,
+                               userKey: HashKey,
+                               name: String,
+                               gender: String)(implicit input: VerifyModel,
+                                               p: Pipeline): VerifyResponse = {
     val props = Map[Prop, Any](
       NameProp -> name,
       GenderProp -> gender,
       UpdatedProp -> TimeService().asString())
     userKey.set(props).flatMap {
-      case true  => deviceKeySet(DeviceKeyFactory().make(KeyId(input.deviceUuid)))
+      case true  => deviceKeySet(userId, DeviceKeyFactory().make(KeyId(input.deviceUuid)))
       case false => internalErrorSetUserFailedResponse
     }
   }
 
-  private[impl] def deviceKeySet(deviceKey: HashKey)(implicit input: VerifyModel,
-                                                     p: Pipeline): VerifyResponse = {
+  private[impl] def deviceKeySet(userId: UUID, deviceKey: HashKey)(implicit input: VerifyModel,
+                                                                   p: Pipeline): VerifyResponse = {
     deviceKey.setNx(CreatedProp, TimeService().asString()).flatMap { exists =>
       val token = RandomService().uuid
       val props = Map[Prop, Any](
         UpdatedProp -> TimeService().asString(),
-        TokenProp -> token)
+        TokenProp -> token,
+        UserIdProp -> userId)
       deviceKey.set(props).flatMap {
         case true  => VerifyResponseModel(token)
         case false => internalErrorSetDeviceFailedResponse
@@ -143,7 +148,7 @@ private[entity] class VerifyServiceImpl(codeLength: Int,
 object VerifyServiceImpl {
 
   private val crudImplicits = CrudImplicits[VerifyResponseModel]
-  import base.entity.user.impl.VerifyServiceImpl.crudImplicits._
+  import crudImplicits._
 
   lazy val externalErrorNoCode = "A verification code has not been sent for this phone number."
   lazy val externalErrorCodeValidation = "The supplied verification code does not validate."

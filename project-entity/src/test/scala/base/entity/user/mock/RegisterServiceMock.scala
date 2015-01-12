@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 9:39 AM
+ * Last modified by rconrad, 1/11/15 6:22 PM
  */
 
 package base.entity.user.mock
@@ -22,12 +22,6 @@ import scala.concurrent.Future
 class RegisterServiceMock extends ServiceImpl with RegisterService {
 
   def register(input: RegisterModel)(implicit authCtx: AuthContext) =
-    Future.successful(Left(ApiError("not implemented")))
-
-  def verify(input: VerifyModel)(implicit authCtx: AuthContext) =
-    Future.successful(Left(ApiError("not implemented")))
-
-  def login(input: LoginModel)(implicit authCtx: AuthContext) =
     Future.successful(Left(ApiError("not implemented")))
 
 }
