@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 7:06 PM
+ * Last modified by rconrad, 1/12/15 8:11 PM
  */
 
 package base.entity.user.impl
@@ -96,7 +96,7 @@ private[entity] class RegisterServiceImpl(phoneCooldown: FiniteDuration)
     phoneKey.set(UserIdProp, userId).flatMap {
       case true =>
         val userKey = UserKeyFactory().make(KeyId(userId))
-        userKey.setNx(CreatedProp, TimeService().now).flatMap { exists =>
+        userKey.setNx(CreatedProp, TimeService().asString()).flatMap { exists =>
           phoneKeyUpdates(phoneKey)
         }
       case false => internalErrorUserCreateResponse

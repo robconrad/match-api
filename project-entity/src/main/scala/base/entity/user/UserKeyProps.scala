@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 6:55 PM
+ * Last modified by rconrad, 1/12/15 8:11 PM
  */
 
 package base.entity.user
@@ -22,6 +22,9 @@ private[user] object UserKeyProps {
   object GenderProp extends KeyProp("gender")
   object NameProp extends KeyProp("name")
   object TokenProp extends KeyProp("token")
+
+  // user shiz
+  object LastLoginProp extends KeyProp("lastLogin")
 
   // device shiz
   object AppVersionProp extends KeyProp("appVersion")

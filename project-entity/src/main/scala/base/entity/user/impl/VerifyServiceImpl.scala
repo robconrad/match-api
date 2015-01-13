@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 7:06 PM
+ * Last modified by rconrad, 1/12/15 9:22 PM
  */
 
 package base.entity.user.impl
@@ -35,8 +35,7 @@ import spray.http.StatusCodes._
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class VerifyServiceImpl(codeLength: Int,
-                                        smsBody: String)
+private[entity] class VerifyServiceImpl(codeLength: Int, smsBody: String)
     extends ServiceImpl with VerifyService with Dispatchable with AuthLoggable {
 
   private implicit val ec = dispatcher
