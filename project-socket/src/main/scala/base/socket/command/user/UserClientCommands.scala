@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 9:50 AM
+ * Last modified by rconrad, 1/13/15 5:17 PM
  */
 
 package base.socket.command.user
 
-import base.entity.user.{ VerifyService, LoginService, RegisterService }
+import base.entity.user.{ VerifyCommandService, LoginCommandService, RegisterCommandService }
 import base.entity.user.model.{ LoginModel, RegisterModel, VerifyModel }
 import base.socket.command.{ CommandObject, UserClientCommand }
 import base.socket.model.HeartbeatModel
@@ -19,19 +19,19 @@ object UserClientCommands extends CommandObject {
 
   case object Register extends UserClientCommand[RegisterModel]("register") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: RegisterModel) {
-      RegisterService().register(msg)(ctx).foreach(ctx.channel().write)
+      RegisterCommandService().register(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 
   case object Verify extends UserClientCommand[VerifyModel]("verify") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: VerifyModel) {
-      VerifyService().verify(msg)(ctx).foreach(ctx.channel().write)
+      VerifyCommandService().verify(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 
   case object Login extends UserClientCommand[LoginModel]("login") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: LoginModel) {
-      LoginService().login(msg)(ctx).foreach(ctx.channel().write)
+      LoginCommandService().login(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 

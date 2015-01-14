@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:23 PM
+ * Last modified by rconrad, 1/13/15 10:09 PM
  */
 
 package base.entity.kv.impl
@@ -10,7 +10,7 @@ package base.entity.kv.impl
 import java.nio.charset.Charset
 
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.{ KeyLogger, SetKey }
+import base.entity.kv.{ PrivateHashKey, KeyLogger, SetKey }
 import redis.reply.BulkReply
 
 import scala.collection.JavaConversions._
@@ -19,7 +19,7 @@ import scala.collection.JavaConversions._
  * Base model for set keys
  */
 // scalastyle:off null
-private[kv] final class SetKeyImpl(val token: String, protected val logger: KeyLogger) extends KeyImpl with SetKey {
+abstract class SetKeyImpl extends KeyImpl with SetKey {
 
   def members()(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SMEMBERS (start)")

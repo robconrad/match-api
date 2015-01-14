@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 3:56 PM
+ * Last modified by rconrad, 1/13/15 4:50 PM
  */
 
 package base.entity.kv
@@ -18,7 +18,7 @@ import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
  */
 trait KvTest extends EntityBaseSuite with BeforeAndAfterAll with BeforeAndAfterEach {
 
-  implicit val p = KvService().client.pipeline()
+  implicit val p = KvFactoryService().client.pipeline()
 
   override def beforeAll() {
     super.beforeAll()
@@ -27,7 +27,7 @@ trait KvTest extends EntityBaseSuite with BeforeAndAfterAll with BeforeAndAfterE
 
   override def beforeEach() {
     super.beforeEach()
-    KvService().client.flushall()
+    KvFactoryService().client.flushall()
   }
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 4:36 PM
+ * Last modified by rconrad, 1/13/15 10:09 PM
  */
 
 package base.entity.kv.mock
@@ -25,7 +25,7 @@ class IntKeyMock(val token: String = RandomService().md5.toString,
                  getResult: Future[Option[Int]] = Future.successful(None),
                  keyMock: Key = new KeyMock()) extends IntKey {
 
-  def incr()(implicit p: Pipeline) = incrResult
+  def increment()(implicit p: Pipeline) = incrResult
 
   def set(v: Int)(implicit p: Pipeline) = setResult
 

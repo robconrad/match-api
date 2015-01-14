@@ -2,16 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 3:52 PM
+ * Last modified by rconrad, 1/13/15 7:00 PM
  */
 
 package base.entity.service
 
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.auth.impl.AuthServiceImpl
-import base.entity.kv.impl.KvServiceImpl
+import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
-import base.entity.user.impl.{ LoginServiceImpl, VerifyServiceImpl, RegisterServiceImpl }
+import base.entity.user.impl._
 
 /**
  * Injects configuration into Services and boots them up. If it's configurable, it belongs here.
@@ -39,7 +39,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val kvRegistered = {
 
-    Services.register(new KvServiceImpl(
+    Services.register(new KvFactoryServiceImpl(
       Keys(KV, "clientCount"),
       Keys(KV, "host"),
       Keys(KV, "port")))
@@ -59,14 +59,19 @@ object EntityServicesBootstrap extends ServicesBootstrap {
       Keys(TWILIO, "token"),
       Keys(TWILIO, "from")))
 
-    Services.register(new RegisterServiceImpl(
+    Services.register(new RegisterCommandServiceImpl(
       Keys(MATCH_USER, "phoneCooldown")))
 
-    Services.register(new VerifyServiceImpl(
+    Services.register(new VerifyCommandServiceImpl(
       Keys(MATCH_USER, "verifyCodeLength"),
       Keys(MATCH_USER, "verifySmsBody")))
 
-    Services.register(new LoginServiceImpl())
+    Services.register(new LoginCommandServiceImpl())
+
+    Services.register(new UserKeyServiceImpl())
+    Services.register(new DeviceKeyServiceImpl())
+    Services.register(new PhoneKeyServiceImpl())
+    Services.register(new PhoneCooldownKeyServiceImpl())
 
     true
   }
