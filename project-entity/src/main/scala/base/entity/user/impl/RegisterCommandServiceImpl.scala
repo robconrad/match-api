@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 9:09 PM
+ * Last modified by rconrad, 1/15/15 11:01 AM
  */
 
 package base.entity.user.impl
@@ -17,12 +17,12 @@ import base.entity.kv.Key.Pipeline
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
 import base.entity.perm.Perms
-import base.entity.service.CrudImplicits
+import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import base.entity.user.RegisterCommandService.RegisterResponse
 import base.entity.user._
-import base.entity.user.impl.RegisterCommandServiceImpl._
-import base.entity.user.model._
-import spray.http.StatusCodes._
+import base.entity.user.impl.RegisterCommandServiceImpl.Errors
+import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
+import spray.http.StatusCodes
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -31,12 +31,13 @@ import scala.concurrent.duration.FiniteDuration
  * @author rconrad
  */
 private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
-    extends ServiceImpl with RegisterCommandService with Dispatchable with AuthLoggable {
+    extends ServiceImpl
+    with RegisterCommandService
+    with CrudImplicits[RegisterResponseModel]
+    with Dispatchable
+    with AuthLoggable {
 
   private implicit val ec = dispatcher
-
-  private val crudImplicits = CrudImplicits[RegisterResponseModel]
-  import crudImplicits._
 
   /**
    * - reject if phone in cooldown
@@ -54,16 +55,16 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
   private[impl] def phoneCooldownExists(phoneCooldownKey: IntKey)(implicit input: RegisterModel,
                                                                   p: Pipeline): RegisterResponse = {
     phoneCooldownKey.exists().flatMap {
-      case true  => externalErrorPhoneResponse
       case false => phoneCooldownSet(phoneCooldownKey)
+      case true  => Errors.phoneCooldown
     }
   }
 
   private[impl] def phoneCooldownSet(phoneCooldownKey: IntKey)(implicit input: RegisterModel,
                                                                p: Pipeline): RegisterResponse = {
-    phoneCooldownKey.set(phoneCooldownValue).flatMap {
+    phoneCooldownKey.set(RegisterCommandServiceImpl.phoneCooldownValue).flatMap {
       case true  => phoneCooldownExpire(phoneCooldownKey)
-      case false => internalErrorSetPhoneCooldownResponse
+      case false => Errors.phoneCooldownSetFailed
     }
   }
 
@@ -71,7 +72,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
                                                                   p: Pipeline): RegisterResponse = {
     phoneCooldownKey.expire(phoneCooldown.toSeconds).flatMap {
       case true  => phoneKeyCreate()
-      case false => internalErrorExpirePhoneCooldownResponse
+      case false => Errors.phoneCooldownExpireFailed
     }
   }
 
@@ -90,11 +91,11 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
                                                       p: Pipeline): RegisterResponse = {
     val userId = RandomService().uuid
     UserKeyService().make(KeyId(userId)).create().flatMap {
-      case false => internalErrorUserCreateResponse
+      case false => Errors.userSetFailed
       case true =>
         phoneKey.setUserId(userId).flatMap {
           case true  => phoneKeyUpdates(phoneKey)
-          case false => internalErrorUserCreateResponse
+          case false => Errors.userSetFailed
         }
     }
   }
@@ -104,7 +105,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
     val code = VerifyCommandService().makeVerifyCode()
     phoneKey.setCode(code).flatMap {
       case true  => smsSend(code: String)
-      case false => internalErrorPhoneUpdatesResponse
+      case false => Errors.phoneSetFailed
     }
   }
 
@@ -112,7 +113,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
                                           p: Pipeline): RegisterResponse = {
     VerifyCommandService().sendVerifySms(input.phone, code).map {
       case true  => RegisterResponseModel()
-      case false => internalErrorSmsFailedResponse
+      case false => Errors.smsSendFailed
     }
   }
 
@@ -120,31 +121,21 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
 
 object RegisterCommandServiceImpl {
 
-  private val crudImplicits = CrudImplicits[RegisterResponseModel]
-  import base.entity.user.impl.RegisterCommandServiceImpl.crudImplicits._
-
   val phoneCooldownValue = 1
 
-  lazy val externalErrorPhone = "This phone number has been registered too recently."
-  lazy val externalErrorRegister = "There was a problem with registration."
+  object Errors extends CrudErrorImplicits[RegisterResponseModel] {
 
-  lazy val internalErrorSetPhoneCooldown = "failed to set phoneCooldown"
-  lazy val internalErrorExpirePhoneCooldown = "failed to expire phoneCooldown"
-  lazy val internalErrorUserCreate = "failed to create user"
-  lazy val internalErrorPhoneUpdates = "failed to set phone updates"
-  lazy val internalErrorSmsFailed = "failed to send sms"
+    protected val externalErrorText = "There was a problem with registration."
 
-  lazy val externalErrorPhoneResponse: RegisterResponse =
-    ApiError(externalErrorPhone, EnhanceYourCalm, PHONE_RATE_LIMIT)
-  lazy val internalErrorSetPhoneCooldownResponse: RegisterResponse =
-    ApiError(externalErrorRegister, InternalServerError, internalErrorSetPhoneCooldown)
-  lazy val internalErrorExpirePhoneCooldownResponse: RegisterResponse =
-    ApiError(externalErrorRegister, InternalServerError, internalErrorExpirePhoneCooldown)
-  lazy val internalErrorUserCreateResponse: RegisterResponse =
-    ApiError(externalErrorRegister, InternalServerError, internalErrorUserCreate)
-  lazy val internalErrorPhoneUpdatesResponse: RegisterResponse =
-    ApiError(externalErrorRegister, InternalServerError, internalErrorPhoneUpdates)
-  lazy val internalErrorSmsFailedResponse =
-    ApiError(externalErrorRegister, InternalServerError, internalErrorSmsFailed)
+    private val phoneCooldownText = "This phone number has been registered too recently."
+
+    lazy val phoneCooldown: Response = (phoneCooldownText, StatusCodes.EnhanceYourCalm, PHONE_RATE_LIMIT)
+    lazy val phoneCooldownSetFailed: Response = "failed to set phoneCooldown"
+    lazy val phoneCooldownExpireFailed: Response = "failed to expire phoneCooldown"
+    lazy val userSetFailed: Response = "failed to create user"
+    lazy val phoneSetFailed: Response = "failed to set phone updates"
+    lazy val smsSendFailed: ApiError = "failed to send sms"
+
+  }
 
 }

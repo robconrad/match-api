@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 9:09 PM
+ * Last modified by rconrad, 1/15/15 11:01 AM
  */
 
 package base.entity.user.impl
@@ -13,7 +13,6 @@ import base.common.lib.Dispatchable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
-import base.entity.error.ApiError
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
 import base.entity.kv.Key._
@@ -24,10 +23,10 @@ import base.entity.pair.model.PairModel
 import base.entity.perm.Perms
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
-import base.entity.service.CrudImplicits
+import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import base.entity.user.LoginCommandService.LoginResponse
 import base.entity.user._
-import base.entity.user.impl.LoginCommandServiceImpl._
+import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.model._
 import spray.http.StatusCodes._
 
@@ -36,12 +35,13 @@ import spray.http.StatusCodes._
  * @author rconrad
  */
 private[entity] class LoginCommandServiceImpl()
-    extends ServiceImpl with LoginCommandService with Dispatchable with AuthLoggable {
+    extends ServiceImpl
+    with LoginCommandService
+    with CrudImplicits[LoginResponseModel]
+    with Dispatchable
+    with AuthLoggable {
 
   private implicit val ec = dispatcher
-
-  private val crudImplicits = CrudImplicits[LoginResponseModel]
-  import crudImplicits._
 
   /**
    * - get device token
@@ -62,8 +62,8 @@ private[entity] class LoginCommandServiceImpl()
                                                        p: Pipeline): LoginResponse = {
     deviceKey.getToken.flatMap {
       case Some(token) if input.token == token => deviceKeySet(deviceKey)
-      case Some(token)                         => externalErrorTokenNotValidResponse
-      case None                                => externalErrorDeviceNotVerifiedResponse
+      case Some(token)                         => Errors.tokenInvalid
+      case None                                => Errors.deviceUnverified
     }
   }
 
@@ -78,7 +78,7 @@ private[entity] class LoginCommandServiceImpl()
       input.device.version
     ).flatMap {
         case true  => userKeyGet(deviceKey)
-        case false => internalErrorDeviceSetFailedResponse
+        case false => Errors.deviceSetFailed
       }
   }
 
@@ -86,7 +86,7 @@ private[entity] class LoginCommandServiceImpl()
                                                      p: Pipeline): LoginResponse = {
     deviceKey.getUserId.flatMap {
       case Some(userId) => getPairs(userId)
-      case None         => internalErrorUserIdGetFailedResponse
+      case None         => Errors.userIdGetFailed
     }
   }
 
@@ -126,7 +126,7 @@ private[entity] class LoginCommandServiceImpl()
     userKey.getLastLogin.flatMap { lastLogin =>
       userKey.setLastLogin().flatMap {
         case true  => LoginResponseModel(userId, pairs, events, questions, lastLogin)
-        case false => internalErrorUserSetFailedResponse
+        case false => Errors.userSetFailed
       }
     }
   }
@@ -135,26 +135,19 @@ private[entity] class LoginCommandServiceImpl()
 
 object LoginCommandServiceImpl {
 
-  private val crudImplicits = CrudImplicits[LoginResponseModel]
-  import base.entity.user.impl.LoginCommandServiceImpl.crudImplicits._
+  object Errors extends CrudErrorImplicits[LoginResponseModel] {
 
-  lazy val externalErrorDeviceNotVerified = "This device has not been verified."
-  lazy val externalErrorTokenNotValid = "The supplied token is not valid."
-  lazy val externalErrorLogin = "There was a problem during login."
+    protected val externalErrorText = "There was a problem during login."
 
-  lazy val internalErrorDeviceSetFailed = "failed to set device attributes"
-  lazy val internalErrorUserIdGetFailed = "failed to get user id from device"
-  lazy val internalErrorUserSetFailed = "failed to set user attributes"
+    private val deviceUnverifiedText = "This device has not been verified."
+    private val tokenInvalidText = "The supplied token is not valid."
 
-  lazy val externalErrorDeviceNotVerifiedResponse: LoginResponse =
-    ApiError(externalErrorDeviceNotVerified, BadRequest, DEVICE_NOT_VERIFIED)
-  lazy val externalErrorTokenNotValidResponse: LoginResponse =
-    ApiError(externalErrorTokenNotValid, Unauthorized, TOKEN_NOT_VALID)
-  lazy val internalErrorDeviceSetFailedResponse: LoginResponse =
-    ApiError(externalErrorLogin, InternalServerError, internalErrorDeviceSetFailed)
-  lazy val internalErrorUserIdGetFailedResponse: LoginResponse =
-    ApiError(externalErrorLogin, InternalServerError, internalErrorUserIdGetFailed)
-  lazy val internalErrorUserSetFailedResponse: LoginResponse =
-    ApiError(externalErrorLogin, InternalServerError, internalErrorUserSetFailed)
+    lazy val deviceUnverified: Response = (deviceUnverifiedText, DEVICE_NOT_VERIFIED)
+    lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_NOT_VALID)
+    lazy val deviceSetFailed: Response = "failed to set device attributes"
+    lazy val userIdGetFailed: Response = "failed to get user id from device"
+    lazy val userSetFailed: Response = "failed to set user attributes"
+
+  }
 
 }

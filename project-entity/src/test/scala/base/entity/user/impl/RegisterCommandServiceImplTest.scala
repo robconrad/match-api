@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/15/15 10:51 AM
  */
 
 package base.entity.user.impl
@@ -16,14 +16,14 @@ import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock, IntKeyMock, KeyMock }
+import base.entity.kv.mock.{ IntKeyMock, KeyLoggerMock, KeyMock, PrivateHashKeyMock }
 import base.entity.kv.{ KeyId, KvFactoryService, KvTest }
 import base.entity.service.EntityServiceTest
+import base.entity.user.PhoneCooldownKeyService
 import base.entity.user.UserKeyProps.{ CodeProp, UserIdProp }
 import base.entity.user.impl.RegisterCommandServiceImpl._
 import base.entity.user.mock.VerifyCommandServiceMock
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
-import base.entity.user.{ UserKey, PhoneCooldownKeyService, PhoneKeyService, UserKeyService }
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -96,34 +96,34 @@ class RegisterCommandServiceImplTest extends EntityServiceTest with KvTest {
   test("phone cooldown in effect") {
     val key = PhoneCooldownKeyService().make(KeyId(registerModel.phone))
     assert(key.set(1).await())
-    assert(service.phoneCooldownExists(key).await() == externalErrorPhoneResponse.await())
+    assert(service.phoneCooldownExists(key).await() == Errors.phoneCooldown.await())
   }
 
   test("failed to set phone cooldown") {
     val keyMock = new IntKeyMock(setResult = Future.successful(false))
-    assert(service.phoneCooldownSet(keyMock).await() == internalErrorSetPhoneCooldownResponse.await())
+    assert(service.phoneCooldownSet(keyMock).await() == Errors.phoneCooldownSetFailed.await())
   }
 
   test("failed to expire phone cooldown") {
     val key = new IntKeyMock(keyMock = new KeyMock(expireResult = Future.successful(false)))
-    assert(service.phoneCooldownExpire(key).await() == internalErrorExpirePhoneCooldownResponse.await())
+    assert(service.phoneCooldownExpire(key).await() == Errors.phoneCooldownExpireFailed.await())
   }
 
   test("failed to create user") {
     val hashMock = new PrivateHashKeyMock(setResult = Future.successful(false))
     val key = new PhoneKeyImpl(hashMock)
-    assert(service.userKeyCreate(key).await() == internalErrorUserCreateResponse.await())
+    assert(service.userKeyCreate(key).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set phone updates") {
     val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
     val key = new PhoneKeyImpl(hashMock)
-    assert(service.phoneKeyUpdates(key).await() == internalErrorPhoneUpdatesResponse.await())
+    assert(service.phoneKeyUpdates(key).await() == Errors.phoneSetFailed.await())
   }
 
   test("failed to send sms") {
     val unregister = TestServices.register(new VerifyCommandServiceMock(sendVerifySmsResult = Future.successful(false)))
-    assert(service.smsSend(code = "code").await() == Left(internalErrorSmsFailedResponse))
+    assert(service.smsSend(code = "code").await() == Left(Errors.smsSendFailed))
     unregister()
   }
 

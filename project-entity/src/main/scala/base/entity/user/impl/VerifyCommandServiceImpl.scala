@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 9:08 PM
+ * Last modified by rconrad, 1/15/15 10:59 AM
  */
 
 package base.entity.user.impl
@@ -15,16 +15,15 @@ import base.common.random.RandomService
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
-import base.entity.error.ApiError
 import base.entity.kv.Key._
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
 import base.entity.perm.Perms
-import base.entity.service.CrudImplicits
+import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import base.entity.sms.SmsService
 import base.entity.user.VerifyCommandService.VerifyResponse
 import base.entity.user._
-import base.entity.user.impl.VerifyCommandServiceImpl._
+import base.entity.user.impl.VerifyCommandServiceImpl.Errors
 import base.entity.user.model._
 import spray.http.StatusCodes._
 
@@ -33,12 +32,13 @@ import spray.http.StatusCodes._
  * @author rconrad
  */
 private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
-    extends ServiceImpl with VerifyCommandService with Dispatchable with AuthLoggable {
+    extends ServiceImpl
+    with VerifyCommandService
+    with CrudImplicits[VerifyResponseModel]
+    with Dispatchable
+    with AuthLoggable {
 
   private implicit val ec = dispatcher
-
-  private val crudImplicits = CrudImplicits[VerifyResponseModel]
-  import crudImplicits._
 
   /**
    * - get code
@@ -71,7 +71,7 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
                                                     p: Pipeline): VerifyResponse = {
     phoneKey.getCode.flatMap {
       case Some(code) => phoneKeyVerify(phoneKey, code)
-      case None       => externalErrorNoCodeResponse
+      case None       => Errors.codeMissing
     }
   }
 
@@ -79,7 +79,7 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
                                                                      p: Pipeline): VerifyResponse = {
     validateVerifyCodes(input.code, code) match {
       case true  => userIdGet(phoneKey)
-      case false => externalErrorCodeValidationResponse
+      case false => Errors.codeValidation
     }
   }
 
@@ -87,15 +87,15 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
                                                   p: Pipeline): VerifyResponse = {
     phoneKey.getUserId.flatMap {
       case Some(userId) => userKeyGet(userId, UserKeyService().make(KeyId(userId)))
-      case None         => internalErrorNoUserIdResponse
+      case None         => Errors.userIdMissing
     }
   }
 
   private[impl] def userKeyGet(userId: UUID, userKey: UserKey)(implicit input: VerifyModel,
                                                                p: Pipeline): VerifyResponse = {
     userKey.getNameAndGender.flatMap {
-      case (None, _) if input.name.isEmpty   => externalErrorRequiredParamsResponse
-      case (_, None) if input.gender.isEmpty => externalErrorRequiredParamsResponse
+      case (None, _) if input.name.isEmpty   => Errors.paramsMissing
+      case (_, None) if input.gender.isEmpty => Errors.paramsMissing
       case (name, gender) =>
         // TODO this is weird get rid of it
         val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
@@ -111,7 +111,7 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
                                                p: Pipeline): VerifyResponse = {
     userKey.setNameAndGender(name, gender).flatMap {
       case true  => deviceKeySet(userId, DeviceKeyService().make(KeyId(input.deviceUuid)))
-      case false => internalErrorSetUserFailedResponse
+      case false => Errors.userSetFailed
     }
   }
 
@@ -121,7 +121,7 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
       val token = RandomService().uuid
       deviceKey.setTokenAndUserId(token, userId).flatMap {
         case true  => VerifyResponseModel(token)
-        case false => internalErrorSetDeviceFailedResponse
+        case false => Errors.deviceSetFailed
       }
     }
   }
@@ -130,29 +130,21 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
 
 object VerifyCommandServiceImpl {
 
-  private val crudImplicits = CrudImplicits[VerifyResponseModel]
-  import base.entity.user.impl.VerifyCommandServiceImpl.crudImplicits._
+  object Errors extends CrudErrorImplicits[VerifyResponseModel] {
 
-  lazy val externalErrorNoCode = "A verification code has not been sent for this phone number."
-  lazy val externalErrorCodeValidation = "The supplied verification code does not validate."
-  lazy val externalErrorRequiredParams = "Name and gender must be supplied upon first verification."
-  lazy val externalErrorVerify = "There was a problem with verification."
+    protected val externalErrorText = "There was a problem with verification."
 
-  lazy val internalErrorNoUserId = "user id is missing"
-  lazy val internalErrorSetUserFailed = "failed to set user attributes"
-  lazy val internalErrorSetDeviceFailed = "failed to set device attributes"
+    private val codeMissingText = "A verification code has not been sent for this phone number."
+    private val codeValidationText = "The supplied verification code does not validate."
+    private val paramsMissingText = "Name and gender must be supplied upon first verification."
 
-  lazy val externalErrorNoCodeResponse: VerifyResponse =
-    ApiError(externalErrorNoCode, BadRequest, NO_VERIFY_CODE)
-  lazy val externalErrorCodeValidationResponse: VerifyResponse =
-    ApiError(externalErrorCodeValidation, BadRequest, VERIFY_CODE_VALIDATION)
-  lazy val externalErrorRequiredParamsResponse: VerifyResponse =
-    ApiError(externalErrorRequiredParams, BadRequest, REQUIRED_PARAMS)
-  lazy val internalErrorNoUserIdResponse: VerifyResponse =
-    ApiError(externalErrorVerify, InternalServerError, internalErrorNoUserId)
-  lazy val internalErrorSetUserFailedResponse: VerifyResponse =
-    ApiError(externalErrorVerify, InternalServerError, internalErrorSetUserFailed)
-  lazy val internalErrorSetDeviceFailedResponse: VerifyResponse =
-    ApiError(externalErrorVerify, InternalServerError, internalErrorSetDeviceFailed)
+    lazy val codeMissing: Response = (codeMissingText, NO_VERIFY_CODE)
+    lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_VALIDATION)
+    lazy val paramsMissing: Response = (paramsMissingText, REQUIRED_PARAMS)
+    lazy val userIdMissing: Response = "user id is missing"
+    lazy val userSetFailed: Response = "failed to set user attributes"
+    lazy val deviceSetFailed: Response = "failed to set device attributes"
+
+  }
 
 }

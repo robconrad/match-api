@@ -11,8 +11,7 @@ import base.entity.api.ApiErrorCodes
 import base.entity.error.ApiError
 import base.entity.test.EntityBaseSuite
 import spray.http.StatusCodes
-
-import scala.concurrent.Future
+import spray.http.StatusCodes._
 
 /**
  * {{ Describe the high level purpose of CrudImplicitsTest here. }}
@@ -20,35 +19,23 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class CrudImplicitsTest extends EntityBaseSuite {
+class CrudErrorImplicitsTest extends EntityBaseSuite {
 
   private def assertImplicits[T](value: T)(implicit m: Manifest[T]) {
     type Result = Either[ApiError, T]
 
-    object DoAsserts extends CrudImplicits[T] {
+    object DoAsserts extends CrudErrorImplicits[T] {
+
+      protected val externalErrorText = "external api error"
 
       private val error = "api error"
-      private val status = StatusCodes.Forbidden
-      private val seed = "error seed"
       private val code = ApiErrorCodes.TEST
 
-      private val tuple2ApiError: Result = (error, status)
-      assert(tuple2ApiError == Left(ApiError(error, status)))
+      private val externalTuple2ApiError: Result = (error, code)
+      assert(externalTuple2ApiError == Left(ApiError(error, StatusCodes.BadRequest, code)))
 
-      private val stringTuple2ApiError: Result = (error, status, seed)
-      assert(stringTuple2ApiError == Left(ApiError(error, status, seed)))
-
-      private val codeTuple2ApiError: Result = (error, status, code)
-      assert(codeTuple2ApiError == Left(ApiError(error, status, code)))
-
-      private val result2Right: Result = value
-      assert(result2Right == Right(value))
-
-      private val apiError2Left: Result = ApiError(error)
-      assert(apiError2Left == Left(ApiError(error)))
-
-      private val either2Future: Future[Result] = Right[ApiError, T](value)
-      assert(either2Future.await() == Right(value))
+      private val internalTuple2ApiError: Result = error
+      assert(internalTuple2ApiError == Left(ApiError(externalErrorText, StatusCodes.InternalServerError, error)))
 
     }
 

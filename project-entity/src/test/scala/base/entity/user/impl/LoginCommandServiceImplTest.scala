@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/15/15 11:00 AM
  */
 
 package base.entity.user.impl
@@ -18,11 +18,10 @@ import base.entity.error.ApiError
 import base.entity.event.mock.EventServiceMock
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
-import base.entity.kv.{ KeyId, KvFactoryService, KvTest }
+import base.entity.kv.{ KvFactoryService, KvTest }
 import base.entity.pair.mock.PairServiceMock
 import base.entity.question.mock.QuestionServiceMock
 import base.entity.service.EntityServiceTest
-import base.entity.user.{ UserKeyService, DeviceKeyService }
 import base.entity.user.UserKeyProps._
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
@@ -102,25 +101,25 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
   test("failed to get device token") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeyGet(deviceKey).await() == externalErrorDeviceNotVerifiedResponse.await())
+    assert(service.deviceKeyGet(deviceKey).await() == Errors.deviceUnverified.await())
   }
 
   test("failed to validate token") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(Option(RandomService().uuid)))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeyGet(deviceKey).await() == externalErrorTokenNotValidResponse.await())
+    assert(service.deviceKeyGet(deviceKey).await() == Errors.tokenInvalid.await())
   }
 
   test("failed to set device attributes") {
     val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeySet(deviceKey).await() == internalErrorDeviceSetFailedResponse.await())
+    assert(service.deviceKeySet(deviceKey).await() == Errors.deviceSetFailed.await())
   }
 
   test("failed to get device user id") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.userKeyGet(deviceKey).await() == internalErrorUserIdGetFailedResponse.await())
+    assert(service.userKeyGet(deviceKey).await() == Errors.userIdGetFailed.await())
   }
 
   test("failed to get pairs") {
@@ -152,7 +151,7 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
     val hashMock = new PrivateHashKeyMock(setResult = Future.successful(false))
     val userKey = new UserKeyImpl(hashMock)
     val future = service.userKeyGetLogin(userKey, uuid, List(), None, None)
-    assert(future.await() == internalErrorUserSetFailedResponse.await())
+    assert(future.await() == Errors.userSetFailed.await())
   }
 
 }

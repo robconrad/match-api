@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:23 PM
+ * Last modified by rconrad, 1/15/15 9:32 AM
  */
 
 package base.entity.kv.impl
@@ -10,10 +10,10 @@ package base.entity.kv.impl
 import java.nio.charset.Charset
 import java.util.UUID
 
-import base.common.lib.{Ifo, Tryo}
+import base.common.lib.{ Ifo, Tryo }
 import base.common.time.TimeService
-import base.entity.kv.Key.{Pipeline, Prop}
-import base.entity.kv.{Key, KeyLogger, KeyProp, PrivateHashKey}
+import base.entity.kv.Key.{ Pipeline, Prop }
+import base.entity.kv.{ Key, KeyLogger, KeyProp, PrivateHashKey }
 
 import scala.collection.JavaConversions._
 import scala.collection.breakOut
