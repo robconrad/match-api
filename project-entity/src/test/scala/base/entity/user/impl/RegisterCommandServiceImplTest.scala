@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:35 PM
  */
 
 package base.entity.user.impl
@@ -112,14 +112,14 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to create user") {
-    val hashMock = new PrivateHashKeyMock(setResult = Future.successful(false))
-    val key = new PhoneKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(setResult = Future.successful(false))
+    val key = new PhoneKeyImpl(mock)
     assert(command.userCreate(key).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set phone updates") {
-    val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new PhoneKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
+    val key = new PhoneKeyImpl(mock)
     assert(command.phoneSetCode(key).await() == Errors.phoneSetFailed.await())
   }
 

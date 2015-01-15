@@ -2,15 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:36 PM
  */
 
 package base.entity.user.impl
 
 import java.util.UUID
 
-import base.common.lib.Dispatchable
-import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
@@ -18,16 +16,14 @@ import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
 import base.entity.kv._
-import base.entity.logging.AuthLoggable
 import base.entity.pair.PairService
 import base.entity.pair.model.PairModel
-import base.entity.perm.Perms
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
-import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
+import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
-import base.entity.user.model._
+import base.entity.user.model.{ LoginModel, LoginResponseModel }
 import spray.http.StatusCodes._
 
 /**
@@ -58,16 +54,16 @@ private[entity] class LoginCommandServiceImpl()
       deviceGetToken(DeviceKeyService().make(KeyId(input.device.uuid)))
     }
 
-    def deviceGetToken(deviceKey: DeviceKey): Response = {
-      deviceKey.getToken.flatMap {
-        case Some(token) if input.token == token => deviceSet(deviceKey)
+    def deviceGetToken(key: DeviceKey): Response = {
+      key.getToken.flatMap {
+        case Some(token) if input.token == token => deviceSet(key)
         case Some(token)                         => Errors.tokenInvalid
         case None                                => Errors.deviceUnverified
       }
     }
 
-    def deviceSet(deviceKey: DeviceKey): Response = {
-      deviceKey.set(
+    def deviceSet(key: DeviceKey): Response = {
+      key.set(
         input.appVersion,
         input.locale,
         input.device.model,
@@ -75,30 +71,30 @@ private[entity] class LoginCommandServiceImpl()
         input.device.platform,
         input.device.version
       ).flatMap {
-          case true  => deviceGetUserId(deviceKey)
+          case true  => deviceGetUserId(key)
           case false => Errors.deviceSetFailed
         }
     }
 
-    def deviceGetUserId(deviceKey: DeviceKey): Response = {
-      deviceKey.getUserId.flatMap {
+    def deviceGetUserId(key: DeviceKey): Response = {
+      key.getUserId.flatMap {
         case Some(userId) => pairsGet(userId)
         case None         => Errors.userIdGetFailed
       }
     }
 
     def pairsGet(userId: UUID): Response = {
-      val userKey = UserKeyService().make(KeyId(userId))
+      val key = UserKeyService().make(KeyId(userId))
       PairService().getPairs(userId).flatMap {
         case Left(error) => error
         case Right(pairs) => input.pairId match {
-          case Some(pairId) => eventsGet(userKey, userId, pairs, pairId)
-          case None         => userGetSetLastLogin(userKey, userId, pairs, None, None)
+          case Some(pairId) => eventsGet(key, userId, pairs, pairId)
+          case None         => userGetSetLastLogin(key, userId, pairs, None, None)
         }
       }
     }
 
-    def eventsGet(userKey: UserKey,
+    def eventsGet(key: UserKey,
                   userId: UUID,
                   pairs: List[PairModel],
                   pairId: UUID): Response = {
@@ -107,18 +103,18 @@ private[entity] class LoginCommandServiceImpl()
         case Right(events) =>
           QuestionService().getQuestions(pairId).flatMap {
             case Left(error)      => error
-            case Right(questions) => userGetSetLastLogin(userKey, userId, pairs, Option(events), Option(questions))
+            case Right(questions) => userGetSetLastLogin(key, userId, pairs, Option(events), Option(questions))
           }
       }
     }
 
-    def userGetSetLastLogin(userKey: UserKey,
+    def userGetSetLastLogin(key: UserKey,
                             userId: UUID,
                             pairs: List[PairModel],
                             events: Option[List[EventModel]],
                             questions: Option[List[QuestionModel]]): Response = {
-      userKey.getLastLogin.flatMap { lastLogin =>
-        userKey.setLastLogin().flatMap {
+      key.getLastLogin.flatMap { lastLogin =>
+        key.setLastLogin().flatMap {
           case true  => LoginResponseModel(userId, pairs, events, questions, lastLogin)
           case false => Errors.userSetFailed
         }

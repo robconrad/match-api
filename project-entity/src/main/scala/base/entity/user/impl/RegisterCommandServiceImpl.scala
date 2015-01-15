@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:35 PM
  */
 
 package base.entity.user.impl
@@ -52,20 +52,20 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       phoneCooldownExists(PhoneCooldownKeyService().make(KeyId(input.phone)))
     }
 
-    def phoneCooldownExists(phoneCooldownKey: IntKey): Response =
-      phoneCooldownKey.exists().flatMap {
-        case false => phoneCooldownSet(phoneCooldownKey)
+    def phoneCooldownExists(key: IntKey): Response =
+      key.exists().flatMap {
+        case false => phoneCooldownSet(key)
         case true  => Errors.phoneCooldown
       }
 
-    def phoneCooldownSet(phoneCooldownKey: IntKey): Response =
-      phoneCooldownKey.set(RegisterCommandServiceImpl.phoneCooldownValue).flatMap {
-        case true  => phoneCooldownExpire(phoneCooldownKey)
+    def phoneCooldownSet(key: IntKey): Response =
+      key.set(RegisterCommandServiceImpl.phoneCooldownValue).flatMap {
+        case true  => phoneCooldownExpire(key)
         case false => Errors.phoneCooldownSetFailed
       }
 
-    def phoneCooldownExpire(phoneCooldownKey: IntKey): Response =
-      phoneCooldownKey.expire(phoneCooldown.toSeconds).flatMap {
+    def phoneCooldownExpire(key: IntKey): Response =
+      key.expire(phoneCooldown.toSeconds).flatMap {
         case true  => phoneCreate()
         case false => Errors.phoneCooldownExpireFailed
       }
@@ -80,21 +80,21 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       }
     }
 
-    def userCreate(phoneKey: PhoneKey): Response = {
+    def userCreate(key: PhoneKey): Response = {
       val userId = RandomService().uuid
       UserKeyService().make(KeyId(userId)).create().flatMap {
         case false => Errors.userSetFailed
         case true =>
-          phoneKey.setUserId(userId).flatMap {
-            case true  => phoneSetCode(phoneKey)
+          key.setUserId(userId).flatMap {
+            case true  => phoneSetCode(key)
             case false => Errors.userSetFailed
           }
       }
     }
 
-    def phoneSetCode(phoneKey: PhoneKey): Response = {
+    def phoneSetCode(key: PhoneKey): Response = {
       val code = VerifyCommandService().makeVerifyCode()
-      phoneKey.setCode(code).flatMap {
+      key.setCode(code).flatMap {
         case true  => smsSend(code: String)
         case false => Errors.phoneSetFailed
       }

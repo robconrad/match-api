@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 5:17 PM
+ * Last modified by rconrad, 1/15/15 12:20 PM
  */
 
 package base.socket.command.user
@@ -31,7 +31,7 @@ object UserClientCommands extends CommandObject {
 
   case object Login extends UserClientCommand[LoginModel]("login") {
     protected def process(implicit ctx: ChannelHandlerContext, msg: LoginModel) {
-      LoginCommandService().login(msg)(ctx).foreach(ctx.channel().write)
+      InviteCommandService().login(msg)(ctx).foreach(ctx.channel().write)
     }
   }
 

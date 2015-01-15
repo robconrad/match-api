@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:35 PM
  */
 
 package base.entity.user.impl
@@ -101,27 +101,27 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to get device token") {
-    val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
-    val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(command.deviceGetToken(deviceKey).await() == Errors.deviceUnverified.await())
+    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
+    val key = new DeviceKeyImpl(mock)
+    assert(command.deviceGetToken(key).await() == Errors.deviceUnverified.await())
   }
 
   test("failed to validate token") {
-    val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(Option(RandomService().uuid)))
-    val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(command.deviceGetToken(deviceKey).await() == Errors.tokenInvalid.await())
+    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(Option(RandomService().uuid)))
+    val key = new DeviceKeyImpl(mock)
+    assert(command.deviceGetToken(key).await() == Errors.tokenInvalid.await())
   }
 
   test("failed to set device attributes") {
-    val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(command.deviceSet(deviceKey).await() == Errors.deviceSetFailed.await())
+    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
+    val key = new DeviceKeyImpl(mock)
+    assert(command.deviceSet(key).await() == Errors.deviceSetFailed.await())
   }
 
   test("failed to get device user id") {
-    val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
-    val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(command.deviceGetUserId(deviceKey).await() == Errors.userIdGetFailed.await())
+    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
+    val key = new DeviceKeyImpl(mock)
+    assert(command.deviceGetUserId(key).await() == Errors.userIdGetFailed.await())
   }
 
   test("failed to get pairs") {
@@ -132,27 +132,27 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to get pair events") {
     val uuid = RandomService().uuid
-    val hashMock = new PrivateHashKeyMock()
-    val userKey = new UserKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock()
+    val key = new UserKeyImpl(mock)
     val unregister = TestServices.register(new EventServiceMock(getEventsResult = Future.successful(Left(apiError))))
-    assert(command.eventsGet(userKey, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }
 
   test("failed to get pair questions") {
     val uuid = RandomService().uuid
-    val hashMock = new PrivateHashKeyMock()
-    val userKey = new UserKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock()
+    val key = new UserKeyImpl(mock)
     val unregister = TestServices.register(new QuestionServiceMock(getResult = Future.successful(Left(apiError))))
-    assert(command.eventsGet(userKey, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }
 
   test("failed to set user attributes") {
     val uuid = RandomService().uuid
-    val hashMock = new PrivateHashKeyMock(setResult = Future.successful(false))
-    val userKey = new UserKeyImpl(hashMock)
-    val future = command.userGetSetLastLogin(userKey, uuid, List(), None, None)
+    val mock = new PrivateHashKeyMock(setResult = Future.successful(false))
+    val key = new UserKeyImpl(mock)
+    val future = command.userGetSetLastLogin(key, uuid, List(), None, None)
     assert(future.await() == Errors.userSetFailed.await())
   }
 

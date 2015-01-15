@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:35 PM
  */
 
 package base.entity.user.impl
@@ -66,48 +66,48 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
       phoneGetCode(PhoneKeyService().make(KeyId(input.phone)))
     }
 
-    def phoneGetCode(phoneKey: PhoneKey): Response =
-      phoneKey.getCode.flatMap {
-        case Some(code) => phoneVerify(phoneKey, code)
+    def phoneGetCode(key: PhoneKey): Response =
+      key.getCode.flatMap {
+        case Some(code) => phoneVerify(key, code)
         case None       => Errors.codeMissing
       }
 
-    def phoneVerify(phoneKey: PhoneKey, code: String): Response =
+    def phoneVerify(key: PhoneKey, code: String): Response =
       validateVerifyCodes(input.code, code) match {
-        case true  => phoneGetUserId(phoneKey)
+        case true  => phoneGetUserId(key)
         case false => Errors.codeValidation
       }
 
-    def phoneGetUserId(phoneKey: PhoneKey): Response =
-      phoneKey.getUserId.flatMap {
+    def phoneGetUserId(key: PhoneKey): Response =
+      key.getUserId.flatMap {
         case Some(userId) => userGet(userId, UserKeyService().make(KeyId(userId)))
         case None         => Errors.userIdMissing
       }
 
-    def userGet(userId: UUID, userKey: UserKey): Response =
-      userKey.getNameAndGender.flatMap {
+    def userGet(userId: UUID, key: UserKey): Response =
+      key.getNameAndGender.flatMap {
         case (None, _) if input.name.isEmpty   => Errors.paramsMissing
         case (_, None) if input.gender.isEmpty => Errors.paramsMissing
         case (name, gender) =>
           // TODO this is weird get rid of it
           val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
           val g = input.gender.getOrElse(gender.getOrElse(throw new RuntimeException("missing gender")))
-          userSet(userId, userKey, n, g)
+          userSet(userId, key, n, g)
       }
 
     def userSet(userId: UUID,
-                userKey: UserKey,
+                key: UserKey,
                 name: String,
                 gender: Gender): Response =
-      userKey.setNameAndGender(name, gender).flatMap {
+      key.setNameAndGender(name, gender).flatMap {
         case true  => deviceSet(userId, DeviceKeyService().make(KeyId(input.deviceUuid)))
         case false => Errors.userSetFailed
       }
 
-    def deviceSet(userId: UUID, deviceKey: DeviceKey): Response =
-      deviceKey.create.flatMap { exists =>
+    def deviceSet(userId: UUID, key: DeviceKey): Response =
+      key.create.flatMap { exists =>
         val token = RandomService().uuid
-        deviceKey.setTokenAndUserId(token, userId).flatMap {
+        key.setTokenAndUserId(token, userId).flatMap {
           case true  => VerifyResponseModel(token)
           case false => Errors.deviceSetFailed
         }

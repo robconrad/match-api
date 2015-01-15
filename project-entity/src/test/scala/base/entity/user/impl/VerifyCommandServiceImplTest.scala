@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/15/15 12:35 PM
  */
 
 package base.entity.user.impl
@@ -107,27 +107,27 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
   test("failed to provide name on first verify") {
     val myModel = model.copy(name = None)
     val result = Future.successful(Map[Prop, Option[String]](GenderProp -> Option(gender.toString)))
-    val hashMock = new PrivateHashKeyMock(getMultiResult = result)
-    val key = new UserKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(getMultiResult = result)
+    val key = new UserKeyImpl(mock)
     assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
   }
 
   test("failed to provide gender on first verify") {
     val myModel = model.copy(gender = None)
-    val hashMock = new PrivateHashKeyMock(getMultiResult = Future.successful(Map(NameProp -> Option(name))))
-    val key = new UserKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(getMultiResult = Future.successful(Map(NameProp -> Option(name))))
+    val key = new UserKeyImpl(mock)
     assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
   }
 
   test("failed to set user attributes") {
-    val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new UserKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
+    val key = new UserKeyImpl(mock)
     assert(command.userSet(userId, key, name, gender).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set device attributes") {
-    val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new DeviceKeyImpl(hashMock)
+    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
+    val key = new DeviceKeyImpl(mock)
     assert(command.deviceSet(userId, key).await() == Errors.deviceSetFailed.await())
   }
 
