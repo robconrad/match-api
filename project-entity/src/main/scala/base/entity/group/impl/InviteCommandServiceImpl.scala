@@ -2,23 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 1:19 PM
  */
 
 package base.entity.group.impl
 
-import base.common.random.RandomService
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.error.ApiError
-import base.entity.kv.KeyId
-import base.entity.group.impl.InviteCommandServiceImpl.Errors
-import base.entity.group.{GroupKeyService, GroupKey, InviteCommandService}
+import base.entity.group.InviteCommandService
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
 import base.entity.service.CrudErrorImplicits
-import base.entity.sms.SmsService
-import base.entity.user.{PhoneKeyService, UserKeyService, UserKey, PhoneKey}
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)
@@ -45,34 +40,34 @@ private[entity] class InviteCommandServiceImpl(smsBody: String)
       ApiError("")
     }
 
-//    def phoneGetUserId(key: PhoneKey) =
-//      key.getUserId.flatMap {
-//        case Some(userId) => userGet(UserKeyService().make(KeyId(userId)))
-//        case None => sendInviteSms()
-//      }
-//
-//    def userGet(key: UserKey) =
-//
-//       //groupCreate(GroupKeyService().make(KeyId(userId)))
-//    def sendInviteSms() =
-//      SmsService().send(input.phone, smsBody) match {
-//        case true => userCreate(PhoneKeyService().make(KeyId(input.phone)))
-//        case false => Errors.smsSendFailed
-//      }
-//
-//    def userCreate(key: PhoneKey): Response = {
-//      val userId = RandomService().uuid
-//      UserKeyService().make(KeyId(userId)).create().flatMap {
-//        case false => Errors.userSetFailed
-//        case true =>
-//          key.setUserId(userId).flatMap {
-//            case true => groupCreate()
-//            case false => Errors.userSetFailed
-//          }
-//      }
-//    }
-//
-//    def groupCreate(key: GroupKey) =
+    //    def phoneGetUserId(key: PhoneKey) =
+    //      key.getUserId.flatMap {
+    //        case Some(userId) => userGet(UserKeyService().make(KeyId(userId)))
+    //        case None => sendInviteSms()
+    //      }
+    //
+    //    def userGet(key: UserKey) =
+    //
+    //       //groupCreate(GroupKeyService().make(KeyId(userId)))
+    //    def sendInviteSms() =
+    //      SmsService().send(input.phone, smsBody) match {
+    //        case true => userCreate(PhoneKeyService().make(KeyId(input.phone)))
+    //        case false => Errors.smsSendFailed
+    //      }
+    //
+    //    def userCreate(key: PhoneKey): Response = {
+    //      val userId = RandomService().uuid
+    //      UserKeyService().make(KeyId(userId)).create().flatMap {
+    //        case false => Errors.userSetFailed
+    //        case true =>
+    //          key.setUserId(userId).flatMap {
+    //            case true => groupCreate()
+    //            case false => Errors.userSetFailed
+    //          }
+    //      }
+    //    }
+    //
+    //    def groupCreate(key: GroupKey) =
 
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:35 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
 package base.entity.user.impl
@@ -19,9 +19,11 @@ import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ IntKeyMock, KeyLoggerMock, KeyMock, PrivateHashKeyMock }
 import base.entity.kv.{ KeyId, KvFactoryService }
-import base.entity.user.PhoneCooldownKeyService
-import base.entity.user.UserKeyProps.{ CodeProp, UserIdProp }
+import base.entity.user.kv.impl.PhoneKeyImpl
+import base.entity.user.kv.{ UserKeyProps, PhoneCooldownKeyService }
+import UserKeyProps.{ CodeProp, UserIdProp }
 import base.entity.user.impl.RegisterCommandServiceImpl._
+import base.entity.user.kv.PhoneCooldownKeyService
 import base.entity.user.mock.VerifyCommandServiceMock
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 

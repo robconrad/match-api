@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:35 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
 package base.entity.user.impl
@@ -21,6 +21,7 @@ import base.entity.perm.Perms
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.RegisterCommandServiceImpl.Errors
+import base.entity.user.kv.{ UserKeyService, PhoneKeyService, PhoneKey, PhoneCooldownKeyService }
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 import spray.http.StatusCodes
 

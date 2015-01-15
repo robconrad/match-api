@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:10 PM
+ * Last modified by rconrad, 1/15/15 1:15 PM
  */
 
-package base.entity.user
+package base.entity.user.kv
 
 import base.common.lib.Genders.Gender
 import base.common.time.TimeService

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:35 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
 package base.entity.user.impl
@@ -21,8 +21,10 @@ import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
 import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.UserKeyProps._
+import base.entity.user.kv.UserKeyProps
+import UserKeyProps._
 import base.entity.user.impl.VerifyCommandServiceImpl._
+import base.entity.user.kv.impl.{ DeviceKeyImpl, PhoneKeyImpl, UserKeyImpl }
 import base.entity.user.model.{ VerifyModel, VerifyResponseModel }
 
 import scala.concurrent.Future

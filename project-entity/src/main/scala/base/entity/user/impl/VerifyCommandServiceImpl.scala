@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:35 PM
+ * Last modified by rconrad, 1/15/15 1:15 PM
  */
 
 package base.entity.user.impl
@@ -24,6 +24,7 @@ import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import base.entity.sms.SmsService
 import base.entity.user._
 import base.entity.user.impl.VerifyCommandServiceImpl.Errors
+import base.entity.user.kv._
 import base.entity.user.model._
 
 /**

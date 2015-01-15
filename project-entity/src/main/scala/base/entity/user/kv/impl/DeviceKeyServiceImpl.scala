@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
-package base.entity.group.impl
+package base.entity.user.kv.impl
 
 import base.entity.kv.Key.Id
 import base.entity.kv.impl.{ HashKeyServiceImpl, PrivateHashKeyImpl }
-import base.entity.group.{ GroupKey, GroupKeyService }
+import base.entity.user.kv.{ DeviceKey, DeviceKeyService }
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -17,8 +17,8 @@ import base.entity.group.{ GroupKey, GroupKeyService }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupKeyServiceImpl extends HashKeyServiceImpl[GroupKey] with GroupKeyService {
+class DeviceKeyServiceImpl extends HashKeyServiceImpl[DeviceKey] with DeviceKeyService {
 
-  def make(id: Id) = new GroupKeyImpl(new PrivateHashKeyImpl(getKey(id), this))
+  def make(id: Id) = new DeviceKeyImpl(new PrivateHashKeyImpl(getKey(id), this))
 
 }

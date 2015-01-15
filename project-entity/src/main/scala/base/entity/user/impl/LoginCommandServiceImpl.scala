@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
 package base.entity.user.impl
@@ -23,6 +23,7 @@ import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
+import base.entity.user.kv.{ UserKeyService, UserKey, DeviceKeyService, DeviceKey }
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
 import spray.http.StatusCodes._
 

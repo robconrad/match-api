@@ -2,18 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 1:17 PM
  */
 
-package base.entity.group
+package base.entity.group.kv
 
-import java.util.UUID
-
-import base.entity.error.ApiError
-import base.entity.kv.{ HashKey, PrivateHashKey }
-import base.entity.kv.Key._
-
-import scala.concurrent.Future
+import base.entity.kv.HashKey
 
 /**
  * {{ Describe the high level purpose of UserKey here. }}

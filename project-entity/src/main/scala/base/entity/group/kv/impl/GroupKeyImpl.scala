@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 1:17 PM
  */
 
-package base.entity.group.impl
+package base.entity.group.kv.impl
 
+import base.entity.group.kv.GroupKey
 import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.HashKeyImpl
-import base.entity.group.GroupKey
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}

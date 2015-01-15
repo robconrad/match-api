@@ -2,20 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:10 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
-package base.entity.user.impl
+package base.entity.user.kv.impl
 
 import base.common.lib.Genders._
 import base.common.lib.{ Genders, Tryo }
 import base.common.time.TimeService
 import base.entity.kv.Key._
-import base.entity.kv.{ PrivateHashKey, KeyLogger }
 import base.entity.kv.KeyProps.UpdatedProp
-import base.entity.kv.impl.{ HashKeyImpl, PrivateHashKeyImpl }
-import base.entity.user.UserKey
-import base.entity.user.UserKeyProps.{ LastLoginProp, GenderProp, NameProp }
+import base.entity.kv.PrivateHashKey
+import base.entity.kv.impl.HashKeyImpl
+import base.entity.user.kv.{ UserKey, UserKeyProps }
+import base.entity.user.kv.UserKeyProps.{ GenderProp, LastLoginProp, NameProp }
 import org.joda.time.DateTime
 
 /**

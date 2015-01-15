@@ -2,21 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:10 PM
+ * Last modified by rconrad, 1/15/15 1:18 PM
  */
 
-package base.entity.user.impl
+package base.entity.user.kv.impl
 
 import java.util.UUID
 
-import base.common.random.RandomService
 import base.common.time.TimeService
 import base.entity.kv.Key._
-import base.entity.kv.{ PrivateHashKey, KeyLogger }
-import base.entity.kv.KeyProps.{ UpdatedProp, CreatedProp }
-import base.entity.kv.impl.{ HashKeyImpl, PrivateHashKeyImpl }
-import base.entity.user.DeviceKey
-import base.entity.user.UserKeyProps._
+import base.entity.kv.KeyProps.UpdatedProp
+import base.entity.kv.PrivateHashKey
+import base.entity.kv.impl.HashKeyImpl
+import base.entity.user.kv.DeviceKey
+import base.entity.user.kv.UserKeyProps._
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
