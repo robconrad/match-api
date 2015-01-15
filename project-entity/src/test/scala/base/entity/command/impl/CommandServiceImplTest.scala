@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:37 AM
+ * Last modified by rconrad, 1/15/15 12:16 PM
  */
 
 package base.entity.command.impl
@@ -19,6 +19,6 @@ import base.entity.service.EntityServiceTest
  */
 abstract class CommandServiceImplTest extends EntityServiceTest with KvTest {
 
-  def service: CommandService
+  def service: CommandService[_, _]
 
 }

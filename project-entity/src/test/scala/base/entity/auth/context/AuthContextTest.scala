@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 10:17 AM
+ * Last modified by rconrad, 1/15/15 11:52 AM
  */
 
 package base.entity.auth.context
@@ -33,7 +33,7 @@ class AuthContextTest extends EntityBaseSuite {
   // scalastyle:off cyclomatic.complexity
   private def assertContext(
     ctx: AuthContext,
-    authTypeId: Option[Long],
+    authTypeId: Option[_],
     perms: PermSetGroup,
     isUser: Boolean = true,
     hasUser: Boolean = true) {

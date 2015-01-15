@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:50 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -72,7 +72,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(deviceKey.set(TokenProp, token).await())
     assert(deviceKey.set(UserIdProp, userId).await())
 
-    assert(service.login(model).await() == Right(response))
+    assert(service.innerExecute(model).await() == Right(response))
 
     assert(userKey.getDateTime(LastLoginProp).await().exists(_.isEqual(TimeService().now)))
     assert(deviceKey.getString(AppVersionProp).await().contains(appVersion))
@@ -85,7 +85,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("without perms") {
     assertPermException(authCtx => {
-      service.login(model)(authCtx)
+      service.execute(model)(authCtx)
     })
   }
 

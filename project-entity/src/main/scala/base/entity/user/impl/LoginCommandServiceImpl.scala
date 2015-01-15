@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:51 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -14,6 +14,7 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
+import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
 import base.entity.kv._
@@ -34,11 +35,12 @@ import spray.http.StatusCodes._
  * @author rconrad
  */
 private[entity] class LoginCommandServiceImpl()
-    extends ServiceImpl
-    with LoginCommandService
-    with CrudImplicits[LoginResponseModel]
-    with Dispatchable
-    with AuthLoggable {
+    extends CommandServiceImpl[LoginModel, LoginResponseModel]
+    with LoginCommandService {
+
+  def innerExecute(input: LoginModel)(implicit authCtx: AuthContext) = {
+    new LoginCommand(input).execute()
+  }
 
   /**
    * - get device token
@@ -50,11 +52,6 @@ private[entity] class LoginCommandServiceImpl()
    * - optionally retrieve current pair questions
    * - update user attributes (last login)
    */
-  def login(input: LoginModel)(implicit authCtx: AuthContext) = {
-    authCtx.assertHas(Perms.LOGIN)
-    new LoginCommand(input).execute()
-  }
-
   private[impl] class LoginCommand(val input: LoginModel) extends Command[LoginModel, LoginResponseModel] {
 
     def execute() = {

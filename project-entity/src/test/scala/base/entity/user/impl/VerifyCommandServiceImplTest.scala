@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:50 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -62,7 +62,7 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
 
   test("without perms") {
     assertPermException(authCtx => {
-      service.verify(model)(authCtx)
+      service.execute(model)(authCtx)
     })
   }
 
@@ -74,7 +74,7 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
       UserIdProp -> userId)
     val phoneKey = new PrivateHashKeyImpl(s"phone-$phone", KeyLoggerMock)
     assert(phoneKey.set(props).await())
-    assert(service.verify(model).await() == Right(VerifyResponseModel(token)))
+    assert(service.innerExecute(model).await() == Right(VerifyResponseModel(token)))
 
     val userKey = new PrivateHashKeyImpl(s"user-$userId", KeyLoggerMock)
     assert(userKey.getString(NameProp).await().contains(name))

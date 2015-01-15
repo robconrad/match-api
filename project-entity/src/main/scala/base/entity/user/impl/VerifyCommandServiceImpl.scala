@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:51 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -16,6 +16,7 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
+import base.entity.command.impl.CommandServiceImpl
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
 import base.entity.perm.Perms
@@ -30,23 +31,10 @@ import base.entity.user.model._
  * @author rconrad
  */
 private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
-    extends ServiceImpl
-    with VerifyCommandService
-    with CrudImplicits[VerifyResponseModel]
-    with Dispatchable
-    with AuthLoggable {
+    extends CommandServiceImpl[VerifyModel, VerifyResponseModel]
+    with VerifyCommandService {
 
-  /**
-   * - get code
-   * - verify code
-   * - get userId
-   * - get user attributes, reject if none exist and none supplied
-   * - store attributes on user
-   * - create device
-   * - store attributes on device with token
-   */
-  def verify(input: VerifyModel)(implicit authCtx: AuthContext) = {
-    authCtx.assertHas(Perms.VERIFY)
+  def innerExecute(input: VerifyModel)(implicit authCtx: AuthContext) = {
     new VerifyCommand(input).execute()
   }
 
@@ -63,6 +51,15 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     normalize(code1) == normalize(code2)
   }
 
+  /**
+   * - get code
+   * - verify code
+   * - get userId
+   * - get user attributes, reject if none exist and none supplied
+   * - store attributes on user
+   * - create device
+   * - store attributes on device with token
+   */
   private[impl] class VerifyCommand(val input: VerifyModel) extends Command[VerifyModel, VerifyResponseModel] {
 
     def execute() = {

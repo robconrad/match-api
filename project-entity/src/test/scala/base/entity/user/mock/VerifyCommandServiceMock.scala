@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 5:19 PM
+ * Last modified by rconrad, 1/15/15 12:17 PM
  */
 
 package base.entity.user.mock
@@ -26,7 +26,7 @@ class VerifyCommandServiceMock(verifyResult: VerifyResponse = Future.successful(
                                makeVerifyCodeResult: String = "code")
     extends ServiceImpl with VerifyCommandService {
 
-  def verify(input: VerifyModel)(implicit authCtx: AuthContext) = verifyResult
+  def execute(input: VerifyModel)(implicit authCtx: AuthContext) = verifyResult
 
   def sendVerifySms(phone: String, code: String) = sendVerifySmsResult
 

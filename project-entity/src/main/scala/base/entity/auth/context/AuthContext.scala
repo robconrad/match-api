@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:06 PM
+ * Last modified by rconrad, 1/15/15 11:52 AM
  */
 
 package base.entity.auth.context
@@ -41,7 +41,7 @@ trait AuthContext {
   /**
    * The unique identifier of the type of authentication used to obtain this auth context
    */
-  def authTypeId: Option[Long]
+  def authTypeId: Option[_]
 
   /**
    * Provides suite of useful methods for auth contexts

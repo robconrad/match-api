@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:51 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -13,6 +13,7 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
+import base.entity.command.impl.CommandServiceImpl
 import base.entity.error.ApiError
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
@@ -30,10 +31,12 @@ import scala.concurrent.duration.FiniteDuration
  * @author rconrad
  */
 private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
-    extends ServiceImpl
-    with RegisterCommandService
-    with Dispatchable
-    with AuthLoggable {
+    extends CommandServiceImpl[RegisterModel, RegisterResponseModel]
+    with RegisterCommandService {
+
+  def innerExecute(input: RegisterModel)(implicit authCtx: AuthContext) = {
+    new RegisterCommand(input).execute()
+  }
 
   /**
    * - reject if phone in cooldown
@@ -43,11 +46,6 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
    * - update phone key attributes
    * - send SMS verification
    */
-  def register(input: RegisterModel)(implicit authCtx: AuthContext) = {
-    authCtx.assertHas(Perms.REGISTER)
-    new RegisterCommand(input).execute()
-  }
-
   private[impl] class RegisterCommand(val input: RegisterModel) extends Command[RegisterModel, RegisterResponseModel] {
 
     def execute() = {

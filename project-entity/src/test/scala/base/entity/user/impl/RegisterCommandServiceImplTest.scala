@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:50 AM
+ * Last modified by rconrad, 1/15/15 12:19 PM
  */
 
 package base.entity.user.impl
@@ -73,25 +73,25 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
 
   test("without perms") {
     assertPermException(authCtx => {
-      service.register(registerModel)(authCtx)
+      service.execute(registerModel)(authCtx)
     })
   }
 
   test("success - no existing phone or user") {
     val userId = randomMock.nextUuid()
-    assert(service.register(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
   }
 
   test("success - existing phone and user") {
     val userId = randomMock.nextUuid()
-    assert(service.register(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
 
     val phoneCooldownKey = PhoneCooldownKeyService().make(KeyId(phone))
     assert(phoneCooldownKey.del().await())
 
-    assert(service.register(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
   }
 

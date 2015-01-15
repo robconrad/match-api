@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 5:16 PM
+ * Last modified by rconrad, 1/15/15 12:17 PM
  */
 
 package base.entity.user.mock
@@ -21,7 +21,7 @@ import scala.concurrent.Future
  */
 class LoginCommandServiceMock extends ServiceImpl with LoginCommandService {
 
-  def login(input: LoginModel)(implicit authCtx: AuthContext) =
+  def execute(input: LoginModel)(implicit authCtx: AuthContext) =
     Future.successful(Left(ApiError("not implemented")))
 
 }
