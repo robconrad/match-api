@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:56 AM
+ * Last modified by rconrad, 1/15/15 11:50 AM
  */
 
 package base.entity.user.impl
@@ -14,12 +14,12 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
+import base.entity.command.impl.CommandServiceImplTest
 import base.entity.kv.Key.Prop
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
+import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
-import base.entity.kv.{ KvFactoryService, KvTest }
-import base.entity.service.EntityServiceTest
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.UserKeyProps._
 import base.entity.user.impl.VerifyCommandServiceImpl._
@@ -32,7 +32,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class VerifyCommandServiceImplTest extends EntityServiceTest with KvTest {
+class VerifyCommandServiceImplTest extends CommandServiceImplTest {
 
   val codeLength = 6
 
@@ -57,6 +57,8 @@ class VerifyCommandServiceImplTest extends EntityServiceTest with KvTest {
     Services.register(TimeServiceConstantMock)
     Services.register(randomMock)
   }
+
+  private def command(implicit input: VerifyModel) = new service.VerifyCommand(input)
 
   test("without perms") {
     assertPermException(authCtx => {
@@ -88,18 +90,18 @@ class VerifyCommandServiceImplTest extends EntityServiceTest with KvTest {
 
   test("failed to get phone verification code") {
     val key = new PhoneKeyImpl(new PrivateHashKeyMock())
-    assert(service.phoneKeyGet(key).await() == Errors.codeMissing.await())
+    assert(command.phoneGetCode(key).await() == Errors.codeMissing.await())
   }
 
   test("failed to validate phone verification code") {
     val key = new PhoneKeyImpl(new PrivateHashKeyMock())
     val code = model.code + "munge"
-    assert(service.phoneKeyVerify(key, code).await() == Errors.codeValidation.await())
+    assert(command.phoneVerify(key, code).await() == Errors.codeValidation.await())
   }
 
   test("failed to get userId") {
     val key = new PhoneKeyImpl(new PrivateHashKeyMock(getIdResult = Future.successful(None)))
-    assert(service.userIdGet(key).await() == Errors.userIdMissing.await())
+    assert(command.phoneGetUserId(key).await() == Errors.userIdMissing.await())
   }
 
   test("failed to provide name on first verify") {
@@ -107,26 +109,26 @@ class VerifyCommandServiceImplTest extends EntityServiceTest with KvTest {
     val result = Future.successful(Map[Prop, Option[String]](GenderProp -> Option(gender.toString)))
     val hashMock = new PrivateHashKeyMock(getMultiResult = result)
     val key = new UserKeyImpl(hashMock)
-    assert(service.userKeyGet(userId, key)(myModel, p).await() == Errors.paramsMissing.await())
+    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
   }
 
   test("failed to provide gender on first verify") {
     val myModel = model.copy(gender = None)
     val hashMock = new PrivateHashKeyMock(getMultiResult = Future.successful(Map(NameProp -> Option(name))))
     val key = new UserKeyImpl(hashMock)
-    assert(service.userKeyGet(userId, key)(myModel, p).await() == Errors.paramsMissing.await())
+    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
   }
 
   test("failed to set user attributes") {
     val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
     val key = new UserKeyImpl(hashMock)
-    assert(service.userKeySet(userId, key, name, gender).await() == Errors.userSetFailed.await())
+    assert(command.userSet(userId, key, name, gender).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set device attributes") {
     val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
     val key = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeySet(userId, key).await() == Errors.deviceSetFailed.await())
+    assert(command.deviceSet(userId, key).await() == Errors.deviceSetFailed.await())
   }
 
   test("send verify sms") {

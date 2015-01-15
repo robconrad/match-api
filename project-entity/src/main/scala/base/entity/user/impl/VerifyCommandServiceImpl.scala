@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:59 AM
+ * Last modified by rconrad, 1/15/15 11:51 AM
  */
 
 package base.entity.user.impl
@@ -15,17 +15,15 @@ import base.common.random.RandomService
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
-import base.entity.kv.Key._
+import base.entity.command.Command
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
 import base.entity.perm.Perms
 import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import base.entity.sms.SmsService
-import base.entity.user.VerifyCommandService.VerifyResponse
 import base.entity.user._
 import base.entity.user.impl.VerifyCommandServiceImpl.Errors
 import base.entity.user.model._
-import spray.http.StatusCodes._
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)
@@ -38,8 +36,6 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     with Dispatchable
     with AuthLoggable {
 
-  private implicit val ec = dispatcher
-
   /**
    * - get code
    * - verify code
@@ -51,7 +47,7 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
    */
   def verify(input: VerifyModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.VERIFY)
-    phoneKeyGet(PhoneKeyService().make(KeyId(input.phone)))(input, KvFactoryService().pipeline)
+    new VerifyCommand(input).execute()
   }
 
   def sendVerifySms(phone: String, code: String) = {
@@ -67,63 +63,59 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     normalize(code1) == normalize(code2)
   }
 
-  private[impl] def phoneKeyGet(phoneKey: PhoneKey)(implicit input: VerifyModel,
-                                                    p: Pipeline): VerifyResponse = {
-    phoneKey.getCode.flatMap {
-      case Some(code) => phoneKeyVerify(phoneKey, code)
-      case None       => Errors.codeMissing
-    }
-  }
+  private[impl] class VerifyCommand(val input: VerifyModel) extends Command[VerifyModel, VerifyResponseModel] {
 
-  private[impl] def phoneKeyVerify(phoneKey: PhoneKey, code: String)(implicit input: VerifyModel,
-                                                                     p: Pipeline): VerifyResponse = {
-    validateVerifyCodes(input.code, code) match {
-      case true  => userIdGet(phoneKey)
-      case false => Errors.codeValidation
+    def execute() = {
+      phoneGetCode(PhoneKeyService().make(KeyId(input.phone)))
     }
-  }
 
-  private[impl] def userIdGet(phoneKey: PhoneKey)(implicit input: VerifyModel,
-                                                  p: Pipeline): VerifyResponse = {
-    phoneKey.getUserId.flatMap {
-      case Some(userId) => userKeyGet(userId, UserKeyService().make(KeyId(userId)))
-      case None         => Errors.userIdMissing
-    }
-  }
-
-  private[impl] def userKeyGet(userId: UUID, userKey: UserKey)(implicit input: VerifyModel,
-                                                               p: Pipeline): VerifyResponse = {
-    userKey.getNameAndGender.flatMap {
-      case (None, _) if input.name.isEmpty   => Errors.paramsMissing
-      case (_, None) if input.gender.isEmpty => Errors.paramsMissing
-      case (name, gender) =>
-        // TODO this is weird get rid of it
-        val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
-        val g = input.gender.getOrElse(gender.getOrElse(throw new RuntimeException("missing gender")))
-        userKeySet(userId, userKey, n, g)
-    }
-  }
-
-  private[impl] def userKeySet(userId: UUID,
-                               userKey: UserKey,
-                               name: String,
-                               gender: Gender)(implicit input: VerifyModel,
-                                               p: Pipeline): VerifyResponse = {
-    userKey.setNameAndGender(name, gender).flatMap {
-      case true  => deviceKeySet(userId, DeviceKeyService().make(KeyId(input.deviceUuid)))
-      case false => Errors.userSetFailed
-    }
-  }
-
-  private[impl] def deviceKeySet(userId: UUID, deviceKey: DeviceKey)(implicit input: VerifyModel,
-                                                                     p: Pipeline): VerifyResponse = {
-    deviceKey.create.flatMap { exists =>
-      val token = RandomService().uuid
-      deviceKey.setTokenAndUserId(token, userId).flatMap {
-        case true  => VerifyResponseModel(token)
-        case false => Errors.deviceSetFailed
+    def phoneGetCode(phoneKey: PhoneKey): Response =
+      phoneKey.getCode.flatMap {
+        case Some(code) => phoneVerify(phoneKey, code)
+        case None       => Errors.codeMissing
       }
-    }
+
+    def phoneVerify(phoneKey: PhoneKey, code: String): Response =
+      validateVerifyCodes(input.code, code) match {
+        case true  => phoneGetUserId(phoneKey)
+        case false => Errors.codeValidation
+      }
+
+    def phoneGetUserId(phoneKey: PhoneKey): Response =
+      phoneKey.getUserId.flatMap {
+        case Some(userId) => userGet(userId, UserKeyService().make(KeyId(userId)))
+        case None         => Errors.userIdMissing
+      }
+
+    def userGet(userId: UUID, userKey: UserKey): Response =
+      userKey.getNameAndGender.flatMap {
+        case (None, _) if input.name.isEmpty   => Errors.paramsMissing
+        case (_, None) if input.gender.isEmpty => Errors.paramsMissing
+        case (name, gender) =>
+          // TODO this is weird get rid of it
+          val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
+          val g = input.gender.getOrElse(gender.getOrElse(throw new RuntimeException("missing gender")))
+          userSet(userId, userKey, n, g)
+      }
+
+    def userSet(userId: UUID,
+                userKey: UserKey,
+                name: String,
+                gender: Gender): Response =
+      userKey.setNameAndGender(name, gender).flatMap {
+        case true  => deviceSet(userId, DeviceKeyService().make(KeyId(input.deviceUuid)))
+        case false => Errors.userSetFailed
+      }
+
+    def deviceSet(userId: UUID, deviceKey: DeviceKey): Response =
+      deviceKey.create.flatMap { exists =>
+        val token = RandomService().uuid
+        deviceKey.setTokenAndUserId(token, userId).flatMap {
+          case true  => VerifyResponseModel(token)
+          case false => Errors.deviceSetFailed
+        }
+      }
+
   }
 
 }

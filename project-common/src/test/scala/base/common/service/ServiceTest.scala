@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/15/15 11:37 AM
  */
 
 package base.common.service
@@ -17,7 +17,7 @@ import base.common.test.BaseSuite
  */
 abstract class ServiceTest extends BaseSuite with Dispatchable with ServicesBeforeAndAfterAll with Loggable {
 
-  val service: Service
+  def service: Service
 
   override def beforeAll() {
     super.beforeAll()

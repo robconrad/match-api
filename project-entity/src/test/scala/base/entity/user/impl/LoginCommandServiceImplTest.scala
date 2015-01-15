@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:00 AM
+ * Last modified by rconrad, 1/15/15 11:50 AM
  */
 
 package base.entity.user.impl
@@ -13,15 +13,15 @@ import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
+import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.event.mock.EventServiceMock
+import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
-import base.entity.kv.{ KvFactoryService, KvTest }
 import base.entity.pair.mock.PairServiceMock
 import base.entity.question.mock.QuestionServiceMock
-import base.entity.service.EntityServiceTest
 import base.entity.user.UserKeyProps._
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
@@ -33,7 +33,7 @@ import scala.concurrent.Future
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
+class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   val service = new LoginCommandServiceImpl
   private val token = RandomService().uuid
@@ -61,6 +61,8 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
     Services.register(pairMock)
     Services.register(questionMock)
   }
+
+  private def command(implicit input: LoginModel) = new service.LoginCommand(input)
 
   private def testSuccess(model: LoginModel, response: LoginResponseModel) {
     val userId = response.userId
@@ -101,30 +103,30 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
   test("failed to get device token") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeyGet(deviceKey).await() == Errors.deviceUnverified.await())
+    assert(command.deviceGetToken(deviceKey).await() == Errors.deviceUnverified.await())
   }
 
   test("failed to validate token") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(Option(RandomService().uuid)))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeyGet(deviceKey).await() == Errors.tokenInvalid.await())
+    assert(command.deviceGetToken(deviceKey).await() == Errors.tokenInvalid.await())
   }
 
   test("failed to set device attributes") {
     val hashMock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.deviceKeySet(deviceKey).await() == Errors.deviceSetFailed.await())
+    assert(command.deviceSet(deviceKey).await() == Errors.deviceSetFailed.await())
   }
 
   test("failed to get device user id") {
     val hashMock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
     val deviceKey = new DeviceKeyImpl(hashMock)
-    assert(service.userKeyGet(deviceKey).await() == Errors.userIdGetFailed.await())
+    assert(command.deviceGetUserId(deviceKey).await() == Errors.userIdGetFailed.await())
   }
 
   test("failed to get pairs") {
     val unregister = TestServices.register(new PairServiceMock(getPairsResult = Future.successful(Left(apiError))))
-    assert(service.getPairs(RandomService().uuid).await() == Left(apiError))
+    assert(command.pairsGet(RandomService().uuid).await() == Left(apiError))
     unregister()
   }
 
@@ -133,7 +135,7 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
     val hashMock = new PrivateHashKeyMock()
     val userKey = new UserKeyImpl(hashMock)
     val unregister = TestServices.register(new EventServiceMock(getEventsResult = Future.successful(Left(apiError))))
-    assert(service.getPairEvents(userKey, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(userKey, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }
 
@@ -142,7 +144,7 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
     val hashMock = new PrivateHashKeyMock()
     val userKey = new UserKeyImpl(hashMock)
     val unregister = TestServices.register(new QuestionServiceMock(getResult = Future.successful(Left(apiError))))
-    assert(service.getPairEvents(userKey, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(userKey, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }
 
@@ -150,7 +152,7 @@ class LoginCommandServiceImplTest extends EntityServiceTest with KvTest {
     val uuid = RandomService().uuid
     val hashMock = new PrivateHashKeyMock(setResult = Future.successful(false))
     val userKey = new UserKeyImpl(hashMock)
-    val future = service.userKeyGetLogin(userKey, uuid, List(), None, None)
+    val future = command.userGetSetLastLogin(userKey, uuid, List(), None, None)
     assert(future.await() == Errors.userSetFailed.await())
   }
 

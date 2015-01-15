@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:01 AM
+ * Last modified by rconrad, 1/15/15 11:51 AM
  */
 
 package base.entity.user.impl
@@ -13,9 +13,9 @@ import base.common.lib.Dispatchable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
+import base.entity.command.Command
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
-import base.entity.kv.Key._
 import base.entity.kv._
 import base.entity.logging.AuthLoggable
 import base.entity.pair.PairService
@@ -24,7 +24,6 @@ import base.entity.perm.Perms
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
-import base.entity.user.LoginCommandService.LoginResponse
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.model._
@@ -41,8 +40,6 @@ private[entity] class LoginCommandServiceImpl()
     with Dispatchable
     with AuthLoggable {
 
-  private implicit val ec = dispatcher
-
   /**
    * - get device token
    * - validate provided token
@@ -55,80 +52,82 @@ private[entity] class LoginCommandServiceImpl()
    */
   def login(input: LoginModel)(implicit authCtx: AuthContext) = {
     authCtx.assertHas(Perms.LOGIN)
-    deviceKeyGet(DeviceKeyService().make(KeyId(input.device.uuid)))(input, KvFactoryService().pipeline)
+    new LoginCommand(input).execute()
   }
 
-  private[impl] def deviceKeyGet(deviceKey: DeviceKey)(implicit input: LoginModel,
-                                                       p: Pipeline): LoginResponse = {
-    deviceKey.getToken.flatMap {
-      case Some(token) if input.token == token => deviceKeySet(deviceKey)
-      case Some(token)                         => Errors.tokenInvalid
-      case None                                => Errors.deviceUnverified
+  private[impl] class LoginCommand(val input: LoginModel) extends Command[LoginModel, LoginResponseModel] {
+
+    def execute() = {
+      deviceGetToken(DeviceKeyService().make(KeyId(input.device.uuid)))
     }
-  }
 
-  private[impl] def deviceKeySet(deviceKey: DeviceKey)(implicit input: LoginModel,
-                                                       p: Pipeline): LoginResponse = {
-    deviceKey.set(
-      input.appVersion,
-      input.locale,
-      input.device.model,
-      input.device.cordova,
-      input.device.platform,
-      input.device.version
-    ).flatMap {
-        case true  => userKeyGet(deviceKey)
-        case false => Errors.deviceSetFailed
-      }
-  }
-
-  private[impl] def userKeyGet(deviceKey: DeviceKey)(implicit input: LoginModel,
-                                                     p: Pipeline): LoginResponse = {
-    deviceKey.getUserId.flatMap {
-      case Some(userId) => getPairs(userId)
-      case None         => Errors.userIdGetFailed
-    }
-  }
-
-  private[impl] def getPairs(userId: UUID)(implicit input: LoginModel,
-                                           p: Pipeline): LoginResponse = {
-    val userKey = UserKeyService().make(KeyId(userId))
-    PairService().getPairs(userId).flatMap {
-      case Left(error) => error
-      case Right(pairs) => input.pairId match {
-        case Some(pairId) => getPairEvents(userKey, userId, pairs, pairId)
-        case None         => userKeyGetLogin(userKey, userId, pairs, None, None)
+    def deviceGetToken(deviceKey: DeviceKey): Response = {
+      deviceKey.getToken.flatMap {
+        case Some(token) if input.token == token => deviceSet(deviceKey)
+        case Some(token)                         => Errors.tokenInvalid
+        case None                                => Errors.deviceUnverified
       }
     }
-  }
 
-  private[impl] def getPairEvents(userKey: UserKey,
-                                  userId: UUID,
-                                  pairs: List[PairModel],
-                                  pairId: UUID)(implicit input: LoginModel,
-                                                p: Pipeline): LoginResponse = {
-    EventService().getEvents(pairId).flatMap {
-      case Left(error) => error
-      case Right(events) =>
-        QuestionService().getQuestions(pairId).flatMap {
-          case Left(error)      => error
-          case Right(questions) => userKeyGetLogin(userKey, userId, pairs, Option(events), Option(questions))
+    def deviceSet(deviceKey: DeviceKey): Response = {
+      deviceKey.set(
+        input.appVersion,
+        input.locale,
+        input.device.model,
+        input.device.cordova,
+        input.device.platform,
+        input.device.version
+      ).flatMap {
+          case true  => deviceGetUserId(deviceKey)
+          case false => Errors.deviceSetFailed
         }
     }
-  }
 
-  private[impl] def userKeyGetLogin(userKey: UserKey,
-                                    userId: UUID,
-                                    pairs: List[PairModel],
-                                    events: Option[List[EventModel]],
-                                    questions: Option[List[QuestionModel]])(implicit input: LoginModel,
-                                                                            p: Pipeline): LoginResponse = {
-    userKey.getLastLogin.flatMap { lastLogin =>
-      userKey.setLastLogin().flatMap {
-        case true  => LoginResponseModel(userId, pairs, events, questions, lastLogin)
-        case false => Errors.userSetFailed
+    def deviceGetUserId(deviceKey: DeviceKey): Response = {
+      deviceKey.getUserId.flatMap {
+        case Some(userId) => pairsGet(userId)
+        case None         => Errors.userIdGetFailed
       }
     }
+
+    def pairsGet(userId: UUID): Response = {
+      val userKey = UserKeyService().make(KeyId(userId))
+      PairService().getPairs(userId).flatMap {
+        case Left(error) => error
+        case Right(pairs) => input.pairId match {
+          case Some(pairId) => eventsGet(userKey, userId, pairs, pairId)
+          case None         => userGetSetLastLogin(userKey, userId, pairs, None, None)
+        }
+      }
+    }
+
+    def eventsGet(userKey: UserKey,
+                  userId: UUID,
+                  pairs: List[PairModel],
+                  pairId: UUID): Response = {
+      EventService().getEvents(pairId).flatMap {
+        case Left(error) => error
+        case Right(events) =>
+          QuestionService().getQuestions(pairId).flatMap {
+            case Left(error)      => error
+            case Right(questions) => userGetSetLastLogin(userKey, userId, pairs, Option(events), Option(questions))
+          }
+      }
+    }
+
+    def userGetSetLastLogin(userKey: UserKey,
+                            userId: UUID,
+                            pairs: List[PairModel],
+                            events: Option[List[EventModel]],
+                            questions: Option[List[QuestionModel]]): Response = {
+      userKey.getLastLogin.flatMap { lastLogin =>
+        userKey.setLastLogin().flatMap {
+          case true  => LoginResponseModel(userId, pairs, events, questions, lastLogin)
+          case false => Errors.userSetFailed
+        }
+      }
+    }
+
   }
 
 }
