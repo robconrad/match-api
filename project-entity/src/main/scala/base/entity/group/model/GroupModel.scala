@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 1/15/15 1:03 PM
  */
 
-package base.entity.pair.model
+package base.entity.group.model
 
 import java.util.UUID
 
@@ -24,7 +24,7 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
-case class PairModel(
+case class GroupModel(
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  id: UUID,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  users: List[UserModel],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  lastEventTime: DateTime,

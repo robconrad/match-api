@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:36 PM
+ * Last modified by rconrad, 1/15/15 1:09 PM
  */
 
 package base.entity.user.impl
@@ -16,8 +16,8 @@ import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
 import base.entity.kv._
-import base.entity.pair.PairService
-import base.entity.pair.model.PairModel
+import base.entity.group.GroupService
+import base.entity.group.model.GroupModel
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
@@ -43,9 +43,9 @@ private[entity] class LoginCommandServiceImpl()
    * - validate provided token
    * - update device attributes
    * - get userId
-   * - retrieve pairs
-   * - optionally retrieve current pair events
-   * - optionally retrieve current pair questions
+   * - retrieve groups
+   * - optionally retrieve current group events
+   * - optionally retrieve current group questions
    * - update user attributes (last login)
    */
   private[impl] class LoginCommand(val input: LoginModel) extends Command[LoginModel, LoginResponseModel] {
@@ -78,44 +78,44 @@ private[entity] class LoginCommandServiceImpl()
 
     def deviceGetUserId(key: DeviceKey): Response = {
       key.getUserId.flatMap {
-        case Some(userId) => pairsGet(userId)
+        case Some(userId) => groupsGet(userId)
         case None         => Errors.userIdGetFailed
       }
     }
 
-    def pairsGet(userId: UUID): Response = {
+    def groupsGet(userId: UUID): Response = {
       val key = UserKeyService().make(KeyId(userId))
-      PairService().getPairs(userId).flatMap {
+      GroupService().getGroups(userId).flatMap {
         case Left(error) => error
-        case Right(pairs) => input.pairId match {
-          case Some(pairId) => eventsGet(key, userId, pairs, pairId)
-          case None         => userGetSetLastLogin(key, userId, pairs, None, None)
+        case Right(groups) => input.groupId match {
+          case Some(groupId) => eventsGet(key, userId, groups, groupId)
+          case None          => userGetSetLastLogin(key, userId, groups, None, None)
         }
       }
     }
 
     def eventsGet(key: UserKey,
                   userId: UUID,
-                  pairs: List[PairModel],
-                  pairId: UUID): Response = {
-      EventService().getEvents(pairId).flatMap {
+                  groups: List[GroupModel],
+                  groupId: UUID): Response = {
+      EventService().getEvents(groupId).flatMap {
         case Left(error) => error
         case Right(events) =>
-          QuestionService().getQuestions(pairId).flatMap {
+          QuestionService().getQuestions(groupId).flatMap {
             case Left(error)      => error
-            case Right(questions) => userGetSetLastLogin(key, userId, pairs, Option(events), Option(questions))
+            case Right(questions) => userGetSetLastLogin(key, userId, groups, Option(events), Option(questions))
           }
       }
     }
 
     def userGetSetLastLogin(key: UserKey,
                             userId: UUID,
-                            pairs: List[PairModel],
+                            groups: List[GroupModel],
                             events: Option[List[EventModel]],
                             questions: Option[List[QuestionModel]]): Response = {
       key.getLastLogin.flatMap { lastLogin =>
         key.setLastLogin().flatMap {
-          case true  => LoginResponseModel(userId, pairs, events, questions, lastLogin)
+          case true  => LoginResponseModel(userId, groups, events, questions, lastLogin)
           case false => Errors.userSetFailed
         }
       }

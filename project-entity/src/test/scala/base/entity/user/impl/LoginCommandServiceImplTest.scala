@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:35 PM
+ * Last modified by rconrad, 1/15/15 1:08 PM
  */
 
 package base.entity.user.impl
@@ -20,7 +20,7 @@ import base.entity.event.mock.EventServiceMock
 import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
-import base.entity.pair.mock.PairServiceMock
+import base.entity.group.mock.GroupServiceMock
 import base.entity.question.mock.QuestionServiceMock
 import base.entity.user.UserKeyProps._
 import base.entity.user.impl.LoginCommandServiceImpl._
@@ -37,7 +37,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   val service = new LoginCommandServiceImpl
   private val token = RandomService().uuid
-  private val pairId = RandomService().uuid
+  private val groupId = RandomService().uuid
   private val appVersion = "some app version"
   private val apiVersion = ApiVersions.V01
   private val locale = "some locale"
@@ -47,18 +47,18 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val apiError = ApiError("test error")
 
   private val eventMock = new EventServiceMock()
-  private val pairMock = new PairServiceMock()
+  private val groupMock = new GroupServiceMock()
   private val questionMock = new QuestionServiceMock()
 
   private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
-  private implicit val model = LoginModel(token, Option(pairId), appVersion, apiVersion, locale, deviceModel)
+  private implicit val model = LoginModel(token, Option(groupId), appVersion, apiVersion, locale, deviceModel)
 
   override def beforeAll() {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
     Services.register(eventMock)
-    Services.register(pairMock)
+    Services.register(groupMock)
     Services.register(questionMock)
   }
 
@@ -89,13 +89,13 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     })
   }
 
-  test("success - with pair id") {
+  test("success - with group id") {
     val response = LoginResponseModel(RandomService().uuid, List(), Option(List()), Option(List()), None)
     testSuccess(model, response)
   }
 
-  test("success - without pair id") {
-    val myModel = model.copy(pairId = None)
+  test("success - without group id") {
+    val myModel = model.copy(groupId = None)
     val response = LoginResponseModel(RandomService().uuid, List(), None, None, None)
     testSuccess(myModel, response)
   }
@@ -124,13 +124,13 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(command.deviceGetUserId(key).await() == Errors.userIdGetFailed.await())
   }
 
-  test("failed to get pairs") {
-    val unregister = TestServices.register(new PairServiceMock(getPairsResult = Future.successful(Left(apiError))))
-    assert(command.pairsGet(RandomService().uuid).await() == Left(apiError))
+  test("failed to get groups") {
+    val unregister = TestServices.register(new GroupServiceMock(getGroupsResult = Future.successful(Left(apiError))))
+    assert(command.groupsGet(RandomService().uuid).await() == Left(apiError))
     unregister()
   }
 
-  test("failed to get pair events") {
+  test("failed to get group events") {
     val uuid = RandomService().uuid
     val mock = new PrivateHashKeyMock()
     val key = new UserKeyImpl(mock)
@@ -139,7 +139,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     unregister()
   }
 
-  test("failed to get pair questions") {
+  test("failed to get group questions") {
     val uuid = RandomService().uuid
     val mock = new PrivateHashKeyMock()
     val key = new UserKeyImpl(mock)

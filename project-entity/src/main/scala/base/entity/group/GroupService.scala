@@ -2,32 +2,32 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/12/15 7:59 PM
+ * Last modified by rconrad, 1/15/15 1:08 PM
  */
 
-package base.entity.pair
+package base.entity.group
 
 import java.util.UUID
 
 import base.common.service.{ Service, ServiceCompanion }
 import base.entity.error.ApiError
 import base.entity.kv.Key.Pipeline
-import base.entity.pair.model.PairModel
+import base.entity.group.model.GroupModel
 
 import scala.concurrent.Future
 
 /**
- * Pair CRUD, etc.
+ * CRUD, etc.
  * @author rconrad
  */
-trait PairService extends Service {
+trait GroupService extends Service {
 
-  final def serviceManifest = manifest[PairService]
+  final def serviceManifest = manifest[GroupService]
 
-  def getPairs(userId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[PairModel]]]
+  def getGroups(userId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[GroupModel]]]
 
 }
 
-object PairService extends ServiceCompanion[PairService] {
+object GroupService extends ServiceCompanion[GroupService] {
 
 }

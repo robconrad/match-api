@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 7:00 PM
+ * Last modified by rconrad, 1/15/15 1:03 PM
  */
 
 package base.entity.service
@@ -10,6 +10,7 @@ package base.entity.service
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.auth.impl.AuthServiceImpl
 import base.entity.kv.impl.KvFactoryServiceImpl
+import base.entity.group.impl.InviteCommandServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 
@@ -28,6 +29,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
   protected val MATCH = "match"
   protected val MATCH_USER = Keys(MATCH, "user")
+  protected val MATCH_GROUP = Keys(MATCH, "group")
 
   /**
    * Registration of services, see classes for details on these parameters
@@ -67,6 +69,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
       Keys(MATCH_USER, "verifySmsBody")))
 
     Services.register(new LoginCommandServiceImpl())
+
+    Services.register(new InviteCommandServiceImpl(
+      Keys(MATCH_GROUP, "inviteSmsBody")))
 
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())

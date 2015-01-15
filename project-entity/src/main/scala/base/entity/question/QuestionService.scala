@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/12/15 8:45 PM
+ * Last modified by rconrad, 1/15/15 1:08 PM
  */
 
 package base.entity.question
@@ -18,14 +18,14 @@ import base.entity.question.model.QuestionModel
 import scala.concurrent.Future
 
 /**
- * Pair CRUD, etc.
+ * CRUD, etc.
  * @author rconrad
  */
 trait QuestionService extends Service {
 
   final def serviceManifest = manifest[QuestionService]
 
-  def getQuestions(pairId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[QuestionModel]]]
+  def getQuestions(groupId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[QuestionModel]]]
 
 }
 

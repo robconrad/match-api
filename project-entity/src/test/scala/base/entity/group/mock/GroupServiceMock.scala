@@ -5,26 +5,26 @@
  * Last modified by rconrad, 1/15/15 1:08 PM
  */
 
-package base.entity.question.mock
+package base.entity.group.mock
 
 import java.util.UUID
 
 import base.entity.error.ApiError
 import base.entity.kv.Key.Pipeline
-import base.entity.question.QuestionService
-import base.entity.question.model.QuestionModel
+import base.entity.group.GroupService
+import base.entity.group.model.GroupModel
 
 import scala.concurrent.Future
 
 /**
- * {{ Describe the high level purpose of QuestionServiceMock here. }}
+ * {{ Describe the high level purpose of GroupServiceMock here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionServiceMock(getResult: Future[Either[ApiError, List[QuestionModel]]] = Future.successful(Right(List())))
-    extends QuestionService {
+class GroupServiceMock(getGroupsResult: Future[Either[ApiError, List[GroupModel]]] = Future.successful(Right(List())))
+    extends GroupService {
 
-  def getQuestions(groupId: UUID)(implicit p: Pipeline) = getResult
+  def getGroups(userId: UUID)(implicit p: Pipeline) = getGroupsResult
 
 }
