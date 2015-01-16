@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:15 PM
+ * Last modified by rconrad, 1/15/15 5:22 PM
  */
 
 package base.entity.user.kv
@@ -15,7 +15,7 @@ import base.entity.kv.KeyProp
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-private[user] object UserKeyProps {
+object UserKeyProps {
 
   object UserIdProp extends KeyProp("userId")
   object CodeProp extends KeyProp("code")

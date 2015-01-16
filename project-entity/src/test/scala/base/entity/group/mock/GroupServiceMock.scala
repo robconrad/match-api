@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 4:07 PM
  */
 
 package base.entity.group.mock
@@ -22,8 +22,11 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupServiceMock(getGroupsResult: Future[Either[ApiError, List[GroupModel]]] = Future.successful(Right(List())))
+class GroupServiceMock(getGroupResult: Future[Either[ApiError, Option[GroupModel]]] = Future.successful(Right(None)),
+                       getGroupsResult: Future[Either[ApiError, List[GroupModel]]] = Future.successful(Right(List())))
     extends GroupService {
+
+  def getGroup(groupId: UUID)(implicit p: Pipeline) = getGroupResult
 
   def getGroups(userId: UUID)(implicit p: Pipeline) = getGroupsResult
 

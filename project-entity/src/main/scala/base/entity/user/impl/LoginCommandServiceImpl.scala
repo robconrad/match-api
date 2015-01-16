@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/15/15 3:59 PM
  */
 
 package base.entity.user.impl
@@ -49,7 +49,8 @@ private[entity] class LoginCommandServiceImpl()
    * - optionally retrieve current group questions
    * - update user attributes (last login)
    */
-  private[impl] class LoginCommand(val input: LoginModel) extends Command[LoginModel, LoginResponseModel] {
+  private[impl] class LoginCommand(val input: LoginModel)(implicit val authCtx: AuthContext)
+      extends Command[LoginModel, LoginResponseModel] {
 
     def execute() = {
       deviceGetToken(DeviceKeyService().make(KeyId(input.device.uuid)))

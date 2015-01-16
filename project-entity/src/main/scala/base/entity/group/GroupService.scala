@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/15/15 3:25 PM
  */
 
 package base.entity.group
@@ -23,6 +23,8 @@ import scala.concurrent.Future
 trait GroupService extends Service {
 
   final def serviceManifest = manifest[GroupService]
+
+  def getGroup(groupId: UUID)(implicit p: Pipeline): Future[Either[ApiError, Option[GroupModel]]]
 
   def getGroups(userId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[GroupModel]]]
 

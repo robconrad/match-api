@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:15 PM
+ * Last modified by rconrad, 1/15/15 3:59 PM
  */
 
 package base.entity.user.impl
@@ -61,7 +61,8 @@ private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
    * - create device
    * - store attributes on device with token
    */
-  private[impl] class VerifyCommand(val input: VerifyModel) extends Command[VerifyModel, VerifyResponseModel] {
+  private[impl] class VerifyCommand(val input: VerifyModel)(implicit val authCtx: AuthContext)
+      extends Command[VerifyModel, VerifyResponseModel] {
 
     def execute() = {
       phoneGetCode(PhoneKeyService().make(KeyId(input.phone)))

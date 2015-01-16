@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/3/15 1:13 PM
+ * Last modified by rconrad, 1/15/15 3:58 PM
  */
 
 package base.entity.kv
@@ -27,7 +27,7 @@ trait SetKey extends Key {
 
   def pop()(implicit p: Pipeline): Future[Option[String]]
 
-  def add(value: Any)(implicit p: Pipeline): Future[Boolean]
+  def add(value: Any*)(implicit p: Pipeline): Future[Int]
 
   def remove(value: Any)(implicit p: Pipeline): Future[Boolean]
 

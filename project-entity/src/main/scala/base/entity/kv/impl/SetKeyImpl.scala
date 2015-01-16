@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/15/15 3:58 PM
  */
 
 package base.entity.kv.impl
@@ -64,10 +64,13 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
     }
   }
 
-  def add(value: Any)(implicit p: Pipeline) = p.sadd_(token, value.asInstanceOf[AnyRef]).map { v =>
-    val res = v.data().toInt > 0
-    if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
-    res
+  def add(value: Any*)(implicit p: Pipeline) = {
+    val args = token +: value.map(_.asInstanceOf[AnyRef])
+    p.sadd_(args: _*).map { v =>
+      val res = v.data().toInt
+      if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
+      res
+    }
   }
 
   def remove(value: Any)(implicit p: Pipeline) = p.srem_(token, value.asInstanceOf[AnyRef]).map { v =>

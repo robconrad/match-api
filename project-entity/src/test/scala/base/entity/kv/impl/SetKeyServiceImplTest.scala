@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:59 PM
+ * Last modified by rconrad, 1/15/15 4:03 PM
  */
 
 package base.entity.kv.impl
@@ -51,13 +51,12 @@ class SetKeyServiceImplTest extends KeyServiceImplTest[SetKey] {
 
     assert(keyService.remove(models, val1).await() == Map(model1 -> false, model2 -> false))
 
-    assert(model1.add(val1).await())
+    assert(model1.add(val1).await() == 1)
     assert(keyService.remove(models, val1).await() == Map(model1 -> true, model2 -> false))
     assert(!model1.isMember(val1).await())
 
-    assert(model1.add(val1).await())
-    assert(model2.add(val1).await())
-    assert(model2.add(val2).await())
+    assert(model1.add(val1).await() == 1)
+    assert(model2.add(val1, val2).await() == 2)
     assert(keyService.remove(models, val1).await() == Map(model1 -> true, model2 -> true))
     assert(!model1.isMember(val1).await())
     assert(!model2.isMember(val1).await())
@@ -69,18 +68,16 @@ class SetKeyServiceImplTest extends KeyServiceImplTest[SetKey] {
 
     assert(keyService.count(models).await() == Map(model1 -> 0, model2 -> 0))
 
-    assert(model1.add(val1).await())
-    assert(model2.add(val1).await())
-    assert(model2.add(val2).await())
+    assert(model1.add(val1).await() == 1)
+    assert(model2.add(val1, val2).await() == 2)
     assert(keyService.count(models).await() == Map(model1 -> 1, model2 -> 2))
   }
 
   test("unionStore") {
     assert(keyService.unionStore(dest).await() == 0)
 
-    assert(model1.add(val1).await())
-    assert(model1.add(val2).await())
-    assert(model2.add(val2).await())
+    assert(model1.add(val1, val2).await() == 2)
+    assert(model2.add(val2).await() == 1)
     assert(keyService.unionStore(dest, model1, model2).await() == 2)
     assert(dest.isMember(val1).await())
     assert(dest.isMember(val2).await())

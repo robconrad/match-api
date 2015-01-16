@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/15/15 5:43 PM
  */
 
 package base.entity.user.impl
@@ -47,7 +47,8 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
    * - update phone key attributes
    * - send SMS verification
    */
-  private[impl] class RegisterCommand(val input: RegisterModel) extends Command[RegisterModel, RegisterResponseModel] {
+  private[impl] class RegisterCommand(val input: RegisterModel)(implicit val authCtx: AuthContext)
+      extends Command[RegisterModel, RegisterResponseModel] {
 
     def execute() = {
       phoneCooldownExists(PhoneCooldownKeyService().make(KeyId(input.phone)))
