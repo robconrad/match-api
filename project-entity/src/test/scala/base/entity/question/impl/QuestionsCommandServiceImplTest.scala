@@ -2,23 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:23 PM
+ * Last modified by rconrad, 1/15/15 11:24 PM
  */
 
-package base.entity.message.impl
+package base.entity.question.impl
 
 import base.common.random.RandomService
-import base.common.random.mock.RandomServiceMock
 import base.common.service.{ TestServices, Services }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
-import base.entity.event.EventTypes
-import base.entity.event.model.EventModel
 import base.entity.group.mock.GroupEventsServiceMock
 import base.entity.kv.KvFactoryService
-import base.entity.message.model.MessageModel
+import base.entity.question.mock.QuestionServiceMock
+import base.entity.question.model.{ QuestionsResponseModel, QuestionsModel }
 
 import scala.concurrent.Future
 
@@ -27,30 +25,27 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class MessageCommandServiceImplTest extends CommandServiceImplTest {
+class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
 
-  val service = new MessageCommandServiceImpl()
+  val service = new QuestionsCommandServiceImpl()
 
   private val body = "a message"
   private val groupId = RandomService().uuid
 
   private val error = ApiError("test")
 
-  private val randomMock = new RandomServiceMock()
-  private val groupEventsMock = new GroupEventsServiceMock()
+  private val questionsMock = new QuestionServiceMock()
 
   private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
-  private implicit val model = MessageModel(groupId, body)
+  private implicit val model = QuestionsModel(groupId)
 
   override def beforeAll() {
     super.beforeAll()
-    Services.register(TimeServiceConstantMock)
-    Services.register(randomMock)
-    Services.register(groupEventsMock)
+    Services.register(questionsMock)
   }
 
-  private def command(implicit input: MessageModel) = new service.MessageCommand(input)
+  private def command(implicit input: QuestionsModel) = new service.QuestionsCommand(input)
 
   test("without perms") {
     assertPermException(authCtx => {
@@ -59,15 +54,13 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
-    val messageId = randomMock.nextUuid()
-    val event = EventModel(messageId, groupId, Option(authCtx.userId), EventTypes.MESSAGE, body)
-    assert(service.innerExecute(model).await() == Right(event))
+    val response = QuestionsResponseModel(groupId, List())
+    assert(service.innerExecute(model).await() == Right(response))
   }
 
-  test("group event set failed") {
-    val unregister = TestServices.register(
-      new GroupEventsServiceMock(setEventResult = Option(Future.successful(Left(error)))))
-    assert(command.groupEventSet().await() == Left(error))
+  test("questions get failed") {
+    val unregister = TestServices.register(new QuestionServiceMock(getResult = Future.successful(Left(error))))
+    assert(command.questionsGet().await() == Left(error))
     unregister()
   }
 
