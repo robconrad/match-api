@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:25 PM
+ * Last modified by rconrad, 1/15/15 10:03 PM
  */
 
 package base.entity.group
@@ -30,6 +30,4 @@ trait GroupService extends Service {
 
 }
 
-object GroupService extends ServiceCompanion[GroupService] {
-
-}
+object GroupService extends ServiceCompanion[GroupService]

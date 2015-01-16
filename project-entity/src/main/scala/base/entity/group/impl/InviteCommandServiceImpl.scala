@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 6:06 PM
+ * Last modified by rconrad, 1/15/15 10:50 PM
  */
 
 package base.entity.group.impl
@@ -13,10 +13,12 @@ import base.common.random.RandomService
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
+import base.entity.event.EventTypes
+import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupService, InviteCommandService }
+import base.entity.group.{ GroupEventsService, GroupService, InviteCommandService }
 import base.entity.kv.KeyId
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
@@ -25,7 +27,7 @@ import base.entity.user.kv._
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class InviteCommandServiceImpl()
+private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
     extends CommandServiceImpl[InviteModel, InviteResponseModel]
     with InviteCommandService {
 
@@ -38,9 +40,11 @@ private[entity] class InviteCommandServiceImpl()
    * - create invited user if not exists
    * - check if group pair exists
    * - create group
+   * - create group pair
    * - create group users
    * - update user groups
-   * - create group pair
+   * - add welcome message to group events
+   * - get and return group
    */
   private[impl] class InviteCommand(val input: InviteModel)(implicit val authCtx: AuthContext)
       extends Command[InviteModel, InviteResponseModel] {
@@ -103,9 +107,21 @@ private[entity] class InviteCommandServiceImpl()
 
     def invitingUserGroupsAdd(userId: UUID, groupId: UUID, key: UserGroupsKey) =
       key.add(groupId).flatMap {
-        case 1 => groupGet(userId, groupId)
+        case 1 => groupEventsPrepend(userId, groupId)
         case _ => Errors.userGroupsAddFailed
       }
+
+    def groupEventsPrepend(userId: UUID, groupId: UUID) = {
+      val event = EventModel(
+        id = RandomService().uuid,
+        groupId = groupId,
+        `type` = EventTypes.MESSAGE,
+        body = welcomeMessage)
+      GroupEventsService().setEvent(event, createIfNotExists = true).flatMap {
+        case Right(event) => groupGet(userId, groupId)
+        case Left(error)  => error
+      }
+    }
 
     def groupGet(userId: UUID, groupId: UUID) =
       GroupService().getGroup(groupId).flatMap {

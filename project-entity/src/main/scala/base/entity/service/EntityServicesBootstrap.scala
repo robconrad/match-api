@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 5:03 PM
+ * Last modified by rconrad, 1/15/15 11:06 PM
  */
 
 package base.entity.service
@@ -12,6 +12,7 @@ import base.entity.auth.impl.AuthServiceImpl
 import base.entity.group.kv.impl.{ GroupUsersKeyServiceImpl, GroupPairKeyServiceImpl, GroupKeyServiceImpl }
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.group.impl.InviteCommandServiceImpl
+import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 import base.entity.user.kv.impl._
@@ -72,7 +73,10 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new LoginCommandServiceImpl())
 
-    Services.register(new InviteCommandServiceImpl())
+    Services.register(new InviteCommandServiceImpl(
+      Keys(MATCH_GROUP, "welcomeMessage")))
+
+    Services.register(new MessageCommandServiceImpl())
 
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())

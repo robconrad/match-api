@@ -1,0 +1,40 @@
+/*
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * This file is proprietary and confidential.
+ * Last modified by rconrad, 1/15/15 11:00 PM
+ */
+
+package base.entity.group.mock
+
+import java.util.UUID
+
+import base.entity.error.ApiError
+import base.entity.event.model.EventModel
+import base.entity.group.GroupEventsService
+import base.entity.kv.Key._
+
+import scala.concurrent.Future
+
+/**
+ * {{ Describe the high level purpose of GroupServiceMock here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
+ * @author rconrad
+ */
+// scalastyle:off line.size.limit
+class GroupEventsServiceMock(getEventCountResult: Future[Either[ApiError, Int]] = Future.successful(Right(0)),
+                             getEventsResult: Future[Either[ApiError, List[EventModel]]] = Future.successful(Right(List())),
+                             setEventResult: Option[Future[Either[ApiError, EventModel]]] = None)
+    extends GroupEventsService {
+
+  def getEventCount(groupId: UUID)(implicit p: Pipeline) = getEventCountResult
+
+  def getEvents(groupId: UUID)(implicit p: Pipeline) = getEventsResult
+
+  def setEvent(event: EventModel, createIfNotExists: Boolean)(implicit p: Pipeline) = setEventResult match {
+    case Some(result) => result
+    case None         => Future.successful(Right(event))
+  }
+
+}

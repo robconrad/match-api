@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 6:22 PM
+ * Last modified by rconrad, 1/15/15 11:00 PM
  */
 
 package base.entity.group.impl
@@ -16,10 +16,12 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
+import base.entity.event.EventTypes
+import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv.impl.{ GroupUsersKeyImpl, GroupPairKeyImpl, GroupKeyImpl }
 import base.entity.group.kv.{ GroupPairKeyService, GroupUsersKeyService }
-import base.entity.group.mock.GroupServiceMock
+import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.kv.Key._
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
@@ -38,9 +40,10 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
+// scalastyle:off null
 class InviteCommandServiceImplTest extends CommandServiceImplTest {
 
-  val service = new InviteCommandServiceImpl
+  val service = new InviteCommandServiceImpl("welcome!")
 
   private val phone = "555-1234"
   private val label = "Bob"
@@ -49,8 +52,11 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   private val userId = RandomService().uuid
   private val groupId = RandomService().uuid
 
+  private val error = ApiError("test")
+
   private val randomMock = new RandomServiceMock()
   private val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(None)))
+  private val groupEventsMock = new GroupEventsServiceMock()
 
   private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
@@ -61,6 +67,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(TimeServiceConstantMock)
     Services.register(randomMock)
     Services.register(groupMock)
+    Services.register(groupEventsMock)
   }
 
   private def command(implicit input: InviteModel) = new service.InviteCommand(input)
@@ -199,10 +206,16 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     assert(command.invitingUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
 
+  test("group events prepend returned error") {
+    val unregister = TestServices.register(new GroupServiceMock(getGroupResult = Future.successful(Left(error))))
+    assert(command.groupGet(userId, groupId).await() == Left(error))
+    unregister()
+  }
+
   test("group get returned error") {
-    val error = Left(ApiError("test"))
-    val unregister = TestServices.register(new GroupServiceMock(getGroupResult = Future.successful(error)))
-    assert(command.groupGet(userId, groupId).await() == error)
+    val unregister = TestServices.register(
+      new GroupEventsServiceMock(setEventResult = Option(Future.successful(Left(error)))))
+    assert(command.groupEventsPrepend(userId, groupId).await() == Left(error))
     unregister()
   }
 
