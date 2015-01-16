@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:23 PM
+ * Last modified by rconrad, 1/15/15 11:36 PM
  */
 
 package base.entity.question.impl
@@ -10,9 +10,8 @@ package base.entity.question.impl
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.event.model.EventModel
+import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
 import base.entity.question.{ QuestionService, QuestionsCommandService }
-import base.entity.question.model.{ QuestionsResponseModel, QuestionsModel }
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)
