@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/9/15 9:51 PM
+ * Last modified by rconrad, 1/17/15 1:50 PM
  */
 
 package base.socket.logging
 
 import base.common.logging.LoggableTestUtil
+import base.entity.auth.context.NoAuthContext
 import base.entity.test.EntityBaseSuite
 
 /**
@@ -18,7 +19,7 @@ import base.entity.test.EntityBaseSuite
 class SocketLoggableTest extends EntityBaseSuite with SocketLoggable {
 
   private implicit val ch = new LoggableChannelInfo {
-    def authCtx = None
+    def authCtx = NoAuthContext
     def remoteAddress = "123 fake street"
   }
   private val t = new RuntimeException("error!")

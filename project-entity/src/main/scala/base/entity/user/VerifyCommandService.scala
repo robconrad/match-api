@@ -2,11 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:17 PM
+ * Last modified by rconrad, 1/17/15 12:29 PM
  */
 
 package base.entity.user
 
+import base.entity.command.model.CommandModel
 import base.entity.command.{ CommandService, CommandServiceCompanion }
 import base.entity.error.ApiError
 import base.entity.perm.Perms
@@ -19,6 +20,8 @@ import scala.concurrent.Future
  * @author rconrad
  */
 trait VerifyCommandService extends CommandService[VerifyModel, VerifyResponseModel] {
+
+  final def command = VerifyCommandService.cmd
 
   final def serviceManifest = manifest[VerifyCommandService]
 
@@ -34,6 +37,8 @@ trait VerifyCommandService extends CommandService[VerifyModel, VerifyResponseMod
 
 object VerifyCommandService extends CommandServiceCompanion[VerifyCommandService] {
 
-  type VerifyResponse = Future[Either[ApiError, VerifyResponseModel]]
+  final val cmd = "verify"
+
+  type VerifyResponse = Future[Either[ApiError, CommandModel[VerifyResponseModel]]]
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 4:03 PM
+ * Last modified by rconrad, 1/16/15 11:07 PM
  */
 
 package base.entity.perm
@@ -24,6 +24,22 @@ private[perm] object PermSets {
 
   val login = PermSet(
     Perms.LOGIN
+  )
+
+  val invite = PermSet(
+    Perms.INVITE
+  )
+
+  val message = PermSet(
+    Perms.MESSAGE
+  )
+
+  val answer = PermSet(
+    Perms.ANSWER
+  )
+
+  val questions = PermSet(
+    Perms.QUESTIONS
   )
 
 }

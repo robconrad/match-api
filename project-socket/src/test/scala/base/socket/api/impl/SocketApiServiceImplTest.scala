@@ -2,58 +2,77 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 9:36 AM
+ * Last modified by rconrad, 1/17/15 1:23 PM
  */
 
 package base.socket.api.impl
 
 import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
-import java.net.Socket
+import java.net.{ ConnectException, Socket }
 
-import base.common.lib.{ Actors, Dispatchable, Genders }
-import base.common.logging.Loggable
+import base.common.service.Services
 import base.common.test.Tags
-import base.entity.api.ApiVersions
-import base.entity.json.JsonFormats
-import base.entity.user.model.RegisterModel
-import base.socket.api.SocketApiService
-import base.socket.model.CommandModel
-import base.socket.test.SocketBaseSuite
-import org.json4s.native.Serialization
+import base.socket.api.mock.{ SocketApiStatsServiceMock, SocketApiHandlerServiceMock }
+import base.socket.service.SocketServiceTest
+
+import scala.concurrent.duration._
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
  * @author rconrad
  */
-class SocketApiServiceImplTest extends SocketBaseSuite with Dispatchable with Loggable {
+class SocketApiServiceImplTest extends SocketServiceTest {
 
-  implicit def json4sFormats = JsonFormats.withEnumsAndFields
+  private val host = "0.0.0.0"
+  private val port = 9999
+  private val connectionsAllowed = 10
+  private val stopSleep = 1.millis
+  private val shutdownTimeout = 10.seconds
 
-  test("server startup", Tags.SLOW) {
-    implicit val system = Actors.actorSystem
+  val service = new SocketApiServiceImpl(host, port, connectionsAllowed, stopSleep, shutdownTimeout)
 
-    try {
-      assert(SocketApiService().start().await())
+  private val response = "a response"
+  private val connections = 1
 
-      val socket = new Socket(SocketApiService().host, SocketApiService().port)
-      socket.setSoTimeout(timeout.duration.toMillis.toInt)
+  override def beforeAll() {
+    super.beforeAll()
+    Services.register(new SocketApiHandlerServiceMock(channelReadResponse = Option(response)))
+    Services.register(new SocketApiStatsServiceMock(connections))
+  }
 
-      val out = new PrintWriter(socket.getOutputStream, true)
-      val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+  private def makeSocket(message: Any): BufferedReader = {
+    val socket = new Socket(host, port)
+    socket.setSoTimeout(timeout.duration.toMillis.toInt)
 
-      val cmd = CommandModel("register", RegisterModel(ApiVersions.V01, "555-5555"))
-      val json = Serialization.write(cmd) + "\r\n"
+    val out = new PrintWriter(socket.getOutputStream, true)
+    val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
 
-      out.write(json)
-      out.flush()
+    out.write(message.toString + "\r\n")
+    out.flush()
 
-      assert(in.readLine().contains("not implemented"))
+    in
+  }
 
-      assert(SocketApiService().stop().await())
-    } catch {
-      case e: Exception =>
-        SocketApiService().stop().await()
-        throw e
+  test("isConnectionAllowed") {
+    assert(new SocketApiServiceImpl(host, port, connectionsAllowed, stopSleep, shutdownTimeout).isConnectionAllowed)
+
+    val noConnections = 0
+    assert(!new SocketApiServiceImpl(host, port, noConnections, stopSleep, shutdownTimeout).isConnectionAllowed)
+  }
+
+  test("start / stop", Tags.SLOW) {
+    intercept[ConnectException] {
+      makeSocket(response)
+    }
+
+    assert(service.start().await())
+
+    assert(makeSocket(response).readLine() == response)
+
+    assert(service.stop().await())
+
+    intercept[ConnectException] {
+      makeSocket(response)
     }
   }
 

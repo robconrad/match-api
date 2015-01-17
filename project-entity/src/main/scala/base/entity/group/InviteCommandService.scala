@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:10 PM
+ * Last modified by rconrad, 1/17/15 12:29 PM
  */
 
 package base.entity.group
@@ -18,10 +18,16 @@ import base.entity.user.model._
  */
 trait InviteCommandService extends CommandService[InviteModel, InviteResponseModel] {
 
+  final def command = InviteCommandService.cmd
+
   final def serviceManifest = manifest[InviteCommandService]
 
   final val perms = Set(Perms.INVITE)
 
 }
 
-object InviteCommandService extends CommandServiceCompanion[InviteCommandService]
+object InviteCommandService extends CommandServiceCompanion[InviteCommandService] {
+
+  final val cmd = "invite"
+
+}

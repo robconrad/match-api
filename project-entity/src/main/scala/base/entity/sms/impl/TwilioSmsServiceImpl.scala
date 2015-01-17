@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 4:44 PM
+ * Last modified by rconrad, 1/16/15 8:08 PM
  */
 
 package base.entity.sms.impl
@@ -37,6 +37,9 @@ class TwilioSmsServiceImpl(sid: String, token: String, from: String) extends Ser
       messageFactory.create(params)
       true
     } catch {
+      case e: TwilioRestException if e.getMessage.contains("is not a valid phone number") =>
+        debug("Twilio threw phone number exception for '%s'", e, to)
+        false
       case e: TwilioRestException =>
         error("Twilio threw exception", e)
         false

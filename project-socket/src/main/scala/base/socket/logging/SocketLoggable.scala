@@ -2,14 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:59 PM
+ * Last modified by rconrad, 1/17/15 1:52 PM
  */
 
 package base.socket.logging
 
 import base.common.logging.Loggable
-import base.socket._
-import io.netty.channel.{ Channel, ChannelHandlerContext }
 
 /**
  * {{ Describe the high level purpose of SocketLoggable here. }}
@@ -18,9 +16,6 @@ import io.netty.channel.{ Channel, ChannelHandlerContext }
  * @author rconrad
  */
 trait SocketLoggable extends Loggable {
-
-  protected implicit def ctx2Channel(ctx: ChannelHandlerContext): Channel = ctx.channel
-  protected implicit def ctx2Loggable(ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
 
   protected def trace(msg: String, x: Any*)(implicit ch: LoggableChannelInfo) {
     if (isTraceEnabled) super.trace(format(msg, x: _*))
@@ -49,6 +44,6 @@ trait SocketLoggable extends Loggable {
   }
 
   private def format(msg: String, x: Any*)(implicit ch: LoggableChannelInfo): String =
-    super.format(s"User:${ch.authCtx.map(_.user.map(_.id)).flatten} Addr:${ch.remoteAddress} $msg", x: _*)
+    super.format(s"User:${ch.authCtx.user.map(_.id)} Addr:${ch.remoteAddress} $msg", x: _*)
 
 }

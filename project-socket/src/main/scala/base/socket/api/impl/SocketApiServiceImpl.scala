@@ -2,21 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:41 PM
+ * Last modified by rconrad, 1/17/15 1:19 PM
  */
 
 package base.socket.api.impl
 
 import java.net.InetSocketAddress
 
-import base.common.service.ServiceImpl
-import base.socket.api.{ SocketApiService, SocketApiStats, SocketApiStatsService }
-import base.socket.handler.AuthenticationHandler
+import base.common.service.{ CommonService, ServiceImpl }
+import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.channel.{ ChannelHandler, ChannelHandlerContext, ChannelInitializer, ChannelOption }
+import io.netty.channel.{ ChannelHandlerContext, ChannelInitializer, ChannelOption }
 import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
 import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
 
@@ -33,27 +32,24 @@ import scala.util.{ Failure, Success }
 class SocketApiServiceImpl(val host: String,
                            val port: Int,
                            connectionsAllowed: Int,
-                           shutdownTime: FiniteDuration,
-                           encoder: ChannelHandler,
-                           decoder: ChannelHandler) extends ServiceImpl with SocketApiService {
+                           stopSleep: FiniteDuration,
+                           shutdownTimeout: FiniteDuration) extends ServiceImpl with SocketApiService {
 
-  private lazy val eventLoop1 = new NioEventLoopGroup
-  private lazy val eventLoop2 = new NioEventLoopGroup
-  private lazy val eventLoops = Set(eventLoop1, eventLoop2)
+  private lazy val acceptorLoop = new NioEventLoopGroup
+  private lazy val clientLoop = new NioEventLoopGroup
+  private lazy val eventLoops = Set(acceptorLoop, clientLoop)
 
   def isConnectionAllowed = {
-    SocketApiStatsService().get(SocketApiStats.CONNECTIONS) > connectionsAllowed
+    SocketApiStatsService().get(SocketApiStats.CONNECTIONS) <= connectionsAllowed
   }
 
   def start() = {
     val p = Promise[Boolean]()
-
-    val port = 8888
-    val address = new InetSocketAddress(port)
+    val address = new InetSocketAddress(host, port)
 
     Future {
       val server = new ServerBootstrap
-      server.group(eventLoop1, eventLoop2)
+      server.group(acceptorLoop, clientLoop)
         .localAddress(address)
         .channel(classOf[NioServerSocketChannel])
         .childOption[java.lang.Boolean](ChannelOption.TCP_NODELAY, true)
@@ -66,9 +62,6 @@ class SocketApiServiceImpl(val host: String,
             val maxFrameLength = 8192
             pipeline.addLast("framer", new DelimiterBasedFrameDecoder(maxFrameLength, Delimiters.lineDelimiter: _*))
 
-            pipeline.addLast("decoder", encoder)
-            pipeline.addLast("encoder", decoder)
-
             val readWriteIdleTime = 0
             val allIdleTime = 60
             pipeline.addLast("timeout", new IdleStateHandler(readWriteIdleTime, readWriteIdleTime, allIdleTime) {
@@ -77,7 +70,7 @@ class SocketApiServiceImpl(val host: String,
               }
             })
 
-            pipeline.addLast("authHandler", AuthenticationHandler)
+            pipeline.addLast("commandHandler", SocketApiHandlerService())
           }
         })
       server.bind().syncUninterruptibly()
@@ -95,14 +88,14 @@ class SocketApiServiceImpl(val host: String,
 
   def stop() = {
     // stop processing new input
-    AuthenticationHandler.stop()
+    SocketApiHandlerService().stop()
 
-    // allow time for in process messages to wind downs
-    Thread.sleep(shutdownTime.toMillis)
+    // allow time for in process messages to wind down
+    Thread.sleep(stopSleep.toMillis)
 
     // Shut down all event loops to terminate all threads.
     val set = eventLoops.map(_.shutdownGracefully()).map { f =>
-      f.awaitUninterruptibly(shutdownTime.toMillis)
+      f.awaitUninterruptibly(shutdownTimeout.toMillis)
     }
 
     Future.successful(!set.contains(false))

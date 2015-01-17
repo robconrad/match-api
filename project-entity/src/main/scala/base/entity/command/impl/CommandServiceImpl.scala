@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 12:19 PM
+ * Last modified by rconrad, 1/17/15 12:29 PM
  */
 
 package base.entity.command.impl
@@ -10,6 +10,7 @@ package base.entity.command.impl
 import base.common.service.ServiceImpl
 import base.entity.auth.context.AuthContext
 import base.entity.command.CommandService
+import base.entity.command.model.CommandModel
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudImplicits
 
@@ -29,7 +30,9 @@ private[entity] trait CommandServiceImpl[A, B]
     perms.foreach { perm =>
       authCtx.assertHas(perm)
     }
-    innerExecute(input)
+    innerExecute(input).map {
+      case Right(response) => Right(CommandModel(command, response))
+    }
   }
 
   protected def innerExecute(input: A)(implicit authCtx: AuthContext): Response
