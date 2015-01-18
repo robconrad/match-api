@@ -2,32 +2,34 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:46 PM
+ * Last modified by rconrad, 1/18/15 3:47 PM
  */
 
 package base.entity.user.impl
+
+import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.{ Services, TestServices }
 import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.AuthContextDataFactory
+import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
-import base.entity.kv.Key.Prop
+import base.entity.kv.Key._
 import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.KeyLoggerMock
-import base.entity.question.mock.QuestionServiceMock
+import base.entity.question.QuestionService
+import base.entity.question.model.AnswerModel
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv.UserKeyProps._
 import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
 import base.entity.user.mock.UserServiceMock
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
-import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -49,20 +51,24 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private val apiError = ApiError("test error")
 
-  private val userMock = new UserServiceMock()
-  private val groupMock = new GroupServiceMock()
-  private val groupEventsMock = new GroupEventsServiceMock()
-  private val questionMock = new QuestionServiceMock()
-
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = LoginModel(token, Option(groupId), appVersion, apiVersion, locale, deviceModel)
 
   override def beforeAll() {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
-    Services.register(userMock)
-    Services.register(groupMock)
-    Services.register(groupEventsMock)
+    Services.register(new UserServiceMock())
+    Services.register(new GroupServiceMock())
+    registerQuestionMock()
+    Services.register(new GroupEventsServiceMock())
+  }
+
+  private def registerQuestionMock() {
+    val questionMock = mock[QuestionService]
+    (questionMock.answer(_: AnswerModel)(_: Pipeline, _: AuthContext)) expects
+      (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
+    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: AuthContext)) expects
+      (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
     Services.register(questionMock)
   }
 
@@ -94,6 +100,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success - with group id") {
+    registerQuestionMock()
     val response = LoginResponseModel(RandomService().uuid, List(), Option(List()), Option(List()), None)
     testSuccess(model, response)
   }
@@ -146,7 +153,10 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   test("failed to get group questions") {
     val uuid = RandomService().uuid
     val key = new UserKeyImpl(mock[PrivateHashKey])
-    val unregister = TestServices.register(new QuestionServiceMock(getResult = Future.successful(Left(apiError))))
+    val questionMock = mock[QuestionService]
+    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: AuthContext)) expects
+      (*, *, *) returning Future.successful(Left(apiError))
+    val unregister = TestServices.register(questionMock)
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }

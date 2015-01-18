@@ -2,19 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:29 AM
+ * Last modified by rconrad, 1/18/15 3:03 PM
  */
 
 package base.entity.question.impl
 
 import base.common.random.RandomService
-import base.common.service.{ TestServices, Services }
-import base.entity.auth.context.AuthContextDataFactory
+import base.common.service.TestServices
+import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
-import base.entity.kv.KvFactoryService
-import base.entity.question.QuestionSides
-import base.entity.question.mock.QuestionServiceMock
+import base.entity.kv.Key.Pipeline
+import base.entity.question.{ QuestionService, QuestionSides }
 import base.entity.question.model.AnswerModel
 
 import scala.concurrent.Future
@@ -33,15 +32,8 @@ class AnswerCommandServiceImplTest extends CommandServiceImplTest {
 
   private val error = ApiError("test")
 
-  private val questionsMock = new QuestionServiceMock()
-
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = AnswerModel(RandomService().uuid, groupId, QuestionSides.SIDE_A, questionResponse)
-
-  override def beforeAll() {
-    super.beforeAll()
-    Services.register(questionsMock)
-  }
 
   private def command(implicit input: AnswerModel) = new service.AnswerCommand(input)
 
@@ -52,11 +44,19 @@ class AnswerCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
+    val questionService = mock[QuestionService]
+    (questionService.answer(_: AnswerModel)(_: Pipeline, _: AuthContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
+    val unregister = TestServices.register(questionService)
     assert(service.innerExecute(model).await() == Right(List()))
+    unregister()
   }
 
   test("answer set failed") {
-    val unregister = TestServices.register(new QuestionServiceMock(answerResult = Future.successful(Left(error))))
+    val questionService = mock[QuestionService]
+    (questionService.answer(_: AnswerModel)(_: Pipeline, _: AuthContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
+    val unregister = TestServices.register(questionService)
     assert(command.answerSet().await() == Left(error))
     unregister()
   }

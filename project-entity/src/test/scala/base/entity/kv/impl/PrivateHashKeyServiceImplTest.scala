@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:42 PM
+ * Last modified by rconrad, 1/18/15 2:48 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.Key.{ Pipeline, Id, Prop }
-import base.entity.kv.mock.{ PrivateHashKeyMock, KeyLoggerMock }
+import base.entity.kv.Key.{ Id, Pipeline, Prop }
 import base.entity.kv._
+import base.entity.kv.mock.KeyLoggerMock
 
 /**
  * {{ Describe the high level purpose of HashKeyFactoryImplTest here. }}
