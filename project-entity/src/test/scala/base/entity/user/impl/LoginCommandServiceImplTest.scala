@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:24 PM
+ * Last modified by rconrad, 1/18/15 2:40 PM
  */
 
 package base.entity.user.impl
@@ -17,15 +17,17 @@ import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
-import base.entity.kv.KvFactoryService
+import base.entity.kv.Key.Prop
+import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
+import base.entity.kv.mock.KeyLoggerMock
 import base.entity.question.mock.QuestionServiceMock
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv.UserKeyProps._
 import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
 import base.entity.user.mock.UserServiceMock
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
+import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -34,7 +36,7 @@ import scala.concurrent.Future
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class LoginCommandServiceImplTest extends CommandServiceImplTest {
+class LoginCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
 
   val service = new LoginCommandServiceImpl
   private val token = RandomService().uuid
@@ -103,27 +105,27 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to get device token") {
-    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
-    val key = new DeviceKeyImpl(mock)
-    assert(command.deviceGetToken(key).await() == Errors.deviceUnverified.await())
+    val key = mock[PrivateHashKey]
+    key.getId _ expects * returning Future.successful(None)
+    assert(command.deviceGetToken(new DeviceKeyImpl(key)).await() == Errors.deviceUnverified.await())
   }
 
   test("failed to validate token") {
-    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(Option(RandomService().uuid)))
-    val key = new DeviceKeyImpl(mock)
-    assert(command.deviceGetToken(key).await() == Errors.tokenInvalid.await())
+    val key = mock[PrivateHashKey]
+    key.getId _ expects * returning Future.successful(Option(RandomService().uuid))
+    assert(command.deviceGetToken(new DeviceKeyImpl(key)).await() == Errors.tokenInvalid.await())
   }
 
   test("failed to set device attributes") {
-    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new DeviceKeyImpl(mock)
-    assert(command.deviceSet(key).await() == Errors.deviceSetFailed.await())
+    val key = mock[PrivateHashKey]
+    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
+    assert(command.deviceSet(new DeviceKeyImpl(key)).await() == Errors.deviceSetFailed.await())
   }
 
   test("failed to get device user id") {
-    val mock = new PrivateHashKeyMock(getIdResult = Future.successful(None))
-    val key = new DeviceKeyImpl(mock)
-    assert(command.deviceGetUserId(key).await() == Errors.userIdGetFailed.await())
+    val key = mock[PrivateHashKey]
+    key.getId _ expects * returning Future.successful(None)
+    assert(command.deviceGetUserId(new DeviceKeyImpl(key)).await() == Errors.userIdGetFailed.await())
   }
 
   test("failed to get groups") {
@@ -134,8 +136,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to get group events") {
     val uuid = RandomService().uuid
-    val mock = new PrivateHashKeyMock()
-    val key = new UserKeyImpl(mock)
+    val key = new UserKeyImpl(mock[PrivateHashKey])
     val result = Future.successful(Left(apiError))
     val unregister = TestServices.register(new GroupEventsServiceMock(getEventsResult = result))
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
@@ -144,8 +145,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to get group questions") {
     val uuid = RandomService().uuid
-    val mock = new PrivateHashKeyMock()
-    val key = new UserKeyImpl(mock)
+    val key = new UserKeyImpl(mock[PrivateHashKey])
     val unregister = TestServices.register(new QuestionServiceMock(getResult = Future.successful(Left(apiError))))
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
@@ -153,9 +153,10 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to set user attributes") {
     val uuid = RandomService().uuid
-    val mock = new PrivateHashKeyMock(setResult = Future.successful(false))
-    val key = new UserKeyImpl(mock)
-    val future = command.userGetSetLastLogin(key, uuid, List(), None, None)
+    val key = mock[PrivateHashKey]
+    key.getDateTime _ expects * returning Future.successful(None)
+    (key.set(_: Prop, _: Any)) expects (*, *) returning Future.successful(false)
+    val future = command.userGetSetLastLogin(new UserKeyImpl(key), uuid, List(), None, None)
     assert(future.await() == Errors.userSetFailed.await())
   }
 

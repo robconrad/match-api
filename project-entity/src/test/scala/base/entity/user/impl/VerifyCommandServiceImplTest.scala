@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:24 PM
+ * Last modified by rconrad, 1/18/15 2:45 PM
  */
 
 package base.entity.user.impl
@@ -17,15 +17,15 @@ import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.kv.Key.Prop
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
-import base.entity.kv.KvFactoryService
+import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
+import base.entity.kv.mock.KeyLoggerMock
 import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.kv.UserKeyProps
-import UserKeyProps._
 import base.entity.user.impl.VerifyCommandServiceImpl._
+import base.entity.user.kv.UserKeyProps._
 import base.entity.user.kv.impl.{ DeviceKeyImpl, PhoneKeyImpl, UserKeyImpl }
 import base.entity.user.model.{ VerifyModel, VerifyResponseModel }
+import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -34,7 +34,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class VerifyCommandServiceImplTest extends CommandServiceImplTest {
+class VerifyCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
 
   val codeLength = 6
 
@@ -90,46 +90,49 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to get phone verification code") {
-    val key = new PhoneKeyImpl(new PrivateHashKeyMock())
-    assert(command.phoneGetCode(key).await() == Errors.codeMissing.await())
+    val key = mock[PrivateHashKey]
+    key.getString _ expects * returning Future.successful(None)
+    assert(command.phoneGetCode(new PhoneKeyImpl(key)).await() == Errors.codeMissing.await())
   }
 
   test("failed to validate phone verification code") {
-    val key = new PhoneKeyImpl(new PrivateHashKeyMock())
+    val key = new PhoneKeyImpl(mock[PrivateHashKey])
     val code = model.code + "munge"
     assert(command.phoneVerify(key, code).await() == Errors.codeValidation.await())
   }
 
   test("failed to get userId") {
-    val key = new PhoneKeyImpl(new PrivateHashKeyMock(getIdResult = Future.successful(None)))
-    assert(command.phoneGetUserId(key).await() == Errors.userIdMissing.await())
+    val key = mock[PrivateHashKey]
+    key.getId _ expects * returning Future.successful(None)
+    assert(command.phoneGetUserId(new PhoneKeyImpl(key)).await() == Errors.userIdMissing.await())
   }
 
   test("failed to provide name on first verify") {
     val myModel = model.copy(name = None)
     val result = Future.successful(Map[Prop, Option[String]](GenderProp -> Option(gender.toString)))
-    val mock = new PrivateHashKeyMock(getMultiResult = result)
-    val key = new UserKeyImpl(mock)
-    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
+    val key = mock[PrivateHashKey]
+    (key.get(_: Array[Prop])) expects * returning result
+    assert(command(myModel).userGet(userId, new UserKeyImpl(key)).await() == Errors.paramsMissing.await())
   }
 
   test("failed to provide gender on first verify") {
     val myModel = model.copy(gender = None)
-    val mock = new PrivateHashKeyMock(getMultiResult = Future.successful(Map(NameProp -> Option(name))))
-    val key = new UserKeyImpl(mock)
-    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
+    val key = mock[PrivateHashKey]
+    (key.get(_: Array[Prop])) expects * returning Future.successful(Map(NameProp -> Option(name)))
+    assert(command(myModel).userGet(userId, new UserKeyImpl(key)).await() == Errors.paramsMissing.await())
   }
 
   test("failed to set user attributes") {
-    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new UserKeyImpl(mock)
-    assert(command.userSet(userId, key, name, gender).await() == Errors.userSetFailed.await())
+    val key = mock[PrivateHashKey]
+    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
+    assert(command.userSet(userId, new UserKeyImpl(key), name, gender).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set device attributes") {
-    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new DeviceKeyImpl(mock)
-    assert(command.deviceSet(userId, key).await() == Errors.deviceSetFailed.await())
+    val key = mock[PrivateHashKey]
+    key.setNx _ expects (*, *) returning Future.successful(true)
+    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
+    assert(command.deviceSet(userId, new DeviceKeyImpl(key)).await() == Errors.deviceSetFailed.await())
   }
 
   test("send verify sms") {

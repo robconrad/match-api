@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:49 PM
+ * Last modified by rconrad, 1/18/15 2:38 PM
  */
 
 package base.entity.user.impl
@@ -15,14 +15,15 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.kv.KeyId
+import base.entity.kv.Key.Prop
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ KeyLoggerMock, KeyMock, PrivateHashKeyMock }
+import base.entity.kv.mock.KeyLoggerMock
+import base.entity.kv.{ KeyId, PrivateHashKey }
 import base.entity.user.impl.RegisterCommandServiceImpl._
 import base.entity.user.kv.UserKeyProps.{ CodeProp, UserIdProp }
 import base.entity.user.kv.impl.PhoneKeyImpl
-import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService, UserKeyProps }
+import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService }
 import base.entity.user.mock.VerifyCommandServiceMock
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 import org.scalamock.scalatest.MockFactory
@@ -115,15 +116,15 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest with MockFac
   }
 
   test("failed to create user") {
-    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new PhoneKeyImpl(mock)
-    assert(command.userCreate(key).await() == Errors.userSetFailed.await())
+    val key = mock[PrivateHashKey]
+    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
+    assert(command.userCreate(new PhoneKeyImpl(key)).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set phone updates") {
-    val mock = new PrivateHashKeyMock(setMultiResult = Future.successful(false))
-    val key = new PhoneKeyImpl(mock)
-    assert(command.phoneSetCode(key).await() == Errors.phoneSetFailed.await())
+    val key = mock[PrivateHashKey]
+    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
+    assert(command.phoneSetCode(new PhoneKeyImpl(key)).await() == Errors.phoneSetFailed.await())
   }
 
   test("failed to send sms") {
