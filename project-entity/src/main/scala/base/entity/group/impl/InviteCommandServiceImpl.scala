@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:46 PM
+ * Last modified by rconrad, 1/18/15 2:16 PM
  */
 
 package base.entity.group.impl
@@ -77,7 +77,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
         case false => Errors.phoneSetUserIdFailed
       }
 
-    def userUserLabelSet(userId: UUID, key: StringKey) =
+    def userUserLabelSet(userId: UUID, key: UserUserLabelKey) =
       key.set(input.label).flatMap {
         case true  => groupPairGet(userId, GroupPairKeyService().make(userId, authCtx.userId))
         case false => Errors.userUserLabelSetFailed

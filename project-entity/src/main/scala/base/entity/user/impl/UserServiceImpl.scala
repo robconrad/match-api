@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:58 PM
+ * Last modified by rconrad, 1/18/15 2:16 PM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.kv.Key._
 import base.entity.kv.{ KeyId, SetKey, StringKey }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKeyService }
+import base.entity.user.kv.{ UserUserLabelKey, UserGroupsKey, UserGroupsKeyService, UserUserLabelKeyService }
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 
@@ -37,7 +37,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
     getUser(userId, key)
   }
 
-  private[impl] def getUser(userId: UUID, key: StringKey)(implicit p: Pipeline, authCtx: AuthContext) =
+  private[impl] def getUser(userId: UUID, key: UserUserLabelKey)(implicit p: Pipeline, authCtx: AuthContext) =
     key.get.map { label =>
       Right(UserModel(userId, label))
     }

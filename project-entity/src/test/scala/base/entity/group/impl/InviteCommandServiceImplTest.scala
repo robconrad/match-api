@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/18/15 2:17 PM
  */
 
 package base.entity.group.impl
@@ -21,15 +21,15 @@ import base.entity.group.kv.impl.{ GroupKeyImpl, GroupPairKeyImpl, GroupUsersKey
 import base.entity.group.kv.{ GroupPairKeyService, GroupUsersKeyService }
 import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
-import base.entity.kv.Key._
+import base.entity.kv.KeyId
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock, StringKeyMock }
-import base.entity.kv.{ KeyId, KvFactoryService }
-import base.entity.user.kv.UserGroupsKeyService
+import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
 import base.entity.user.kv.UserKeyProps.UserIdProp
-import base.entity.user.kv.impl.{ UserUserLabelKeyImpl, PhoneKeyImpl, UserGroupsKeyImpl, UserKeyImpl }
+import base.entity.user.kv.impl.{ PhoneKeyImpl, UserGroupsKeyImpl, UserKeyImpl, UserUserLabelKeyImpl }
+import base.entity.user.kv.{ UserGroupsKeyService, UserUserLabelKey }
 import base.entity.user.model.UserModel
+import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -39,7 +39,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class InviteCommandServiceImplTest extends CommandServiceImplTest {
+class InviteCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
 
   val service = new InviteCommandServiceImpl("welcome!")
 
@@ -181,7 +181,8 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("user user label set failed") {
-    val key = new StringKeyMock(setResult = Future.successful(false))
+    val key = mock[UserUserLabelKey]
+    key.set _ expects * returning Future.successful(false)
     assert(command.userUserLabelSet(userId, key).await() == Errors.userUserLabelSetFailed.await())
   }
 

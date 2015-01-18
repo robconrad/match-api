@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:14 PM
+ * Last modified by rconrad, 1/18/15 2:16 PM
  */
 
 package base.entity.user.impl
@@ -17,11 +17,9 @@ import base.entity.group.mock.GroupServiceMock
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
-import base.entity.kv.mock.StringKeyMock
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService, UserGroupsKey }
-import base.entity.user.kv.impl.{ UserUserLabelKeyImpl, UserUserLabelKeyServiceImpl }
+import base.entity.user.kv.{ UserGroupsKey, UserUserLabelKey, UserUserLabelKeyService }
 import base.entity.user.model.UserModel
 import org.scalamock.scalatest.MockFactory
 
@@ -47,7 +45,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest with MockFactory
   private implicit val authCtx = AuthContextDataFactory.userAuth
 
   test("getUser") {
-    val key = new StringKeyMock(getResult = Future.successful(Option(label)))
+    val key = mock[UserUserLabelKey]
+    key.get _ expects () returning Future.successful(Option(label))
     val model = UserModel(userId, Option(label))
     assert(service.getUser(userId, key).await() == Right(model))
   }
