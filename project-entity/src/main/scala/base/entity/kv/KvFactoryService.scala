@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:28 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.kv
@@ -19,7 +19,7 @@ import redis.client.RedisClient
  */
 private[entity] trait KvFactoryService extends Service {
 
-  final def serviceManifest = manifest[KvFactoryService]
+  final val serviceManifest = manifest[KvFactoryService]
 
   private[kv] def client: RedisClient
   def pipeline: Pipeline

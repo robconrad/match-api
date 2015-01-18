@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 4:46 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.common.time
@@ -16,7 +16,7 @@ import org.joda.time.DateTime
  */
 trait TimeService extends Service {
 
-  final def serviceManifest = manifest[TimeService]
+  final val serviceManifest = manifest[TimeService]
 
   def now: DateTime
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:34 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.group.kv
@@ -20,7 +20,7 @@ import base.entity.kv.{ KeyService, KeyServiceCompanion }
  */
 trait GroupUserQuestionsTempKeyService extends KeyService[GroupUserQuestionsTempKey] {
 
-  final def serviceManifest = manifest[GroupUserQuestionsTempKeyService]
+  final val serviceManifest = manifest[GroupUserQuestionsTempKeyService]
 
   final val CHANNEL = "groupUserQuestionsTemp"
 

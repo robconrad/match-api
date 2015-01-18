@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.group.kv
@@ -17,7 +17,7 @@ import base.entity.kv.{ KeyService, KeyServiceCompanion }
  */
 trait GroupKeyService extends KeyService[GroupKey] {
 
-  final def serviceManifest = manifest[GroupKeyService]
+  final val serviceManifest = manifest[GroupKeyService]
 
   final val CHANNEL = "group"
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 10:00 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.socket.api
@@ -15,7 +15,7 @@ import base.common.service.{ ApiService, ServiceCompanion }
  */
 trait SocketApiService extends ApiService {
 
-  final def serviceManifest = manifest[SocketApiService]
+  final val serviceManifest = manifest[SocketApiService]
 
   val name = "socket-api"
 

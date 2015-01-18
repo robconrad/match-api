@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 11:24 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.question
@@ -24,7 +24,7 @@ import scala.concurrent.Future
  */
 trait QuestionService extends Service {
 
-  final def serviceManifest = manifest[QuestionService]
+  final val serviceManifest = manifest[QuestionService]
 
   def getQuestions(groupId: UUID)(implicit p: Pipeline,
                                   authCtx: AuthContext): Future[Either[ApiError, List[QuestionModel]]]

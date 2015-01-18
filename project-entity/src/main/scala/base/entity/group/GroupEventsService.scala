@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:25 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.group
@@ -22,7 +22,7 @@ import scala.concurrent.Future
  */
 trait GroupEventsService extends Service {
 
-  final def serviceManifest = manifest[GroupEventsService]
+  final val serviceManifest = manifest[GroupEventsService]
 
   def getEvents(groupId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[EventModel]]]
 

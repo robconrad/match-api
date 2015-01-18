@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 10:45 AM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.socket.api
@@ -16,7 +16,7 @@ import io.netty.channel.ChannelInboundHandler
  */
 trait SocketApiHandlerService extends Service with ChannelInboundHandler {
 
-  final def serviceManifest = manifest[SocketApiHandlerService]
+  final val serviceManifest = manifest[SocketApiHandlerService]
 
   def stop()
 

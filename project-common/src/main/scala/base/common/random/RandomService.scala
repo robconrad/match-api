@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.common.random
@@ -18,7 +18,7 @@ import com.google.common.hash.HashCode
  */
 trait RandomService extends Service {
 
-  final def serviceManifest = manifest[RandomService]
+  final val serviceManifest = manifest[RandomService]
 
   /**
    * Generate a random md5 hashcode

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:43 PM
+ * Last modified by rconrad, 1/18/15 3:35 PM
  */
 
 package base.socket.api
@@ -94,7 +94,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
   }
 
   override def afterAll() {
-    super.beforeAll()
+    super.afterAll()
     assert(SocketApiService().stop().await())
   }
 

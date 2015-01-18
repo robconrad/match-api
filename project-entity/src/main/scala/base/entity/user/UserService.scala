@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 9:04 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.entity.group
@@ -25,7 +25,7 @@ import scala.concurrent.Future
  */
 trait UserService extends Service {
 
-  final def serviceManifest = manifest[UserService]
+  final val serviceManifest = manifest[UserService]
 
   def getUser(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext): GetUser
 

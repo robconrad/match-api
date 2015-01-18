@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 1:55 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.common.service
@@ -18,7 +18,7 @@ import scala.concurrent.duration.Duration
  */
 trait CommonService extends Service {
 
-  final def serviceManifest = manifest[CommonService]
+  final val serviceManifest = manifest[CommonService]
 
   /**
    * Default timeout for futures, actors, etc. across the system

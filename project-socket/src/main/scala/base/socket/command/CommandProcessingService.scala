@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 11:19 AM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.socket.command
@@ -19,7 +19,7 @@ import scala.concurrent.Future
  */
 trait CommandProcessingService extends Service {
 
-  final def serviceManifest = manifest[CommandProcessingService]
+  final val serviceManifest = manifest[CommandProcessingService]
 
   def process(input: String)(implicit authCtx: AuthContext): FutureResponse
 

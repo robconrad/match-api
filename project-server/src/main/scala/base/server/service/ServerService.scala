@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 3:43 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.server.service
@@ -15,7 +15,7 @@ import base.common.service.{ ServiceCompanion, ApiService }
  */
 trait ServerService extends ApiService {
 
-  final def serviceManifest = manifest[ServerService]
+  final val serviceManifest = manifest[ServerService]
 
   val name = "server-api"
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:12 PM
+ * Last modified by rconrad, 1/18/15 2:58 PM
  */
 
 package base.rest.api
@@ -17,7 +17,7 @@ import scala.concurrent.Future
  */
 trait RestApiService extends ApiService {
 
-  final def serviceManifest = manifest[RestApiService]
+  final val serviceManifest = manifest[RestApiService]
 
   val name = "rest-api"
 
