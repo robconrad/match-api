@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:11 AM
+ * Last modified by rconrad, 1/17/15 5:29 PM
  */
 
 package base.entity.service
@@ -26,7 +26,7 @@ class CrudErrorImplicitsTest extends EntityBaseSuite {
 
     object DoAsserts extends CrudErrorImplicits[T] {
 
-      protected val externalErrorText = "external api error"
+      override protected val externalErrorText = "external api error"
 
       private val error = "api error"
       private val code = ApiErrorCodes.TEST

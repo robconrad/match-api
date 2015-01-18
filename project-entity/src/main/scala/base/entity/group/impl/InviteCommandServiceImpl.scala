@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:50 PM
+ * Last modified by rconrad, 1/17/15 5:29 PM
  */
 
 package base.entity.group.impl
@@ -138,7 +138,7 @@ object InviteCommandServiceImpl {
 
   object Errors extends CrudErrorImplicits[InviteResponseModel] {
 
-    protected val externalErrorText = "There was a problem during invite."
+    override protected val externalErrorText = "There was a problem during invite."
 
     lazy val userCreateFailed: Response = "failed to create user"
     lazy val phoneSetUserIdFailed: Response = "failed to set user id on phone"

@@ -2,14 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:17 PM
+ * Last modified by rconrad, 1/17/15 6:17 PM
  */
 
 package base.entity.group.kv.impl
 
+import base.common.time.TimeService
 import base.entity.group.kv.GroupKey
+import base.entity.group.kv.GroupKeyProps.{ EventCountProp, LastEventTimeProp }
+import base.entity.kv.Key._
 import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.HashKeyImpl
+import org.joda.time.DateTime
+
+import scala.concurrent.Future
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -18,5 +24,20 @@ import base.entity.kv.impl.HashKeyImpl
  * @author rconrad
  */
 class GroupKeyImpl(protected val key: PrivateHashKey) extends GroupKey with HashKeyImpl {
+
+  private val props = Array[Prop](LastEventTimeProp, EventCountProp)
+  def getLastEventAndCount(implicit p: Pipeline): Future[(Option[DateTime], Option[Int])] = {
+    key.get(props).map { props =>
+      val time = props(LastEventTimeProp).map(TimeService().fromString)
+      val count = props(EventCountProp).map(_.toInt)
+      (time, count)
+    }
+  }
+
+  def setLastEvent(time: DateTime)(implicit p: Pipeline) =
+    key.set(LastEventTimeProp, TimeService().asString(time))
+
+  def setEventCount(count: Int)(implicit p: Pipeline) =
+    key.set(EventCountProp, count)
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/17/15 5:55 PM
  */
 
 package base.entity.user.impl
@@ -17,15 +17,16 @@ import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.event.mock.EventServiceMock
+import base.entity.group.mock.GroupServiceMock
 import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
-import base.entity.group.mock.GroupServiceMock
 import base.entity.question.mock.QuestionServiceMock
-import base.entity.user.kv.UserKeyProps
-import UserKeyProps._
 import base.entity.user.impl.LoginCommandServiceImpl._
+import base.entity.user.kv.UserKeyProps
+import base.entity.user.kv.UserKeyProps._
 import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
+import base.entity.user.mock.UserServiceMock
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
 
 import scala.concurrent.Future
@@ -48,6 +49,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private val apiError = ApiError("test error")
 
+  private val userMock = new UserServiceMock()
   private val eventMock = new EventServiceMock()
   private val groupMock = new GroupServiceMock()
   private val questionMock = new QuestionServiceMock()
@@ -59,6 +61,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   override def beforeAll() {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
+    Services.register(userMock)
     Services.register(eventMock)
     Services.register(groupMock)
     Services.register(questionMock)
@@ -127,7 +130,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to get groups") {
-    val unregister = TestServices.register(new GroupServiceMock(getGroupsResult = Future.successful(Left(apiError))))
+    val unregister = TestServices.register(new UserServiceMock(getGroupsResult = Future.successful(Left(apiError))))
     assert(command.groupsGet(RandomService().uuid).await() == Left(apiError))
     unregister()
   }

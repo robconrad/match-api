@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:13 PM
+ * Last modified by rconrad, 1/17/15 4:15 PM
  */
 
 package base.socket.api
@@ -31,6 +31,7 @@ package object impl {
     }
 
     def remoteAddress = ch.remoteAddress().toString
+
   }
 
 }

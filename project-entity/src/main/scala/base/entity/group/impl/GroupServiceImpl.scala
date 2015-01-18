@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 3:09 PM
+ * Last modified by rconrad, 1/17/15 6:12 PM
  */
 
 package base.entity.group.impl
@@ -10,23 +10,59 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
-import base.entity.group.GroupService
+import base.entity.auth.context.AuthContext
+import base.entity.group.kv._
+import base.entity.group.model.{ GroupModelBuilder, GroupModel }
+import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key.Pipeline
-
-import scala.concurrent.Future
+import base.entity.kv.KeyId
+import base.entity.service.CrudImplicits
 
 /**
- * {{ Describe the high level purpose of GroupServiceImpk here. }}
+ * {{ Describe the high level purpose of GroupServiceImpl here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
 class GroupServiceImpl extends ServiceImpl with GroupService {
 
-  def getGroup(groupId: UUID)(implicit p: Pipeline) =
-    Future.successful(Right(None))
+  def getGroup(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
+    new GetGroupMethod(groupId).execute()
+  }
 
-  def getGroups(userId: UUID)(implicit p: Pipeline) =
-    Future.successful(Right(List()))
+  private[impl] class GetGroupMethod(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext)
+      extends CrudImplicits[Option[GroupModel]] {
+
+    def execute(): Response = {
+      val key = GroupUserKeyService().make(groupId, authCtx.userId)
+      groupUserGetSetLastRead(key, GroupModelBuilder(id = Option(groupId)))
+    }
+
+    def groupUserGetSetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
+      key.getLastRead.flatMap { lastRead =>
+        val key = GroupKeyService().make(KeyId(groupId))
+        groupGet(key, builder.copy(lastReadTime = lastRead))
+      }
+
+    def groupGet(key: GroupKey, builder: GroupModelBuilder): Response =
+      key.getLastEventAndCount.flatMap {
+        case (lastEvent, count) =>
+          val key = GroupUsersKeyService().make(KeyId(groupId))
+          groupUsersGet(key, builder.copy(lastEventTime = lastEvent, eventCount = Option(count.getOrElse(0))))
+      }
+
+    def groupUsersGet(key: GroupUsersKey, builder: GroupModelBuilder): Response =
+      key.members().flatMap { members =>
+        val userIds = members.map(UUID.fromString)
+        usersGet(userIds, builder)
+      }
+
+    def usersGet(userIds: Iterable[UUID], builder: GroupModelBuilder): Response =
+      UserService().getUsers(userIds).map {
+        case Right(users) => Option(builder.copy(users = Option(users)).build)
+        case Left(error)  => error
+      }
+
+  }
 
 }

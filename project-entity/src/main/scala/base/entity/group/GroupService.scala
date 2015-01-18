@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:03 PM
+ * Last modified by rconrad, 1/17/15 5:47 PM
  */
 
 package base.entity.group
@@ -10,9 +10,11 @@ package base.entity.group
 import java.util.UUID
 
 import base.common.service.{ Service, ServiceCompanion }
+import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
-import base.entity.kv.Key.Pipeline
+import base.entity.group.GroupService.GetGroup
 import base.entity.group.model.GroupModel
+import base.entity.kv.Key.Pipeline
 
 import scala.concurrent.Future
 
@@ -24,10 +26,12 @@ trait GroupService extends Service {
 
   final def serviceManifest = manifest[GroupService]
 
-  def getGroup(groupId: UUID)(implicit p: Pipeline): Future[Either[ApiError, Option[GroupModel]]]
-
-  def getGroups(userId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[GroupModel]]]
+  def getGroup(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext): GetGroup
 
 }
 
-object GroupService extends ServiceCompanion[GroupService]
+object GroupService extends ServiceCompanion[GroupService] {
+
+  type GetGroup = Future[Either[ApiError, Option[GroupModel]]]
+
+}

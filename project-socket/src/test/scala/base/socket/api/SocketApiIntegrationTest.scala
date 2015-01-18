@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:13 PM
+ * Last modified by rconrad, 1/17/15 5:56 PM
  */
 
 package base.socket.api
@@ -110,7 +110,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     val inviteUserId = randomMock.nextUuid()
     val groupId = randomMock.nextUuid(1)
 
-    val groupModel = GroupModel(groupId, List(), time, time, 0)
+    val groupModel = GroupModel(groupId, List(), Option(time), Option(time), 0)
     val inviteModel = InviteModel("555-5432", "bob")
     val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
     // TODO enable once GroupServices are implemented

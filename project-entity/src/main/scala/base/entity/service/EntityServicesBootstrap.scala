@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:01 PM
+ * Last modified by rconrad, 1/17/15 6:10 PM
  */
 
 package base.entity.service
 
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.group.impl.{ GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
-import base.entity.group.kv.impl.{ GroupKeyServiceImpl, GroupPairKeyServiceImpl, GroupUsersKeyServiceImpl }
+import base.entity.group.kv.impl.{ GroupUserKeyServiceImpl, GroupKeyServiceImpl, GroupPairKeyServiceImpl, GroupUsersKeyServiceImpl }
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
@@ -65,6 +65,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new GroupEventsServiceImpl())
 
+    Services.register(new UserServiceImpl())
+
     Services.register(new RegisterCommandServiceImpl(
       Keys(MATCH_USER, "phoneCooldown")))
 
@@ -87,6 +89,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new GroupKeyServiceImpl())
     Services.register(new GroupPairKeyServiceImpl())
+    Services.register(new GroupUserKeyServiceImpl())
     Services.register(new GroupUsersKeyServiceImpl())
 
     true

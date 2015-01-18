@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:59 PM
+ * Last modified by rconrad, 1/17/15 5:47 PM
  */
 
 package base.entity.user.impl
@@ -15,15 +15,15 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventService
 import base.entity.event.model.EventModel
-import base.entity.kv._
-import base.entity.group.GroupService
+import base.entity.group.UserService
 import base.entity.group.model.GroupModel
+import base.entity.kv._
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
-import base.entity.user.kv.{ UserKeyService, UserKey, DeviceKeyService, DeviceKey }
+import base.entity.user.kv.{ DeviceKey, DeviceKeyService, UserKey, UserKeyService }
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
 import spray.http.StatusCodes._
 
@@ -87,7 +87,7 @@ private[entity] class LoginCommandServiceImpl()
 
     def groupsGet(userId: UUID): Response = {
       val key = UserKeyService().make(KeyId(userId))
-      GroupService().getGroups(userId).flatMap {
+      UserService().getGroups(userId).flatMap {
         case Left(error) => error
         case Right(groups) => input.groupId match {
           case Some(groupId) => eventsGet(key, userId, groups, groupId)
@@ -131,7 +131,7 @@ object LoginCommandServiceImpl {
 
   object Errors extends CrudErrorImplicits[LoginResponseModel] {
 
-    protected val externalErrorText = "There was a problem during login."
+    override protected val externalErrorText = "There was a problem during login."
 
     private val deviceUnverifiedText = "This device has not been verified."
     private val tokenInvalidText = "The supplied token is not valid."

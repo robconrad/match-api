@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 2:16 PM
+ * Last modified by rconrad, 1/17/15 5:29 PM
  */
 
 package base.entity.user.impl
@@ -114,7 +114,7 @@ object RegisterCommandServiceImpl {
 
   object Errors extends CrudErrorImplicits[RegisterResponseModel] {
 
-    protected val externalErrorText = "There was a problem with registration."
+    override protected val externalErrorText = "There was a problem with registration."
 
     private val phoneCooldownText = "This phone number has been registered too recently."
 

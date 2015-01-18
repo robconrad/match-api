@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 3:00 PM
+ * Last modified by rconrad, 1/17/15 5:29 PM
  */
 
 package base.entity.user.impl
@@ -123,7 +123,7 @@ object VerifyCommandServiceImpl {
 
   object Errors extends CrudErrorImplicits[VerifyResponseModel] {
 
-    protected val externalErrorText = "There was a problem with verification."
+    override protected val externalErrorText = "There was a problem with verification."
 
     private val codeMissingText = "A verification code has not been sent for this phone number."
     private val codeValidationText = "The supplied verification code does not validate."

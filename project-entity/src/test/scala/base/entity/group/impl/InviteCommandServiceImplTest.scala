@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:00 PM
+ * Last modified by rconrad, 1/17/15 5:54 PM
  */
 
 package base.entity.group.impl
@@ -83,7 +83,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val userId = randomMock.nextUuid()
     val users = List(UserModel(userId, label))
     val groupId = randomMock.nextUuid(1)
-    val group = GroupModel(groupId, users, time, time, eventCount)
+    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
     val unregister = TestServices.register(groupMock)
     val response = InviteResponseModel(userId, group)
@@ -123,7 +123,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val eventCount = 0
     val users = List(UserModel(userId, label))
     val groupId = randomMock.nextUuid()
-    val group = GroupModel(groupId, users, time, time, eventCount)
+    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
     val unregister = TestServices.register(groupMock)
     val response = InviteResponseModel(userId, group)
@@ -157,7 +157,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
 
     val eventCount = 0
     val users = List(UserModel(userId, label))
-    val group = GroupModel(groupId, users, time, time, eventCount)
+    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
     val unregister = TestServices.register(groupMock)
     val response = InviteResponseModel(userId, group)
