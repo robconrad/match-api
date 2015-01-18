@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 9:32 AM
+ * Last modified by rconrad, 1/18/15 11:05 AM
  */
 
 package base.entity.kv.impl
@@ -45,7 +45,7 @@ final class PrivateHashKeyImpl(val token: String, protected val logger: KeyLogge
     get_(prop).map(Key.string2Boolean)
 
   private def get_(prop: Prop)(implicit p: Pipeline) = p.hget(token, prop).map { v =>
-    val res = v.asAsciiString()
+    val res = v.asUTF8String()
     if (isDebugEnabled) log("HGET", s"prop: $prop, value: $res")
     res
   }

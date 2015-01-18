@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:36 AM
+ * Last modified by rconrad, 1/18/15 10:58 AM
  */
 
 package base.entity.kv
@@ -24,6 +24,8 @@ trait SetKey extends Key {
   def isMember(value: Any)(implicit p: Pipeline): Future[Boolean]
 
   def rand()(implicit p: Pipeline): Future[Option[String]]
+
+  def rand(count: Int)(implicit p: Pipeline): Future[Set[String]]
 
   def pop()(implicit p: Pipeline): Future[Option[String]]
 

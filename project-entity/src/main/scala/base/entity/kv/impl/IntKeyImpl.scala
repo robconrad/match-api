@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/18/15 11:05 AM
  */
 
 package base.entity.kv.impl
@@ -37,7 +37,7 @@ abstract class IntKeyImpl extends KeyImpl with IntKey {
     if (isDebugEnabled) log("GET (start)")
     p.get(token).map {
       case res if res == null || res.data() == null => None
-      case res                                      => Option(res.asAsciiString().toInt)
+      case res                                      => Option(res.asUTF8String().toInt)
     }.map { res =>
       if (isDebugEnabled) log("GET (finish)", s"value: $res")
       res

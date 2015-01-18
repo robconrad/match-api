@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 9:50 PM
+ * Last modified by rconrad, 1/18/15 11:05 AM
  */
 
 package base.entity.kv.impl
@@ -37,7 +37,7 @@ abstract class HashKeyServiceImpl[T <: Key] extends KeyServiceImpl[T] with HashK
         }).toList // has to be list or gets interpreted as set later, killing duplicate results
         Future.sequence(futures).map { v =>
           ids.zip(v).map {
-            case (key, value) => key -> Option(value.asAsciiString())
+            case (key, value) => key -> Option(value.asUTF8String())
           }.toMap
         }
       case false => Future.successful(Map())

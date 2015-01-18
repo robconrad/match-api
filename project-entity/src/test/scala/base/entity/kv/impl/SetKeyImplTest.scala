@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:41 AM
+ * Last modified by rconrad, 1/18/15 11:06 AM
  */
 
 package base.entity.kv.impl
@@ -46,6 +46,13 @@ class SetKeyImplTest extends KeyImplTest {
     assert(model.rand().await() == None)
     assert(model.add(val1).await() == 1)
     assert(model.rand().await() == Option(val1))
+  }
+
+  test("rand(count)") {
+    val count = 3
+    assert(model.rand(count).await() == Set())
+    assert(model.add(val1, val2).await() == 2)
+    assert(model.rand(count).await() == Set(val1, val2))
   }
 
   test("pop") {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:38 AM
+ * Last modified by rconrad, 1/18/15 10:59 AM
  */
 
 package base.entity.kv.mock
@@ -23,6 +23,7 @@ class SetKeyMock(val token: String = RandomService().md5.toString,
                  membersResult: Future[Set[String]] = Future.successful(Set()),
                  moveResult: Future[Boolean] = Future.successful(true),
                  randResult: Future[Option[String]] = Future.successful(None),
+                 randCountResult: Future[Set[String]] = Future.successful(Set()),
                  removeResult: Future[Boolean] = Future.successful(true),
                  addResult: Future[Int] = Future.successful(0),
                  popResult: Future[Option[String]] = Future.successful(None),
@@ -35,6 +36,8 @@ class SetKeyMock(val token: String = RandomService().md5.toString,
   def move(to: SetKey, member: Any)(implicit p: Pipeline) = moveResult
 
   def rand()(implicit p: Pipeline) = randResult
+
+  def rand(count: Int)(implicit p: Pipeline) = randCountResult
 
   def remove(value: Any)(implicit p: Pipeline) = removeResult
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:42 AM
+ * Last modified by rconrad, 1/18/15 11:09 AM
  */
 
 package base.entity.kv.impl
@@ -11,7 +11,8 @@ import java.nio.charset.Charset
 
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.{ PrivateHashKey, KeyLogger, SetKey }
-import redis.reply.BulkReply
+import redis.client.RedisException
+import redis.reply.{ MultiBulkReply, BulkReply }
 
 import scala.collection.JavaConversions._
 
@@ -37,21 +38,33 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
     }
   }
 
-  // note will only work for 1 randmember with this impl
   def rand()(implicit p: Pipeline) = {
     p.srandmember_(token).map { v =>
       val res = v match {
         case v if v == null || v.data() == null => None
-        case v                                  => Some(v.asInstanceOf[BulkReply].asAsciiString())
+        case v                                  => Some(v.asInstanceOf[BulkReply].asUTF8String())
       }
       if (isDebugEnabled) log("SRANDMEMBER", s"result: $res")
       res
     }
   }
 
+  def rand(count: Int)(implicit p: Pipeline) = {
+    p.srandmember_(token, count.asInstanceOf[AnyRef]).map {
+      case v: MultiBulkReply =>
+        val res: Set[String] = v match {
+          case v if v == null || v.data() == null => Set()
+          case v                                  => v.asStringSet(Charset.defaultCharset()).toSet
+        }
+        if (isDebugEnabled) log("SRANDMEMBER", s"count: $count, result: $res")
+        res
+      case v => throw new RedisException(s"SRANDMEMBER got something other than MultiBulkReply: $v")
+    }
+  }
+
   def pop()(implicit p: Pipeline) = {
     p.spop(token).map { v =>
-      val res = v.asAsciiString()
+      val res = v.asUTF8String()
       if (isDebugEnabled) log("SPOP", s"result: $res")
       res match {
         case null => None
