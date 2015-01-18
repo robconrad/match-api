@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:05 PM
+ * Last modified by rconrad, 1/18/15 1:13 PM
  */
 
 package base.entity.question.impl
@@ -16,15 +16,15 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.EventModel
-import base.entity.group.kv.impl.GroupUserQuestionsTempKeyImpl
-import base.entity.group.kv.{ GroupUserQuestionsYesKeyService, GroupUsersKeyService }
-import base.entity.kv.Key._
-import base.entity.kv.mock.KeyLoggerMock
+import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
+import base.entity.kv.Key.Pipeline
 import base.entity.kv.{ KeyId, KvTest }
 import base.entity.question.QuestionSides._
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite }
 import base.entity.service.EntityServiceTest
+import org.scalamock.MockFunction0
+import org.scalamock.scalatest.MockFactory
 import redis.client.RedisException
 
 import scala.concurrent.Future
@@ -35,7 +35,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionServiceImplTest extends EntityServiceTest with KvTest {
+class QuestionServiceImplTest extends EntityServiceTest with KvTest with MockFactory {
 
   private val totalSides = 6
   private val questions = List(
@@ -76,11 +76,10 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
   test("questions - failed to delete") {
     val groupId = RandomService().uuid
-    val key = new GroupUserQuestionsTempKeyImpl(groupId.toString, KeyLoggerMock) {
-      override def del()(implicit p: Pipeline) = {
-        Future.successful(false)
-      }
-    }
+    val key = mock[GroupUserQuestionsTempKey]
+    (key.del()(_: Pipeline)) expects p returning Future.successful(false)
+    key.token _ expects () returning ""
+
     val method = new service.GetQuestionsMethod(groupId)
     intercept[RedisException] {
       method.groupUserQuestionTempDel(key, Iterable[String]()).await()

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:12 PM
+ * Last modified by rconrad, 1/18/15 12:46 PM
  */
 
 package base.socket.api
@@ -34,7 +34,7 @@ import base.entity.kv.KvTest
 import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
 import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.{QuestionModel, QuestionsModel, QuestionsResponseModel, AnswerModel}
+import base.entity.question.model.{ QuestionModel, QuestionsModel, QuestionsResponseModel, AnswerModel }
 import base.entity.question._
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
