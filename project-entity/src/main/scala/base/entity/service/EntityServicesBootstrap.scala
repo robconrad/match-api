@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:10 PM
+ * Last modified by rconrad, 1/17/15 6:59 PM
  */
 
 package base.entity.service
 
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.group.impl.{ GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
-import base.entity.group.kv.impl.{ GroupUserKeyServiceImpl, GroupKeyServiceImpl, GroupPairKeyServiceImpl, GroupUsersKeyServiceImpl }
+import base.entity.group.kv.impl._
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
@@ -32,6 +32,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
   protected val MATCH = "match"
   protected val MATCH_USER = Keys(MATCH, "user")
   protected val MATCH_GROUP = Keys(MATCH, "group")
+  protected val MATCH_GROUP_EVENT = Keys(MATCH_GROUP, "event")
 
   /**
    * Registration of services, see classes for details on these parameters
@@ -63,7 +64,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new GroupServiceImpl())
 
-    Services.register(new GroupEventsServiceImpl())
+    Services.register(new GroupEventsServiceImpl(
+      Keys(MATCH_GROUP_EVENT, "count")))
 
     Services.register(new UserServiceImpl())
 
@@ -91,6 +93,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new GroupPairKeyServiceImpl())
     Services.register(new GroupUserKeyServiceImpl())
     Services.register(new GroupUsersKeyServiceImpl())
+    Services.register(new GroupEventsKeyServiceImpl())
 
     true
   }

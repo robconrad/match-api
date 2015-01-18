@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:47 PM
+ * Last modified by rconrad, 1/17/15 6:55 PM
  */
 
 package base.entity.user.impl
@@ -13,10 +13,9 @@ import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.event.EventService
 import base.entity.event.model.EventModel
-import base.entity.group.UserService
 import base.entity.group.model.GroupModel
+import base.entity.group.{ GroupEventsService, UserService }
 import base.entity.kv._
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
@@ -100,7 +99,7 @@ private[entity] class LoginCommandServiceImpl()
                   userId: UUID,
                   groups: List[GroupModel],
                   groupId: UUID): Response = {
-      EventService().getEvents(groupId).flatMap {
+      GroupEventsService().getEvents(groupId).flatMap {
         case Left(error) => error
         case Right(events) =>
           QuestionService().getQuestions(groupId).flatMap {

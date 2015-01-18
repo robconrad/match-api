@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:55 PM
+ * Last modified by rconrad, 1/17/15 6:58 PM
  */
 
 package base.entity.user.impl
@@ -16,14 +16,12 @@ import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
-import base.entity.event.mock.EventServiceMock
-import base.entity.group.mock.GroupServiceMock
+import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
 import base.entity.kv.KvFactoryService
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock }
 import base.entity.question.mock.QuestionServiceMock
 import base.entity.user.impl.LoginCommandServiceImpl._
-import base.entity.user.kv.UserKeyProps
 import base.entity.user.kv.UserKeyProps._
 import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
 import base.entity.user.mock.UserServiceMock
@@ -50,8 +48,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val apiError = ApiError("test error")
 
   private val userMock = new UserServiceMock()
-  private val eventMock = new EventServiceMock()
   private val groupMock = new GroupServiceMock()
+  private val groupEventsMock = new GroupEventsServiceMock()
   private val questionMock = new QuestionServiceMock()
 
   private implicit val pipeline = KvFactoryService().pipeline
@@ -62,8 +60,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
     Services.register(userMock)
-    Services.register(eventMock)
     Services.register(groupMock)
+    Services.register(groupEventsMock)
     Services.register(questionMock)
   }
 
@@ -139,7 +137,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val mock = new PrivateHashKeyMock()
     val key = new UserKeyImpl(mock)
-    val unregister = TestServices.register(new EventServiceMock(getEventsResult = Future.successful(Left(apiError))))
+    val result = Future.successful(Left(apiError))
+    val unregister = TestServices.register(new GroupEventsServiceMock(getEventsResult = result))
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }

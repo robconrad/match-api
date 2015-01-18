@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:00 PM
+ * Last modified by rconrad, 1/17/15 6:25 PM
  */
 
 package base.entity.group.mock
@@ -23,12 +23,9 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off line.size.limit
-class GroupEventsServiceMock(getEventCountResult: Future[Either[ApiError, Int]] = Future.successful(Right(0)),
-                             getEventsResult: Future[Either[ApiError, List[EventModel]]] = Future.successful(Right(List())),
+class GroupEventsServiceMock(getEventsResult: Future[Either[ApiError, List[EventModel]]] = Future.successful(Right(List())),
                              setEventResult: Option[Future[Either[ApiError, EventModel]]] = None)
     extends GroupEventsService {
-
-  def getEventCount(groupId: UUID)(implicit p: Pipeline) = getEventCountResult
 
   def getEvents(groupId: UUID)(implicit p: Pipeline) = getEventsResult
 
