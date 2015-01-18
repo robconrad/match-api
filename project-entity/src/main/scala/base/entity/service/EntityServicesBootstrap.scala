@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:59 PM
+ * Last modified by rconrad, 1/17/15 7:45 PM
  */
 
 package base.entity.service
@@ -88,6 +88,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new PhoneKeyServiceImpl())
     Services.register(new PhoneCooldownKeyServiceImpl())
     Services.register(new UserGroupsKeyServiceImpl())
+    Services.register(new UserUserLabelKeyServiceImpl())
 
     Services.register(new GroupKeyServiceImpl())
     Services.register(new GroupPairKeyServiceImpl())

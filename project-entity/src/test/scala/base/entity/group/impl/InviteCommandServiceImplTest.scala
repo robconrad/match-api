@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:54 PM
+ * Last modified by rconrad, 1/17/15 7:44 PM
  */
 
 package base.entity.group.impl
@@ -16,21 +16,19 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
-import base.entity.event.EventTypes
-import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
-import base.entity.group.kv.impl.{ GroupUsersKeyImpl, GroupPairKeyImpl, GroupKeyImpl }
+import base.entity.group.kv.impl.{ GroupKeyImpl, GroupPairKeyImpl, GroupUsersKeyImpl }
 import base.entity.group.kv.{ GroupPairKeyService, GroupUsersKeyService }
 import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.kv.Key._
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ PrivateHashKeyMock, KeyLoggerMock }
+import base.entity.kv.mock.{ KeyLoggerMock, PrivateHashKeyMock, StringKeyMock }
 import base.entity.kv.{ KeyId, KvFactoryService }
 import base.entity.user.kv.UserGroupsKeyService
 import base.entity.user.kv.UserKeyProps.UserIdProp
-import base.entity.user.kv.impl.{ UserGroupsKeyImpl, PhoneKeyImpl, UserKeyImpl }
+import base.entity.user.kv.impl.{ UserUserLabelKeyImpl, PhoneKeyImpl, UserGroupsKeyImpl, UserKeyImpl }
 import base.entity.user.model.UserModel
 
 import scala.concurrent.Future
@@ -97,6 +95,9 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val userKey = new PrivateHashKeyImpl(s"user-$userId", KeyLoggerMock)
     assert(userKey.getDateTime(CreatedProp).await().exists(_.isEqual(time)))
 
+    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${authCtx.userId}-$userId", KeyLoggerMock)
+    assert(userUserLabelKey.get.await().contains(label))
+
     val groupKey = new PrivateHashKeyImpl(s"group-$groupId", KeyLoggerMock)
     assert(groupKey.getDateTime(CreatedProp).await().exists(_.isEqual(time)))
 
@@ -128,6 +129,9 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val unregister = TestServices.register(groupMock)
     val response = InviteResponseModel(userId, group)
     assert(service.innerExecute(model).await() == Right(response))
+
+    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${authCtx.userId}-$userId", KeyLoggerMock)
+    assert(userUserLabelKey.get.await().contains(label))
 
     val groupKey = new PrivateHashKeyImpl(s"group-$groupId", KeyLoggerMock)
     assert(groupKey.getDateTime(CreatedProp).await().exists(_.isEqual(time)))
@@ -175,6 +179,11 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   test("phone set userId failed") {
     val phoneKey = new PhoneKeyImpl(new PrivateHashKeyMock(setMultiResult = Future.successful(false)))
     assert(command.phoneSetUserId(userId, phoneKey).await() == Errors.phoneSetUserIdFailed.await())
+  }
+
+  test("user user label set failed") {
+    val key = new StringKeyMock(setResult = Future.successful(false))
+    assert(command.userUserLabelSet(userId, key).await() == Errors.userUserLabelSetFailed.await())
   }
 
   test("group pair set failed") {

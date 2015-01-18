@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:29 PM
+ * Last modified by rconrad, 1/17/15 7:46 PM
  */
 
 package base.entity.group.impl
@@ -19,7 +19,7 @@ import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupService, InviteCommandService }
-import base.entity.kv.KeyId
+import base.entity.kv.{ StringKey, KeyId }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
 
@@ -38,6 +38,8 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
   /**
    * - get invited userId from phone
    * - create invited user if not exists
+   * - set phone user id if new user
+   * - create invited user label
    * - check if group pair exists
    * - create group
    * - create group pair
@@ -56,26 +58,30 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
     def phoneGetUserId(key: PhoneKey) =
       key.create().flatMap { exists =>
         key.getUserId.flatMap {
-          case Some(userId) => groupPairGet(userId, GroupPairKeyService().make(userId, authCtx.userId))
+          case Some(userId) => userUserLabelSet(userId, UserUserLabelKeyService().make(authCtx.userId, userId))
           case None =>
             val userId = RandomService().uuid
             userCreate(userId, UserKeyService().make(KeyId(userId)), key)
         }
       }
 
-    def userCreate(userId: UUID, userKey: UserKey, phoneKey: PhoneKey) = {
+    def userCreate(userId: UUID, userKey: UserKey, phoneKey: PhoneKey) =
       userKey.create().flatMap {
         case true  => phoneSetUserId(userId, phoneKey)
         case false => Errors.userCreateFailed
       }
-    }
 
-    def phoneSetUserId(userId: UUID, key: PhoneKey) = {
+    def phoneSetUserId(userId: UUID, key: PhoneKey) =
       key.setUserId(userId).flatMap {
-        case true  => groupPairGet(userId, GroupPairKeyService().make(userId, authCtx.userId))
+        case true  => userUserLabelSet(userId, UserUserLabelKeyService().make(authCtx.userId, userId))
         case false => Errors.phoneSetUserIdFailed
       }
-    }
+
+    def userUserLabelSet(userId: UUID, key: StringKey) =
+      key.set(input.label).flatMap {
+        case true  => groupPairGet(userId, GroupPairKeyService().make(userId, authCtx.userId))
+        case false => Errors.userUserLabelSetFailed
+      }
 
     def groupPairGet(userId: UUID, key: GroupPairKey) =
       key.get.flatMap {
@@ -142,6 +148,7 @@ object InviteCommandServiceImpl {
 
     lazy val userCreateFailed: Response = "failed to create user"
     lazy val phoneSetUserIdFailed: Response = "failed to set user id on phone"
+    lazy val userUserLabelSetFailed: Response = "failed to set userUserLabel"
     lazy val groupGetFailed: Response = "failed to get group"
     lazy val pairSetFailed: Response = "failed to set group pair"
     lazy val groupUsersAddFailed: Response = "failed to add to groupUsers"
