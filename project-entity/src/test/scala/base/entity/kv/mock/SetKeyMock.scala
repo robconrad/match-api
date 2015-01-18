@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:39 PM
+ * Last modified by rconrad, 1/18/15 10:38 AM
  */
 
 package base.entity.kv.mock
@@ -27,6 +27,7 @@ class SetKeyMock(val token: String = RandomService().md5.toString,
                  addResult: Future[Int] = Future.successful(0),
                  popResult: Future[Option[String]] = Future.successful(None),
                  isMemberResult: Future[Boolean] = Future.successful(true),
+                 diffStoreResult: Future[Int] = Future.successful(0),
                  keyMock: Key = new KeyMock()) extends SetKey {
 
   def members()(implicit p: Pipeline) = membersResult
@@ -42,6 +43,8 @@ class SetKeyMock(val token: String = RandomService().md5.toString,
   def pop()(implicit p: Pipeline) = popResult
 
   def isMember(value: Any)(implicit p: Pipeline) = isMemberResult
+
+  def diffStore(sets: SetKey*)(implicit p: Pipeline) = diffStoreResult
 
   def exists()(implicit p: Pipeline) = keyMock.exists()
 

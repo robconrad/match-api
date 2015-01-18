@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:58 PM
+ * Last modified by rconrad, 1/18/15 10:36 AM
  */
 
 package base.entity.kv
@@ -32,5 +32,7 @@ trait SetKey extends Key {
   def remove(value: Any)(implicit p: Pipeline): Future[Boolean]
 
   def move(to: SetKey, member: Any)(implicit p: Pipeline): Future[Boolean]
+
+  def diffStore(sets: SetKey*)(implicit p: Pipeline): Future[Int]
 
 }

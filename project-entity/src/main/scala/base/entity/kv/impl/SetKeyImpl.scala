@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:58 PM
+ * Last modified by rconrad, 1/18/15 10:42 AM
  */
 
 package base.entity.kv.impl
@@ -22,41 +22,37 @@ import scala.collection.JavaConversions._
 abstract class SetKeyImpl extends KeyImpl with SetKey {
 
   def members()(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SMEMBERS (start)")
     p.smembers(token).map { v =>
       val res = v.asStringSet(Charset.defaultCharset()).toSet
-      if (isDebugEnabled) log("SMEMBERS (finish)", "props: " + res.toString)
+      if (isDebugEnabled) log("SMEMBERS", "props: " + res.toString)
       res
     }
   }
 
   def isMember(value: Any)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SISMEMBER (start)", s"value: $value")
     p.sismember(token, value).map { v =>
       val isMember = v.data() == 1L
-      if (isDebugEnabled) log("SISMEMBER (finish)", s"value: $value res: $isMember")
+      if (isDebugEnabled) log("SISMEMBER", s"value: $value res: $isMember")
       isMember
     }
   }
 
   // note will only work for 1 randmember with this impl
   def rand()(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SRANDMEMBER (start)")
     p.srandmember_(token).map { v =>
       val res = v match {
         case v if v == null || v.data() == null => None
         case v                                  => Some(v.asInstanceOf[BulkReply].asAsciiString())
       }
-      if (isDebugEnabled) log("SRANDMEMBER (finish)", s"result: $res")
+      if (isDebugEnabled) log("SRANDMEMBER", s"result: $res")
       res
     }
   }
 
   def pop()(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SPOP (start)")
     p.spop(token).map { v =>
       val res = v.asAsciiString()
-      if (isDebugEnabled) log("SPOP (finish)", s"result: $res")
+      if (isDebugEnabled) log("SPOP", s"result: $res")
       res match {
         case null => None
         case x    => Some(x)
@@ -82,6 +78,11 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
   def move(to: SetKey, member: Any)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member")
     p.smove(token, to.token, member).map(_.data().toInt > 0)
+  }
+
+  def diffStore(sets: SetKey*)(implicit p: Pipeline) = {
+    if (isDebugEnabled) log("SDIFFSTORE", s" sets: $sets")
+    p.sdiffstore(token, sets.map(_.token): _*).map(_.data().toInt)
   }
 
 }

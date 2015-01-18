@@ -2,11 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 4:06 PM
+ * Last modified by rconrad, 1/18/15 10:41 AM
  */
 
 package base.entity.kv.impl
 
+import base.entity.kv.KeyLogger
 import base.entity.kv.mock.KeyLoggerMock
 
 /**
@@ -75,6 +76,22 @@ class SetKeyImplTest extends KeyImplTest {
     assert(model.move(dest, val1).await())
     assert(dest.members().await() == Set(val1))
     assert(model.members().await() == Set())
+  }
+
+  test("diffStore") {
+    val all = new SetKeyImpl {
+      val token = this.getClass.getSimpleName + "all"
+      val logger = KeyLoggerMock
+    }
+    val remove = new SetKeyImpl {
+      val token = this.getClass.getSimpleName + "remove"
+      val logger = KeyLoggerMock
+    }
+
+    assert(all.add(val1, val2).await() == 2)
+    assert(remove.add(val1).await() == 1)
+    assert(model.diffStore(all, remove).await() == 1)
+    assert(model.members.await() == Set(val2))
   }
 
 }
