@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:24 PM
+ * Last modified by rconrad, 1/18/15 1:49 PM
  */
 
 package base.entity.user.impl
@@ -15,17 +15,17 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
+import base.entity.kv.KeyId
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
-import base.entity.kv.mock.{ IntKeyMock, KeyLoggerMock, KeyMock, PrivateHashKeyMock }
-import base.entity.kv.{ KeyId, KvFactoryService }
-import base.entity.user.kv.impl.PhoneKeyImpl
-import base.entity.user.kv.{ UserKeyProps, PhoneCooldownKeyService }
-import UserKeyProps.{ CodeProp, UserIdProp }
+import base.entity.kv.mock.{ KeyLoggerMock, KeyMock, PrivateHashKeyMock }
 import base.entity.user.impl.RegisterCommandServiceImpl._
-import base.entity.user.kv.PhoneCooldownKeyService
+import base.entity.user.kv.UserKeyProps.{ CodeProp, UserIdProp }
+import base.entity.user.kv.impl.PhoneKeyImpl
+import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService, UserKeyProps }
 import base.entity.user.mock.VerifyCommandServiceMock
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
+import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -35,7 +35,7 @@ import scala.concurrent.duration._
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class RegisterCommandServiceImplTest extends CommandServiceImplTest {
+class RegisterCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
 
   val service = new RegisterCommandServiceImpl(10.minutes)
 
@@ -103,12 +103,14 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to set phone cooldown") {
-    val keyMock = new IntKeyMock(setResult = Future.successful(false))
-    assert(command.phoneCooldownSet(keyMock).await() == Errors.phoneCooldownSetFailed.await())
+    val key = mock[PhoneCooldownKey]
+    key.set _ expects * returning Future.successful(false)
+    assert(command.phoneCooldownSet(key).await() == Errors.phoneCooldownSetFailed.await())
   }
 
   test("failed to expire phone cooldown") {
-    val key = new IntKeyMock(keyMock = new KeyMock(expireResult = Future.successful(false)))
+    val key = mock[PhoneCooldownKey]
+    key.expire _ expects * returning Future.successful(false)
     assert(command.phoneCooldownExpire(key).await() == Errors.phoneCooldownExpireFailed.await())
   }
 

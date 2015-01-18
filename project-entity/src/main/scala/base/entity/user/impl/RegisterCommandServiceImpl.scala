@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:29 PM
+ * Last modified by rconrad, 1/18/15 1:49 PM
  */
 
 package base.entity.user.impl
@@ -17,7 +17,7 @@ import base.entity.kv._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.RegisterCommandServiceImpl.Errors
-import base.entity.user.kv.{ PhoneCooldownKeyService, PhoneKey, PhoneKeyService, UserKeyService }
+import base.entity.user.kv._
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 import spray.http.StatusCodes
 
@@ -50,19 +50,19 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       phoneCooldownExists(PhoneCooldownKeyService().make(KeyId(input.phone)))
     }
 
-    def phoneCooldownExists(key: IntKey): Response =
+    def phoneCooldownExists(key: PhoneCooldownKey): Response =
       key.exists().flatMap {
         case false => phoneCooldownSet(key)
         case true  => Errors.phoneCooldown
       }
 
-    def phoneCooldownSet(key: IntKey): Response =
+    def phoneCooldownSet(key: PhoneCooldownKey): Response =
       key.set(RegisterCommandServiceImpl.phoneCooldownValue).flatMap {
         case true  => phoneCooldownExpire(key)
         case false => Errors.phoneCooldownSetFailed
       }
 
-    def phoneCooldownExpire(key: IntKey): Response =
+    def phoneCooldownExpire(key: PhoneCooldownKey): Response =
       key.expire(phoneCooldown.toSeconds).flatMap {
         case true  => phoneCreate()
         case false => Errors.phoneCooldownExpireFailed
