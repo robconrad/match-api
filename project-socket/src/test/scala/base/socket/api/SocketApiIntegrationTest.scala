@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:21 AM
+ * Last modified by rconrad, 1/18/15 12:12 PM
  */
 
 package base.socket.api
@@ -33,7 +33,8 @@ import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
-import base.entity.question.model.AnswerModel
+import base.entity.question.impl.QuestionServiceImpl
+import base.entity.question.model.{QuestionModel, QuestionsModel, QuestionsResponseModel, AnswerModel}
 import base.entity.question._
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
@@ -51,6 +52,14 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
 
   private implicit val formats = JsonFormats.withEnumsAndFields
 
+  private val totalSides = 6
+  private val questions = List(
+    ("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04", "Doin' it with the lights off", None),
+    ("2c75851f-1a87-40ab-9f66-14766fa12c6c", "Liberal use of chocolate sauce", None),
+    ("a8d08d2d-d914-4e7b-8ff4-6a9dde02002c", "Giving buttsex", Option("Receiving buttsex")),
+    ("543c57e3-54ba-4d9b-8ed3-c8f2e394b18d", "Dominating", Option("Being dominated"))
+  ).map(q => QuestionDef(UUID.fromString(q._1), q._2, q._3))
+
   private val randomMock = new RandomServiceMock()
   private val time = TimeServiceConstantMock.now
 
@@ -66,7 +75,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
       override def validateVerifyCodes(code1: String, code2: String) = true
     })
 
-    // user real user service but ensure a constant ordering of users
+    // use real user service but ensure a constant ordering of users
     Services.register(new UserServiceImpl() {
       override def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) =
         super.getUsers(userIds).map {
@@ -74,6 +83,9 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
           case x            => x
         }
     })
+
+    // use real question service but control what questions are used
+    Services.register(new QuestionServiceImpl(questions, totalSides))
 
     Services.register(randomMock)
     Services.register(TimeServiceConstantMock)
@@ -143,7 +155,13 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
     execute(InviteCommandService, inviteModel, inviteResponseModel)
 
-    // execute(QuestionsCommandService, questionsModel, questionsResponseModel)
+    val questionModels = questions.map(QuestionModel(_, QuestionSides.SIDE_A)) ++
+      questions.collect {
+        case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
+      }
+    val questionsModel = QuestionsModel(groupId)
+    val questionsResponseModel = QuestionsResponseModel(groupId, questionModels)
+    execute(QuestionsCommandService, questionsModel, questionsResponseModel)
 
     val messageBody = "a message!"
     val messageEventId = randomMock.nextUuid()
@@ -153,10 +171,10 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     execute(MessageCommandService, messageModel, eventModel)
 
     val answer = true
-    val questionId = UUID.fromString("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04") // see reference.conf
+    val questionId = questions(0).id
     val side = QuestionSides.SIDE_A
     val answerEventId = randomMock.nextUuid()
-    val answerBody = QuestionDef(questionId, "Doin' it with the lights off") + " is a match"
+    val answerBody = questions(0) + " is a match"
 
     val inviteUserAuthCtx = new StandardUserAuthContext(new User(inviteUserId))
     val inviteUserAnswerModel = AnswerModel(questionId, groupId, side, answer)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:15 AM
+ * Last modified by rconrad, 1/18/15 12:14 PM
  */
 
 package base.entity.service
@@ -77,6 +77,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new GroupUsersKeyServiceImpl())
     Services.register(new GroupUserQuestionsKeyServiceImpl())
     Services.register(new GroupUserQuestionsYesKeyServiceImpl())
+    Services.register(new GroupUserQuestionsTempKeyServiceImpl())
     Services.register(new GroupEventsKeyServiceImpl())
 
     Services.register(new TwilioSmsServiceImpl(
@@ -96,7 +97,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
           Keys("id"),
           Keys("a"),
           Keys("b"))
-      }))
+      },
+      Keys(MATCH_QUESTION, "count")))
 
     Services.register(new UserServiceImpl())
 

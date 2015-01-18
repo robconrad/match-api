@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:09 AM
+ * Last modified by rconrad, 1/18/15 11:42 AM
  */
 
 package base.entity.kv.impl
@@ -82,20 +82,26 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
     }
   }
 
-  def remove(value: Any)(implicit p: Pipeline) = p.srem_(token, value.asInstanceOf[AnyRef]).map { v =>
-    val res = v.data().toInt > 0
-    if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
-    res
-  }
+  def remove(value: Any)(implicit p: Pipeline) =
+    p.srem_(token, value.asInstanceOf[AnyRef]).map { v =>
+      val res = v.data().toInt > 0
+      if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
+      res
+    }
 
-  def move(to: SetKey, member: Any)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member")
-    p.smove(token, to.token, member).map(_.data().toInt > 0)
-  }
+  def move(to: SetKey, member: Any)(implicit p: Pipeline) =
+    p.smove(token, to.token, member).map { v =>
+      val res = v.data().toInt
+      if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member, result: $res")
+      res > 0
+    }
 
   def diffStore(sets: SetKey*)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SDIFFSTORE", s" sets: $sets")
-    p.sdiffstore(token, sets.map(_.token): _*).map(_.data().toInt)
+    p.sdiffstore(token, sets.map(_.token): _*).map { v =>
+      val res = v.data().toInt
+      if (isDebugEnabled) log("SDIFFSTORE", s" sets: $sets, result: $res")
+      res
+    }
   }
 
 }

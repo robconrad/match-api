@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:26 AM
+ * Last modified by rconrad, 1/18/15 12:05 PM
  */
 
 package base.entity.question.impl
@@ -16,12 +16,18 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.EventModel
-import base.entity.group.kv.{ GroupUsersKeyService, GroupUserQuestionsYesKeyService }
+import base.entity.group.kv.impl.GroupUserQuestionsTempKeyImpl
+import base.entity.group.kv.{ GroupUserQuestionsYesKeyService, GroupUsersKeyService }
+import base.entity.kv.Key._
+import base.entity.kv.mock.KeyLoggerMock
 import base.entity.kv.{ KeyId, KvTest }
-import base.entity.question.{ QuestionIdComposite, QuestionDef }
 import base.entity.question.QuestionSides._
-import base.entity.question.model.AnswerModel
+import base.entity.question.model.{ AnswerModel, QuestionModel }
+import base.entity.question.{ QuestionDef, QuestionIdComposite }
 import base.entity.service.EntityServiceTest
+import redis.client.RedisException
+
+import scala.concurrent.Future
 
 /**
  * {{ Describe the high level purpose of QuestionServiceImplTest here. }}
@@ -31,6 +37,7 @@ import base.entity.service.EntityServiceTest
  */
 class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
+  private val totalSides = 6
   private val questions = List(
     ("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04", "Doin' it with the lights off", None),
     ("2c75851f-1a87-40ab-9f66-14766fa12c6c", "Liberal use of chocolate sauce", None),
@@ -38,7 +45,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     ("543c57e3-54ba-4d9b-8ed3-c8f2e394b18d", "Dominating", Option("Being dominated"))
   ).map(q => QuestionDef(UUID.fromString(q._1), q._2, q._3))
 
-  val service = new QuestionServiceImpl(questions)
+  val service = new QuestionServiceImpl(questions, totalSides)
 
   private val randomMock = new RandomServiceMock()
 
@@ -48,6 +55,36 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     super.beforeAll()
     Services.register(randomMock)
     Services.register(TimeServiceConstantMock)
+  }
+
+  override def beforeEach() {
+    super.beforeEach()
+    assert(service.init().await() == totalSides)
+  }
+
+  test("questions - success") {
+    val groupId = RandomService().uuid
+    val questionModels = questions.map(QuestionModel(_, SIDE_A)) ++
+      questions.collect {
+        case q if q.b.isDefined => QuestionModel(q, SIDE_B)
+      }
+
+    service.getQuestions(groupId).await() match {
+      case Right(models) => assert(models.toSet == questionModels.toSet)
+    }
+  }
+
+  test("questions - failed to delete") {
+    val groupId = RandomService().uuid
+    val key = new GroupUserQuestionsTempKeyImpl(groupId.toString, KeyLoggerMock) {
+      override def del()(implicit p: Pipeline) = {
+        Future.successful(false)
+      }
+    }
+    val method = new service.GetQuestionsMethod(groupId)
+    intercept[RedisException] {
+      method.groupUserQuestionTempDel(key, Iterable[String]()).await()
+    }
   }
 
   test("answer - success") {
