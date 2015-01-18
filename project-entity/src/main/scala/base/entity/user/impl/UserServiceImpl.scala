@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 9:03 PM
+ * Last modified by rconrad, 1/18/15 1:58 PM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.kv.Key._
 import base.entity.kv.{ KeyId, SetKey, StringKey }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserGroupsKeyService, UserUserLabelKeyService }
+import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKeyService }
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 
@@ -43,8 +43,13 @@ class UserServiceImpl extends ServiceImpl with UserService {
     }
 
   def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) = {
+    getUsers(userIds, UserUserLabelKeyService())
+  }
+
+  private[impl] def getUsers(userIds: List[UUID],
+                             keyService: UserUserLabelKeyService)(implicit p: Pipeline, authCtx: AuthContext) = {
     val futures = userIds.map { userId =>
-      UserUserLabelKeyService().make(authCtx.userId, userId).get.map { label =>
+      keyService.make(authCtx.userId, userId).get.map { label =>
         UserModel(userId, label)
       }
     }
@@ -56,7 +61,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
     getGroups(userId, key)
   }
 
-  private[impl] def getGroups(userId: UUID, key: SetKey)(implicit p: Pipeline, authCtx: AuthContext) = {
+  private[impl] def getGroups(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline, authCtx: AuthContext) = {
     key.members().flatMap { groupIds =>
       val futures = groupIds.map { groupId =>
         GroupService().getGroup(UUID.fromString(groupId))

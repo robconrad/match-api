@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:05 PM
+ * Last modified by rconrad, 1/18/15 2:11 PM
  */
 
 package base.entity.kv.impl
@@ -21,11 +21,11 @@ private[impl] abstract class KeyServiceImpl[T <: Key]
     PREFIX + id
   }
 
-  private[kv] def log(cmd: String, msg: String) {
+  def log(cmd: String, msg: String) {
     if (isDebugEnabled) log(cmd, CHANNEL, msg)
   }
 
-  private[kv] def log(cmd: String, token: String, msg: String = "") {
+  def log(cmd: String, token: String, msg: String = "") {
     if (isDebugEnabled) debug(s"Redis.$cmd:: token: $token, $msg")
   }
 

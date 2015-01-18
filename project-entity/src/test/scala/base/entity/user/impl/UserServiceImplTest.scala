@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:42 PM
+ * Last modified by rconrad, 1/18/15 2:14 PM
  */
 
 package base.entity.user.impl
@@ -17,11 +17,13 @@ import base.entity.group.mock.GroupServiceMock
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
-import base.entity.kv.mock.{ SetKeyMock, StringKeyMock }
+import base.entity.kv.mock.StringKeyMock
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
+import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService, UserGroupsKey }
 import base.entity.user.kv.impl.{ UserUserLabelKeyImpl, UserUserLabelKeyServiceImpl }
 import base.entity.user.model.UserModel
+import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -31,7 +33,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserServiceImplTest extends EntityServiceTest with KvTest {
+class UserServiceImplTest extends EntityServiceTest with KvTest with MockFactory {
 
   val service = new UserServiceImpl()
 
@@ -52,28 +54,28 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getUsers") {
     val userIds = List(userId1, userId2)
+
     val model1 = UserModel(userId1, Option(label))
     val model2 = UserModel(userId2, None)
     val models = List(model1, model2)
-    val unregister = TestServices.register(new UserUserLabelKeyServiceImpl {
-      override def make(id: Id)(implicit p: Pipeline) = new UserUserLabelKeyImpl(id.toString, this)(p) {
-        override def get = {
-          id.id == authCtx.userId + "-" + userId2 match {
-            case false => Future.successful(Option(label))
-            case true  => Future.successful(None)
-          }
-        }
-      }
-    })
-    assert(service.getUsers(userIds).await() == Right(models))
-    unregister()
+
+    val (key1, key2) = (mock[UserUserLabelKey], mock[UserUserLabelKey])
+    key1.get _ expects () returning Future.successful(Option(label))
+    key2.get _ expects () returning Future.successful(None)
+
+    val keyService = mock[UserUserLabelKeyService]
+    (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key1
+    (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key2
+
+    assert(service.getUsers(userIds, keyService).await() == Right(models))
   }
 
   test("getGroups - success") {
     val groups = Set(groupId1, groupId2).map(_.toString)
     val group1 = GroupModel(groupId1, List(), None, None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
-    val key = new SetKeyMock(membersResult = Future.successful(groups))
+    val key = mock[UserGroupsKey]
+    key.members _ expects () returning Future.successful(groups)
     val groupMock = new GroupServiceMock() {
       override def getGroup(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = groupId == groupId1 match {
         case true  => Future.successful(Right(Option(group1)))
@@ -87,7 +89,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroups - GroupService ApiError") {
     val groups = Set(groupId1, groupId2).map(_.toString)
-    val key = new SetKeyMock(membersResult = Future.successful(groups))
+    val key = mock[UserGroupsKey]
+    key.members _ expects () returning Future.successful(groups)
     val error = ApiError("whatever")
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Left(error)))
     val unregister = TestServices.register(groupMock)
@@ -98,7 +101,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   test("getGroups - not all groups returned") {
     val groups = Set(groupId1, groupId2).map(_.toString)
     val group = GroupModel(groupId1, List(), None, None, eventCount = 0)
-    val key = new SetKeyMock(membersResult = Future.successful(groups))
+    val key = mock[UserGroupsKey]
+    key.members _ expects () returning Future.successful(groups)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
     val unregister = TestServices.register(groupMock)
     assert(service.getGroups(userId, key).await() == Errors.notAllGroupsReturned)
