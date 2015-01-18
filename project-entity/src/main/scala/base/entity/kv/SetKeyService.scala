@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:31 PM
+ * Last modified by rconrad, 1/18/15 1:28 PM
  */
 
 package base.entity.kv
@@ -20,7 +20,7 @@ import scala.concurrent.Future
  */
 trait SetKeyService[T <: SetKey] extends KeyService[T] {
 
-  def make(id: Id): T
+  def make(id: Id)(implicit p: Pipeline): T
 
   def remove(sets: List[SetKey], value: Any)(implicit p: Pipeline): Future[Map[SetKey, Boolean]]
 

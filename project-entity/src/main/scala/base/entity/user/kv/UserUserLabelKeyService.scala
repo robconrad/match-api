@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:44 PM
+ * Last modified by rconrad, 1/18/15 1:28 PM
  */
 
 package base.entity.user.kv
 
 import java.util.UUID
 
+import base.entity.kv.Key._
 import base.entity.kv.{ KeyService, KeyServiceCompanion }
 
 /**
@@ -23,7 +24,7 @@ trait UserUserLabelKeyService extends KeyService[UserUserLabelKey] {
 
   final val CHANNEL = "userUserLabel"
 
-  def make(ownerUserId: UUID, labelUserId: UUID): UserUserLabelKey
+  def make(ownerUserId: UUID, labelUserId: UUID)(implicit p: Pipeline): UserUserLabelKey
 
 }
 

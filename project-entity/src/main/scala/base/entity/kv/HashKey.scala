@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:10 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv
@@ -21,16 +21,16 @@ trait HashKey extends Key {
 
   protected def key: PrivateHashKey
 
-  def create()(implicit p: Pipeline): Future[Boolean]
+  def create(): Future[Boolean]
 
   def token = key.token
 
-  def exists()(implicit p: Pipeline) = key.exists()
+  def exists() = key.exists()
 
-  def del()(implicit p: Pipeline) = key.del()
+  def del() = key.del()
 
-  def expire(seconds: Long)(implicit p: Pipeline) = key.expire(seconds)
+  def expire(seconds: Long) = key.expire(seconds)
 
-  def ttl()(implicit p: Pipeline) = key.ttl()
+  def ttl() = key.ttl()
 
 }

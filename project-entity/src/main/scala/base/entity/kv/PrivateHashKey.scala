@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv
@@ -22,31 +22,31 @@ import scala.concurrent.Future
  */
 trait PrivateHashKey extends Key {
 
-  def getString(prop: Prop)(implicit p: Pipeline): Future[Option[String]]
-  def getDateTime(prop: Prop)(implicit p: Pipeline): Future[Option[DateTime]]
-  def getId(prop: Prop)(implicit p: Pipeline): Future[Option[UUID]]
-  def getInt(prop: Prop)(implicit p: Pipeline): Future[Option[Int]]
-  def getLong(prop: Prop)(implicit p: Pipeline): Future[Option[Long]]
-  def getFlag(prop: Prop)(implicit p: Pipeline): Future[Boolean]
+  def getString(prop: Prop): Future[Option[String]]
+  def getDateTime(prop: Prop): Future[Option[DateTime]]
+  def getId(prop: Prop): Future[Option[UUID]]
+  def getInt(prop: Prop): Future[Option[Int]]
+  def getLong(prop: Prop): Future[Option[Long]]
+  def getFlag(prop: Prop): Future[Boolean]
 
-  def get(props: Array[Prop])(implicit p: Pipeline): Future[Map[Prop, Option[String]]]
+  def get(props: Array[Prop]): Future[Map[Prop, Option[String]]]
 
-  def get(implicit p: Pipeline): Future[Map[Prop, String]]
+  def get: Future[Map[Prop, String]]
 
-  def getProps(implicit p: Pipeline): Future[List[Prop]]
+  def getProps: Future[List[Prop]]
 
-  def setFlag(prop: Prop, value: Boolean)(implicit p: Pipeline): Future[Boolean]
+  def setFlag(prop: Prop, value: Boolean): Future[Boolean]
 
-  def set(prop: Prop, value: Any)(implicit p: Pipeline): Future[Boolean]
+  def set(prop: Prop, value: Any): Future[Boolean]
 
-  def set(props: Map[Prop, Any])(implicit p: Pipeline): Future[Boolean]
+  def set(props: Map[Prop, Any]): Future[Boolean]
 
-  def setNx(prop: Prop, value: Any)(implicit p: Pipeline): Future[Boolean]
+  def setNx(prop: Prop, value: Any): Future[Boolean]
 
-  def increment(prop: Prop, value: Long)(implicit p: Pipeline): Future[Long]
+  def increment(prop: Prop, value: Long): Future[Long]
 
-  def del(prop: Prop)(implicit p: Pipeline): Future[Boolean]
+  def del(prop: Prop): Future[Boolean]
 
-  def del(props: List[Prop])(implicit p: Pipeline): Future[Boolean]
+  def del(props: List[Prop]): Future[Boolean]
 
 }

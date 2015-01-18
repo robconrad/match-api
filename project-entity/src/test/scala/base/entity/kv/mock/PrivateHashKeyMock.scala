@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:16 PM
+ * Last modified by rconrad, 1/18/15 1:42 PM
  */
 
 package base.entity.kv.mock
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.entity.kv.Key.{ Prop, Pipeline }
-import base.entity.kv.{ PrivateHashKey, Key }
+import base.entity.kv.{ KvFactoryService, PrivateHashKey, Key }
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -39,46 +39,47 @@ class PrivateHashKeyMock(val token: String = RandomService().md5.toString,
                          incrementResult: Future[Long] = Future.successful(1L),
                          delResult: Future[Boolean] = Future.successful(true),
                          delMultiResult: Future[Boolean] = Future.successful(true),
-                         keyMock: Key = new KeyMock()) extends PrivateHashKey {
+                         keyMock: Key = new KeyMock()(KvFactoryService().pipeline))(implicit protected val p: Pipeline)
+    extends PrivateHashKey {
 
-  def getString(prop: Prop)(implicit p: Pipeline) = getStringResult
+  def getString(prop: Prop) = getStringResult
 
-  def getDateTime(prop: Prop)(implicit p: Pipeline) = getDateTimeResult
+  def getDateTime(prop: Prop) = getDateTimeResult
 
-  def getId(prop: Prop)(implicit p: Pipeline) = getIdResult
+  def getId(prop: Prop) = getIdResult
 
-  def getInt(prop: Prop)(implicit p: Pipeline) = getIntResult
+  def getInt(prop: Prop) = getIntResult
 
-  def getLong(prop: Prop)(implicit p: Pipeline) = getLongResult
+  def getLong(prop: Prop) = getLongResult
 
-  def getFlag(prop: Prop)(implicit p: Pipeline) = getFlagResult
+  def getFlag(prop: Prop) = getFlagResult
 
-  def get(props: Array[Prop])(implicit p: Pipeline) = getMultiResult
+  def get(props: Array[Prop]) = getMultiResult
 
-  def get(implicit p: Pipeline) = getResult
+  def get = getResult
 
-  def getProps(implicit p: Pipeline) = getPropsResult
+  def getProps = getPropsResult
 
-  def setFlag(prop: Prop, value: Boolean)(implicit p: Pipeline) = setFlagResult
+  def setFlag(prop: Prop, value: Boolean) = setFlagResult
 
-  def set(prop: Prop, value: Any)(implicit p: Pipeline) = setResult
+  def set(prop: Prop, value: Any) = setResult
 
-  def set(props: Map[Prop, Any])(implicit p: Pipeline) = setMultiResult
+  def set(props: Map[Prop, Any]) = setMultiResult
 
-  def setNx(prop: Prop, value: Any)(implicit p: Pipeline) = setNxResult
+  def setNx(prop: Prop, value: Any) = setNxResult
 
-  def increment(prop: Prop, value: Long)(implicit p: Pipeline) = incrementResult
+  def increment(prop: Prop, value: Long) = incrementResult
 
-  def del(prop: Prop)(implicit p: Pipeline) = delResult
+  def del(prop: Prop) = delResult
 
-  def del(props: List[Prop])(implicit p: Pipeline) = delMultiResult
+  def del(props: List[Prop]) = delMultiResult
 
-  def exists()(implicit p: Pipeline) = keyMock.exists()
+  def exists() = keyMock.exists()
 
-  def expire(seconds: Long)(implicit p: Pipeline) = keyMock.expire(seconds)
+  def expire(seconds: Long) = keyMock.expire(seconds)
 
-  def ttl()(implicit p: Pipeline) = keyMock.ttl()
+  def ttl() = keyMock.ttl()
 
-  def del()(implicit p: Pipeline) = keyMock.del()
+  def del() = keyMock.del()
 
 }

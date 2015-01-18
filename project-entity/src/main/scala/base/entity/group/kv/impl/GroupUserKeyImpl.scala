@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:28 PM
+ * Last modified by rconrad, 1/18/15 1:33 PM
  */
 
 package base.entity.group.kv.impl
@@ -21,9 +21,10 @@ import org.joda.time.DateTime
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupUserKeyImpl(protected val key: PrivateHashKey) extends GroupUserKey with HashKeyImpl {
+class GroupUserKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
+    extends GroupUserKey with HashKeyImpl {
 
-  def getLastRead(implicit p: Pipeline) = key.getDateTime(LastReadTimeProp)
-  def setLastRead(time: DateTime)(implicit p: Pipeline) = key.set(LastReadTimeProp, TimeService().asString(time))
+  def getLastRead = key.getDateTime(LastReadTimeProp)
+  def setLastRead(time: DateTime) = key.set(LastReadTimeProp, TimeService().asString(time))
 
 }

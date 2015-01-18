@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:06 AM
+ * Last modified by rconrad, 1/18/15 1:43 PM
  */
 
 package base.entity.kv.impl
@@ -24,6 +24,7 @@ class SetKeyImplTest extends KeyImplTest {
   val model = new SetKeyImpl {
     val token = this.getClass.getSimpleName
     val logger = KeyLoggerMock
+    protected implicit val p = tp
   }
 
   def create = model.add(val1).await() == 1
@@ -78,6 +79,7 @@ class SetKeyImplTest extends KeyImplTest {
     val dest = new SetKeyImpl {
       val token = this.getClass.getSimpleName + "destination"
       val logger = KeyLoggerMock
+      protected implicit val p = tp
     }
     assert(model.add(val1).await() == 1)
     assert(model.move(dest, val1).await())
@@ -89,10 +91,12 @@ class SetKeyImplTest extends KeyImplTest {
     val all = new SetKeyImpl {
       val token = this.getClass.getSimpleName + "all"
       val logger = KeyLoggerMock
+      protected implicit val p = tp
     }
     val remove = new SetKeyImpl {
       val token = this.getClass.getSimpleName + "remove"
       val logger = KeyLoggerMock
+      protected implicit val p = tp
     }
 
     assert(all.add(val1, val2).await() == 2)

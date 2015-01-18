@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:33 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv.impl
@@ -19,7 +19,7 @@ import scala.collection.JavaConversions._
 // scalastyle:off null
 abstract class ListKeyImpl extends KeyImpl with ListKey {
 
-  def prepend(value: Any*)(implicit p: Pipeline) = {
+  def prepend(value: Any*) = {
     val args = token +: value.map(_.asInstanceOf[AnyRef])
     p.lpush_(args: _*).map { v =>
       val res = v.data().toInt > 0
@@ -28,7 +28,7 @@ abstract class ListKeyImpl extends KeyImpl with ListKey {
     }
   }
 
-  def prependIfExists(value: Any)(implicit p: Pipeline) = {
+  def prependIfExists(value: Any) = {
     p.lpushx(token, value).map { v =>
       val res = v.data().toInt > 0
       if (isDebugEnabled) log("LPUSHX", s" value: $value, result: $res")
@@ -36,7 +36,7 @@ abstract class ListKeyImpl extends KeyImpl with ListKey {
     }
   }
 
-  def range(start: Int, stop: Int)(implicit p: Pipeline) = {
+  def range(start: Int, stop: Int) = {
     p.lrange(token, start, stop).map { v =>
       val res = v.asStringList(Charset.defaultCharset()).toList
       if (isDebugEnabled) log("LRANGE", s" start: $start, stop: $stop, resukt: $res")

@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 4:55 PM
+ * Last modified by rconrad, 1/18/15 1:33 PM
  */
 
 package base.entity.user.kv.impl
 
-import base.entity.kv.Key.Id
+import base.entity.kv.Key.{ Pipeline, Id }
 import base.entity.kv.impl.SetKeyServiceImpl
 import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService }
 
@@ -19,6 +19,6 @@ import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService }
  */
 class UserGroupsKeyServiceImpl extends SetKeyServiceImpl[UserGroupsKey] with UserGroupsKeyService {
 
-  def make(id: Id) = new UserGroupsKeyImpl(getKey(id), this)
+  def make(id: Id)(implicit p: Pipeline) = new UserGroupsKeyImpl(getKey(id), this)
 
 }

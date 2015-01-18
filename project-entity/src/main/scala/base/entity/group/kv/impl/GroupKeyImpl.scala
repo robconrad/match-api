@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:17 PM
+ * Last modified by rconrad, 1/18/15 1:33 PM
  */
 
 package base.entity.group.kv.impl
@@ -23,10 +23,11 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupKeyImpl(protected val key: PrivateHashKey) extends GroupKey with HashKeyImpl {
+class GroupKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
+    extends GroupKey with HashKeyImpl {
 
   private val props = Array[Prop](LastEventTimeProp, EventCountProp)
-  def getLastEventAndCount(implicit p: Pipeline): Future[(Option[DateTime], Option[Int])] = {
+  def getLastEventAndCount: Future[(Option[DateTime], Option[Int])] = {
     key.get(props).map { props =>
       val time = props(LastEventTimeProp).map(TimeService().fromString)
       val count = props(EventCountProp).map(_.toInt)
@@ -34,10 +35,10 @@ class GroupKeyImpl(protected val key: PrivateHashKey) extends GroupKey with Hash
     }
   }
 
-  def setLastEvent(time: DateTime)(implicit p: Pipeline) =
+  def setLastEvent(time: DateTime) =
     key.set(LastEventTimeProp, TimeService().asString(time))
 
-  def setEventCount(count: Int)(implicit p: Pipeline) =
+  def setEventCount(count: Int) =
     key.set(EventCountProp, count)
 
 }

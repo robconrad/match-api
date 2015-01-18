@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:15 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.user.kv
@@ -22,17 +22,17 @@ import scala.concurrent.Future
  */
 trait DeviceKey extends HashKey {
 
-  def getToken(implicit p: Pipeline): Future[Option[UUID]]
+  def getToken: Future[Option[UUID]]
 
-  def getUserId(implicit p: Pipeline): Future[Option[UUID]]
+  def getUserId: Future[Option[UUID]]
 
-  def setTokenAndUserId(token: UUID, userId: UUID)(implicit p: Pipeline): Future[Boolean]
+  def setTokenAndUserId(token: UUID, userId: UUID): Future[Boolean]
 
   def set(appVersion: String,
           locale: String,
           model: String,
           cordova: String,
           platform: String,
-          version: String)(implicit p: Pipeline): Future[Boolean]
+          version: String): Future[Boolean]
 
 }

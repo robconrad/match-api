@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 5:21 PM
+ * Last modified by rconrad, 1/18/15 1:33 PM
  */
 
 package base.entity.user.kv.impl
@@ -23,18 +23,19 @@ import base.entity.user.kv.UserKeyProps.{ CodeProp, UserIdProp }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class PhoneKeyImpl(protected val key: PrivateHashKey) extends PhoneKey with HashKeyImpl {
+class PhoneKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
+    extends PhoneKey with HashKeyImpl {
 
-  def getCode(implicit p: Pipeline) = key.getString(CodeProp)
-  def setCode(code: String)(implicit p: Pipeline) = {
+  def getCode = key.getString(CodeProp)
+  def setCode(code: String) = {
     val props = Map[Prop, Any](
       UpdatedProp -> TimeService().asString(),
       CodeProp -> code)
     key.set(props)
   }
 
-  def getUserId(implicit p: Pipeline) = key.getId(UserIdProp)
-  def setUserId(userId: UUID)(implicit p: Pipeline) = {
+  def getUserId = key.getId(UserIdProp)
+  def setUserId(userId: UUID) = {
     val props = Map[Prop, Any](
       UpdatedProp -> TimeService().asString(),
       UserIdProp -> userId)

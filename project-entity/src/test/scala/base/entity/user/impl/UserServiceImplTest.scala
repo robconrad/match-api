@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:31 AM
+ * Last modified by rconrad, 1/18/15 1:42 PM
  */
 
 package base.entity.user.impl
@@ -56,8 +56,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     val model2 = UserModel(userId2, None)
     val models = List(model1, model2)
     val unregister = TestServices.register(new UserUserLabelKeyServiceImpl {
-      override def make(id: Id) = new UserUserLabelKeyImpl(id.toString, this) {
-        override def get(implicit p: Pipeline) = {
+      override def make(id: Id)(implicit p: Pipeline) = new UserUserLabelKeyImpl(id.toString, this)(p) {
+        override def get = {
           id.id == authCtx.userId + "-" + userId2 match {
             case false => Future.successful(Option(label))
             case true  => Future.successful(None)

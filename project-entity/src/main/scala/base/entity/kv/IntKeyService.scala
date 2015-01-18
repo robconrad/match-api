@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:30 PM
+ * Last modified by rconrad, 1/18/15 1:28 PM
  */
 
 package base.entity.kv
 
-import base.entity.kv.Key.Id
+import base.entity.kv.Key._
 
 /**
  * {{ Describe the high level purpose of IntKeyFactory here. }}
@@ -17,6 +17,6 @@ import base.entity.kv.Key.Id
  */
 trait IntKeyService[T <: IntKey] extends KeyService[T] {
 
-  def make(id: Id): T
+  def make(id: Id)(implicit p: Pipeline): T
 
 }

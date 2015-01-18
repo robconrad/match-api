@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:05 AM
+ * Last modified by rconrad, 1/18/15 1:28 PM
  */
 
 package base.entity.kv.impl
@@ -25,7 +25,7 @@ import scala.concurrent.Future
 // scalastyle:off null
 abstract class HashKeyServiceImpl[T <: Key] extends KeyServiceImpl[T] with HashKeyService[T] {
 
-  def make(id: Id): T
+  def make(id: Id)(implicit p: Pipeline): T
 
   def getMulti(prop: Prop, ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Option[String]]] = {
     if (isDebugEnabled) log("HGET-MULTI", s"prop: $prop, ids: $ids")

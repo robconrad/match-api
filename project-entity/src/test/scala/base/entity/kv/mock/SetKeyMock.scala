@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:59 AM
+ * Last modified by rconrad, 1/18/15 1:42 PM
  */
 
 package base.entity.kv.mock
 
 import base.common.random.RandomService
-import base.entity.kv.{ SetKey, Key, IntKey }
+import base.entity.kv.{ KvFactoryService, SetKey, Key, IntKey }
 import base.entity.kv.Key.Pipeline
 
 import scala.concurrent.Future
@@ -29,32 +29,33 @@ class SetKeyMock(val token: String = RandomService().md5.toString,
                  popResult: Future[Option[String]] = Future.successful(None),
                  isMemberResult: Future[Boolean] = Future.successful(true),
                  diffStoreResult: Future[Int] = Future.successful(0),
-                 keyMock: Key = new KeyMock()) extends SetKey {
+                 keyMock: Key = new KeyMock()(KvFactoryService().pipeline))(implicit protected val p: Pipeline)
+    extends SetKey {
 
-  def members()(implicit p: Pipeline) = membersResult
+  def members() = membersResult
 
-  def move(to: SetKey, member: Any)(implicit p: Pipeline) = moveResult
+  def move(to: SetKey, member: Any) = moveResult
 
-  def rand()(implicit p: Pipeline) = randResult
+  def rand() = randResult
 
-  def rand(count: Int)(implicit p: Pipeline) = randCountResult
+  def rand(count: Int) = randCountResult
 
-  def remove(value: Any)(implicit p: Pipeline) = removeResult
+  def remove(value: Any) = removeResult
 
-  def add(value: Any*)(implicit p: Pipeline) = addResult
+  def add(value: Any*) = addResult
 
-  def pop()(implicit p: Pipeline) = popResult
+  def pop() = popResult
 
-  def isMember(value: Any)(implicit p: Pipeline) = isMemberResult
+  def isMember(value: Any) = isMemberResult
 
-  def diffStore(sets: SetKey*)(implicit p: Pipeline) = diffStoreResult
+  def diffStore(sets: SetKey*) = diffStoreResult
 
-  def exists()(implicit p: Pipeline) = keyMock.exists()
+  def exists() = keyMock.exists()
 
-  def expire(seconds: Long)(implicit p: Pipeline) = keyMock.expire(seconds)
+  def expire(seconds: Long) = keyMock.expire(seconds)
 
-  def ttl()(implicit p: Pipeline) = keyMock.ttl()
+  def ttl() = keyMock.ttl()
 
-  def del()(implicit p: Pipeline) = keyMock.del()
+  def del() = keyMock.del()
 
 }

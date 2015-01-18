@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:11 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv
@@ -21,15 +21,17 @@ import scala.concurrent.Future
  */
 trait Key {
 
+  protected def p: Pipeline
+
   def token: String
 
-  def exists()(implicit p: Pipeline): Future[Boolean]
+  def exists(): Future[Boolean]
 
-  def del()(implicit p: Pipeline): Future[Boolean]
+  def del(): Future[Boolean]
 
-  def expire(seconds: Long)(implicit p: Pipeline): Future[Boolean]
+  def expire(seconds: Long): Future[Boolean]
 
-  def ttl()(implicit p: Pipeline): Future[Option[Long]]
+  def ttl(): Future[Option[Long]]
 
   override lazy val toString = s"${getClass.getSimpleName}($token)"
 

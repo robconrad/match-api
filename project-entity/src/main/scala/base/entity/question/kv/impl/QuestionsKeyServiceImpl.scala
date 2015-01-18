@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 9:23 AM
+ * Last modified by rconrad, 1/18/15 1:34 PM
  */
 
 package base.entity.question.kv.impl
 
-import base.entity.kv.Key.Id
+import base.entity.kv.Key.{ Pipeline, Id }
 import base.entity.kv.impl.SetKeyServiceImpl
 import base.entity.question.kv.{ QuestionsKeyService, QuestionsKey }
 
@@ -20,6 +20,6 @@ import base.entity.question.kv.{ QuestionsKeyService, QuestionsKey }
 class QuestionsKeyServiceImpl
     extends SetKeyServiceImpl[QuestionsKey] with QuestionsKeyService {
 
-  def make(id: Id) = new QuestionsKeyImpl(getKey(id), this)
+  def make(id: Id)(implicit p: Pipeline) = new QuestionsKeyImpl(getKey(id), this)
 
 }

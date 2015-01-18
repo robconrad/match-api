@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:58 AM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv
@@ -19,22 +19,22 @@ import scala.concurrent.Future
  */
 trait SetKey extends Key {
 
-  def members()(implicit p: Pipeline): Future[Set[String]]
+  def members(): Future[Set[String]]
 
-  def isMember(value: Any)(implicit p: Pipeline): Future[Boolean]
+  def isMember(value: Any): Future[Boolean]
 
-  def rand()(implicit p: Pipeline): Future[Option[String]]
+  def rand(): Future[Option[String]]
 
-  def rand(count: Int)(implicit p: Pipeline): Future[Set[String]]
+  def rand(count: Int): Future[Set[String]]
 
-  def pop()(implicit p: Pipeline): Future[Option[String]]
+  def pop(): Future[Option[String]]
 
-  def add(value: Any*)(implicit p: Pipeline): Future[Int]
+  def add(value: Any*): Future[Int]
 
-  def remove(value: Any)(implicit p: Pipeline): Future[Boolean]
+  def remove(value: Any): Future[Boolean]
 
-  def move(to: SetKey, member: Any)(implicit p: Pipeline): Future[Boolean]
+  def move(to: SetKey, member: Any): Future[Boolean]
 
-  def diffStore(sets: SetKey*)(implicit p: Pipeline): Future[Int]
+  def diffStore(sets: SetKey*): Future[Int]
 
 }

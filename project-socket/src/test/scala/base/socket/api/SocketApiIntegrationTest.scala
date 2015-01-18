@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:46 PM
+ * Last modified by rconrad, 1/18/15 1:43 PM
  */
 
 package base.socket.api
@@ -78,7 +78,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     // use real user service but ensure a constant ordering of users
     Services.register(new UserServiceImpl() {
       override def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) =
-        super.getUsers(userIds).map {
+        super.getUsers(userIds)(p, authCtx).map {
           case Right(users) => Right(users.sortBy(_.label.getOrElse("")))
           case x            => x
         }
@@ -178,7 +178,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
 
     val inviteUserAuthCtx = new StandardUserAuthContext(new User(inviteUserId))
     val inviteUserAnswerModel = AnswerModel(questionId, groupId, side, answer)
-    QuestionService().answer(inviteUserAnswerModel)(p, inviteUserAuthCtx).await()
+    QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
 
     val answerModel = AnswerModel(questionId, groupId, side, answer)
     val answerResponseModel = List(EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time))

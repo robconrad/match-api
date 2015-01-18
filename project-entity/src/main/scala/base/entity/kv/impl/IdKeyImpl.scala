@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:05 AM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv.impl
@@ -21,7 +21,7 @@ import scala.concurrent.Future
 // scalastyle:off null
 abstract class IdKeyImpl extends KeyImpl with IdKey {
 
-  def get(implicit p: Pipeline): Future[Option[UUID]] = p.get(token).map { v =>
+  def get: Future[Option[UUID]] = p.get(token).map { v =>
     val res = v.asUTF8String()
     if (isDebugEnabled) log("GET", s"value: $res")
     res match {
@@ -30,7 +30,7 @@ abstract class IdKeyImpl extends KeyImpl with IdKey {
     }
   }
 
-  def set(v: UUID)(implicit p: Pipeline) = {
+  def set(v: UUID) = {
     if (isDebugEnabled) log("SET", s"value: $v")
     p.set(token, v).map(_.data() == Key.STATUS_OK)
   }

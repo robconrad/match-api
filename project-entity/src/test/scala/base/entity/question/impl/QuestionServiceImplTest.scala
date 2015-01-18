@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:13 PM
+ * Last modified by rconrad, 1/18/15 1:37 PM
  */
 
 package base.entity.question.impl
@@ -77,7 +77,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest with MockFac
   test("questions - failed to delete") {
     val groupId = RandomService().uuid
     val key = mock[GroupUserQuestionsTempKey]
-    (key.del()(_: Pipeline)) expects p returning Future.successful(false)
+    key.del _ expects () returning Future.successful(false)
     key.token _ expects () returning ""
 
     val method = new service.GetQuestionsMethod(groupId)

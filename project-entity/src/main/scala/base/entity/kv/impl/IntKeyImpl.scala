@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:05 AM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv.impl
@@ -16,7 +16,7 @@ import base.entity.kv.{ IntKey, KeyLogger }
 // scalastyle:off null
 abstract class IntKeyImpl extends KeyImpl with IntKey {
 
-  def increment()(implicit p: Pipeline) = {
+  def increment() = {
     if (isDebugEnabled) log("INCR (start)")
     p.incr(token).map { v =>
       val res = v.data().toInt
@@ -25,7 +25,7 @@ abstract class IntKeyImpl extends KeyImpl with IntKey {
     }
   }
 
-  def set(v: Int)(implicit p: Pipeline) = {
+  def set(v: Int) = {
     if (isDebugEnabled) log("SET (start)", s"value: $v")
     p.set(token, v).map { v =>
       if (isDebugEnabled) log("SET (finish)", s"value: $v")
@@ -33,7 +33,7 @@ abstract class IntKeyImpl extends KeyImpl with IntKey {
     }
   }
 
-  def get()(implicit p: Pipeline) = {
+  def get() = {
     if (isDebugEnabled) log("GET (start)")
     p.get(token).map {
       case res if res == null || res.data() == null => None

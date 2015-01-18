@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:05 PM
+ * Last modified by rconrad, 1/18/15 1:36 PM
  */
 
 package base.entity.question.impl
@@ -40,7 +40,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
   private val uuidLength = 36
 
   private val questionMap = questions.map(q => q.id -> q).toMap
-  private val questionKey = QuestionsKeyService().make(KeyId("standard"))
+  private val questionKey = QuestionsKeyService().make(KeyId("standard"))(KvFactoryService().pipeline)
 
   Await.ready(init(), CommonService().defaultDuration)
 

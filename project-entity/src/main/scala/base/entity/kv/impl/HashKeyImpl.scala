@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:10 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv.impl
@@ -21,6 +21,6 @@ import base.entity.kv.KeyProps.CreatedProp
  */
 trait HashKeyImpl extends HashKey with Dispatchable {
 
-  def create()(implicit p: Pipeline) = key.setNx(CreatedProp, TimeService().asString())
+  def create() = key.setNx(CreatedProp, TimeService().asString())
 
 }

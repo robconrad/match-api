@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/18/15 1:28 PM
  */
 
 package base.entity.user.kv.impl
@@ -19,6 +19,6 @@ import base.entity.user.kv.{ UserKey, UserKeyService }
  */
 class UserKeyServiceImpl extends HashKeyServiceImpl[UserKey] with UserKeyService {
 
-  def make(id: Id) = new UserKeyImpl(new PrivateHashKeyImpl(getKey(id), this))
+  def make(id: Id)(implicit p: Pipeline) = new UserKeyImpl(new PrivateHashKeyImpl(getKey(id), this))
 
 }

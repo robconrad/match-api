@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:18 PM
+ * Last modified by rconrad, 1/18/15 1:32 PM
  */
 
 package base.entity.user.kv.impl
@@ -24,10 +24,11 @@ import org.joda.time.DateTime
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserKeyImpl(protected val key: PrivateHashKey) extends UserKey with HashKeyImpl {
+class UserKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
+    extends UserKey with HashKeyImpl {
 
   private val userKeyGetProps = Array[Prop](NameProp, GenderProp)
-  def getNameAndGender(implicit p: Pipeline) = {
+  def getNameAndGender = {
     key.get(userKeyGetProps).map { props =>
       val name = props.get(NameProp).flatten
       val gender = Tryo(props.get(GenderProp).flatten.map(Genders.withName)).flatten
@@ -35,7 +36,7 @@ class UserKeyImpl(protected val key: PrivateHashKey) extends UserKey with HashKe
     }
   }
 
-  def setNameAndGender(name: String, gender: Gender)(implicit p: Pipeline) = {
+  def setNameAndGender(name: String, gender: Gender) = {
     val props = Map[Prop, Any](
       NameProp -> name,
       GenderProp -> gender,
@@ -43,7 +44,7 @@ class UserKeyImpl(protected val key: PrivateHashKey) extends UserKey with HashKe
     key.set(props)
   }
 
-  def getLastLogin(implicit p: Pipeline) = key.getDateTime(LastLoginProp)
-  def setLastLogin(time: DateTime)(implicit p: Pipeline) = key.set(LastLoginProp, TimeService().asString(time))
+  def getLastLogin = key.getDateTime(LastLoginProp)
+  def setLastLogin(time: DateTime) = key.set(LastLoginProp, TimeService().asString(time))
 
 }

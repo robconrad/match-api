@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:59 PM
+ * Last modified by rconrad, 1/18/15 1:40 PM
  */
 
 package base.entity.kv.impl
@@ -24,9 +24,10 @@ class IntKeyServiceImplTest extends KeyServiceImplTest[IntKey] {
   val keyService = new IntKeyServiceImpl[IntKey]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id) = new IntKeyImpl {
+    def make(id: Id)(implicit p: Pipeline) = new IntKeyImpl {
       val token = id.toString
       val logger = KeyLoggerMock
+      protected implicit val p = tp
     }
     val CHANNEL = "test"
   }

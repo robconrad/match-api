@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:16 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.group.kv
@@ -22,10 +22,10 @@ import scala.concurrent.Future
  */
 trait GroupKey extends HashKey {
 
-  def getLastEventAndCount(implicit p: Pipeline): Future[(Option[DateTime], Option[Int])]
+  def getLastEventAndCount: Future[(Option[DateTime], Option[Int])]
 
-  def setLastEvent(time: DateTime = TimeService().now)(implicit p: Pipeline): Future[Boolean]
+  def setLastEvent(time: DateTime = TimeService().now): Future[Boolean]
 
-  def setEventCount(count: Int)(implicit p: Pipeline): Future[Boolean]
+  def setEventCount(count: Int): Future[Boolean]
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:32 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.kv
@@ -21,7 +21,7 @@ import scala.concurrent.Future
  */
 trait IdKey extends Key {
 
-  def get(implicit p: Pipeline): Future[Option[UUID]]
-  def set(v: UUID)(implicit p: Pipeline): Future[Boolean]
+  def get: Future[Option[UUID]]
+  def set(v: UUID): Future[Boolean]
 
 }

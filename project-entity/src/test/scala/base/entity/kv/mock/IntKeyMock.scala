@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/18/15 1:42 PM
  */
 
 package base.entity.kv.mock
 
 import base.common.random.RandomService
-import base.entity.kv.{ Key, IntKey }
+import base.entity.kv.{ KvFactoryService, Key, IntKey }
 import base.entity.kv.Key.Pipeline
 
 import scala.concurrent.Future
@@ -23,20 +23,21 @@ class IntKeyMock(val token: String = RandomService().md5.toString,
                  incrResult: Future[Int] = Future.successful(1),
                  setResult: Future[Boolean] = Future.successful(true),
                  getResult: Future[Option[Int]] = Future.successful(None),
-                 keyMock: Key = new KeyMock()) extends IntKey {
+                 keyMock: Key = new KeyMock()(KvFactoryService().pipeline))(implicit protected val p: Pipeline)
+    extends IntKey {
 
-  def increment()(implicit p: Pipeline) = incrResult
+  def increment() = incrResult
 
-  def set(v: Int)(implicit p: Pipeline) = setResult
+  def set(v: Int) = setResult
 
-  def get()(implicit p: Pipeline) = getResult
+  def get() = getResult
 
-  def exists()(implicit p: Pipeline) = keyMock.exists()
+  def exists() = keyMock.exists()
 
-  def expire(seconds: Long)(implicit p: Pipeline) = keyMock.expire(seconds)
+  def expire(seconds: Long) = keyMock.expire(seconds)
 
-  def ttl()(implicit p: Pipeline) = keyMock.ttl()
+  def ttl() = keyMock.ttl()
 
-  def del()(implicit p: Pipeline) = keyMock.del()
+  def del() = keyMock.del()
 
 }

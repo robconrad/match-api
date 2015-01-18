@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:15 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.user.kv
@@ -23,11 +23,11 @@ import scala.concurrent.Future
  */
 trait UserKey extends HashKey {
 
-  def getNameAndGender(implicit p: Pipeline): Future[(Option[String], Option[Gender])]
+  def getNameAndGender: Future[(Option[String], Option[Gender])]
 
-  def setNameAndGender(name: String, gender: Gender)(implicit p: Pipeline): Future[Boolean]
+  def setNameAndGender(name: String, gender: Gender): Future[Boolean]
 
-  def getLastLogin(implicit p: Pipeline): Future[Option[DateTime]]
-  def setLastLogin(time: DateTime = TimeService().now)(implicit p: Pipeline): Future[Boolean]
+  def getLastLogin: Future[Option[DateTime]]
+  def setLastLogin(time: DateTime = TimeService().now): Future[Boolean]
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:28 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.group.kv
@@ -22,7 +22,7 @@ import scala.concurrent.Future
  */
 trait GroupUserKey extends HashKey {
 
-  def getLastRead(implicit p: Pipeline): Future[Option[DateTime]]
-  def setLastRead(time: DateTime = TimeService().now)(implicit p: Pipeline): Future[Boolean]
+  def getLastRead: Future[Option[DateTime]]
+  def setLastRead(time: DateTime = TimeService().now): Future[Boolean]
 
 }

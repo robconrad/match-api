@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:28 PM
+ * Last modified by rconrad, 1/18/15 1:40 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.Key.Id
+import base.entity.kv.Key._
 import base.entity.kv.mock.KeyLoggerMock
 import base.entity.kv.{ ListKey, KeyId, SetKey }
 
@@ -28,9 +28,10 @@ class ListKeyServiceImplTest extends KeyServiceImplTest[ListKey] {
   val keyService = new ListKeyServiceImpl[ListKey]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id) = new ListKeyImpl {
+    def make(id: Id)(implicit p: Pipeline) = new ListKeyImpl {
       val token = id.toString
       val logger = KeyLoggerMock
+      protected implicit val p = tp
     }
     val CHANNEL = "test"
   }

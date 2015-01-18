@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:20 PM
+ * Last modified by rconrad, 1/18/15 1:42 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.Key.{ Id, Prop }
+import base.entity.kv.Key.{ Pipeline, Id, Prop }
 import base.entity.kv.mock.{ PrivateHashKeyMock, KeyLoggerMock }
 import base.entity.kv._
 
@@ -32,7 +32,7 @@ class PrivateHashKeyServiceImplTest extends KeyServiceImplTest[PrivateHashKey] {
   val keyService = new HashKeyServiceImpl[PrivateHashKey]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id) = new PrivateHashKeyImpl(s"$CHANNEL-$id", KeyLoggerMock)
+    def make(id: Id)(implicit p: Pipeline) = new PrivateHashKeyImpl(s"$CHANNEL-$id", KeyLoggerMock)(p)
     val CHANNEL = "test"
   }
   private val model1 = keyService.make(id)

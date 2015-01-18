@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:33 PM
+ * Last modified by rconrad, 1/18/15 1:30 PM
  */
 
 package base.entity.kv
@@ -25,7 +25,7 @@ trait KeyService[T <: Key] extends Service with KeyLogger {
 
   protected def getKey(id: Id): String
 
-  def make(id: Id): T
+  def make(id: Id)(implicit p: Pipeline): T
 
   def del(items: Iterable[T])(implicit p: Pipeline): Future[Int]
 

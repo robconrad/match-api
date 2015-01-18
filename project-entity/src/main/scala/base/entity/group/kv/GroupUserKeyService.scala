@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:46 PM
+ * Last modified by rconrad, 1/18/15 1:35 PM
  */
 
 package base.entity.group.kv
 
 import java.util.UUID
 
+import base.entity.kv.Key._
 import base.entity.kv.{ KeyService, KeyServiceCompanion }
 
 /**
@@ -23,7 +24,7 @@ trait GroupUserKeyService extends KeyService[GroupUserKey] {
 
   final val CHANNEL = "groupUser"
 
-  def make(groupId: UUID, userId: UUID): GroupUserKey
+  def make(groupId: UUID, userId: UUID)(implicit p: Pipeline): GroupUserKey
 
 }
 

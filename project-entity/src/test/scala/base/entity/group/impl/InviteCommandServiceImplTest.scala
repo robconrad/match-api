@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:25 PM
+ * Last modified by rconrad, 1/18/15 1:16 PM
  */
 
 package base.entity.group.impl
@@ -188,28 +188,28 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   test("group pair set failed") {
     val groupKey = new GroupKeyImpl(new PrivateHashKeyMock())
     val pairKey = new GroupPairKeyImpl("", KeyLoggerMock) {
-      override def set(v: UUID)(implicit p: Pipeline) = Future.successful(false)
+      override def set(v: UUID) = Future.successful(false)
     }
     assert(command.groupPairSet(userId, groupId, groupKey, pairKey).await() == Errors.pairSetFailed.await())
   }
 
   test("group user add failed") {
     val key = new GroupUsersKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*)(implicit p: Pipeline) = Future.successful(0)
+      override def add(value: Any*) = Future.successful(0)
     }
     assert(command.groupUsersAdd(userId, groupId, key).await() == Errors.groupUsersAddFailed.await())
   }
 
   test("invited user groups add failed") {
     val key = new UserGroupsKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*)(implicit p: Pipeline) = Future.successful(0)
+      override def add(value: Any*) = Future.successful(0)
     }
     assert(command.invitedUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
 
   test("inviting user groups add failed") {
     val key = new UserGroupsKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*)(implicit p: Pipeline) = Future.successful(0)
+      override def add(value: Any*) = Future.successful(0)
     }
     assert(command.invitingUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
