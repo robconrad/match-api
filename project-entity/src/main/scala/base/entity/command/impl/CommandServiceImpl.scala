@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 12:29 PM
+ * Last modified by rconrad, 1/17/15 3:41 PM
  */
 
 package base.entity.command.impl
@@ -11,6 +11,7 @@ import base.common.service.ServiceImpl
 import base.entity.auth.context.AuthContext
 import base.entity.command.CommandService
 import base.entity.command.model.CommandModel
+import base.entity.error.ApiError
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudImplicits
 
@@ -31,7 +32,8 @@ private[entity] trait CommandServiceImpl[A, B]
       authCtx.assertHas(perm)
     }
     innerExecute(input).map {
-      case Right(response) => Right(CommandModel(command, response))
+      case Right(response) => CommandModel(outCmd, response)
+      case Left(error)     => CommandModel(errorCmd, error)
     }
   }
 

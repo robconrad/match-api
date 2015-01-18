@@ -2,18 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 12:29 PM
+ * Last modified by rconrad, 1/17/15 2:49 PM
  */
 
 package base.entity.user
 
-import base.entity.command.model.CommandModel
 import base.entity.command.{ CommandService, CommandServiceCompanion }
-import base.entity.error.ApiError
 import base.entity.perm.Perms
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
-
-import scala.concurrent.Future
 
 /**
  * User CRUD, etc.
@@ -21,7 +17,8 @@ import scala.concurrent.Future
  */
 trait RegisterCommandService extends CommandService[RegisterModel, RegisterResponseModel] {
 
-  final def command = RegisterCommandService.cmd
+  final def inCmd = RegisterCommandService.inCmd
+  final def outCmd = RegisterCommandService.outCmd
 
   final def serviceManifest = manifest[RegisterCommandService]
 
@@ -31,8 +28,7 @@ trait RegisterCommandService extends CommandService[RegisterModel, RegisterRespo
 
 object RegisterCommandService extends CommandServiceCompanion[RegisterCommandService] {
 
-  type RegisterResponse = Future[Either[ApiError, CommandModel[RegisterResponseModel]]]
-
-  final val cmd = "register"
+  final val inCmd = "register"
+  final val outCmd = "registerResponse"
 
 }

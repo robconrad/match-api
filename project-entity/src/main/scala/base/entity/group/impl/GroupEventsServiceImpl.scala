@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:56 PM
+ * Last modified by rconrad, 1/17/15 4:02 PM
  */
 
 package base.entity.group.impl
@@ -37,7 +37,7 @@ class GroupEventsServiceImpl
   }
 
   def setEvent(event: EventModel, createIfNotExists: Boolean)(implicit p: Pipeline) = {
-    Future.failed(new RuntimeException())
+    Future.successful(Right(event))
   }
 
 }

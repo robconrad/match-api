@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:55 PM
+ * Last modified by rconrad, 1/17/15 2:50 PM
  */
 
 package base.socket.api.impl
@@ -38,7 +38,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
   def testCommand[A, T <: AnyRef](model: A,
                                   response: T,
                                   cmdService: CommandService[_, _])(implicit authCtx: AuthContext, m: Manifest[T]) {
-    val cmd = CommandModel(cmdService.command, model)
+    val cmd = CommandModel(cmdService.inCmd, model)
     val input = Serialization.write(cmd)
 
     val responseJson = Serialization.write(response)
@@ -54,8 +54,8 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
   test("command - register") {
     val model = RegisterModel(ApiVersions.V01, "555-5555")
     val response = RegisterResponseModel()
-    val command = RegisterCommandService.command(response)
-    val service = new RegisterCommandServiceMock(Future.successful(Right(command)))
+    val command = RegisterCommandService.inCommand(response)
+    val service = new RegisterCommandServiceMock(Future.successful(command))
     val unregister = TestServices.register(service)
     testCommand(model, command, service)
     unregister()
@@ -64,8 +64,8 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
   test("command - verify") {
     val model = VerifyModel(ApiVersions.V01, None, None, "", RandomService().uuid, "")
     val response = VerifyResponseModel(RandomService().uuid)
-    val command = VerifyCommandService.command(response)
-    val service = new VerifyCommandServiceMock(verifyResult = Future.successful(Right(command)))
+    val command = VerifyCommandService.inCommand(response)
+    val service = new VerifyCommandServiceMock(verifyResult = Future.successful(command))
     val unregister = TestServices.register(service)
     testCommand(model, command, service)
     unregister()

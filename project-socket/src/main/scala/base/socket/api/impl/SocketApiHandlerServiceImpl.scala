@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:50 PM
+ * Last modified by rconrad, 1/17/15 4:00 PM
  */
 
 package base.socket.api.impl
@@ -11,6 +11,7 @@ import base.common.lib.Dispatchable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.NoAuthContext
+import base.entity.command.CommandService
 import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
 import base.entity.json.JsonFormats
@@ -23,6 +24,8 @@ import io.netty.channel._
 import io.netty.util.CharsetUtil
 import org.json4s.native.Serialization
 import spray.http.StatusCodes
+
+import scala.util.{ Failure, Success }
 
 @Sharable
 class SocketApiHandlerServiceImpl
@@ -75,8 +78,8 @@ class SocketApiHandlerServiceImpl
     } else {
       val msgStr = msg.asInstanceOf[ByteBuf].toString(CharsetUtil.UTF_8)
       if (isDebugEnabled) debug("message received: " + msgStr)
-      CommandProcessingService().process(msgStr)(ctx.channel.authCtx).map {
-        case Right(result) =>
+      CommandProcessingService().process(msgStr)(ctx.channel.authCtx).onComplete {
+        case Success(Right(result)) =>
           result.authContext.foreach { authCtx =>
             ctx.channel.authCtx = authCtx
           }
@@ -90,8 +93,11 @@ class SocketApiHandlerServiceImpl
             ctx.write(encoded)
             ctx.flush()
           }
-        case Left(error) =>
+        case Success(Left(error)) =>
           warn("processing failed with %s", error.reason)
+          ctx.channel.close()
+        case Failure(t) =>
+          error("processing threw", t)
           ctx.channel.close()
       }
     }
@@ -99,6 +105,7 @@ class SocketApiHandlerServiceImpl
 
   override def channelActive(ctx: ChannelHandlerContext) {
     implicit val iCtx = ctx
+    ctx.channel.authCtx = NoAuthContext
 
     if (SocketApiService().isConnectionAllowed) {
       SocketApiStatsService().increment(SocketApiStats.CONNECTIONS)
@@ -125,10 +132,10 @@ object SocketApiHandlerServiceImpl {
 
   lazy val runningText = "The server is not processing commands right now."
   lazy val runningApiError = ApiError(runningText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_NOT_RUNNING)
-  lazy val runningJson = Serialization.write(CommandModel("error", runningApiError))
+  lazy val runningJson = Serialization.write(CommandService.errorCommand(runningApiError))
 
   lazy val busyText = "The server is too busy to accept new connections right now."
   lazy val busyApiError = ApiError(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
-  lazy val busyJson = Serialization.write(CommandModel("error", busyApiError))
+  lazy val busyJson = Serialization.write(CommandService.errorCommand(busyApiError))
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:59 PM
+ * Last modified by rconrad, 1/17/15 3:00 PM
  */
 
 package base.entity.user.impl
@@ -31,7 +31,7 @@ import base.entity.user.model._
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
+class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     extends CommandServiceImpl[VerifyModel, VerifyResponseModel]
     with VerifyCommandService {
 

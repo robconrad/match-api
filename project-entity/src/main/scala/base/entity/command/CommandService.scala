@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 12:29 PM
+ * Last modified by rconrad, 1/17/15 2:46 PM
  */
 
 package base.entity.command
@@ -21,10 +21,20 @@ import scala.concurrent.Future
  */
 trait CommandService[A, B] extends Service {
 
-  def command: String
+  def inCmd: String
+  def outCmd: String
+  final def errorCmd = CommandService.errorCmd
 
   def perms: Iterable[Perm]
 
-  def execute(input: A)(implicit authCtx: AuthContext): Future[Either[ApiError, CommandModel[B]]]
+  def execute(input: A)(implicit authCtx: AuthContext): Future[CommandModel[_]]
+
+}
+
+object CommandService {
+
+  val errorCmd = "error"
+
+  def errorCommand(response: ApiError) = CommandModel(errorCmd, response)
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 12:16 PM
+ * Last modified by rconrad, 1/17/15 2:12 PM
  */
 
 package base.entity.command
@@ -16,9 +16,11 @@ import base.entity.command.model.CommandModel
  */
 abstract class CommandServiceCompanion[T <: CommandService[_, _]](implicit m: Manifest[T]) {
 
-  def cmd: String
+  def inCmd: String
+  def outCmd: String
 
-  final def command[R](response: R) = CommandModel[R](cmd, response)
+  final def inCommand[R](model: R) = CommandModel[R](inCmd, model)
+  final def outCommand[R](model: R) = CommandModel[R](outCmd, model)
 
   def apply() = Services.apply[T]
 

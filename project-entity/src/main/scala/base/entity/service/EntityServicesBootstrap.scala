@@ -2,16 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:06 PM
+ * Last modified by rconrad, 1/17/15 4:01 PM
  */
 
 package base.entity.service
 
 import base.common.service.{ Services, ServicesBootstrap }
-import base.entity.auth.impl.AuthServiceImpl
-import base.entity.group.kv.impl.{ GroupUsersKeyServiceImpl, GroupPairKeyServiceImpl, GroupKeyServiceImpl }
+import base.entity.group.impl.{ GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
+import base.entity.group.kv.impl.{ GroupKeyServiceImpl, GroupPairKeyServiceImpl, GroupUsersKeyServiceImpl }
 import base.entity.kv.impl.KvFactoryServiceImpl
-import base.entity.group.impl.InviteCommandServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
@@ -57,12 +56,14 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val otherRegistered = {
 
-    Services.register(new AuthServiceImpl())
-
     Services.register(new TwilioSmsServiceImpl(
       Keys(TWILIO, "sid"),
       Keys(TWILIO, "token"),
       Keys(TWILIO, "from")))
+
+    Services.register(new GroupServiceImpl())
+
+    Services.register(new GroupEventsServiceImpl())
 
     Services.register(new RegisterCommandServiceImpl(
       Keys(MATCH_USER, "phoneCooldown")))

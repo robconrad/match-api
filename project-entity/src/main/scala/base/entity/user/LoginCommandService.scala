@@ -2,18 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 12:29 PM
+ * Last modified by rconrad, 1/17/15 2:49 PM
  */
 
 package base.entity.user
 
-import base.entity.command.model.CommandModel
 import base.entity.command.{ CommandService, CommandServiceCompanion }
-import base.entity.error.ApiError
 import base.entity.perm.Perms
 import base.entity.user.model._
-
-import scala.concurrent.Future
 
 /**
  * User CRUD, etc.
@@ -21,7 +17,8 @@ import scala.concurrent.Future
  */
 trait LoginCommandService extends CommandService[LoginModel, LoginResponseModel] {
 
-  final def command = LoginCommandService.cmd
+  final def inCmd = LoginCommandService.inCmd
+  final def outCmd = LoginCommandService.outCmd
 
   final def serviceManifest = manifest[LoginCommandService]
 
@@ -31,8 +28,7 @@ trait LoginCommandService extends CommandService[LoginModel, LoginResponseModel]
 
 object LoginCommandService extends CommandServiceCompanion[LoginCommandService] {
 
-  type LoginResponse = Future[Either[ApiError, CommandModel[LoginResponseModel]]]
-
-  final val cmd = "login"
+  final val inCmd = "login"
+  final val outCmd = "loginResponse"
 
 }
