@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:55 PM
+ * Last modified by rconrad, 1/17/15 8:22 PM
  */
 
 package base.entity.user.impl
@@ -97,7 +97,7 @@ private[entity] class LoginCommandServiceImpl()
 
     def eventsGet(key: UserKey,
                   userId: UUID,
-                  groups: List[GroupModel],
+                  groups: Iterable[GroupModel],
                   groupId: UUID): Response = {
       GroupEventsService().getEvents(groupId).flatMap {
         case Left(error) => error
@@ -111,7 +111,7 @@ private[entity] class LoginCommandServiceImpl()
 
     def userGetSetLastLogin(key: UserKey,
                             userId: UUID,
-                            groups: List[GroupModel],
+                            groups: Iterable[GroupModel],
                             events: Option[List[EventModel]],
                             questions: Option[List[QuestionModel]]): Response = {
       key.getLastLogin.flatMap { lastLogin =>

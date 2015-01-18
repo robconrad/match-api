@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:46 PM
+ * Last modified by rconrad, 1/17/15 8:06 PM
  */
 
 package base.entity.group
@@ -39,6 +39,6 @@ object UserService extends ServiceCompanion[UserService] {
 
   type GetUser = Future[Either[ApiError, UserModel]]
   type GetUsers = Future[Either[ApiError, Iterable[UserModel]]]
-  type GetGroups = Future[Either[ApiError, List[GroupModel]]]
+  type GetGroups = Future[Either[ApiError, Iterable[GroupModel]]]
 
 }

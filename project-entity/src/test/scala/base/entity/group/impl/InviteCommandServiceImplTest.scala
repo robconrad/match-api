@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:44 PM
+ * Last modified by rconrad, 1/17/15 8:25 PM
  */
 
 package base.entity.group.impl
@@ -56,7 +56,6 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   private val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(None)))
   private val groupEventsMock = new GroupEventsServiceMock()
 
-  private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = InviteModel(phone, label)
 
@@ -79,7 +78,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   test("success - new user") {
     val eventCount = 0
     val userId = randomMock.nextUuid()
-    val users = List(UserModel(userId, label))
+    val users = List(UserModel(userId, Option(label)))
     val groupId = randomMock.nextUuid(1)
     val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
@@ -122,7 +121,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneKey.set(UserIdProp, userId).await())
 
     val eventCount = 0
-    val users = List(UserModel(userId, label))
+    val users = List(UserModel(userId, Option(label)))
     val groupId = randomMock.nextUuid()
     val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
@@ -160,7 +159,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     assert(groupPairKey.set(groupId).await())
 
     val eventCount = 0
-    val users = List(UserModel(userId, label))
+    val users = List(UserModel(userId, Option(label)))
     val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(Option(group))))
     val unregister = TestServices.register(groupMock)

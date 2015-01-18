@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 6:58 PM
+ * Last modified by rconrad, 1/17/15 8:24 PM
  */
 
 package base.entity.user.impl
@@ -52,7 +52,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val groupEventsMock = new GroupEventsServiceMock()
   private val questionMock = new QuestionServiceMock()
 
-  private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = LoginModel(token, Option(groupId), appVersion, apiVersion, locale, deviceModel)
 

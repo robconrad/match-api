@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:11 PM
+ * Last modified by rconrad, 1/17/15 8:25 PM
  */
 
 package base.entity.group.impl
@@ -13,7 +13,7 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.impl.GroupEventsServiceImpl.Errors
-import base.entity.kv.KvFactoryService
+import base.entity.kv.{ KvTest, KvFactoryService }
 import base.entity.service.EntityServiceTest
 
 /**
@@ -22,7 +22,7 @@ import base.entity.service.EntityServiceTest
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupEventsServiceImplTest extends EntityServiceTest {
+class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
 
   private val count = 2
 
@@ -37,8 +37,6 @@ class GroupEventsServiceImplTest extends EntityServiceTest {
     userId = None,
     `type` = EventTypes.JOIN,
     body = body)
-
-  private implicit val pipeline = KvFactoryService().pipeline
 
   override def beforeAll() {
     super.beforeAll()

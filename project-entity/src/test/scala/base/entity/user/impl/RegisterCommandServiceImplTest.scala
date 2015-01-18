@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 5:43 PM
+ * Last modified by rconrad, 1/17/15 8:24 PM
  */
 
 package base.entity.user.impl
@@ -46,7 +46,6 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   private val verifyMock = new VerifyCommandServiceMock(makeVerifyCodeResult = verifyCode)
 
   private implicit val registerModel = RegisterModel(ApiVersions.V01, phone)
-  private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
 
   override def beforeAll() {

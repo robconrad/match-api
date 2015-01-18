@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:23 PM
+ * Last modified by rconrad, 1/17/15 8:24 PM
  */
 
 package base.entity.message.impl
@@ -39,7 +39,6 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   private val randomMock = new RandomServiceMock()
   private val groupEventsMock = new GroupEventsServiceMock()
 
-  private implicit val pipeline = KvFactoryService().pipeline
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = MessageModel(groupId, body)
 

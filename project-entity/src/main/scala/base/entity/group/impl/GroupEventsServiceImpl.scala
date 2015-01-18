@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:10 PM
+ * Last modified by rconrad, 1/17/15 8:08 PM
  */
 
 package base.entity.group.impl
@@ -67,7 +67,7 @@ object GroupEventsServiceImpl {
 
   object Errors extends CrudErrorImplicits[EventModel] {
 
-    val setEventFailed = Left(ApiError(externalErrorText, InternalServerError, "failed to set event"))
+    lazy val setEventFailed = Left(ApiError(externalErrorText, InternalServerError, "failed to set event"))
 
   }
 
