@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:37 PM
+ * Last modified by rconrad, 1/18/15 2:46 PM
  */
 
 package base.entity.question.impl
@@ -35,7 +35,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionServiceImplTest extends EntityServiceTest with KvTest with MockFactory {
+class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
   private val totalSides = 6
   private val questions = List(

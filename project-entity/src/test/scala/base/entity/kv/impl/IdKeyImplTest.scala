@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:40 PM
+ * Last modified by rconrad, 1/18/15 2:47 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.random.RandomService
+import base.entity.kv.KeyLogger
 import base.entity.kv.mock.KeyLoggerMock
 
 /**

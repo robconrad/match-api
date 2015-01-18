@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:38 PM
+ * Last modified by rconrad, 1/18/15 2:46 PM
  */
 
 package base.entity.user.impl
@@ -36,7 +36,7 @@ import scala.concurrent.duration._
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class RegisterCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
+class RegisterCommandServiceImplTest extends CommandServiceImplTest {
 
   val service = new RegisterCommandServiceImpl(10.minutes)
 

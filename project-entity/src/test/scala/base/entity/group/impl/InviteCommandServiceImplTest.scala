@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:42 PM
+ * Last modified by rconrad, 1/18/15 2:46 PM
  */
 
 package base.entity.group.impl
@@ -40,7 +40,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class InviteCommandServiceImplTest extends CommandServiceImplTest with MockFactory {
+class InviteCommandServiceImplTest extends CommandServiceImplTest {
 
   val service = new InviteCommandServiceImpl("welcome!")
 

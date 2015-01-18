@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:16 PM
+ * Last modified by rconrad, 1/18/15 2:46 PM
  */
 
 package base.entity.user.impl
@@ -31,7 +31,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserServiceImplTest extends EntityServiceTest with KvTest with MockFactory {
+class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   val service = new UserServiceImpl()
 
