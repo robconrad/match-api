@@ -1,0 +1,142 @@
+/*
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * This file is proprietary and confidential.
+ * Last modified by rconrad, 1/18/15 10:10 AM
+ */
+
+package base.entity.question.impl
+
+import java.util.UUID
+
+import base.common.random.RandomService
+import base.common.service.{ CommonService, ServiceImpl }
+import base.entity.auth.context.AuthContext
+import base.entity.event.EventTypes
+import base.entity.event.model.EventModel
+import base.entity.group.kv._
+import base.entity.kv.Key._
+import base.entity.kv.{ KeyId, KvFactoryService }
+import base.entity.question.QuestionSides.QuestionSide
+import base.entity.question.kv.QuestionsKeyService
+import base.entity.question.model.AnswerModel
+import base.entity.question.{ QuestionIdComposite, QuestionDef, QuestionService, QuestionSides }
+import base.entity.service.CrudImplicits
+
+import scala.concurrent.{ Await, Future }
+
+/**
+ * {{ Describe the high level purpose of QuestionServiceImpl here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
+ * @author rconrad
+ */
+class QuestionServiceImpl(questions: Iterable[QuestionDef]) extends ServiceImpl with QuestionService {
+
+  private val questionMap = questions.map(q => q.id -> q).toMap
+
+  Await.ready(init(), CommonService().defaultDuration)
+
+  def init() = {
+    implicit val p = KvFactoryService().pipeline
+    val key = QuestionsKeyService().make(KeyId("standard"))
+    val compositeIds_a = questions.map(q => compositeId(q.id, QuestionSides.SIDE_A))
+    val compositeIds_b = questions.collect { case q if q.b.isDefined => compositeId(q.id, QuestionSides.SIDE_B) }
+    val compositeIds = compositeIds_a.toSet + compositeIds_b
+    key.add(compositeIds.toSeq: _*)
+  }
+
+  def compositeId(questionId: UUID, side: QuestionSide, inverse: Boolean = false) = {
+    assert(questionMap.contains(questionId))
+    QuestionIdComposite(questionMap(questionId), side, inverse)
+  }
+
+  /**
+   * - diffstore standard questions with answered questions
+   * - get $n random questions from stored set
+   * - delete stored set
+   * - return questions
+   */
+  def getQuestions(groupId: UUID)(implicit p: Pipeline,
+                                  authCtx: AuthContext) = {
+    Future.successful(Right(List()))
+  }
+
+  def answer(input: AnswerModel)(implicit p: Pipeline, authCtx: AuthContext) = {
+    new AnswerMethod(input).execute()
+  }
+
+  /**
+   * - add question to answered set
+   * - if question response is true:
+   *    - add question to answered yes set
+   *    - get other group member user ids
+   *    - check if inverseId is in any other user answered yes set
+   *    - create match events in group list
+   *    - notify other group members of match events (???)
+   *    - return match events for all matches
+   */
+  private[impl] class AnswerMethod(input: AnswerModel)(implicit p: Pipeline, authCtx: AuthContext)
+      extends CrudImplicits[List[EventModel]] {
+
+    def execute() = {
+      val key = GroupUserQuestionsKeyService().make(input.groupId, authCtx.userId)
+      groupUserQuestionAdd(key)
+    }
+
+    def groupUserQuestionAdd(key: GroupUserQuestionsKey) = {
+      val id = compositeId(input.questionId, input.side)
+      key.add(id).flatMap { added =>
+        questionResponse(id)
+      }
+    }
+
+    def questionResponse(id: QuestionIdComposite) =
+      input.response match {
+        case true  => groupUserQuestionYesAdd(id, GroupUserQuestionsYesKeyService().make(input.groupId, authCtx.userId))
+        case false => Future.successful(Right(List()))
+      }
+
+    def groupUserQuestionYesAdd(id: QuestionIdComposite, key: GroupUserQuestionsYesKey) =
+      key.add(id).flatMap { added =>
+        groupUsersGet(GroupUsersKeyService().make(KeyId(input.groupId)))
+      }
+
+    def groupUsersGet(key: GroupUsersKey) =
+      key.members().flatMap { userIdStrings =>
+        val userIds = userIdStrings.collect {
+          case userId if userId != authCtx.userIdString => UUID.fromString(userId)
+        }
+        groupUsersQuestionYesGet(userIds)
+      }
+
+    def groupUsersQuestionYesGet(userIds: Iterable[UUID]) = {
+      val inverseId = compositeId(input.questionId, input.side, inverse = true)
+      val futures = userIds.map { userId =>
+        groupUserQuestionYesGet(userId, inverseId, GroupUserQuestionsYesKeyService().make(input.groupId, userId))
+      }
+      val matches = Future.sequence(futures).map(_.collect {
+        case (userId, res) if res => userId
+      })
+      matches.map { userIds =>
+        buildEvents(userIds)
+      }
+    }
+
+    def groupUserQuestionYesGet(userId: UUID, inverseId: QuestionIdComposite, key: GroupUserQuestionsYesKey) =
+      key.isMember(inverseId).map { res =>
+        userId -> res
+      }
+
+    def buildEvents(userIds: Iterable[UUID]) = {
+      val matches = userIds.map { userId =>
+        val eventId = RandomService().uuid
+        val body = questionMap(input.questionId) + " is a match"
+        EventModel(eventId, input.groupId, userId = None, EventTypes.MATCH, body)
+      }
+      Right(matches.toList)
+    }
+
+  }
+
+}

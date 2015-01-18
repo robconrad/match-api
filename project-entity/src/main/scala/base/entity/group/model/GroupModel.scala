@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:43 PM
+ * Last modified by rconrad, 1/17/15 9:03 PM
  */
 
 package base.entity.group.model
@@ -26,7 +26,7 @@ import scala.annotation.meta.field
 @ApiModel(description = createRequestDesc)
 case class GroupModel(
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  id: UUID,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  users: Iterable[UserModel],
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  users: List[UserModel],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  lastEventTime: Option[DateTime],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  lastReadTime: Option[DateTime],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  eventCount: Int) {
@@ -35,7 +35,7 @@ case class GroupModel(
 }
 
 case class GroupModelBuilder(id: Option[UUID] = None,
-                             users: Option[Iterable[UserModel]] = None,
+                             users: Option[List[UserModel]] = None,
                              lastEventTime: Option[DateTime] = None,
                              lastReadTime: Option[DateTime] = None,
                              eventCount: Option[Int] = None) {

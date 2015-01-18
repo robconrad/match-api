@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/7/15 9:28 PM
+ * Last modified by rconrad, 1/17/15 10:45 PM
  */
 
 package base.common.service
+
+import java.util.UUID
 
 import base.common.lib.{ BaseConfig, Currencies, Dispatchable }
 import base.common.logging.Loggable
@@ -49,6 +51,8 @@ trait ServicesBootstrap extends Loggable with Dispatchable {
   implicit protected def getOptionString(k: Key)(implicit config: BaseConfig) = config.getString(k.s)
   implicit protected def getStringList(k: Key)(implicit config: BaseConfig) = get(k, config.getStringList)
   implicit protected def getOptionStringList(k: Key)(implicit config: BaseConfig) = config.getStringList(k.s)
+  implicit protected def getUuid(k: Key)(implicit config: BaseConfig) = get(k, config.getUuid)
+  implicit protected def getOptionUuid(k: Key)(implicit config: BaseConfig) = config.getUuid(k.s)
   implicit protected def getCurrencySet(k: Key)(implicit config: BaseConfig) = get(k, config.getStringList).map(Currencies.withName).toSet
   implicit protected def getBool(k: Key)(implicit config: BaseConfig) = get(k, config.getBool)
   implicit protected def getOptionBool(k: Key)(implicit config: BaseConfig) = config.getBool(k.s)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:22 PM
+ * Last modified by rconrad, 1/17/15 9:01 PM
  */
 
 package base.entity.user.impl
@@ -116,7 +116,7 @@ private[entity] class LoginCommandServiceImpl()
                             questions: Option[List[QuestionModel]]): Response = {
       key.getLastLogin.flatMap { lastLogin =>
         key.setLastLogin().flatMap {
-          case true  => LoginResponseModel(userId, groups, events, questions, lastLogin)
+          case true  => LoginResponseModel(userId, groups.toList, events, questions, lastLogin)
           case false => Errors.userSetFailed
         }
       }

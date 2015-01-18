@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:40 PM
+ * Last modified by rconrad, 1/17/15 9:03 PM
  */
 
 package base.entity.user.impl
@@ -42,7 +42,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
       Right(UserModel(userId, label))
     }
 
-  def getUsers(userIds: Iterable[UUID])(implicit p: Pipeline, authCtx: AuthContext) = {
+  def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) = {
     val futures = userIds.map { userId =>
       UserUserLabelKeyService().make(authCtx.userId, userId).get.map { label =>
         UserModel(userId, label)
@@ -66,7 +66,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
         lazy val groups = eithers.collect { case Right(Some(group)) => group }
 
         (errors.size == 0, groups.size == groupIds.size) match {
-          case (true, true) => Right(groups)
+          case (true, true) => Right(groups.toList)
           case (false, _)   => Left(errors.head)
           case (_, false)   => Errors.notAllGroupsReturned
         }

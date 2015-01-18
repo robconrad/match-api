@@ -1,8 +1,8 @@
 <!--
-  ~ Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+  ~ Copyright (c) 2015 Robert Conrad - All Rights Reserved.
   ~ Unauthorized copying of this file, via any medium is strictly prohibited.
   ~ This file is proprietary and confidential.
-  ~ Last modified by rconrad, 12/24/14 4:40 PM
+  ~ Last modified by rconrad, 1/18/15 9:42 AM
   -->
 
 <scalastyle>
@@ -60,7 +60,11 @@
             <parameter name="maxParameters"><![CDATA[8]]></parameter>
         </parameters>
     </check>
-    <check level="error" class="org.scalastyle.scalariform.MagicNumberChecker" enabled="true"/>
+    <check level="error" class="org.scalastyle.scalariform.MagicNumberChecker" enabled="true">
+        <parameters>
+            <parameter name="ignore">-1,0,1,2,3</parameter>
+        </parameters>
+    </check>
     <check level="error" class="org.scalastyle.scalariform.NoWhitespaceBeforeLeftBracketChecker" enabled="true"/>
     <check level="error" class="org.scalastyle.scalariform.NoWhitespaceAfterLeftBracketChecker" enabled="true"/>
     <check level="error" class="org.scalastyle.scalariform.ReturnChecker" enabled="true"/>

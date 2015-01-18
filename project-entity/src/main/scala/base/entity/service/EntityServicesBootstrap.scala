@@ -2,16 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:45 PM
+ * Last modified by rconrad, 1/18/15 10:15 AM
  */
 
 package base.entity.service
 
+import base.common.lib.BaseConfig
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.group.impl.{ GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
 import base.entity.group.kv.impl._
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
+import base.entity.question.QuestionDef
+import base.entity.question.impl.{ AnswerCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl }
+import base.entity.question.kv.impl.QuestionsKeyServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 import base.entity.user.kv.impl._
@@ -33,6 +37,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
   protected val MATCH_USER = Keys(MATCH, "user")
   protected val MATCH_GROUP = Keys(MATCH, "group")
   protected val MATCH_GROUP_EVENT = Keys(MATCH_GROUP, "event")
+  protected val MATCH_QUESTION = Keys(MATCH, "question")
 
   /**
    * Registration of services, see classes for details on these parameters
@@ -57,6 +62,23 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val otherRegistered = {
 
+    Services.register(new QuestionsKeyServiceImpl())
+
+    Services.register(new UserKeyServiceImpl())
+    Services.register(new DeviceKeyServiceImpl())
+    Services.register(new PhoneKeyServiceImpl())
+    Services.register(new PhoneCooldownKeyServiceImpl())
+    Services.register(new UserGroupsKeyServiceImpl())
+    Services.register(new UserUserLabelKeyServiceImpl())
+
+    Services.register(new GroupKeyServiceImpl())
+    Services.register(new GroupPairKeyServiceImpl())
+    Services.register(new GroupUserKeyServiceImpl())
+    Services.register(new GroupUsersKeyServiceImpl())
+    Services.register(new GroupUserQuestionsKeyServiceImpl())
+    Services.register(new GroupUserQuestionsYesKeyServiceImpl())
+    Services.register(new GroupEventsKeyServiceImpl())
+
     Services.register(new TwilioSmsServiceImpl(
       Keys(TWILIO, "sid"),
       Keys(TWILIO, "token"),
@@ -66,6 +88,15 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new GroupEventsServiceImpl(
       Keys(MATCH_GROUP_EVENT, "count")))
+
+    Services.register(new QuestionServiceImpl(
+      getConfigList(Keys(MATCH_QUESTION, "questions")).map { tsConfig =>
+        implicit val config = new BaseConfig(tsConfig)
+        QuestionDef(
+          Keys("id"),
+          Keys("a"),
+          Keys("b"))
+      }))
 
     Services.register(new UserServiceImpl())
 
@@ -83,18 +114,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new MessageCommandServiceImpl())
 
-    Services.register(new UserKeyServiceImpl())
-    Services.register(new DeviceKeyServiceImpl())
-    Services.register(new PhoneKeyServiceImpl())
-    Services.register(new PhoneCooldownKeyServiceImpl())
-    Services.register(new UserGroupsKeyServiceImpl())
-    Services.register(new UserUserLabelKeyServiceImpl())
+    Services.register(new QuestionsCommandServiceImpl())
 
-    Services.register(new GroupKeyServiceImpl())
-    Services.register(new GroupPairKeyServiceImpl())
-    Services.register(new GroupUserKeyServiceImpl())
-    Services.register(new GroupUsersKeyServiceImpl())
-    Services.register(new GroupEventsKeyServiceImpl())
+    Services.register(new AnswerCommandServiceImpl())
 
     true
   }

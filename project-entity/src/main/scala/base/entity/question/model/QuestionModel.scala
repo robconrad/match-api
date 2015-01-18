@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/12/15 8:45 PM
+ * Last modified by rconrad, 1/17/15 10:37 PM
  */
 
 package base.entity.question.model
@@ -25,7 +25,7 @@ import scala.annotation.meta.field
 case class QuestionModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     id: UUID,
   @(ApiModelProperty @field)(required = true, value = emailDesc)     a: String,
-  @(ApiModelProperty @field)(required = true, value = emailDesc)     b: String,
+  @(ApiModelProperty @field)(required = true, value = emailDesc)     b: Option[String],
   @(ApiModelProperty @field)(required = true, value = emailDesc)     side: QuestionSide) {
   // format: ON
 

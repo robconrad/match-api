@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 6:11 PM
+ * Last modified by rconrad, 1/17/15 10:47 PM
  */
 
 package base.common.service
 
 import java.security.InvalidParameterException
+import java.util.UUID
 
 import base.common.test.BaseSuite
 
@@ -54,6 +55,9 @@ class ServicesBootstrapTest extends BaseSuite {
 
     lazy val stringList: List[String] = k("stringList")
     lazy val stringListOpt: Option[List[String]] = k("stringList")
+
+    lazy val uuid: UUID = k("uuid")
+    lazy val uuidOpt: Option[UUID] = k("uuid")
 
     lazy val int: Int = k("int")
     lazy val intOpt: Option[Int] = k("int")
@@ -109,6 +113,8 @@ class ServicesBootstrapTest extends BaseSuite {
     assert(stringOpt.contains("string"))
     assert(stringList == List("string1", "string2"))
     assert(stringListOpt.contains(List("string1", "string2")))
+    assert(uuid == UUID.fromString("84421019-ac1e-41e5-a7c1-ed5d83636e9c"))
+    assert(uuidOpt.contains(UUID.fromString("84421019-ac1e-41e5-a7c1-ed5d83636e9c")))
     assert(int == 1)
     assert(intOpt.contains(1))
     assert(intList == List(1, 2))

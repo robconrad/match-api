@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:06 PM
+ * Last modified by rconrad, 1/17/15 9:04 PM
  */
 
 package base.entity.group
@@ -29,7 +29,7 @@ trait UserService extends Service {
 
   def getUser(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext): GetUser
 
-  def getUsers(userIds: Iterable[UUID])(implicit p: Pipeline, authCtx: AuthContext): GetUsers
+  def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext): GetUsers
 
   def getGroups(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext): GetGroups
 
@@ -38,7 +38,7 @@ trait UserService extends Service {
 object UserService extends ServiceCompanion[UserService] {
 
   type GetUser = Future[Either[ApiError, UserModel]]
-  type GetUsers = Future[Either[ApiError, Iterable[UserModel]]]
-  type GetGroups = Future[Either[ApiError, Iterable[GroupModel]]]
+  type GetUsers = Future[Either[ApiError, List[UserModel]]]
+  type GetGroups = Future[Either[ApiError, List[GroupModel]]]
 
 }

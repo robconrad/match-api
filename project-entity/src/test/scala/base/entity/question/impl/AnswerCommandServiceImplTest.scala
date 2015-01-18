@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:24 PM
+ * Last modified by rconrad, 1/18/15 10:29 AM
  */
 
 package base.entity.question.impl
@@ -36,7 +36,7 @@ class AnswerCommandServiceImplTest extends CommandServiceImplTest {
   private val questionsMock = new QuestionServiceMock()
 
   private implicit val authCtx = AuthContextDataFactory.userAuth
-  private implicit val model = AnswerModel(groupId, QuestionSides.SIDE_A, questionResponse)
+  private implicit val model = AnswerModel(RandomService().uuid, groupId, QuestionSides.SIDE_A, questionResponse)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,7 +52,7 @@ class AnswerCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
-    assert(service.innerExecute(model).await() == Right(None))
+    assert(service.innerExecute(model).await() == Right(List()))
   }
 
   test("answer set failed") {

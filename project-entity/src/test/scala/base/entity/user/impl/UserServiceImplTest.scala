@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:48 PM
+ * Last modified by rconrad, 1/18/15 10:31 AM
  */
 
 package base.entity.user.impl
@@ -51,10 +51,10 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("getUsers") {
-    val userIds = Set(userId1, userId2)
+    val userIds = List(userId1, userId2)
     val model1 = UserModel(userId1, Option(label))
     val model2 = UserModel(userId2, None)
-    val models = Set(model1, model2)
+    val models = List(model1, model2)
     val unregister = TestServices.register(new UserUserLabelKeyServiceImpl {
       override def make(id: Id) = new UserUserLabelKeyImpl(id.toString, this) {
         override def get(implicit p: Pipeline) = {
@@ -81,7 +81,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
       }
     }
     val unregister = TestServices.register(groupMock)
-    assert(service.getGroups(userId, key).await() == Right(Set(group1, group2)))
+    assert(service.getGroups(userId, key).await() == Right(List(group1, group2)))
     unregister()
   }
 

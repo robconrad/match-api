@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 6:07 PM
+ * Last modified by rconrad, 1/17/15 10:42 PM
  */
 
 package base.common.lib
 
 import java.security.InvalidParameterException
+import java.util.UUID
 
 import com.typesafe.config.{ Config, ConfigFactory }
 import org.joda.time.Period
@@ -20,7 +21,7 @@ import scala.concurrent.duration._
  * Instance of a TypeSafe config with useful accessor functions
  * @author rconrad
  */
-private[common] class BaseConfig(conf: Config) {
+class BaseConfig(conf: Config) {
 
   private val periodFormats = List(
     new PeriodFormatterBuilder().appendDays().appendSuffix(" day").toFormatter,
@@ -39,6 +40,8 @@ private[common] class BaseConfig(conf: Config) {
   // scalastyle:off line.size.limit
   def getString(name: String) = Tryo(conf.getString(name))
   def getStringList(name: String): Option[List[String]] = Tryo(conf.getStringList(name)).map(_.toList)
+  def getUuid(name: String) = Tryo(UUID.fromString(conf.getString(name)))
+  def getUuidList(name: String): Option[List[UUID]] = Tryo(conf.getStringList(name)).map(_.toList.map(UUID.fromString))
   def getInt(name: String) = Tryo(conf.getInt(name))
   def getIntList(name: String): Option[List[Int]] = Tryo(conf.getIntList(name)).map(_.toList.map(_.toInt))
   def getLong(name: String) = Tryo(conf.getLong(name))

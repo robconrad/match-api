@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:57 PM
+ * Last modified by rconrad, 1/17/15 9:05 PM
  */
 
 package base.entity.user.mock
@@ -30,7 +30,7 @@ class UserServiceMock(getUserResult: GetUser = Future.successful(Left(ApiError("
 
   def getUser(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = getUserResult
 
-  def getUsers(userIds: Iterable[UUID])(implicit p: Pipeline, authCtx: AuthContext) = getUsersResult
+  def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) = getUsersResult
 
   def getGroups(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = getGroupsResult
 

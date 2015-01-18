@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:56 PM
+ * Last modified by rconrad, 1/18/15 10:21 AM
  */
 
 package base.socket.api
 
 import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
 import java.net.Socket
+import java.util.UUID
 
 import base.common.lib.Genders
 import base.common.logging.Loggable
@@ -18,17 +19,28 @@ import base.common.service.{ Services, ServicesBeforeAndAfterAll }
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
+import base.entity.auth.context.{ StandardUserAuthContext, AuthContext }
 import base.entity.command.CommandServiceCompanion
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
+import base.entity.event.EventTypes
+import base.entity.event.model.EventModel
+import base.entity.group.InviteCommandService
+import base.entity.group.kv.GroupUserQuestionsYesKeyService
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.json.JsonFormats
+import base.entity.kv.Key._
 import base.entity.kv.KvTest
+import base.entity.message.MessageCommandService
+import base.entity.message.model.MessageModel
+import base.entity.question.model.AnswerModel
+import base.entity.question._
 import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.impl.VerifyCommandServiceImpl
+import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
 import base.entity.user.model._
-import base.entity.user.{ LoginCommandService, RegisterCommandService, VerifyCommandService }
+import base.entity.user.{ User, LoginCommandService, RegisterCommandService, VerifyCommandService }
 import base.socket.test.SocketBaseSuite
+import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
 
 /**
@@ -54,6 +66,15 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
       override def validateVerifyCodes(code1: String, code2: String) = true
     })
 
+    // user real user service but ensure a constant ordering of users
+    Services.register(new UserServiceImpl() {
+      override def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) =
+        super.getUsers(userIds).map {
+          case Right(users) => Right(users.sortBy(_.label.getOrElse("")))
+          case x            => x
+        }
+    })
+
     Services.register(randomMock)
     Services.register(TimeServiceConstantMock)
 
@@ -66,18 +87,22 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
   }
 
   private def execute[A, B](companion: CommandServiceCompanion[_],
-                            model: A, responseModel: B)(implicit out: PrintWriter, in: BufferedReader) {
+                            model: A, responseModel: B)(implicit out: PrintWriter, in: BufferedReader, m: Manifest[B]) {
 
     val command = CommandModel(companion.inCmd, model)
     val json = Serialization.write(command)
 
-    val responseCommand = CommandModel(companion.outCmd, responseModel)
-    val responseJson = Serialization.write(responseCommand)
+    val expectedResponse = CommandModel(companion.outCmd, responseModel)
 
     out.write(json + "\r\n")
     out.flush()
 
-    assert(in.readLine() == responseJson)
+    val actualResponse = JsonMethods.parse(in.readLine()).extract[CommandModel[B]]
+
+    debug("  actual: " + actualResponse.toString)
+    debug("expected: " + expectedResponse.toString)
+
+    assert(actualResponse == expectedResponse)
   }
 
   test("integration test - runs all commands", Tags.SLOW) {
@@ -109,12 +134,37 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
 
     val inviteUserId = randomMock.nextUuid()
     val groupId = randomMock.nextUuid(1)
+    val label = "bob"
+    val userModel = UserModel(userId, None)
+    val inviteUserModel = UserModel(inviteUserId, Option(label))
 
-    val groupModel = GroupModel(groupId, List(), Option(time), Option(time), 0)
-    val inviteModel = InviteModel("555-5432", "bob")
+    val groupModel = GroupModel(groupId, List(userModel, inviteUserModel), None, None, 0)
+    val inviteModel = InviteModel("555-5432", label)
     val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
-    // TODO enable once GroupServices are implemented
-    //execute(InviteCommandService, inviteModel, inviteResponseModel)
+    execute(InviteCommandService, inviteModel, inviteResponseModel)
+
+    // execute(QuestionsCommandService, questionsModel, questionsResponseModel)
+
+    val messageBody = "a message!"
+    val messageEventId = randomMock.nextUuid()
+
+    val messageModel = MessageModel(groupId, messageBody)
+    val eventModel = EventModel(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
+    execute(MessageCommandService, messageModel, eventModel)
+
+    val answer = true
+    val questionId = UUID.fromString("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04") // see reference.conf
+    val side = QuestionSides.SIDE_A
+    val answerEventId = randomMock.nextUuid()
+    val answerBody = QuestionDef(questionId, "Doin' it with the lights off") + " is a match"
+
+    val inviteUserAuthCtx = new StandardUserAuthContext(new User(inviteUserId))
+    val inviteUserAnswerModel = AnswerModel(questionId, groupId, side, answer)
+    QuestionService().answer(inviteUserAnswerModel)(p, inviteUserAuthCtx).await()
+
+    val answerModel = AnswerModel(questionId, groupId, side, answer)
+    val answerResponseModel = List(EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time))
+    execute(AnswerCommandService, answerModel, answerResponseModel)
   }
 
 }

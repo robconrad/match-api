@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 3:06 PM
+ * Last modified by rconrad, 1/18/15 9:34 AM
  */
 
 package base.entity.auth.context
@@ -65,6 +65,7 @@ case class AuthContextUtilities(authCtx: AuthContext) {
    * user id accessors that throw perm exception on object not found.
    */
   final def userId = userThrows.id
+  final lazy val userIdString = userId.toString
 
   /**
    * user id accessors that throw perm exception on object not found.

@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:36 PM
+ * Last modified by rconrad, 1/18/15 9:27 AM
  */
 
 package base.entity.question.mock
 
 import java.util.UUID
 
+import base.entity.auth.context.AuthContext
 import base.entity.error.ApiError
 import base.entity.event.model.EventModel
 import base.entity.kv.Key.Pipeline
@@ -24,11 +25,11 @@ import scala.concurrent.Future
  * @author rconrad
  */
 class QuestionServiceMock(getResult: Future[Either[ApiError, List[QuestionModel]]] = Future.successful(Right(List())),
-                          answerResult: Future[Either[ApiError, Option[EventModel]]] = Future.successful(Right(None)))
+                          answerResult: Future[Either[ApiError, List[EventModel]]] = Future.successful(Right(List())))
     extends QuestionService {
 
-  def getQuestions(groupId: UUID)(implicit p: Pipeline) = getResult
+  def getQuestions(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = getResult
 
-  def answer(input: AnswerModel)(implicit p: Pipeline) = answerResult
+  def answer(input: AnswerModel)(implicit p: Pipeline, authCtx: AuthContext) = answerResult
 
 }
