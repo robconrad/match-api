@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 3:47 PM
+ * Last modified by rconrad, 1/18/15 3:53 PM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,8 @@ import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
-import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
+import base.entity.group.GroupEventsService
+import base.entity.group.mock.GroupServiceMock
 import base.entity.kv.Key._
 import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.PrivateHashKeyImpl
@@ -60,7 +61,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(new UserServiceMock())
     Services.register(new GroupServiceMock())
     registerQuestionMock()
-    Services.register(new GroupEventsServiceMock())
   }
 
   private def registerQuestionMock() {
@@ -145,7 +145,9 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val key = new UserKeyImpl(mock[PrivateHashKey])
     val result = Future.successful(Left(apiError))
-    val unregister = TestServices.register(new GroupEventsServiceMock(getEventsResult = result))
+    val groupEventsService = mock[GroupEventsService]
+    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects (*, *) returning result
+    val unregister = TestServices.register(groupEventsService)
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
   }

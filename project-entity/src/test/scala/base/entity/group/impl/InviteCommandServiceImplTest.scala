@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:46 PM
+ * Last modified by rconrad, 1/18/15 3:57 PM
  */
 
 package base.entity.group.impl
@@ -16,12 +16,14 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
+import base.entity.event.model.EventModel
+import base.entity.group.GroupEventsService
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv.impl.{ GroupKeyImpl, GroupPairKeyImpl, GroupUsersKeyImpl }
 import base.entity.group.kv.{ GroupPairKeyService, GroupUsersKeyService }
-import base.entity.group.mock.{ GroupEventsServiceMock, GroupServiceMock }
+import base.entity.group.mock.GroupServiceMock
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
-import base.entity.kv.Key.Prop
+import base.entity.kv.Key._
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.KeyLoggerMock
@@ -30,7 +32,6 @@ import base.entity.user.kv.UserKeyProps.UserIdProp
 import base.entity.user.kv.impl.{ PhoneKeyImpl, UserGroupsKeyImpl, UserKeyImpl, UserUserLabelKeyImpl }
 import base.entity.user.kv.{ UserGroupsKeyService, UserUserLabelKey }
 import base.entity.user.model.UserModel
-import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
 
@@ -55,7 +56,6 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
   private val groupMock = new GroupServiceMock(getGroupResult = Future.successful(Right(None)))
-  private val groupEventsMock = new GroupEventsServiceMock()
 
   private implicit val authCtx = AuthContextDataFactory.userAuth
   private implicit val model = InviteModel(phone, label)
@@ -65,7 +65,6 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(TimeServiceConstantMock)
     Services.register(randomMock)
     Services.register(groupMock)
-    Services.register(groupEventsMock)
   }
 
   private def command(implicit input: InviteModel) = new service.InviteCommand(input)
@@ -227,8 +226,10 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("group get returned error") {
-    val unregister = TestServices.register(
-      new GroupEventsServiceMock(setEventResult = Option(Future.successful(Left(error)))))
+    val groupEventsService = mock[GroupEventsService]
+    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
+      (*, *, *) returning Future.successful(Left(error))
+    val unregister = TestServices.register(groupEventsService)
     assert(command.groupEventsPrepend(userId, groupId).await() == Left(error))
     unregister()
   }

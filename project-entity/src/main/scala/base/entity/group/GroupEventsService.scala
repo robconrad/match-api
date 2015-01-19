@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:01 PM
  */
 
 package base.entity.group
@@ -27,7 +27,7 @@ trait GroupEventsService extends Service {
   def getEvents(groupId: UUID)(implicit p: Pipeline): Future[Either[ApiError, List[EventModel]]]
 
   def setEvent(event: EventModel,
-               createIfNotExists: Boolean = false)(implicit p: Pipeline): Future[Either[ApiError, EventModel]]
+               createIfNotExists: Boolean)(implicit p: Pipeline): Future[Either[ApiError, EventModel]]
 
 }
 
