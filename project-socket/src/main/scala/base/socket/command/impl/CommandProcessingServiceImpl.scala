@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 3:53 PM
+ * Last modified by rconrad, 1/18/15 4:40 PM
  */
 
 package base.socket.command.impl
@@ -40,6 +40,8 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
 
   implicit val formats = JsonFormats.withEnumsAndFields
 
+  private val fuckinMichi = Future.successful(Right(CommandProcessResult(None, None)))
+
   implicit def response2Future(r: Response) = Future.successful(r)
 
   def process(input: String)(implicit authCtx: AuthContext) = {
@@ -52,12 +54,15 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
       try {
         val f = extractCommand(JsonMethods.parse(input))
         f.onFailure {
-          case t => error("parse threw exception %s", t)
+          case t =>
+            error("parse threw exception %s", t)
+            fuckinMichi
         }
         f
       } catch {
         case e: Exception =>
           error("parse threw exception %s", e)
+          fuckinMichi
       }
     }
 
@@ -69,11 +74,17 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
             case cmd: JString =>
               json \ "body" match {
                 case body: JObject => processCommand(cmd.s, body)
-                case _             => error("unable to parse body from message: %s", json)
+                case _ =>
+                  error("unable to parse body from message: %s", json)
+                  fuckinMichi
               }
-            case _ => error("unable to parse cmd from message: %s", json)
+            case _ =>
+              error("unable to parse cmd from message: %s", json)
+              fuckinMichi
           }
-        case _ => error("no json received in message")
+        case _ =>
+          error("no json received in message")
+          fuckinMichi
       }
     }
 
