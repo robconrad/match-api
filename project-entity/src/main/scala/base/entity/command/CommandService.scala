@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 2:46 PM
+ * Last modified by rconrad, 1/18/15 4:58 PM
  */
 
 package base.entity.command
@@ -23,7 +23,7 @@ trait CommandService[A, B] extends Service {
 
   def inCmd: String
   def outCmd: String
-  final def errorCmd = CommandService.errorCmd
+  final val errorCmd = CommandService.errorCmd
 
   def perms: Iterable[Perm]
 

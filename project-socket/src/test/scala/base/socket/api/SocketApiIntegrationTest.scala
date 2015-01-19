@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 3:35 PM
+ * Last modified by rconrad, 1/18/15 5:16 PM
  */
 
 package base.socket.api
@@ -19,27 +19,26 @@ import base.common.service.{ Services, ServicesBeforeAndAfterAll }
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.{ StandardUserAuthContext, AuthContext }
+import base.entity.auth.context.{ AuthContext, StandardUserAuthContext }
 import base.entity.command.CommandServiceCompanion
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.InviteCommandService
-import base.entity.group.kv.GroupUserQuestionsYesKeyService
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
-import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.{ QuestionModel, QuestionsModel, QuestionsResponseModel, AnswerModel }
 import base.entity.question._
+import base.entity.question.impl.QuestionServiceImpl
+import base.entity.question.model.{ AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel }
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
 import base.entity.user.model._
-import base.entity.user.{ User, LoginCommandService, RegisterCommandService, VerifyCommandService }
+import base.entity.user.{ LoginCommandService, RegisterCommandService, User, VerifyCommandService }
 import base.socket.test.SocketBaseSuite
 import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
@@ -65,6 +64,11 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
 
   override def beforeAll() {
     super.beforeAll()
+    assert(SocketApiService().start().await())
+  }
+
+  override def beforeEach() {
+    super.beforeEach()
 
     // full integration except sms.. don't want to have external side effects
     Services.register(new SmsServiceMock(result = true))
@@ -84,13 +88,17 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
         }
     })
 
-    // use real question service but control what questions are used
-    Services.register(new QuestionServiceImpl(questions, totalSides))
+    // use real question service but control what questions are used and order they are returned
+    Services.register(new QuestionServiceImpl(questions, totalSides) {
+      override def getQuestions(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
+        super.getQuestions(groupId)(p, authCtx).map {
+          case Right(questions) => Right(questions.sortBy(q => q.id.toString + q.side))
+        }
+      }
+    })
 
     Services.register(randomMock)
     Services.register(TimeServiceConstantMock)
-
-    assert(SocketApiService().start().await())
   }
 
   override def afterAll() {
@@ -160,7 +168,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
         case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
       }
     val questionsModel = QuestionsModel(groupId)
-    val questionsResponseModel = QuestionsResponseModel(groupId, questionModels)
+    val questionsResponseModel = QuestionsResponseModel(groupId, questionModels.sortBy(q => q.id.toString + q.side))
     execute(QuestionsCommandService, questionsModel, questionsResponseModel)
 
     val messageBody = "a message!"
