@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:19 PM
  */
 
 package base.entity.user
@@ -19,8 +19,8 @@ import scala.concurrent.Future
  */
 trait VerifyCommandService extends CommandService[VerifyModel, VerifyResponseModel] {
 
-  final def inCmd = VerifyCommandService.inCmd
-  final def outCmd = VerifyCommandService.outCmd
+  final val inCmd = VerifyCommandService.inCmd
+  final val outCmd = VerifyCommandService.outCmd
 
   final val serviceManifest = manifest[VerifyCommandService]
 

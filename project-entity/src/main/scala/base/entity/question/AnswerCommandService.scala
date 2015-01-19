@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:19 PM
  */
 
 package base.entity.question
@@ -18,8 +18,8 @@ import base.entity.question.model.AnswerModel
  */
 trait AnswerCommandService extends CommandService[AnswerModel, List[EventModel]] {
 
-  final def inCmd = AnswerCommandService.inCmd
-  final def outCmd = AnswerCommandService.outCmd
+  final val inCmd = AnswerCommandService.inCmd
+  final val outCmd = AnswerCommandService.outCmd
 
   final val serviceManifest = manifest[AnswerCommandService]
 

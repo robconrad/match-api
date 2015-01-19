@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:19 PM
  */
 
 package base.entity.user
@@ -17,8 +17,8 @@ import base.entity.user.model._
  */
 trait LoginCommandService extends CommandService[LoginModel, LoginResponseModel] {
 
-  final def inCmd = LoginCommandService.inCmd
-  final def outCmd = LoginCommandService.outCmd
+  final val inCmd = LoginCommandService.inCmd
+  final val outCmd = LoginCommandService.outCmd
 
   final val serviceManifest = manifest[LoginCommandService]
 

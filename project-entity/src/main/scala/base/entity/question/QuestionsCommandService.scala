@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:19 PM
  */
 
 package base.entity.question
@@ -17,8 +17,8 @@ import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
  */
 trait QuestionsCommandService extends CommandService[QuestionsModel, QuestionsResponseModel] {
 
-  final def inCmd = QuestionsCommandService.inCmd
-  final def outCmd = QuestionsCommandService.outCmd
+  final val inCmd = QuestionsCommandService.inCmd
+  final val outCmd = QuestionsCommandService.outCmd
 
   final val serviceManifest = manifest[QuestionsCommandService]
 

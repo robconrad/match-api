@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/18/15 4:19 PM
  */
 
 package base.entity.message
@@ -20,8 +20,8 @@ import base.entity.user.model._
  */
 trait MessageCommandService extends CommandService[MessageModel, EventModel] {
 
-  final def inCmd = MessageCommandService.inCmd
-  final def outCmd = MessageCommandService.outCmd
+  final val inCmd = MessageCommandService.inCmd
+  final val outCmd = MessageCommandService.outCmd
 
   final val serviceManifest = manifest[MessageCommandService]
 
