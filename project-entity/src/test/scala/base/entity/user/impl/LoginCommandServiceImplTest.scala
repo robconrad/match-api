@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 3:53 PM
+ * Last modified by rconrad, 1/18/15 4:02 PM
  */
 
 package base.entity.user.impl
@@ -19,7 +19,6 @@ import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.group.GroupEventsService
-import base.entity.group.mock.GroupServiceMock
 import base.entity.kv.Key._
 import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.PrivateHashKeyImpl
@@ -59,7 +58,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
     Services.register(new UserServiceMock())
-    Services.register(new GroupServiceMock())
     registerQuestionMock()
   }
 
