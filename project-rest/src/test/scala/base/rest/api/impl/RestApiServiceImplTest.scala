@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:16 PM
+ * Last modified by rconrad, 1/20/15 10:00 PM
  */
 
 package base.rest.api.impl
@@ -27,7 +27,7 @@ class RestApiServiceImplTest extends RestBaseSuite with Dispatchable with Loggab
 
   test("server startup", Tags.SLOW) {
     implicit val system = Actors.actorSystem
-    implicit val timeout = longTimeout
+    implicit val defaultTimeout = longTimeout
 
     val expected = Serialization.write(RestVersionsRoute.nakedResponse)
 

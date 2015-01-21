@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 4:00 PM
+ * Last modified by rconrad, 1/20/15 9:18 PM
  */
 
 package base.socket.api.impl
@@ -12,23 +12,24 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.NoAuthContext
 import base.entity.command.CommandService
-import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
 import base.entity.json.JsonFormats
 import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
 import base.socket.command.CommandProcessingService
 import base.socket.logging.{ LoggableChannelInfo, SocketLoggable }
-import io.netty.buffer.{ ByteBuf, Unpooled }
-import io.netty.channel.ChannelHandler.Sharable
-import io.netty.channel._
-import io.netty.util.CharsetUtil
+import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter }
 import org.json4s.native.Serialization
 import spray.http.StatusCodes
 
 import scala.util.{ Failure, Success }
 
-@Sharable
-class SocketApiHandlerServiceImpl
+/**
+ * {{ Describe the high level purpose of SocketApiHandlerServiceImpl here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
+ * @author rconrad
+ */
+abstract class SocketApiHandlerServiceImpl
     extends ChannelInboundHandlerAdapter
     with ServiceImpl
     with SocketApiHandlerService
@@ -37,13 +38,11 @@ class SocketApiHandlerServiceImpl
 
   private var running = true
 
-  private implicit def ctx2AuthCtx(implicit ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
+  protected implicit def ctx2AuthCtx(implicit ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
 
-  final def stop() {
-    running = false
-  }
+  def write(json: String)(implicit ctx: ChannelHandlerContext): ChannelFuture
 
-  override def exceptionCaught(ctx: ChannelHandlerContext, t: Throwable) {
+  final override def exceptionCaught(ctx: ChannelHandlerContext, t: Throwable) {
     implicit val iCtx = ctx
 
     /**
@@ -70,40 +69,30 @@ class SocketApiHandlerServiceImpl
     }
   }
 
-  override def channelRead(ctx: ChannelHandlerContext, msg: Object) {
-    implicit val iCtx = ctx
-
-    if (!running) {
-      ctx.channel.write(SocketApiHandlerServiceImpl.runningJson)
-    } else {
-      val msgStr = msg.asInstanceOf[ByteBuf].toString(CharsetUtil.UTF_8)
-      if (isDebugEnabled) debug("message received: " + msgStr)
-      CommandProcessingService().process(msgStr)(ctx.channel.authCtx).onComplete {
-        case Success(Right(result)) =>
-          result.authContext.foreach { authCtx =>
-            ctx.channel.authCtx = authCtx
-          }
-          result.message.foreach { json =>
-            debug("message sent: %s", json)
-            val terminated = json.length > 0 && json.last == '\n' match {
-              case true  => json
-              case false => json + "\r\n"
+  final def read(msg: String)(implicit ctx: ChannelHandlerContext) {
+    running match {
+      case false => write(SocketApiHandlerServiceImpl.runningJson)
+      case true =>
+        if (isDebugEnabled) debug("message received: " + msg)
+        CommandProcessingService().process(msg)(ctx.channel.authCtx).onComplete {
+          case Success(Right(result)) =>
+            result.authContext.foreach { authCtx =>
+              ctx.channel.authCtx = authCtx
             }
-            val encoded = Unpooled.copiedBuffer(terminated, CharsetUtil.UTF_8)
-            ctx.write(encoded)
-            ctx.flush()
-          }
-        case Success(Left(error)) =>
-          warn("processing failed with %s", error.reason)
-          ctx.channel.close()
-        case Failure(t) =>
-          error("processing threw", t)
-          ctx.channel.close()
-      }
+            result.message.foreach { json =>
+              write(json)
+            }
+          case Success(Left(error)) =>
+            warn("processing failed with %s", error.reason)
+            ctx.channel.close()
+          case Failure(t) =>
+            error("processing threw", t)
+            ctx.channel.close()
+        }
     }
   }
 
-  override def channelActive(ctx: ChannelHandlerContext) {
+  final override def channelActive(ctx: ChannelHandlerContext) {
     implicit val iCtx = ctx
     ctx.channel.authCtx = NoAuthContext
 
@@ -119,9 +108,13 @@ class SocketApiHandlerServiceImpl
       if (System.nanoTime() % 10 == 0) {
         warn("currentConnectionCount has exceeded maximum value")
       }
-      ctx.write(SocketApiHandlerServiceImpl.busyJson)
+      write(SocketApiHandlerServiceImpl.busyJson)
         .addListener(ChannelFutureListener.CLOSE)
     }
+  }
+
+  final def stop() {
+    running = false
   }
 
 }
@@ -139,3 +132,4 @@ object SocketApiHandlerServiceImpl {
   lazy val busyJson = Serialization.write(CommandService.errorCommand(busyApiError))
 
 }
+

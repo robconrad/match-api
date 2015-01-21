@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 4:59 PM
+ * Last modified by rconrad, 1/20/15 10:40 PM
  */
 
 package base.socket.api.impl
@@ -22,9 +22,9 @@ import base.socket.service.SocketServiceTest
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class SocketApiHandlerServiceTest extends SocketServiceTest {
+class RawSocketApiHandlerServiceTest extends SocketServiceTest {
 
-  val service = new SocketApiHandlerServiceImpl()
+  val service = new RawSocketApiHandlerServiceImpl()
 
   def testExceptionCaught(t: Throwable, closeCalled: Boolean = false) {
     val channel = new ChannelMock(isOpen = true)

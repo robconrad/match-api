@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:10 PM
+ * Last modified by rconrad, 1/20/15 10:56 PM
  */
 
 package base.socket.api.mock
@@ -11,7 +11,8 @@ import base.common.logging.Loggable
 import base.socket.api.SocketApiHandlerService
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandler.Sharable
-import io.netty.channel.{ ChannelInboundHandlerAdapter, ChannelHandlerContext }
+import io.netty.channel.socket.SocketChannel
+import io.netty.channel.{ ChannelHandlerContext, ChannelInboundHandlerAdapter, ChannelInitializer }
 import io.netty.util.CharsetUtil
 
 /**
@@ -21,7 +22,8 @@ import io.netty.util.CharsetUtil
  * @author rconrad
  */
 @Sharable
-class SocketApiHandlerServiceMock(channelReadResponse: Option[String] = None)
+class SocketApiHandlerServiceMock(channelReadResponse: Option[String] = None,
+                                  initializer: SocketApiHandlerService => ChannelInitializer[SocketChannel])
     extends ChannelInboundHandlerAdapter
     with SocketApiHandlerService
     with Loggable {
@@ -41,5 +43,7 @@ class SocketApiHandlerServiceMock(channelReadResponse: Option[String] = None)
       ctx.flush()
     }
   }
+
+  def makeInitializer = initializer(this)
 
 }

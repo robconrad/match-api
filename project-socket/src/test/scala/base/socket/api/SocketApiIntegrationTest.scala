@@ -2,13 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 5:16 PM
+ * Last modified by rconrad, 1/20/15 10:58 PM
  */
 
 package base.socket.api
 
-import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
-import java.net.Socket
 import java.util.UUID
 
 import base.common.lib.Genders
@@ -44,12 +42,19 @@ import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
 
 /**
- * Responsible for testing Server startup - highest level integration test possible
+ * {{ Describe the high level purpose of SocketApiIntegrationTest here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAfterAll with Loggable with KvTest {
+abstract class SocketApiIntegrationTest
+    extends SocketBaseSuite
+    with ServicesBeforeAndAfterAll
+    with Loggable
+    with KvTest {
 
   private implicit val formats = JsonFormats.withEnumsAndFields
+  val connectionsAllowed = 6
 
   private val totalSides = 6
   private val questions = List(
@@ -64,6 +69,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
 
   override def beforeAll() {
     super.beforeAll()
+    Services.register(handlerService)
     assert(SocketApiService().start().await())
   }
 
@@ -106,18 +112,19 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     assert(SocketApiService().stop().await())
   }
 
+  def handlerService: SocketApiHandlerService
+  def connect()
+  def disconnect()
+  def writeRead(json: String): String
+
   private def execute[A, B](companion: CommandServiceCompanion[_],
-                            model: A, responseModel: B)(implicit out: PrintWriter, in: BufferedReader, m: Manifest[B]) {
+                            model: A, responseModel: B)(implicit m: Manifest[B]) {
 
     val command = CommandModel(companion.inCmd, model)
     val json = Serialization.write(command)
 
     val expectedResponse = CommandModel(companion.outCmd, responseModel)
-
-    out.write(json + "\r\n")
-    out.flush()
-
-    val actualResponse = JsonMethods.parse(in.readLine()).extract[CommandModel[B]]
+    val actualResponse = JsonMethods.parse(writeRead(json)).extract[CommandModel[B]]
 
     debug("  actual: " + actualResponse.toString)
     debug("expected: " + expectedResponse.toString)
@@ -126,11 +133,7 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
   }
 
   test("integration test - runs all commands", Tags.SLOW) {
-    val socket = new Socket(SocketApiService().host, SocketApiService().port)
-    socket.setSoTimeout(timeout.duration.toMillis.toInt)
-
-    implicit val out = new PrintWriter(socket.getOutputStream, true)
-    implicit val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+    connect()
 
     val phone = "555-1234"
     val deviceId = RandomService().uuid
@@ -191,6 +194,8 @@ class SocketApiIntegrationTest extends SocketBaseSuite with ServicesBeforeAndAft
     val answerModel = AnswerModel(questionId, groupId, side, answer)
     val answerResponseModel = List(EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time))
     execute(AnswerCommandService, answerModel, answerResponseModel)
+
+    disconnect()
   }
 
 }

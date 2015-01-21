@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:19 PM
+ * Last modified by rconrad, 1/20/15 10:32 PM
  */
 
 package base.socket.service
 
 import base.common.service.{ Services, ServicesBootstrap }
-import base.socket.api.impl.{ SocketApiHandlerServiceImpl, SocketApiServiceImpl, SocketApiStatsServiceImpl }
+import base.socket.api.impl._
 import base.socket.command.impl.CommandProcessingServiceImpl
 
 /**
@@ -34,7 +34,7 @@ object SocketServicesBootstrap extends ServicesBootstrap {
       Keys(SOCKET, "stopSleep"),
       Keys(SOCKET, "shutdownTimeout")))
 
-    Services.register(new SocketApiHandlerServiceImpl())
+    Services.register(new WebSocketApiHandlerServiceImpl())
 
     Services.register(new SocketApiStatsServiceImpl(
       Keys(SOCKET, "reportingInterval")))

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:19 PM
+ * Last modified by rconrad, 1/20/15 10:35 PM
  */
 
 package base.socket.api.impl
@@ -33,7 +33,8 @@ class SocketApiServiceImpl(val host: String,
                            val port: Int,
                            connectionsAllowed: Int,
                            stopSleep: FiniteDuration,
-                           shutdownTimeout: FiniteDuration) extends ServiceImpl with SocketApiService {
+                           shutdownTimeout: FiniteDuration)
+    extends ServiceImpl with SocketApiService {
 
   private lazy val acceptorLoop = new NioEventLoopGroup
   private lazy val clientLoop = new NioEventLoopGroup
@@ -56,23 +57,7 @@ class SocketApiServiceImpl(val host: String,
         .childOption[java.lang.Boolean](ChannelOption.SO_KEEPALIVE, true)
         .childOption[java.lang.Boolean](ChannelOption.SO_REUSEADDR, true)
         .childOption[java.lang.Integer](ChannelOption.SO_LINGER, 0)
-        .childHandler(new ChannelInitializer[SocketChannel] {
-          override def initChannel(ch: SocketChannel) {
-            val pipeline = ch.pipeline
-            val maxFrameLength = 8192
-            pipeline.addLast("framer", new DelimiterBasedFrameDecoder(maxFrameLength, Delimiters.lineDelimiter: _*))
-
-            val readWriteIdleTime = 0
-            val allIdleTime = 60
-            pipeline.addLast("timeout", new IdleStateHandler(readWriteIdleTime, readWriteIdleTime, allIdleTime) {
-              override def channelIdle(ctx: ChannelHandlerContext, evt: IdleStateEvent) {
-                ctx.close()
-              }
-            })
-
-            pipeline.addLast("commandHandler", SocketApiHandlerService())
-          }
-        })
+        .childHandler(SocketApiHandlerService().makeInitializer)
       server.bind().syncUninterruptibly()
       info("Listening on %s:%s", address.getAddress.getHostAddress, address.getPort)
     } onComplete {
