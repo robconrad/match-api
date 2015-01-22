@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:55 PM
+ * Last modified by rconrad, 1/21/15 9:14 PM
  */
 
 package base.socket.api.impl
@@ -12,7 +12,8 @@ import java.net.{ ConnectException, Socket }
 
 import base.common.service.Services
 import base.common.test.Tags
-import base.socket.api.mock.{ SocketApiHandlerServiceMock, SocketApiStatsServiceMock }
+import base.socket.api.SocketApiHandlerService
+import base.socket.api.mock.{ RawSocketApiHandlerServiceMock, SocketApiStatsServiceMock }
 import base.socket.service.SocketServiceTest
 
 import scala.concurrent.duration._
@@ -40,7 +41,7 @@ abstract class SocketApiServiceImplTest extends SocketServiceTest {
     Services.register(new SocketApiStatsServiceMock(connections))
   }
 
-  def makeMock: SocketApiHandlerServiceMock
+  def makeMock: SocketApiHandlerService
 
   def assertResponse()
 

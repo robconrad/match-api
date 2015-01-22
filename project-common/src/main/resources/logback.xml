@@ -2,7 +2,7 @@
   ~ Copyright (c) 2015 Robert Conrad - All Rights Reserved.
   ~ Unauthorized copying of this file, via any medium is strictly prohibited.
   ~ This file is proprietary and confidential.
-  ~ Last modified by rconrad, 1/9/15 9:38 PM
+  ~ Last modified by rconrad, 1/21/15 9:07 PM
   -->
 
 <configuration>
@@ -70,5 +70,6 @@
     <logger name="scala.slick" level="INFO" />
     <logger name="com.wordnik.swagger" level="INFO" />
     <logger name="com.gettyimages" level="INFO" />
+    <logger name="io.netty" level="INFO" />
 
 </configuration>

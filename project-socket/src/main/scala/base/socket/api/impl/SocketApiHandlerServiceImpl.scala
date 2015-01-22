@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 9:18 PM
+ * Last modified by rconrad, 1/21/15 9:19 PM
  */
 
 package base.socket.api.impl
@@ -69,7 +69,7 @@ abstract class SocketApiHandlerServiceImpl
     }
   }
 
-  final def read(msg: String)(implicit ctx: ChannelHandlerContext) {
+  def read(msg: String)(implicit ctx: ChannelHandlerContext) {
     running match {
       case false => write(SocketApiHandlerServiceImpl.runningJson)
       case true =>

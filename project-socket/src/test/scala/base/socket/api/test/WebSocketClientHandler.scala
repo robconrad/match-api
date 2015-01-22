@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 9:38 PM
+ * Last modified by rconrad, 1/21/15 8:55 PM
  */
 
-package base.socket.api
+package base.socket.api.test
 
 import io.netty.channel._
 import io.netty.handler.codec.http.FullHttpResponse

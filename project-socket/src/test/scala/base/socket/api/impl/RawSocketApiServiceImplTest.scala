@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:56 PM
+ * Last modified by rconrad, 1/21/15 9:12 PM
  */
 
 package base.socket.api.impl
@@ -10,7 +10,7 @@ package base.socket.api.impl
 import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
 import java.net.Socket
 
-import base.socket.api.mock.SocketApiHandlerServiceMock
+import base.socket.api.mock.RawSocketApiHandlerServiceMock
 
 /**
  * {{ Describe the high level purpose of RawSocketApiServiceImplTest here. }}
@@ -20,8 +20,7 @@ import base.socket.api.mock.SocketApiHandlerServiceMock
  */
 class RawSocketApiServiceImplTest extends SocketApiServiceImplTest {
 
-  def makeMock = new SocketApiHandlerServiceMock(channelReadResponse = Option(response),
-    handler => new RawSocketChannelInitializer(handler))
+  def makeMock = new RawSocketApiHandlerServiceMock(channelReadResponse = Option(response))
 
   def assertResponse() {
     val socket = new Socket(host, port)
