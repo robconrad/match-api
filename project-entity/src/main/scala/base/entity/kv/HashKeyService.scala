@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 12:36 PM
  */
 
 package base.entity.kv
@@ -17,15 +17,15 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait HashKeyService[T <: Key] extends KeyService[T] {
+trait HashKeyService[A, B <: Key] extends KeyService[A, B] {
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: A)(implicit p: Pipeline): B
 
-  def getMulti(prop: Prop, ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Option[String]]]
+  def getMulti(prop: Prop, ids: Iterable[A])(implicit p: Pipeline): Future[Map[A, Option[String]]]
 
   def mGetMulti(props: Array[Prop],
-                ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Map[Prop, Option[String]]]]
+                ids: Iterable[A])(implicit p: Pipeline): Future[Map[A, Map[Prop, Option[String]]]]
 
-  def incrbyMulti(prop: Prop, values: Map[Id, Long])(implicit p: Pipeline): Future[Map[Id, Long]]
+  def incrbyMulti(prop: Prop, values: Map[A, Long])(implicit p: Pipeline): Future[Map[A, Long]]
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/22/15 12:42 PM
  */
 
 package base.entity.group.kv
@@ -18,13 +18,11 @@ import base.entity.kv.{ KeyService, KeyServiceCompanion }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupPairKeyService extends KeyService[GroupPairKey] {
+trait GroupPairKeyService extends KeyService[(UUID, UUID), GroupPairKey] {
 
   final val serviceManifest = manifest[GroupPairKeyService]
 
   final val CHANNEL = "groupPair"
-
-  def make(userA: UUID, userB: UUID)(implicit p: Pipeline): GroupPairKey
 
 }
 

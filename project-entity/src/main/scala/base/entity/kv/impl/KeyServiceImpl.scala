@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:11 PM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.kv.impl
@@ -10,12 +10,12 @@ package base.entity.kv.impl
 import base.common.lib.{ Dispatchable, GuavaFutures }
 import base.common.logging.Loggable
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyId, Key, KeyService }
+import base.entity.kv.{ Key, KeyService }
 
-private[impl] abstract class KeyServiceImpl[T <: Key]
-    extends KeyService[T] with GuavaFutures with Loggable with Dispatchable {
+private[impl] abstract class KeyServiceImpl[A, B <: Key]
+    extends KeyService[A, B] with GuavaFutures with Loggable with Dispatchable {
 
-  protected def getKey(keyId: Id) = {
+  protected def getKey(keyId: A) = {
     val id = keyId.toString
     assert(id.length > 0 && id.length < 1000)
     PREFIX + id
@@ -29,7 +29,7 @@ private[impl] abstract class KeyServiceImpl[T <: Key]
     if (isDebugEnabled) debug(s"Redis.$cmd:: token: $token, $msg")
   }
 
-  def del(items: Iterable[T])(implicit p: Pipeline) = {
+  def del(items: Iterable[B])(implicit p: Pipeline) = {
     if (isDebugEnabled) log("DEL-MULTI", s"items: $items")
     p.del(items.map(_.token).toArray: _*).map(_.data().intValue())
   }

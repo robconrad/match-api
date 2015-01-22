@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:16 PM
+ * Last modified by rconrad, 1/22/15 12:55 PM
  */
 
 package base.entity.user.impl
@@ -15,7 +15,6 @@ import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.kv._
 import base.entity.service.CrudErrorImplicits
 import base.entity.sms.SmsService
 import base.entity.user._
@@ -61,7 +60,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
       extends Command[VerifyModel, VerifyResponseModel] {
 
     def execute() = {
-      phoneGetCode(PhoneKeyService().make(KeyId(input.phone)))
+      phoneGetCode(PhoneKeyService().make(input.phone))
     }
 
     def phoneGetCode(key: PhoneKey): Response =
@@ -78,7 +77,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
 
     def phoneGetUserId(key: PhoneKey): Response =
       key.getUserId.flatMap {
-        case Some(userId) => userGet(userId, UserKeyService().make(KeyId(userId)))
+        case Some(userId) => userGet(userId, UserKeyService().make(userId))
         case None         => Errors.userIdMissing
       }
 
@@ -98,7 +97,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
                 name: String,
                 gender: Gender): Response =
       key.setNameAndGender(name, gender).flatMap {
-        case true  => deviceSet(userId, DeviceKeyService().make(KeyId(input.deviceUuid)))
+        case true  => deviceSet(userId, DeviceKeyService().make(input.deviceUuid))
         case false => Errors.userSetFailed
       }
 

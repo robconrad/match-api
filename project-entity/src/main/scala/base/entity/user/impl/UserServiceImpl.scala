@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:47 AM
+ * Last modified by rconrad, 1/22/15 12:55 PM
  */
 
 package base.entity.user.impl
@@ -15,7 +15,6 @@ import base.entity.error.ApiError
 import base.entity.group.model.GroupModel
 import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key._
-import base.entity.kv.KeyId
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.impl.UserServiceImpl.Errors
 import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService }
@@ -57,7 +56,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
   }
 
   def getGroups(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
-    val key = UserGroupsKeyService().make(KeyId(userId))
+    val key = UserGroupsKeyService().make(userId)
     getGroups(userId, key)
   }
 

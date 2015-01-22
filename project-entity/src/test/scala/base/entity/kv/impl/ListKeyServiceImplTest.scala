@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:00 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key._
+import base.entity.kv.ListKey
 import base.entity.kv.mock.KeyLoggerMock
-import base.entity.kv.{ KeyId, ListKey }
 
 /**
  * {{ Describe the high level purpose of SetKeyFactoryImplTest here. }}
@@ -19,8 +19,8 @@ import base.entity.kv.{ KeyId, ListKey }
  */
 class ListKeyServiceImplTest extends KeyServiceImplTest[ListKey[String]] {
 
-  private val id = KeyId("id")
-  private val id2 = KeyId("id2")
+  private val id = "id"
+  private val id2 = "id2"
 
   private val val1 = "value1"
   private val val2 = "value2"
@@ -28,7 +28,7 @@ class ListKeyServiceImplTest extends KeyServiceImplTest[ListKey[String]] {
   val keyService = new ListKeyServiceImpl[String, ListKey[String]]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id)(implicit p: Pipeline) = new ListKeyImpl[String] with StringTypedKeyImpl {
+    def make(id: String)(implicit p: Pipeline) = new ListKeyImpl[String] with StringTypedKeyImpl {
       val token = id.toString
       val logger = KeyLoggerMock
       protected implicit val p = tp

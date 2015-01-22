@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:38 AM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.question.impl
@@ -16,7 +16,7 @@ import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.kv._
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyId, KvFactoryService }
+import base.entity.kv.KvFactoryService
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.kv.QuestionsKeyService
 import base.entity.question.model.{ AnswerModel, QuestionModel }
@@ -36,7 +36,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
                           questionCount: Int) extends ServiceImpl with QuestionService {
 
   private val questionMap = questions.map(q => q.id -> q).toMap
-  private val questionKey = QuestionsKeyService().make(KeyId("standard"))(KvFactoryService().pipeline)
+  private val questionKey = QuestionsKeyService().make("standard")(KvFactoryService().pipeline)
 
   Await.ready(init(), CommonService().defaultDuration)
 
@@ -130,7 +130,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def groupUserQuestionYesAdd(id: QuestionIdComposite, key: GroupUserQuestionsYesKey) =
       key.add(id).flatMap { added =>
-        groupUsersGet(GroupUsersKeyService().make(KeyId(input.groupId)))
+        groupUsersGet(GroupUsersKeyService().make(input.groupId))
       }
 
     def groupUsersGet(key: GroupUsersKey) =

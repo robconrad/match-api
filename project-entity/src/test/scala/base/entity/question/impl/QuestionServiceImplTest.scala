@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:00 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.question.impl
@@ -17,7 +17,7 @@ import base.entity.auth.context.AuthContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.EventModel
 import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
-import base.entity.kv.{ KeyId, KvTest }
+import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite }
@@ -89,7 +89,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val userId = RandomService().uuid
     val questionResponse = true
 
-    val usersKey = GroupUsersKeyService().make(KeyId(groupId))
+    val usersKey = GroupUsersKeyService().make(groupId)
     assert(usersKey.add(userId).await() == 1L)
     val userYesKey = GroupUserQuestionsYesKeyService().make(groupId, userId)
     assert(userYesKey.add(QuestionIdComposite(questionId, SIDE_B)).await() == 1)

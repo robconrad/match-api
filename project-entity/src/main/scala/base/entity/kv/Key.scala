@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/22/15 12:51 PM
  */
 
 package base.entity.kv
@@ -41,7 +41,6 @@ object Key {
 
   type Pipeline = RedisClient#Pipeline
   type Prop = KeyProp[_]
-  type Id = KeyId[_]
 
   val ID = "id"
   val PREFIX_DELIM = "-"

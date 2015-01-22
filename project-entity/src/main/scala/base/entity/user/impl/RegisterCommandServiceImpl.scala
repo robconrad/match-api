@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:49 PM
+ * Last modified by rconrad, 1/22/15 12:55 PM
  */
 
 package base.entity.user.impl
@@ -47,7 +47,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       extends Command[RegisterModel, RegisterResponseModel] {
 
     def execute() = {
-      phoneCooldownExists(PhoneCooldownKeyService().make(KeyId(input.phone)))
+      phoneCooldownExists(PhoneCooldownKeyService().make(input.phone))
     }
 
     def phoneCooldownExists(key: PhoneCooldownKey): Response =
@@ -69,7 +69,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       }
 
     def phoneCreate(): Response = {
-      val phoneKey = PhoneKeyService().make(KeyId(input.phone))
+      val phoneKey = PhoneKeyService().make(input.phone)
       phoneKey.create().flatMap { exists =>
         phoneKey.getUserId.flatMap {
           case Some(userId) => phoneSetCode(phoneKey)
@@ -80,7 +80,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
 
     def userCreate(key: PhoneKey): Response = {
       val userId = RandomService().uuid
-      UserKeyService().make(KeyId(userId)).create().flatMap {
+      UserKeyService().make(userId).create().flatMap {
         case false => Errors.userSetFailed
         case true =>
           key.setUserId(userId).flatMap {

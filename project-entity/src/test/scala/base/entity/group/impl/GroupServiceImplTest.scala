@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 4:15 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.group.impl
@@ -18,7 +18,7 @@ import base.entity.group.UserService
 import base.entity.group.kv.{ GroupKeyService, GroupUserKeyService }
 import base.entity.group.model.{ GroupModel, GroupModelBuilder }
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyId, KvTest }
+import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 import base.entity.user.model.UserModel
 
@@ -57,8 +57,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val unregister = TestServices.register(userService)
 
     assert(GroupUserKeyService().make(groupId, authCtx.userId).setLastRead(time).await())
-    assert(GroupKeyService().make(KeyId(groupId)).setLastEvent(time).await())
-    assert(GroupKeyService().make(KeyId(groupId)).setEventCount(eventCount).await())
+    assert(GroupKeyService().make(groupId).setLastEvent(time).await())
+    assert(GroupKeyService().make(groupId).setEventCount(eventCount).await())
 
     assert(service.getGroup(groupId).await() == Right(Option(group)))
 

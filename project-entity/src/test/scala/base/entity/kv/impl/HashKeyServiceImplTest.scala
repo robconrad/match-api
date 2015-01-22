@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:09 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.Key.{ Id, Pipeline, Prop }
+import base.entity.kv.Key.{ Pipeline, Prop }
 import base.entity.kv._
 import base.entity.kv.mock.KeyLoggerMock
 
@@ -19,8 +19,8 @@ import base.entity.kv.mock.KeyLoggerMock
  */
 class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
 
-  private val id = KeyId("id")
-  private val id2 = KeyId("id2")
+  private val id = "id"
+  private val id2 = "id2"
   private val ids = Set(id, id2)
 
   private val prop = new KeyProp("prop") {}
@@ -29,10 +29,10 @@ class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
   private val string = "value"
   private val long = 1L
 
-  val keyService = new HashKeyServiceImpl[HashKey]() {
+  val keyService = new HashKeyServiceImpl[String, HashKey]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id)(implicit p: Pipeline) = new HashKeyImpl {
+    def make(id: String)(implicit p: Pipeline) = new HashKeyImpl {
       val logger = KeyLoggerMock
       val token = s"$CHANNEL-$id"
       val p = KvFactoryService().pipeline
@@ -75,7 +75,7 @@ class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
   }
 
   test("incrByMulti") {
-    val input = Map[Id, Long](id -> long, id2 -> long)
+    val input = Map[String, Long](id -> long, id2 -> long)
     assert(keyService.incrbyMulti(prop, Map()).await() == Map())
     assert(keyService.getMulti(prop, ids).await() == Map(id -> None, id2 -> None))
     assert(keyService.incrbyMulti(prop, input).await() == input)

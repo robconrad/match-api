@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:30 PM
+ * Last modified by rconrad, 1/22/15 12:36 PM
  */
 
 package base.entity.kv
@@ -18,15 +18,15 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait KeyService[T <: Key] extends Service with KeyLogger {
+trait KeyService[A, B <: Key] extends Service with KeyLogger {
 
   protected val CHANNEL: String
   final lazy protected val PREFIX = CHANNEL + PREFIX_DELIM
 
-  protected def getKey(id: Id): String
+  protected def getKey(id: A): String
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: A)(implicit p: Pipeline): B
 
-  def del(items: Iterable[T])(implicit p: Pipeline): Future[Int]
+  def del(items: Iterable[B])(implicit p: Pipeline): Future[Int]
 
 }

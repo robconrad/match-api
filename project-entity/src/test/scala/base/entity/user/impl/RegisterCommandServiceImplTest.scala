@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:09 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.user.impl
@@ -15,15 +15,11 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.kv.Key.Prop
-import base.entity.kv.KeyId
-import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
 import base.entity.kv.mock.KeyLoggerMock
 import base.entity.user.VerifyCommandService
 import base.entity.user.impl.RegisterCommandServiceImpl._
-import base.entity.user.kv.UserKeyProps.{ CodeProp, UserIdProp }
-import base.entity.user.kv.impl.{ UserKeyImpl, PhoneKeyImpl }
-import base.entity.user.kv.{ PhoneKey, PhoneCooldownKey, PhoneCooldownKeyService }
+import base.entity.user.kv.impl.{ PhoneKeyImpl, UserKeyImpl }
+import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService, PhoneKey }
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 
 import scala.concurrent.Future
@@ -55,7 +51,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   private def command(implicit input: RegisterModel) = new service.RegisterCommand(input)
 
   private def assertSuccessConditions(userId: UUID) {
-    val phoneCooldownKey = PhoneCooldownKeyService().make(KeyId(phone))
+    val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
     assert(phoneCooldownKey.get().await() == Option(phoneCooldownValue))
     assert(phoneCooldownKey.ttl().await().getOrElse(-1L) > 0L)
 
@@ -98,7 +94,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
 
-    val phoneCooldownKey = PhoneCooldownKeyService().make(KeyId(phone))
+    val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
     assert(phoneCooldownKey.del().await())
 
     assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
@@ -107,7 +103,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("phone cooldown in effect") {
-    val key = PhoneCooldownKeyService().make(KeyId(registerModel.phone))
+    val key = PhoneCooldownKeyService().make(registerModel.phone)
     assert(key.set(1).await())
     assert(command.phoneCooldownExists(key).await() == Errors.phoneCooldown.await())
   }

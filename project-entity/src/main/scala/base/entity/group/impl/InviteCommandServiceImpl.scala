@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:20 PM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.group.impl
@@ -19,7 +19,6 @@ import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupService, InviteCommandService }
-import base.entity.kv.KeyId
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
 
@@ -52,7 +51,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
       extends Command[InviteModel, InviteResponseModel] {
 
     def execute() = {
-      phoneGetUserId(PhoneKeyService().make(KeyId(input.phone)))
+      phoneGetUserId(PhoneKeyService().make(input.phone))
     }
 
     def phoneGetUserId(key: PhoneKey) =
@@ -61,7 +60,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
           case Some(userId) => userUserLabelSet(userId, UserUserLabelKeyService().make(authCtx.userId, userId))
           case None =>
             val userId = RandomService().uuid
-            userCreate(userId, UserKeyService().make(KeyId(userId)), key)
+            userCreate(userId, UserKeyService().make(userId), key)
         }
       }
 
@@ -88,26 +87,26 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
         case Some(groupId) => groupGet(userId, groupId)
         case None =>
           val groupId = RandomService().uuid
-          groupPairSet(userId, groupId, GroupKeyService().make(KeyId(groupId)), key)
+          groupPairSet(userId, groupId, GroupKeyService().make(groupId), key)
       }
 
     def groupPairSet(userId: UUID, groupId: UUID, groupKey: GroupKey, pairKey: GroupPairKey) =
       groupKey.create().flatMap { exists =>
         pairKey.set(groupId).flatMap {
-          case true  => groupUsersAdd(userId, groupId, GroupUsersKeyService().make(KeyId(groupId)))
+          case true  => groupUsersAdd(userId, groupId, GroupUsersKeyService().make(groupId))
           case false => Errors.pairSetFailed
         }
       }
 
     def groupUsersAdd(userId: UUID, groupId: UUID, key: GroupUsersKey) =
       key.add(userId, authCtx.userId).flatMap {
-        case 2 => invitedUserGroupsAdd(userId, groupId, UserGroupsKeyService().make(KeyId(userId)))
+        case 2 => invitedUserGroupsAdd(userId, groupId, UserGroupsKeyService().make(userId))
         case _ => Errors.groupUsersAddFailed
       }
 
     def invitedUserGroupsAdd(userId: UUID, groupId: UUID, key: UserGroupsKey) =
       key.add(groupId).flatMap {
-        case 1 => invitingUserGroupsAdd(userId, groupId, UserGroupsKeyService().make(KeyId(authCtx.userId)))
+        case 1 => invitingUserGroupsAdd(userId, groupId, UserGroupsKeyService().make(authCtx.userId))
         case _ => Errors.userGroupsAddFailed
       }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:50 AM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.group.impl
@@ -17,7 +17,6 @@ import base.entity.group.impl.GroupEventsServiceImpl.Errors
 import base.entity.group.kv.GroupEventsKeyService
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
-import base.entity.kv.KeyId
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudErrorImplicits
 import spray.http.StatusCodes._
@@ -38,14 +37,14 @@ class GroupEventsServiceImpl(count: Int)
   private implicit val formats = JsonFormats.withEnumsAndFields
 
   def getEvents(groupId: UUID)(implicit p: Pipeline) = {
-    val key = GroupEventsKeyService().make(KeyId(groupId))
+    val key = GroupEventsKeyService().make(groupId)
     key.range(0, count - 1).map { events =>
       Right(events)
     }
   }
 
   def setEvent(event: EventModel, createIfNotExists: Boolean)(implicit p: Pipeline) = {
-    val key = GroupEventsKeyService().make(KeyId(event.groupId))
+    val key = GroupEventsKeyService().make(event.groupId)
     val fun: EventModel => Future[Boolean] = createIfNotExists match {
       case true => any => key.prepend(any)
       case false => key.prependIfExists

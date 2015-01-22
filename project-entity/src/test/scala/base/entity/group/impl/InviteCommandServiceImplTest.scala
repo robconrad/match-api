@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:02 PM
+ * Last modified by rconrad, 1/22/15 1:02 PM
  */
 
 package base.entity.group.impl
@@ -23,7 +23,6 @@ import base.entity.group.kv.impl.GroupKeyImpl
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupService }
 import base.entity.kv.Key._
-import base.entity.kv.KeyId
 import base.entity.kv.mock.KeyLoggerMock
 import base.entity.user.kv._
 import base.entity.user.kv.impl.{ PhoneKeyImpl, UserKeyImpl, UserUserLabelKeyImpl }
@@ -90,7 +89,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val userKey = new UserKeyImpl(s"user-$userId", KeyLoggerMock)
     assert(userKey.getCreated.await().exists(_.isEqual(time)))
 
-    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${authCtx.userId}-$userId", KeyLoggerMock)
+    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${(authCtx.userId, userId)}", KeyLoggerMock)
     assert(userUserLabelKey.get.await().contains(label))
 
     val groupKey = new GroupKeyImpl(s"group-$groupId", KeyLoggerMock)
@@ -99,14 +98,14 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupPairKey = GroupPairKeyService().make(userId, authCtx.userId)
     assert(groupPairKey.get.await().contains(groupId))
 
-    val groupUsersKey = GroupUsersKeyService().make(KeyId(groupId))
+    val groupUsersKey = GroupUsersKeyService().make(groupId)
     assert(groupUsersKey.isMember(userId).await())
     assert(groupUsersKey.isMember(authCtx.userId).await())
 
-    val userGroupsKeyA = UserGroupsKeyService().make(KeyId(userId))
+    val userGroupsKeyA = UserGroupsKeyService().make(userId)
     assert(userGroupsKeyA.isMember(groupId).await())
 
-    val userGroupsKeyB = UserGroupsKeyService().make(KeyId(authCtx.userId))
+    val userGroupsKeyB = UserGroupsKeyService().make(authCtx.userId)
     assert(userGroupsKeyB.isMember(groupId).await())
 
     unregister()
@@ -127,7 +126,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val response = InviteResponseModel(userId, group)
     assert(service.innerExecute(model).await() == Right(response))
 
-    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${authCtx.userId}-$userId", KeyLoggerMock)
+    val userUserLabelKey = new UserUserLabelKeyImpl(s"userUserLabel-${(authCtx.userId, userId)}", KeyLoggerMock)
     assert(userUserLabelKey.get.await().contains(label))
 
     val groupKey = new GroupKeyImpl(s"group-$groupId", KeyLoggerMock)
@@ -136,14 +135,14 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupPairKey = GroupPairKeyService().make(userId, authCtx.userId)
     assert(groupPairKey.get.await().contains(groupId))
 
-    val groupUsersKey = GroupUsersKeyService().make(KeyId(groupId))
+    val groupUsersKey = GroupUsersKeyService().make(groupId)
     assert(groupUsersKey.isMember(userId).await())
     assert(groupUsersKey.isMember(authCtx.userId).await())
 
-    val userGroupsKeyA = UserGroupsKeyService().make(KeyId(userId))
+    val userGroupsKeyA = UserGroupsKeyService().make(userId)
     assert(userGroupsKeyA.isMember(groupId).await())
 
-    val userGroupsKeyB = UserGroupsKeyService().make(KeyId(authCtx.userId))
+    val userGroupsKeyB = UserGroupsKeyService().make(authCtx.userId)
     assert(userGroupsKeyB.isMember(groupId).await())
 
     unregister()

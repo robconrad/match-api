@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 10:45 AM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.group.impl
@@ -12,10 +12,9 @@ import java.util.UUID
 import base.common.service.ServiceImpl
 import base.entity.auth.context.AuthContext
 import base.entity.group.kv._
-import base.entity.group.model.{ GroupModelBuilder, GroupModel }
+import base.entity.group.model.{ GroupModel, GroupModelBuilder }
 import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.KeyId
 import base.entity.service.CrudImplicits
 
 /**
@@ -40,14 +39,14 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
 
     def groupUserGetSetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
       key.getLastRead.flatMap { lastRead =>
-        val key = GroupKeyService().make(KeyId(groupId))
+        val key = GroupKeyService().make(groupId)
         groupGet(key, builder.copy(lastReadTime = lastRead))
       }
 
     def groupGet(key: GroupKey, builder: GroupModelBuilder): Response =
       key.getLastEventAndCount.flatMap {
         case (lastEvent, count) =>
-          val key = GroupUsersKeyService().make(KeyId(groupId))
+          val key = GroupUsersKeyService().make(groupId)
           groupUsersGet(key, builder.copy(lastEventTime = lastEvent, eventCount = Option(count.getOrElse(0))))
       }
 

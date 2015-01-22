@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:30 PM
+ * Last modified by rconrad, 1/22/15 12:36 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.Key.Id
 import base.entity.kv._
 
 /**
@@ -16,6 +15,6 @@ import base.entity.kv._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class IntKeyServiceImpl[T <: IntKey] extends KeyServiceImpl[T] with IntKeyService[T] {
+abstract class IntKeyServiceImpl[A, B <: IntKey] extends KeyServiceImpl[A, B] with IntKeyService[A, B] {
 
 }

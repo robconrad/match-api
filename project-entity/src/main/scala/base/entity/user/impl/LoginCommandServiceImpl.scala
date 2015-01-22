@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 9:01 PM
+ * Last modified by rconrad, 1/22/15 12:54 PM
  */
 
 package base.entity.user.impl
@@ -16,7 +16,6 @@ import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.model.EventModel
 import base.entity.group.model.GroupModel
 import base.entity.group.{ GroupEventsService, UserService }
-import base.entity.kv._
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
@@ -52,7 +51,7 @@ private[entity] class LoginCommandServiceImpl()
       extends Command[LoginModel, LoginResponseModel] {
 
     def execute() = {
-      deviceGetToken(DeviceKeyService().make(KeyId(input.device.uuid)))
+      deviceGetToken(DeviceKeyService().make(input.device.uuid))
     }
 
     def deviceGetToken(key: DeviceKey): Response = {
@@ -85,7 +84,7 @@ private[entity] class LoginCommandServiceImpl()
     }
 
     def groupsGet(userId: UUID): Response = {
-      val key = UserKeyService().make(KeyId(userId))
+      val key = UserKeyService().make(userId)
       UserService().getGroups(userId).flatMap {
         case Left(error) => error
         case Right(groups) => input.groupId match {

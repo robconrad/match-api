@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 12:37 PM
  */
 
 package base.entity.kv.impl
@@ -23,11 +23,11 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-abstract class HashKeyServiceImpl[T <: Key] extends KeyServiceImpl[T] with HashKeyService[T] {
+abstract class HashKeyServiceImpl[A, B <: Key] extends KeyServiceImpl[A, B] with HashKeyService[A, B] {
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: A)(implicit p: Pipeline): B
 
-  def getMulti(prop: Prop, ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Option[String]]] = {
+  def getMulti(prop: Prop, ids: Iterable[A])(implicit p: Pipeline): Future[Map[A, Option[String]]] = {
     if (isDebugEnabled) log("HGET-MULTI", s"prop: $prop, ids: $ids")
     ids.size > 0 match {
       case true =>
@@ -45,7 +45,7 @@ abstract class HashKeyServiceImpl[T <: Key] extends KeyServiceImpl[T] with HashK
   }
 
   def mGetMulti(props: Array[Prop],
-                ids: Iterable[Id])(implicit p: Pipeline): Future[Map[Id, Map[Prop, Option[String]]]] = {
+                ids: Iterable[A])(implicit p: Pipeline): Future[Map[A, Map[Prop, Option[String]]]] = {
     if (isDebugEnabled) log("HMGET-MULTI (start)", "props: " + props.map(_.toString).toList + s" ids: $ids")
     ids.size > 0 match {
       case true =>
@@ -71,7 +71,7 @@ abstract class HashKeyServiceImpl[T <: Key] extends KeyServiceImpl[T] with HashK
     }
   }
 
-  def incrbyMulti(prop: Prop, values: Map[Id, Long])(implicit p: Pipeline): Future[Map[Id, Long]] = {
+  def incrbyMulti(prop: Prop, values: Map[A, Long])(implicit p: Pipeline): Future[Map[A, Long]] = {
     if (isDebugEnabled) log("HINCRBY-MULTI", s"prop: $prop, values: $values")
     val keys = values.keys.toList
 

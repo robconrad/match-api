@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:18 AM
+ * Last modified by rconrad, 1/22/15 12:36 PM
  */
 
 package base.entity.kv.impl
@@ -18,9 +18,9 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class SetKeyServiceImpl[A, B <: SetKey[A]] extends KeyServiceImpl[B] with SetKeyService[A, B] {
+abstract class SetKeyServiceImpl[A, B <: SetKey[_]] extends KeyServiceImpl[A, B] with SetKeyService[A, B] {
 
-  def remove(sets: List[SetKey[A]], value: Any)(implicit p: Pipeline) = {
+  def remove(sets: List[SetKey[_]], value: Any)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SREM-MULTI", s"sets: ${sets.map(s => s.token)}, value: $value")
     sets.length > 0 match {
       case true =>
@@ -33,7 +33,7 @@ abstract class SetKeyServiceImpl[A, B <: SetKey[A]] extends KeyServiceImpl[B] wi
     }
   }
 
-  def count(sets: List[SetKey[A]])(implicit p: Pipeline): Future[Map[SetKey[A], Int]] = {
+  def count(sets: List[SetKey[_]])(implicit p: Pipeline): Future[Map[SetKey[_], Int]] = {
     if (isDebugEnabled) log("SCARD-MULTI", s"sets: ${sets.map(s => s.token)}")
     sets.length > 0 match {
       case true =>
@@ -46,7 +46,7 @@ abstract class SetKeyServiceImpl[A, B <: SetKey[A]] extends KeyServiceImpl[B] wi
     }
   }
 
-  def unionStore(destination: SetKey[A], sets: SetKey[A]*)(implicit p: Pipeline) = {
+  def unionStore(destination: SetKey[_], sets: SetKey[_]*)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SUNIONSTORE", s"destination: $destination, sets: $sets")
     sets.length > 0 match {
       case true  => p.sunionstore(destination.token, sets.map(_.token): _*).map(_.data().intValue())

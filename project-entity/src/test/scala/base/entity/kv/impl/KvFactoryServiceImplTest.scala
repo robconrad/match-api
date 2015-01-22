@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 6:45 PM
+ * Last modified by rconrad, 1/22/15 12:59 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv._
 import base.entity.service.EntityServiceTest
 import redis.client.RedisClient
 
@@ -25,7 +24,7 @@ class KvFactoryServiceImplTest extends EntityServiceTest {
 
   val service = new KvFactoryServiceImpl(clientCount, host, port)
 
-  private val id = KeyId("id")
+  private val id = "id"
   private def token(prefix: String) = s"$prefix-$id"
 
   test("client") {

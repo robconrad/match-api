@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 12:36 PM
  */
 
 package base.entity.kv
@@ -15,8 +15,8 @@ import base.entity.kv.Key._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait IntKeyService[T <: IntKey] extends KeyService[T] {
+trait IntKeyService[A, B <: IntKey] extends KeyService[A, B] {
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: A)(implicit p: Pipeline): B
 
 }

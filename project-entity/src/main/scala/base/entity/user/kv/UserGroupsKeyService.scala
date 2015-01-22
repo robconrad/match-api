@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/22/15 12:49 PM
  */
 
 package base.entity.user.kv
+
+import java.util.UUID
 
 import base.entity.kv.{ KeyService, KeyServiceCompanion }
 
@@ -15,7 +17,7 @@ import base.entity.kv.{ KeyService, KeyServiceCompanion }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait UserGroupsKeyService extends KeyService[UserGroupsKey] {
+trait UserGroupsKeyService extends KeyService[UUID, UserGroupsKey] {
 
   final val serviceManifest = manifest[UserGroupsKeyService]
 

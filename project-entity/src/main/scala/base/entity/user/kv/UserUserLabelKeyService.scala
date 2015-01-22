@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 3:02 PM
+ * Last modified by rconrad, 1/22/15 12:49 PM
  */
 
 package base.entity.user.kv
@@ -18,13 +18,11 @@ import base.entity.kv.{ KeyService, KeyServiceCompanion }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait UserUserLabelKeyService extends KeyService[UserUserLabelKey] {
+trait UserUserLabelKeyService extends KeyService[(UUID, UUID), UserUserLabelKey] {
 
   final val serviceManifest = manifest[UserUserLabelKeyService]
 
   final val CHANNEL = "userUserLabel"
-
-  def make(ownerUserId: UUID, labelUserId: UUID)(implicit p: Pipeline): UserUserLabelKey
 
 }
 
