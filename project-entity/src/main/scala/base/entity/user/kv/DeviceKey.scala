@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/22/15 2:39 PM
  */
 
 package base.entity.user.kv
@@ -10,7 +10,6 @@ package base.entity.user.kv
 import java.util.UUID
 
 import base.entity.kv.HashKey
-import base.entity.kv.Key._
 
 import scala.concurrent.Future
 
@@ -23,8 +22,10 @@ import scala.concurrent.Future
 trait DeviceKey extends HashKey {
 
   def getToken: Future[Option[UUID]]
+  def setToken(token: UUID): Future[Boolean]
 
   def getUserId: Future[Option[UUID]]
+  def setUserId(userId: UUID): Future[Boolean]
 
   def setTokenAndUserId(token: UUID, userId: UUID): Future[Boolean]
 
@@ -34,5 +35,12 @@ trait DeviceKey extends HashKey {
           cordova: String,
           platform: String,
           version: String): Future[Boolean]
+
+  def getAppVersion: Future[Option[String]]
+  def getLocale: Future[Option[String]]
+  def getModel: Future[Option[String]]
+  def getCordova: Future[Option[String]]
+  def getPlatform: Future[Option[String]]
+  def getVersion: Future[Option[String]]
 
 }

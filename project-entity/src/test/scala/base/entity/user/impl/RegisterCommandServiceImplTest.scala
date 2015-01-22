@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:59 PM
+ * Last modified by rconrad, 1/22/15 2:52 PM
  */
 
 package base.entity.user.impl
@@ -15,11 +15,9 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.kv.mock.KeyLoggerMock
 import base.entity.user.VerifyCommandService
 import base.entity.user.impl.RegisterCommandServiceImpl._
-import base.entity.user.kv.impl.{ PhoneKeyImpl, UserKeyImpl }
-import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService, PhoneKey }
+import base.entity.user.kv._
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 
 import scala.concurrent.Future
@@ -55,13 +53,13 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneCooldownKey.get().await() == Option(phoneCooldownValue))
     assert(phoneCooldownKey.ttl().await().getOrElse(-1L) > 0L)
 
-    val phoneKey = new PhoneKeyImpl(s"phone-$phone", KeyLoggerMock)
+    val phoneKey = PhoneKeyService().make(phone)
     assert(phoneKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(phoneKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(phoneKey.getUserId.await().contains(userId))
     assert(phoneKey.getCode.await().contains(verifyCode))
 
-    val userKey = new UserKeyImpl(s"user-$userId", KeyLoggerMock)
+    val userKey = UserKeyService().make(userId)
     assert(userKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
   }
 

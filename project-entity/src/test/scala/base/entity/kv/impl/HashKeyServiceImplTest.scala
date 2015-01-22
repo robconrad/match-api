@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:59 PM
+ * Last modified by rconrad, 1/22/15 2:35 PM
  */
 
 package base.entity.kv.impl
@@ -34,10 +34,10 @@ class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
     val serviceManifest = null
     def make(id: String)(implicit p: Pipeline) = new HashKeyImpl {
       val logger = KeyLoggerMock
-      val token = s"$CHANNEL-$id"
+      val token = getKey(id)
       val p = KvFactoryService().pipeline
     }
-    val CHANNEL = "test"
+    val prefix = KeyPrefixes.test
   }
   private val model1 = keyService.make(id)
   private val model2 = keyService.make(id2)

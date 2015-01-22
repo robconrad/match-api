@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:36 PM
+ * Last modified by rconrad, 1/22/15 1:30 PM
  */
 
 package base.entity.kv
 
 import base.common.service.Service
 import base.entity.kv.Key._
+import base.entity.kv.KeyPrefixes.KeyPrefix
 
 import scala.concurrent.Future
 
@@ -20,8 +21,7 @@ import scala.concurrent.Future
  */
 trait KeyService[A, B <: Key] extends Service with KeyLogger {
 
-  protected val CHANNEL: String
-  final lazy protected val PREFIX = CHANNEL + PREFIX_DELIM
+  protected val prefix: KeyPrefix
 
   protected def getKey(id: A): String
 

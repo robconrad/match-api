@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/22/15 2:50 PM
  */
 
 package base.entity.kv.impl
@@ -18,11 +18,11 @@ private[impl] abstract class KeyServiceImpl[A, B <: Key]
   protected def getKey(keyId: A) = {
     val id = keyId.toString
     assert(id.length > 0 && id.length < 1000)
-    PREFIX + id
+    prefix.toString + id
   }
 
   def log(cmd: String, msg: String) {
-    if (isDebugEnabled) log(cmd, CHANNEL, msg)
+    if (isDebugEnabled) log(cmd, prefix.toString, msg)
   }
 
   def log(cmd: String, token: String, msg: String = "") {

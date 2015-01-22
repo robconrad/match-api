@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 11:13 PM
+ * Last modified by rconrad, 1/22/15 2:39 PM
  */
 
 package base.entity.user.impl
@@ -20,12 +20,10 @@ import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
 import base.entity.group.{ GroupEventsService, UserService }
 import base.entity.kv.Key._
-import base.entity.kv.mock.KeyLoggerMock
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
 import base.entity.user.impl.LoginCommandServiceImpl._
-import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
-import base.entity.user.kv.{ DeviceKey, UserKey }
+import base.entity.user.kv.{ DeviceKey, DeviceKeyService, UserKey, UserKeyService }
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
 
 import scala.concurrent.Future
@@ -70,8 +68,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private def testSuccess(model: LoginModel, response: LoginResponseModel) {
     val userId = response.userId
-    val userKey = new UserKeyImpl(s"user-$userId", KeyLoggerMock)
-    val deviceKey = new DeviceKeyImpl(s"device-$deviceUuid", KeyLoggerMock)
+    val userKey = UserKeyService().make(userId)
+    val deviceKey = DeviceKeyService().make(deviceUuid)
 
     assert(deviceKey.setToken(token).await())
     assert(deviceKey.setUserId(userId).await())

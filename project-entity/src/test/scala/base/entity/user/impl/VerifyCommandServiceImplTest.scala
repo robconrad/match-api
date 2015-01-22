@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:17 PM
+ * Last modified by rconrad, 1/22/15 2:43 PM
  */
 
 package base.entity.user.impl
@@ -15,11 +15,9 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.kv.mock.KeyLoggerMock
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.VerifyCommandServiceImpl._
-import base.entity.user.kv.impl.{ DeviceKeyImpl, PhoneKeyImpl, UserKeyImpl }
-import base.entity.user.kv.{ DeviceKey, PhoneKey, UserKey }
+import base.entity.user.kv._
 import base.entity.user.model.{ VerifyModel, VerifyResponseModel }
 
 import scala.concurrent.Future
@@ -65,16 +63,16 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
   test("success") {
     val userId = RandomService().uuid
     val token = randomMock.nextUuid()
-    val phoneKey = new PhoneKeyImpl(s"phone-$phone", KeyLoggerMock)
+    val phoneKey = PhoneKeyService().make(phone)
     assert(phoneKey.setUserId(userId).await())
     assert(phoneKey.setCode(code).await())
     assert(service.innerExecute(model).await() == Right(VerifyResponseModel(token)))
 
-    val userKey = new UserKeyImpl(s"user-$userId", KeyLoggerMock)
+    val userKey = UserKeyService().make(userId)
     assert(userKey.getNameAndGender.await() == (Option(name), Option(gender)))
     assert(userKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
 
-    val deviceKey = new DeviceKeyImpl(s"device-$device", KeyLoggerMock)
+    val deviceKey = DeviceKeyService().make(device)
     assert(deviceKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getToken.await().contains(token))

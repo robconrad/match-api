@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:49 PM
+ * Last modified by rconrad, 1/22/15 2:30 PM
  */
 
 package base.entity.user.kv
@@ -10,7 +10,7 @@ package base.entity.user.kv
 import java.util.UUID
 
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyService, KeyServiceCompanion }
+import base.entity.kv.{ KeyPrefixes, KeyService, KeyServiceCompanion }
 
 /**
  * {{ Describe the high level purpose of UserKeyService here. }}
@@ -22,7 +22,7 @@ trait UserUserLabelKeyService extends KeyService[(UUID, UUID), UserUserLabelKey]
 
   final val serviceManifest = manifest[UserUserLabelKeyService]
 
-  final val CHANNEL = "userUserLabel"
+  final val prefix = KeyPrefixes.userUserLabel
 
 }
 
