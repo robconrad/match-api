@@ -2,19 +2,23 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:25 PM
+ * Last modified by rconrad, 1/22/15 11:57 AM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.{ StringKey, StringKeyService }
+import base.entity.kv.TypedKey
 
 /**
- * {{ Describe the high level purpose of IntFactory here. }}
+ * {{ Describe the high level purpose of StringTypedKeyImpl here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class StringKeyServiceImpl[T <: StringKey] extends KeyServiceImpl[T] with StringKeyService[T] {
+trait StringTypedKeyImpl extends TypedKey[String] {
+
+  protected def toType(data: Array[Byte]) = new String(data)
+
+  protected def fromType(data: String) = data.getBytes
 
 }

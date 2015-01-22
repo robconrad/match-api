@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 4:10 PM
+ * Last modified by rconrad, 1/22/15 12:01 PM
  */
 
 package base.entity.user.impl
@@ -69,7 +69,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("getGroups - success") {
-    val groups = Set(groupId1, groupId2).map(_.toString)
+    val groups = Set(groupId1, groupId2)
     val group1 = GroupModel(groupId1, List(), None, None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
     val key = mock[UserGroupsKey]
@@ -85,7 +85,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("getGroups - GroupService ApiError") {
-    val groups = Set(groupId1, groupId2).map(_.toString)
+    val groups = Set(groupId1, groupId2)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val error = ApiError("whatever")
@@ -98,7 +98,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   }
 
   test("getGroups - not all groups returned") {
-    val groups = Set(groupId1, groupId2).map(_.toString)
+    val groups = Set(groupId1, groupId2)
     val group = GroupModel(groupId1, List(), None, None, eventCount = 0)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)

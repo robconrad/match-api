@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:33 PM
+ * Last modified by rconrad, 1/21/15 11:13 PM
  */
 
 package base.entity.user.impl
@@ -10,23 +10,23 @@ package base.entity.user.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{Services, TestServices}
+import base.common.service.{ Services, TestServices }
 import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.{AuthContext, AuthContextDataFactory}
+import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
-import base.entity.group.{GroupEventsService, UserService}
+import base.entity.group.{ GroupEventsService, UserService }
 import base.entity.kv.Key._
 import base.entity.kv.mock.KeyLoggerMock
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
 import base.entity.user.impl.LoginCommandServiceImpl._
-import base.entity.user.kv.impl.{DeviceKeyImpl, UserKeyImpl}
-import base.entity.user.kv.{DeviceKey, UserKey}
-import base.entity.user.model.{LoginModel, LoginResponseModel}
+import base.entity.user.kv.impl.{ DeviceKeyImpl, UserKeyImpl }
+import base.entity.user.kv.{ DeviceKey, UserKey }
+import base.entity.user.model.{ LoginModel, LoginResponseModel }
 
 import scala.concurrent.Future
 

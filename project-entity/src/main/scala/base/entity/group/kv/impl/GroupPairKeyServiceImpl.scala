@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:34 PM
+ * Last modified by rconrad, 1/22/15 12:20 PM
  */
 
 package base.entity.group.kv.impl
@@ -10,8 +10,8 @@ package base.entity.group.kv.impl
 import java.util.UUID
 
 import base.entity.group.kv.{ GroupPairKey, GroupPairKeyService }
-import base.entity.kv.Key.{ Pipeline, Id }
-import base.entity.kv.impl.IdKeyServiceImpl
+import base.entity.kv.Key.{ Id, Pipeline }
+import base.entity.kv.impl.SimpleKeyServiceImpl
 import base.entity.kv.{ Key, KeyId }
 
 /**
@@ -20,7 +20,7 @@ import base.entity.kv.{ Key, KeyId }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupPairKeyServiceImpl extends IdKeyServiceImpl[GroupPairKey] with GroupPairKeyService {
+class GroupPairKeyServiceImpl extends SimpleKeyServiceImpl[UUID, GroupPairKey] with GroupPairKeyService {
 
   def make(id: Id)(implicit p: Pipeline) = new GroupPairKeyImpl(getKey(id), this)
 

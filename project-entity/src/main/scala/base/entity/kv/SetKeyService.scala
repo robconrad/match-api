@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 11:15 AM
  */
 
 package base.entity.kv
 
 import base.entity.kv.Key._
-import base.entity.kv.impl.SetKeyImpl
 
 import scala.concurrent.Future
 
@@ -18,14 +17,14 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait SetKeyService[T <: SetKey] extends KeyService[T] {
+trait SetKeyService[A, B <: SetKey[A]] extends KeyService[B] {
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: Id)(implicit p: Pipeline): B
 
-  def remove(sets: List[SetKey], value: Any)(implicit p: Pipeline): Future[Map[SetKey, Boolean]]
+  def remove(sets: List[SetKey[A]], value: Any)(implicit p: Pipeline): Future[Map[SetKey[A], Boolean]]
 
-  def count(sets: List[SetKey])(implicit p: Pipeline): Future[Map[SetKey, Int]]
+  def count(sets: List[SetKey[A]])(implicit p: Pipeline): Future[Map[SetKey[A], Int]]
 
-  def unionStore(destination: SetKey, sets: SetKey*)(implicit p: Pipeline): Future[Int]
+  def unionStore(destination: SetKey[A], sets: SetKey[A]*)(implicit p: Pipeline): Future[Int]
 
 }

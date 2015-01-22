@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:34 PM
+ * Last modified by rconrad, 1/22/15 11:47 AM
  */
 
 package base.entity.group.kv.impl
@@ -13,6 +13,7 @@ import base.entity.group.kv.{ GroupUserQuestionsKey, GroupUserQuestionsKeyServic
 import base.entity.kv.Key.{ Pipeline, Id }
 import base.entity.kv.{ Key, KeyId }
 import base.entity.kv.impl.SetKeyServiceImpl
+import base.entity.question.QuestionIdComposite
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -21,7 +22,7 @@ import base.entity.kv.impl.SetKeyServiceImpl
  * @author rconrad
  */
 class GroupUserQuestionsKeyServiceImpl
-    extends SetKeyServiceImpl[GroupUserQuestionsKey] with GroupUserQuestionsKeyService {
+    extends SetKeyServiceImpl[QuestionIdComposite, GroupUserQuestionsKey] with GroupUserQuestionsKeyService {
 
   def make(id: Id)(implicit p: Pipeline) = new GroupUserQuestionsKeyImpl(getKey(id), this)
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:08 PM
+ * Last modified by rconrad, 1/22/15 11:50 AM
  */
 
 package base.entity.group.impl
@@ -20,8 +20,6 @@ import base.entity.kv.Key._
 import base.entity.kv.KeyId
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudErrorImplicits
-import org.json4s.jackson.JsonMethods
-import org.json4s.native.Serialization
 import spray.http.StatusCodes._
 
 import scala.concurrent.Future
@@ -42,20 +40,17 @@ class GroupEventsServiceImpl(count: Int)
   def getEvents(groupId: UUID)(implicit p: Pipeline) = {
     val key = GroupEventsKeyService().make(KeyId(groupId))
     key.range(0, count - 1).map { events =>
-      val res = events.map { event =>
-        JsonMethods.parse(event).extract[EventModel]
-      }
-      Right(res)
+      Right(events)
     }
   }
 
   def setEvent(event: EventModel, createIfNotExists: Boolean)(implicit p: Pipeline) = {
     val key = GroupEventsKeyService().make(KeyId(event.groupId))
-    val fun: Any => Future[Boolean] = createIfNotExists match {
+    val fun: EventModel => Future[Boolean] = createIfNotExists match {
       case true => any => key.prepend(any)
       case false => key.prependIfExists
     }
-    fun(Serialization.write(event)).map {
+    fun(event).map {
       case true  => Right(event)
       case false => Errors.setEventFailed
     }

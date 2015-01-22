@@ -2,36 +2,33 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/22/15 11:20 AM
  */
 
 package base.entity.kv.impl
 
-import java.nio.charset.Charset
-
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.{ PrivateHashKey, KeyLogger, SetKey }
+import base.entity.kv.SetKey
 import redis.client.RedisException
-import redis.reply.{ MultiBulkReply, BulkReply }
-
-import scala.collection.JavaConversions._
+import redis.reply.{ BulkReply, MultiBulkReply }
 
 /**
  * Base model for set keys
  */
 // scalastyle:off null
-abstract class SetKeyImpl extends KeyImpl with SetKey {
+abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
 
   def members() = {
     p.smembers(token).map { v =>
-      val res = v.asStringSet(Charset.defaultCharset()).toSet
+      val res = v.data().map { x =>
+        toType(x.data().asInstanceOf[Array[Byte]])
+      }.toSet
       if (isDebugEnabled) log("SMEMBERS", "props: " + res.toString)
       res
     }
   }
 
-  def isMember(value: Any) = {
-    p.sismember(token, value).map { v =>
+  def isMember(value: T) = {
+    p.sismember(token, fromType(value)).map { v =>
       val isMember = v.data() == 1L
       if (isDebugEnabled) log("SISMEMBER", s"value: $value res: $isMember")
       isMember
@@ -41,8 +38,10 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
   def rand() = {
     p.srandmember_(token).map { v =>
       val res = v match {
-        case v if v == null || v.data() == null => None
-        case v                                  => Some(v.asInstanceOf[BulkReply].asUTF8String())
+        case null                  => None
+        case v if v.data() == null => None
+        case v: BulkReply          => Option(toType(v.data()))
+        case v                     => throw new RedisException(s"SRANDMEMBER received sth. other than BulkReply: $v")
       }
       if (isDebugEnabled) log("SRANDMEMBER", s"result: $res")
       res
@@ -51,54 +50,57 @@ abstract class SetKeyImpl extends KeyImpl with SetKey {
 
   def rand(count: Int) = {
     p.srandmember_(token, count.asInstanceOf[AnyRef]).map {
+      case null                  => Set()
+      case v if v.data() == null => Set()
       case v: MultiBulkReply =>
-        val res: Set[String] = v match {
-          case v if v == null || v.data() == null => Set()
-          case v                                  => v.asStringSet(Charset.defaultCharset()).toSet
+        val res = v.data() map {
+          case v: BulkReply => toType(v.data())
+          case v            => throw new RedisException(s"SRANDMEMBER got something other than BulkReply: $v")
         }
         if (isDebugEnabled) log("SRANDMEMBER", s"count: $count, result: $res")
-        res
+        res.toSet
       case v => throw new RedisException(s"SRANDMEMBER got something other than MultiBulkReply: $v")
     }
   }
 
   def pop() = {
     p.spop(token).map { v =>
-      val res = v.asUTF8String()
-      if (isDebugEnabled) log("SPOP", s"result: $res")
-      res match {
-        case null => None
-        case x    => Some(x)
+      val res = v match {
+        case null                  => None
+        case v if v.data() == null => None
+        case v                     => Option(toType(v.data()))
       }
+      if (isDebugEnabled) log("SPOP", s"result: $res")
+      res
     }
   }
 
-  def add(value: Any*) = {
-    val args = token +: value.map(_.asInstanceOf[AnyRef])
+  def add(value: T*) = {
+    val args = token +: value.map(fromType)
     p.sadd_(args: _*).map { v =>
-      val res = v.data().toInt
+      val res = v.data()
       if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
       res
     }
   }
 
-  def remove(value: Any) =
-    p.srem_(token, value.asInstanceOf[AnyRef]).map { v =>
-      val res = v.data().toInt > 0
+  def remove(value: T) =
+    p.srem_(token, fromType(value)).map { v =>
+      val res = v.data() > 0L
       if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
       res
     }
 
-  def move(to: SetKey, member: Any) =
-    p.smove(token, to.token, member).map { v =>
-      val res = v.data().toInt
+  def move(to: SetKey[T], member: T) =
+    p.smove(token, to.token, fromType(member)).map { v =>
+      val res = v.data()
       if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member, result: $res")
       res > 0
     }
 
-  def diffStore(sets: SetKey*) = {
+  def diffStore(sets: SetKey[T]*) = {
     p.sdiffstore(token, sets.map(_.token): _*).map { v =>
-      val res = v.data().toInt
+      val res = v.data()
       if (isDebugEnabled) log("SDIFFSTORE", s" sets: $sets, result: $res")
       res
     }

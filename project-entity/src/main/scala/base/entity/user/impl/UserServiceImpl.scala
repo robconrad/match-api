@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:16 PM
+ * Last modified by rconrad, 1/22/15 11:47 AM
  */
 
 package base.entity.user.impl
@@ -15,10 +15,10 @@ import base.entity.error.ApiError
 import base.entity.group.model.GroupModel
 import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key._
-import base.entity.kv.{ KeyId, SetKey, StringKey }
+import base.entity.kv.KeyId
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserUserLabelKey, UserGroupsKey, UserGroupsKeyService, UserUserLabelKeyService }
+import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService }
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 
@@ -64,7 +64,7 @@ class UserServiceImpl extends ServiceImpl with UserService {
   private[impl] def getGroups(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline, authCtx: AuthContext) = {
     key.members().flatMap { groupIds =>
       val futures = groupIds.map { groupId =>
-        GroupService().getGroup(UUID.fromString(groupId))
+        GroupService().getGroup(groupId)
       }
       Future.sequence(futures).map { eithers =>
         lazy val errors = eithers.collect { case Left(error) => error }

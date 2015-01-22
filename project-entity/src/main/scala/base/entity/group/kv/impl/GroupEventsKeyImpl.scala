@@ -2,15 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 11:52 AM
  */
 
 package base.entity.group.kv.impl
 
+import base.entity.event.model.EventModel
 import base.entity.group.kv.GroupEventsKey
+import base.entity.json.JsonFormats
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.KeyLogger
 import base.entity.kv.impl.ListKeyImpl
+import org.json4s.native.{ Serialization, JsonMethods }
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -19,6 +22,16 @@ import base.entity.kv.impl.ListKeyImpl
  * @author rconrad
  */
 class GroupEventsKeyImpl(val token: String, protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends ListKeyImpl with GroupEventsKey {
+    extends ListKeyImpl[EventModel] with GroupEventsKey {
+
+  implicit val formats = JsonFormats.withEnumsAndFields
+
+  protected def toType(data: Array[Byte]) = {
+    JsonMethods.parse(new String(data)).extract[EventModel]
+  }
+
+  protected def fromType(data: EventModel) = {
+    Serialization.write(data).getBytes
+  }
 
 }

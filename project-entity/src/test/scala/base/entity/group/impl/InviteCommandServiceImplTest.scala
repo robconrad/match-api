@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:09 PM
+ * Last modified by rconrad, 1/22/15 12:02 PM
  */
 
 package base.entity.group.impl
@@ -18,15 +18,15 @@ import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiError
 import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
-import base.entity.group.kv.impl.{ GroupKeyImpl, GroupUsersKeyImpl }
-import base.entity.group.kv.{ GroupKey, GroupPairKey, GroupPairKeyService, GroupUsersKeyService }
+import base.entity.group.kv._
+import base.entity.group.kv.impl.GroupKeyImpl
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupService }
 import base.entity.kv.Key._
 import base.entity.kv.KeyId
 import base.entity.kv.mock.KeyLoggerMock
-import base.entity.user.kv.impl.{ PhoneKeyImpl, UserGroupsKeyImpl, UserKeyImpl, UserUserLabelKeyImpl }
-import base.entity.user.kv.{ PhoneKey, UserGroupsKeyService, UserKey, UserUserLabelKey }
+import base.entity.user.kv._
+import base.entity.user.kv.impl.{ PhoneKeyImpl, UserKeyImpl, UserUserLabelKeyImpl }
 import base.entity.user.model.UserModel
 
 import scala.concurrent.Future
@@ -199,23 +199,20 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("group user add failed") {
-    val key = new GroupUsersKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*) = Future.successful(0)
-    }
+    val key = mock[GroupUsersKey]
+    key.add _ expects * returning Future.successful(0)
     assert(command.groupUsersAdd(userId, groupId, key).await() == Errors.groupUsersAddFailed.await())
   }
 
   test("invited user groups add failed") {
-    val key = new UserGroupsKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*) = Future.successful(0)
-    }
+    val key = mock[UserGroupsKey]
+    key.add _ expects * returning Future.successful(0L)
     assert(command.invitedUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
 
   test("inviting user groups add failed") {
-    val key = new UserGroupsKeyImpl("", KeyLoggerMock) {
-      override def add(value: Any*) = Future.successful(0)
-    }
+    val key = mock[UserGroupsKey]
+    key.add _ expects * returning Future.successful(0L)
     assert(command.invitingUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
 

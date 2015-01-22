@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:04 AM
+ * Last modified by rconrad, 1/22/15 11:39 AM
  */
 
 package base.entity.question
@@ -17,9 +17,14 @@ import base.entity.question.QuestionSides.QuestionSide
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-case class QuestionIdComposite private[question] (question: QuestionDef, side: QuestionSide, inverse: Boolean = false) {
-  override lazy val toString = {
-    val sideOut = question.b.isEmpty match {
+case class QuestionIdComposite(questionId: UUID, side: QuestionSide)
+
+object QuestionIdComposite {
+
+  private[question] def apply(question: QuestionDef,
+                              side: QuestionSide,
+                              inverse: Boolean = false): QuestionIdComposite = {
+    apply(question.id, question.b.isEmpty match {
       case true => QuestionSides.SIDE_A
       case false => inverse match {
         case false => side
@@ -28,7 +33,7 @@ case class QuestionIdComposite private[question] (question: QuestionDef, side: Q
           case QuestionSides.SIDE_B => QuestionSides.SIDE_A
         }
       }
-    }
-    question.id.toString + sideOut
+    })
   }
+
 }

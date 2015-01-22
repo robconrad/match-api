@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:28 PM
+ * Last modified by rconrad, 1/22/15 11:47 AM
  */
 
 package base.entity.kv
@@ -18,8 +18,8 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait ListKeyService[T <: ListKey] extends KeyService[T] {
+trait ListKeyService[A, B <: ListKey[A]] extends KeyService[B] {
 
-  def make(id: Id)(implicit p: Pipeline): T
+  def make(id: Id)(implicit p: Pipeline): B
 
 }

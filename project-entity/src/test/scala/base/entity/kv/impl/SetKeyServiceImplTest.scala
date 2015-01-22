@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:40 PM
+ * Last modified by rconrad, 1/22/15 12:01 PM
  */
 
 package base.entity.kv.impl
@@ -17,7 +17,7 @@ import base.entity.kv.mock.KeyLoggerMock
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class SetKeyServiceImplTest extends KeyServiceImplTest[SetKey] {
+class SetKeyServiceImplTest extends KeyServiceImplTest[SetKey[String]] {
 
   private val id = KeyId("id")
   private val id2 = KeyId("id2")
@@ -26,10 +26,10 @@ class SetKeyServiceImplTest extends KeyServiceImplTest[SetKey] {
   private val val1 = "value1"
   private val val2 = "value2"
 
-  val keyService = new SetKeyServiceImpl[SetKey]() {
+  val keyService = new SetKeyServiceImpl[String, SetKey[String]]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id)(implicit p: Pipeline) = new SetKeyImpl {
+    def make(id: Id)(implicit p: Pipeline) = new SetKeyImpl[String] with StringTypedKeyImpl {
       val token = id.toString
       val logger = KeyLoggerMock
       protected implicit val p = tp

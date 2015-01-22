@@ -2,12 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/22/15 11:18 AM
  */
 
 package base.entity.kv
-
-import base.entity.kv.Key._
 
 import scala.concurrent.Future
 
@@ -17,24 +15,24 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait SetKey extends Key {
+trait SetKey[T] extends TypedKey[T] {
 
-  def members(): Future[Set[String]]
+  def members(): Future[Set[T]]
 
-  def isMember(value: Any): Future[Boolean]
+  def isMember(value: T): Future[Boolean]
 
-  def rand(): Future[Option[String]]
+  def rand(): Future[Option[T]]
 
-  def rand(count: Int): Future[Set[String]]
+  def rand(count: Int): Future[Set[T]]
 
-  def pop(): Future[Option[String]]
+  def pop(): Future[Option[T]]
 
-  def add(value: Any*): Future[Int]
+  def add(value: T*): Future[Long]
 
-  def remove(value: Any): Future[Boolean]
+  def remove(value: T): Future[Boolean]
 
-  def move(to: SetKey, member: Any): Future[Boolean]
+  def move(to: SetKey[T], member: T): Future[Boolean]
 
-  def diffStore(sets: SetKey*): Future[Int]
+  def diffStore(sets: SetKey[T]*): Future[Long]
 
 }

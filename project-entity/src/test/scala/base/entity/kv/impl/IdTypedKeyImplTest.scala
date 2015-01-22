@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:47 PM
+ * Last modified by rconrad, 1/22/15 12:25 PM
  */
 
 package base.entity.kv.impl
+
+import java.util.UUID
 
 import base.common.random.RandomService
 import base.entity.kv.KeyLogger
@@ -17,11 +19,11 @@ import base.entity.kv.mock.KeyLoggerMock
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class IdKeyImplTest extends KeyImplTest {
+class IdTypedKeyImplTest extends KeyImplTest {
 
   private val id = RandomService().uuid
 
-  val model = new IdKeyImpl {
+  val model = new SimpleKeyImpl[UUID] with IdTypedKeyImpl {
     val token = this.getClass.getSimpleName
     val logger = KeyLoggerMock
     protected implicit val p = tp

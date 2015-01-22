@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 10:44 AM
+ * Last modified by rconrad, 1/22/15 11:35 AM
  */
 
 package base.entity.group.kv
 
 import base.entity.kv.SetKey
+import base.entity.question.QuestionIdComposite
 
 /**
  * {{ Describe the high level purpose of UserKey here. }}
@@ -15,6 +16,6 @@ import base.entity.kv.SetKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupUserQuestionsTempKey extends SetKey {
+trait GroupUserQuestionsTempKey extends SetKey[QuestionIdComposite] {
 
 }

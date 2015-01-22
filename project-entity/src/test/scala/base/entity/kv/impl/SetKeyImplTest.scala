@@ -2,12 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:43 PM
+ * Last modified by rconrad, 1/22/15 12:00 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.KeyLogger
+import java.util.UUID
+
+import base.common.random.RandomService
 import base.entity.kv.mock.KeyLoggerMock
 
 /**
@@ -18,10 +20,10 @@ import base.entity.kv.mock.KeyLoggerMock
  */
 class SetKeyImplTest extends KeyImplTest {
 
-  private val val1 = "value1"
-  private val val2 = "value2"
+  private val val1 = RandomService().uuid
+  private val val2 = RandomService().uuid
 
-  val model = new SetKeyImpl {
+  val model = new SetKeyImpl[UUID] with IdTypedKeyImpl {
     val token = this.getClass.getSimpleName
     val logger = KeyLoggerMock
     protected implicit val p = tp
@@ -76,7 +78,7 @@ class SetKeyImplTest extends KeyImplTest {
   }
 
   test("move") {
-    val dest = new SetKeyImpl {
+    val dest = new SetKeyImpl[UUID] with IdTypedKeyImpl {
       val token = this.getClass.getSimpleName + "destination"
       val logger = KeyLoggerMock
       protected implicit val p = tp
@@ -88,12 +90,12 @@ class SetKeyImplTest extends KeyImplTest {
   }
 
   test("diffStore") {
-    val all = new SetKeyImpl {
+    val all = new SetKeyImpl[UUID] with IdTypedKeyImpl {
       val token = this.getClass.getSimpleName + "all"
       val logger = KeyLoggerMock
       protected implicit val p = tp
     }
-    val remove = new SetKeyImpl {
+    val remove = new SetKeyImpl[UUID] with IdTypedKeyImpl {
       val token = this.getClass.getSimpleName + "remove"
       val logger = KeyLoggerMock
       protected implicit val p = tp
@@ -102,7 +104,7 @@ class SetKeyImplTest extends KeyImplTest {
     assert(all.add(val1, val2).await() == 2)
     assert(remove.add(val1).await() == 1)
     assert(model.diffStore(all, remove).await() == 1)
-    assert(model.members.await() == Set(val2))
+    assert(model.members().await() == Set(val2))
   }
 
 }

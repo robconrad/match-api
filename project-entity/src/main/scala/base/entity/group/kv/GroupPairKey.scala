@@ -2,12 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 3:31 PM
+ * Last modified by rconrad, 1/22/15 12:19 PM
  */
 
 package base.entity.group.kv
 
-import base.entity.kv.IdKey
+import java.util.UUID
+
+import base.entity.kv.SimpleKey
 
 /**
  * {{ Describe the high level purpose of UserKey here. }}
@@ -15,6 +17,6 @@ import base.entity.kv.IdKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupPairKey extends IdKey {
+trait GroupPairKey extends SimpleKey[UUID] {
 
 }

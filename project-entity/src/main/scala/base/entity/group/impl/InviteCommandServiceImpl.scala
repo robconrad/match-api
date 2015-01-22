@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:16 PM
+ * Last modified by rconrad, 1/22/15 12:20 PM
  */
 
 package base.entity.group.impl
@@ -19,7 +19,7 @@ import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupService, InviteCommandService }
-import base.entity.kv.{ StringKey, KeyId }
+import base.entity.kv.KeyId
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
 

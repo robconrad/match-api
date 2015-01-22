@@ -2,11 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:01 PM
+ * Last modified by rconrad, 1/22/15 11:44 AM
  */
 
 package base.entity.group.kv
 
+import base.entity.event.model.EventModel
 import base.entity.kv.ListKey
 
 /**
@@ -15,6 +16,6 @@ import base.entity.kv.ListKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupEventsKey extends ListKey {
+trait GroupEventsKey extends ListKey[EventModel] {
 
 }

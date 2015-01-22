@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:30 PM
+ * Last modified by rconrad, 1/22/15 11:48 AM
  */
 
 package base.entity.group.kv.impl
 
-import base.entity.group.kv.{ GroupEventsKeyService, GroupEventsKey }
-import base.entity.kv.Key.{ Pipeline, Id }
+import base.entity.event.model.EventModel
+import base.entity.group.kv.{ GroupEventsKey, GroupEventsKeyService }
+import base.entity.kv.Key.{ Id, Pipeline }
 import base.entity.kv.impl.ListKeyServiceImpl
 
 /**
@@ -17,7 +18,7 @@ import base.entity.kv.impl.ListKeyServiceImpl
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupEventsKeyServiceImpl extends ListKeyServiceImpl[GroupEventsKey] with GroupEventsKeyService {
+class GroupEventsKeyServiceImpl extends ListKeyServiceImpl[EventModel, GroupEventsKey] with GroupEventsKeyService {
 
   def make(id: Id)(implicit p: Pipeline) = new GroupEventsKeyImpl(getKey(id), this)
 

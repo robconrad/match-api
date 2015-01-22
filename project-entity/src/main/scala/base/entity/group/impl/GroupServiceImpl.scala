@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 9:04 PM
+ * Last modified by rconrad, 1/22/15 10:45 AM
  */
 
 package base.entity.group.impl
@@ -52,8 +52,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
       }
 
     def groupUsersGet(key: GroupUsersKey, builder: GroupModelBuilder): Response =
-      key.members().flatMap { members =>
-        val userIds = members.map(UUID.fromString)
+      key.members().flatMap { userIds =>
         usersGet(userIds.toList, builder)
       }
 

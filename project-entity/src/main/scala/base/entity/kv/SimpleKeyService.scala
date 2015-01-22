@@ -2,26 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/22/15 12:19 PM
  */
 
 package base.entity.kv
 
-import java.util.UUID
-
-import base.entity.kv.Key._
-
-import scala.concurrent.Future
+import base.entity.kv.Key.{ Pipeline, Id }
 
 /**
- * {{ Describe the high level purpose of IntKey here. }}
+ * {{ Describe the high level purpose of IntKeyFactory here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait IdKey extends Key {
+trait SimpleKeyService[A, B <: SimpleKey[A]] extends KeyService[B] {
 
-  def get: Future[Option[UUID]]
-  def set(v: UUID): Future[Boolean]
+  def make(id: Id)(implicit p: Pipeline): B
 
 }

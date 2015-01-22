@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:36 PM
+ * Last modified by rconrad, 1/22/15 11:38 AM
  */
 
 package base.entity.question.impl
@@ -12,7 +12,6 @@ import java.util.UUID
 import base.common.random.RandomService
 import base.common.service.{ CommonService, ServiceImpl }
 import base.entity.auth.context.AuthContext
-import base.entity.error.ApiError
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.kv._
@@ -20,8 +19,8 @@ import base.entity.kv.Key._
 import base.entity.kv.{ KeyId, KvFactoryService }
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.kv.QuestionsKeyService
-import base.entity.question.model.{ QuestionModel, AnswerModel }
-import base.entity.question.{ QuestionIdComposite, QuestionDef, QuestionService, QuestionSides }
+import base.entity.question.model.{ AnswerModel, QuestionModel }
+import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
 import base.entity.service.CrudImplicits
 import redis.client.RedisException
 
@@ -35,9 +34,6 @@ import scala.concurrent.{ Await, Future }
  */
 class QuestionServiceImpl(questions: Iterable[QuestionDef],
                           questionCount: Int) extends ServiceImpl with QuestionService {
-
-  private val compositeIdLength = 37
-  private val uuidLength = 36
 
   private val questionMap = questions.map(q => q.id -> q).toMap
   private val questionKey = QuestionsKeyService().make(KeyId("standard"))(KvFactoryService().pipeline)
@@ -89,17 +85,14 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
         groupUserQuestionTempDel(temp, compositeIds)
       }
 
-    def groupUserQuestionTempDel(temp: GroupUserQuestionsTempKey, compositeIds: Iterable[String]) =
+    def groupUserQuestionTempDel(temp: GroupUserQuestionsTempKey, compositeIds: Iterable[QuestionIdComposite]) =
       temp.del().map {
         case false => throw new RedisException(s"failed to delete $temp")
         case true  => Right(compositeIds.map(makeQuestionModelFromCompositeId).toList)
       }
 
-    def makeQuestionModelFromCompositeId(compositeId: String) = {
-      assert(compositeId.length == compositeIdLength)
-      val id = UUID.fromString(compositeId.substring(0, uuidLength))
-      val side = QuestionSides.withName(compositeId.substring(uuidLength, compositeIdLength))
-      QuestionModel(questionMap(id), side)
+    def makeQuestionModelFromCompositeId(compositeId: QuestionIdComposite) = {
+      QuestionModel(questionMap(compositeId.questionId), compositeId.side)
     }
 
   }
@@ -141,11 +134,11 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       }
 
     def groupUsersGet(key: GroupUsersKey) =
-      key.members().flatMap { userIdStrings =>
-        val userIds = userIdStrings.collect {
-          case userId if userId != authCtx.userIdString => UUID.fromString(userId)
+      key.members().flatMap { allUserIds =>
+        val otherUserIds = allUserIds.collect {
+          case userId if userId != authCtx.userId => userId
         }
-        groupUsersQuestionYesGet(userIds)
+        groupUsersQuestionYesGet(otherUserIds)
       }
 
     def groupUsersQuestionYesGet(userIds: Iterable[UUID]) = {

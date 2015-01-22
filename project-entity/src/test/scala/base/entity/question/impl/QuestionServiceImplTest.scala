@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:33 PM
+ * Last modified by rconrad, 1/22/15 12:00 PM
  */
 
 package base.entity.question.impl
@@ -79,7 +79,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
     val method = new service.GetQuestionsMethod(groupId)
     intercept[RedisException] {
-      method.groupUserQuestionTempDel(key, Iterable[String]()).await()
+      method.groupUserQuestionTempDel(key, Iterable[QuestionIdComposite]()).await()
     }
   }
 
@@ -90,9 +90,9 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val questionResponse = true
 
     val usersKey = GroupUsersKeyService().make(KeyId(groupId))
-    assert(usersKey.add(userId).await() == 1)
+    assert(usersKey.add(userId).await() == 1L)
     val userYesKey = GroupUserQuestionsYesKeyService().make(groupId, userId)
-    assert(userYesKey.add(questionId.toString + SIDE_B).await() == 1)
+    assert(userYesKey.add(QuestionIdComposite(questionId, SIDE_B)).await() == 1)
 
     val model = AnswerModel(questionId, groupId, SIDE_A, questionResponse)
     val eventId = randomMock.nextUuid()

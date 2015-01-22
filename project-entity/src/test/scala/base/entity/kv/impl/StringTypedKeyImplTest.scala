@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:40 PM
+ * Last modified by rconrad, 1/22/15 12:25 PM
  */
 
 package base.entity.kv.impl
@@ -16,11 +16,11 @@ import base.entity.kv.mock.KeyLoggerMock
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class StringKeyImplTest extends KeyImplTest {
+class StringTypedKeyImplTest extends KeyImplTest {
 
   private val string = RandomService().uuid.toString
 
-  val model = new StringKeyImpl {
+  val model = new SimpleKeyImpl[String] with StringTypedKeyImpl {
     val token = this.getClass.getSimpleName
     val logger = KeyLoggerMock
     protected implicit val p = tp
