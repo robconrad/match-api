@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:33 PM
+ * Last modified by rconrad, 1/21/15 9:42 PM
  */
 
 package base.entity.group.kv.impl
@@ -11,7 +11,7 @@ import base.common.time.TimeService
 import base.entity.group.kv.GroupKey
 import base.entity.group.kv.GroupKeyProps.{ EventCountProp, LastEventTimeProp }
 import base.entity.kv.Key._
-import base.entity.kv.PrivateHashKey
+import base.entity.kv.KeyLogger
 import base.entity.kv.impl.HashKeyImpl
 import org.joda.time.DateTime
 
@@ -23,12 +23,13 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
-    extends GroupKey with HashKeyImpl {
+class GroupKeyImpl(val token: String,
+                   protected val logger: KeyLogger)(implicit protected val p: Pipeline)
+    extends HashKeyImpl with GroupKey {
 
   private val props = Array[Prop](LastEventTimeProp, EventCountProp)
   def getLastEventAndCount: Future[(Option[DateTime], Option[Int])] = {
-    key.get(props).map { props =>
+    get(props).map { props =>
       val time = props(LastEventTimeProp).map(TimeService().fromString)
       val count = props(EventCountProp).map(_.toInt)
       (time, count)
@@ -36,9 +37,9 @@ class GroupKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: 
   }
 
   def setLastEvent(time: DateTime) =
-    key.set(LastEventTimeProp, TimeService().asString(time))
+    set(LastEventTimeProp, TimeService().asString(time))
 
   def setEventCount(count: Int) =
-    key.set(EventCountProp, count)
+    set(EventCountProp, count)
 
 }

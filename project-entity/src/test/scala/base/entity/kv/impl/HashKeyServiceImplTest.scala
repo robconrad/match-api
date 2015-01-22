@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:48 PM
+ * Last modified by rconrad, 1/21/15 10:09 PM
  */
 
 package base.entity.kv.impl
@@ -17,7 +17,7 @@ import base.entity.kv.mock.KeyLoggerMock
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class PrivateHashKeyServiceImplTest extends KeyServiceImplTest[PrivateHashKey] {
+class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
 
   private val id = KeyId("id")
   private val id2 = KeyId("id2")
@@ -29,10 +29,14 @@ class PrivateHashKeyServiceImplTest extends KeyServiceImplTest[PrivateHashKey] {
   private val string = "value"
   private val long = 1L
 
-  val keyService = new HashKeyServiceImpl[PrivateHashKey]() {
+  val keyService = new HashKeyServiceImpl[HashKey]() {
     // scalastyle:off null
     val serviceManifest = null
-    def make(id: Id)(implicit p: Pipeline) = new PrivateHashKeyImpl(s"$CHANNEL-$id", KeyLoggerMock)(p)
+    def make(id: Id)(implicit p: Pipeline) = new HashKeyImpl {
+      val logger = KeyLoggerMock
+      val token = s"$CHANNEL-$id"
+      val p = KvFactoryService().pipeline
+    }
     val CHANNEL = "test"
   }
   private val model1 = keyService.make(id)

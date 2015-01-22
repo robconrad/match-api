@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:33 PM
+ * Last modified by rconrad, 1/21/15 10:02 PM
  */
 
 package base.entity.user.kv.impl
@@ -11,8 +11,8 @@ import java.util.UUID
 
 import base.common.time.TimeService
 import base.entity.kv.Key._
+import base.entity.kv.KeyLogger
 import base.entity.kv.KeyProps.UpdatedProp
-import base.entity.kv.PrivateHashKey
 import base.entity.kv.impl.HashKeyImpl
 import base.entity.user.kv.DeviceKey
 import base.entity.user.kv.UserKeyProps._
@@ -23,19 +23,22 @@ import base.entity.user.kv.UserKeyProps._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class DeviceKeyImpl(protected val key: PrivateHashKey)(implicit protected val p: Pipeline)
-    extends DeviceKey with HashKeyImpl {
+class DeviceKeyImpl(val token: String,
+                    protected val logger: KeyLogger)(implicit protected val p: Pipeline)
+    extends HashKeyImpl with DeviceKey {
 
-  def getToken = key.getId(TokenProp)
+  def getToken = getId(TokenProp)
+  def setToken(token: UUID) = set(TokenProp, token)
 
-  def getUserId = key.getId(UserIdProp)
+  def getUserId = getId(UserIdProp)
+  def setUserId(userId: UUID) = set(UserIdProp, userId)
 
   def setTokenAndUserId(token: UUID, userId: UUID) = {
     val props = Map[Prop, Any](
       UpdatedProp -> TimeService().asString(),
       TokenProp -> token,
       UserIdProp -> userId)
-    key.set(props)
+    set(props)
   }
 
   def set(appVersion: String,
@@ -51,7 +54,14 @@ class DeviceKeyImpl(protected val key: PrivateHashKey)(implicit protected val p:
       CordovaProp -> cordova,
       PlatformProp -> platform,
       VersionProp -> version)
-    key.set(props)
+    set(props)
   }
+
+  def getAppVersion = getString(AppVersionProp)
+  def getLocale = getString(LocaleProp)
+  def getModel = getString(ModelProp)
+  def getCordova = getString(CordovaProp)
+  def getPlatform = getString(PlatformProp)
+  def getVersion = getString(VersionProp)
 
 }

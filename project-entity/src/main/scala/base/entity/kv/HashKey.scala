@@ -2,12 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:16 PM
+ * Last modified by rconrad, 1/21/15 9:49 PM
  */
 
 package base.entity.kv
 
-import base.entity.kv.Key.Pipeline
+import java.util.UUID
+
+import base.entity.kv.Key.Prop
+import org.joda.time.DateTime
 
 import scala.concurrent.Future
 
@@ -19,18 +22,36 @@ import scala.concurrent.Future
  */
 trait HashKey extends Key {
 
-  protected def key: PrivateHashKey
-
   def create(): Future[Boolean]
 
-  def token = key.token
+  def getCreated: Future[Option[DateTime]]
+  def getUpdated: Future[Option[DateTime]]
 
-  def exists() = key.exists()
+  protected def getString(prop: Prop): Future[Option[String]]
+  protected def getDateTime(prop: Prop): Future[Option[DateTime]]
+  protected def getId(prop: Prop): Future[Option[UUID]]
+  protected def getInt(prop: Prop): Future[Option[Int]]
+  protected def getLong(prop: Prop): Future[Option[Long]]
+  protected def getFlag(prop: Prop): Future[Boolean]
 
-  def del() = key.del()
+  protected def get(props: Array[Prop]): Future[Map[Prop, Option[String]]]
 
-  def expire(seconds: Long) = key.expire(seconds)
+  protected def get: Future[Map[Prop, String]]
 
-  def ttl() = key.ttl()
+  protected def getProps: Future[List[Prop]]
+
+  protected def setFlag(prop: Prop, value: Boolean): Future[Boolean]
+
+  protected def set(prop: Prop, value: Any): Future[Boolean]
+
+  protected def set[T <: Map[Prop, Any]](props: T): Future[Boolean]
+
+  protected def setNx(prop: Prop, value: Any): Future[Boolean]
+
+  protected def increment(prop: Prop, value: Long): Future[Long]
+
+  protected def del(prop: Prop): Future[Boolean]
+
+  protected def del(props: List[Prop]): Future[Boolean]
 
 }

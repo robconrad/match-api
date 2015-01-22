@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 5:04 PM
+ * Last modified by rconrad, 1/21/15 10:09 PM
  */
 
 package base.entity.user.impl
@@ -16,15 +16,14 @@ import base.entity.api.ApiVersions
 import base.entity.auth.context.AuthContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.kv.Key.Prop
+import base.entity.kv.KeyId
 import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
-import base.entity.kv.impl.PrivateHashKeyImpl
 import base.entity.kv.mock.KeyLoggerMock
-import base.entity.kv.{ KeyId, PrivateHashKey }
 import base.entity.user.VerifyCommandService
 import base.entity.user.impl.RegisterCommandServiceImpl._
 import base.entity.user.kv.UserKeyProps.{ CodeProp, UserIdProp }
-import base.entity.user.kv.impl.PhoneKeyImpl
-import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService }
+import base.entity.user.kv.impl.{ UserKeyImpl, PhoneKeyImpl }
+import base.entity.user.kv.{ PhoneKey, PhoneCooldownKey, PhoneCooldownKeyService }
 import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 
 import scala.concurrent.Future
@@ -60,14 +59,14 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneCooldownKey.get().await() == Option(phoneCooldownValue))
     assert(phoneCooldownKey.ttl().await().getOrElse(-1L) > 0L)
 
-    val phoneKey = new PrivateHashKeyImpl(s"phone-$phone", KeyLoggerMock)
-    assert(phoneKey.getDateTime(CreatedProp).await().exists(_.isEqual(TimeServiceConstantMock.now)))
-    assert(phoneKey.getDateTime(UpdatedProp).await().exists(_.isEqual(TimeServiceConstantMock.now)))
-    assert(phoneKey.getId(UserIdProp).await().contains(userId))
-    assert(phoneKey.getString(CodeProp).await().contains(verifyCode))
+    val phoneKey = new PhoneKeyImpl(s"phone-$phone", KeyLoggerMock)
+    assert(phoneKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
+    assert(phoneKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
+    assert(phoneKey.getUserId.await().contains(userId))
+    assert(phoneKey.getCode.await().contains(verifyCode))
 
-    val userKey = new PrivateHashKeyImpl(s"user-$userId", KeyLoggerMock)
-    assert(userKey.getDateTime(CreatedProp).await().exists(_.isEqual(TimeServiceConstantMock.now)))
+    val userKey = new UserKeyImpl(s"user-$userId", KeyLoggerMock)
+    assert(userKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
   }
 
   test("without perms") {
@@ -126,15 +125,15 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to create user") {
-    val key = mock[PrivateHashKey]
-    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
-    assert(command.userCreate(new PhoneKeyImpl(key)).await() == Errors.userSetFailed.await())
+    val key = mock[PhoneKey]
+    key.setUserId _ expects * returning Future.successful(false)
+    assert(command.userCreate(key).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set phone updates") {
-    val key = mock[PrivateHashKey]
-    (key.set(_: Map[Prop, Any])) expects * returning Future.successful(false)
-    assert(command.phoneSetCode(new PhoneKeyImpl(key)).await() == Errors.phoneSetFailed.await())
+    val key = mock[PhoneKey]
+    key.setCode _ expects * returning Future.successful(false)
+    assert(command.phoneSetCode(key).await() == Errors.phoneSetFailed.await())
   }
 
   test("failed to send sms") {

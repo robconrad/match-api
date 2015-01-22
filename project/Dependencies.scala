@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:40 PM
+ * Last modified by rconrad, 1/21/15 10:31 PM
  */
 
 import sbt._
@@ -78,7 +78,7 @@ object Dependencies {
     "com.wordnik" % "swagger-annotations" % "1.3.5")
 
   lazy val test = Seq(
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test")
+    "org.scalamock" %% "scalamock-scalatest-support" % "3.2.1" % "test")
 
   lazy val twilio = Seq(
     "com.twilio.sdk" % "twilio-java-sdk" % "3.4.5")

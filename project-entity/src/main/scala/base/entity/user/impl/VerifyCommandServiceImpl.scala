@@ -2,25 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:29 PM
+ * Last modified by rconrad, 1/21/15 10:16 PM
  */
 
 package base.entity.user.impl
 
 import java.util.UUID
 
-import base.common.lib.Dispatchable
 import base.common.lib.Genders.Gender
 import base.common.random.RandomService
-import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.AuthContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.kv._
-import base.entity.logging.AuthLoggable
-import base.entity.perm.Perms
-import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
+import base.entity.service.CrudErrorImplicits
 import base.entity.sms.SmsService
 import base.entity.user._
 import base.entity.user.impl.VerifyCommandServiceImpl.Errors
@@ -107,7 +103,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
       }
 
     def deviceSet(userId: UUID, key: DeviceKey): Response =
-      key.create.flatMap { exists =>
+      key.create().flatMap { exists =>
         val token = RandomService().uuid
         key.setTokenAndUserId(token, userId).flatMap {
           case true  => VerifyResponseModel(token)

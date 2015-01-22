@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/13/15 10:09 PM
+ * Last modified by rconrad, 1/21/15 10:09 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key.Prop
-import base.entity.kv.KeyProp
 import base.entity.kv.mock.KeyLoggerMock
+import base.entity.kv.{ KeyProp, KvFactoryService }
 
 import scala.language.reflectiveCalls
 
@@ -20,7 +20,7 @@ import scala.language.reflectiveCalls
  * @author rconrad
  */
 // scalastyle:off null
-class PrivateHashKeyImplTest extends KeyImplTest {
+class HashKeyImplTest extends KeyImplTest {
 
   private val prop = new KeyProp("prop") {}
   private val prop2 = new KeyProp("prop2") {}
@@ -32,7 +32,11 @@ class PrivateHashKeyImplTest extends KeyImplTest {
   private val flagOff = false
   private val map = Map[Prop, String](prop -> string, prop2 -> string)
 
-  val model = new PrivateHashKeyImpl(getClass.getSimpleName, KeyLoggerMock)
+  val model = new HashKeyImpl {
+    val logger = KeyLoggerMock
+    val token = getClass.getSimpleName
+    val p = KvFactoryService().pipeline
+  }
 
   def create = model.set(prop, string).await()
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:46 PM
+ * Last modified by rconrad, 1/21/15 10:33 PM
  */
 
 package base.entity.question.impl
@@ -17,14 +17,11 @@ import base.entity.auth.context.AuthContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.EventModel
 import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
-import base.entity.kv.Key.Pipeline
 import base.entity.kv.{ KeyId, KvTest }
 import base.entity.question.QuestionSides._
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite }
 import base.entity.service.EntityServiceTest
-import org.scalamock.MockFunction0
-import org.scalamock.scalatest.MockFactory
 import redis.client.RedisException
 
 import scala.concurrent.Future
