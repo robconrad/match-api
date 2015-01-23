@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:18 PM
+ * Last modified by rconrad, 1/22/15 5:46 PM
  */
 
 package base.entity.kv.bytea
@@ -10,8 +10,8 @@ package base.entity.kv.bytea
 import java.util.UUID
 
 import base.entity.event.model.EventModel
-import base.entity.kv.IdPair
 import base.entity.kv.bytea.impl._
+import base.entity.kv.{ OrderedIdPair, SortedIdPair }
 import base.entity.question.QuestionIdComposite
 
 /**
@@ -26,7 +26,8 @@ object ByteaSerializers {
     manifest[String] -> StringByteaSerializer,
     manifest[UUID] -> IdByteaSerializer,
     manifest[QuestionIdComposite] -> QuestionIdCompositeByteaSerializer,
-    manifest[IdPair] -> IdPairByteaSerializer,
+    manifest[SortedIdPair] -> IdPairByteaSerializer,
+    manifest[OrderedIdPair] -> IdPairByteaSerializer,
     manifest[EventModel] -> EventModelByteaSerializer
   )
 

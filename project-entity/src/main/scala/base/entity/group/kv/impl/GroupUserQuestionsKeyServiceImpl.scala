@@ -2,15 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:56 PM
+ * Last modified by rconrad, 1/22/15 5:42 PM
  */
 
 package base.entity.group.kv.impl
 
+import java.util.UUID
+
 import base.entity.group.kv.{ GroupUserQuestionsKey, GroupUserQuestionsKeyService }
-import base.entity.kv.IdPair
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.{ IdPairKeyServiceImpl, SetKeyServiceImpl }
+import base.entity.kv.impl.SetKeyServiceImpl
+import base.entity.kv.{ IdPair, OrderedIdPair }
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -19,10 +21,11 @@ import base.entity.kv.impl.{ IdPairKeyServiceImpl, SetKeyServiceImpl }
  * @author rconrad
  */
 class GroupUserQuestionsKeyServiceImpl
-    extends SetKeyServiceImpl[IdPair, GroupUserQuestionsKey]
-    with GroupUserQuestionsKeyService
-    with IdPairKeyServiceImpl[GroupUserQuestionsKey] {
+    extends SetKeyServiceImpl[OrderedIdPair, GroupUserQuestionsKey]
+    with GroupUserQuestionsKeyService {
 
-  def make(id: IdPair)(implicit p: Pipeline) = new GroupUserQuestionsKeyImpl(getKey(id), this)
+  def make(a: UUID, b: UUID)(implicit p: Pipeline) = make(OrderedIdPair(a, b))
+
+  def make(id: OrderedIdPair)(implicit p: Pipeline) = new GroupUserQuestionsKeyImpl(getKey(id), this)
 
 }

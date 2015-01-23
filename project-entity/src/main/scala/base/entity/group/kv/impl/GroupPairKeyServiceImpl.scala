@@ -2,15 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:46 PM
+ * Last modified by rconrad, 1/22/15 5:37 PM
  */
 
 package base.entity.group.kv.impl
 
+import java.util.UUID
+
 import base.entity.group.kv.{ GroupPairKey, GroupPairKeyService }
-import base.entity.kv.IdPair
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.{ IdPairKeyServiceImpl, SimpleKeyServiceImpl }
+import base.entity.kv.SortedIdPair
+import base.entity.kv.impl.SimpleKeyServiceImpl
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -19,17 +21,11 @@ import base.entity.kv.impl.{ IdPairKeyServiceImpl, SimpleKeyServiceImpl }
  * @author rconrad
  */
 class GroupPairKeyServiceImpl
-    extends SimpleKeyServiceImpl[IdPair, GroupPairKey]
-    with GroupPairKeyService
-    with IdPairKeyServiceImpl[GroupPairKey] {
+    extends SimpleKeyServiceImpl[SortedIdPair, GroupPairKey]
+    with GroupPairKeyService {
 
-  def make(id: IdPair)(implicit p: Pipeline) = {
-    val ordered = id.a.compareTo(id.b) match {
-      case -1 => IdPair(id.a, id.b)
-      case 1  => IdPair(id.b, id.a)
-      case 0  => throw new RuntimeException("userA and userB are equal")
-    }
-    new GroupPairKeyImpl(getKey(ordered), this)
-  }
+  def make(a: UUID, b: UUID)(implicit p: Pipeline) = make(SortedIdPair(a, b))
+
+  def make(id: SortedIdPair)(implicit p: Pipeline) = new GroupPairKeyImpl(getKey(id), this)
 
 }

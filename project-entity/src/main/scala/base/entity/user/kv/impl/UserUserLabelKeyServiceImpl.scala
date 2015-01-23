@@ -2,14 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:56 PM
+ * Last modified by rconrad, 1/22/15 5:42 PM
  */
 
 package base.entity.user.kv.impl
 
-import base.entity.kv.IdPair
+import java.util.UUID
+
 import base.entity.kv.Key._
-import base.entity.kv.impl.{ IdPairKeyServiceImpl, SimpleKeyServiceImpl }
+import base.entity.kv.impl.SimpleKeyServiceImpl
+import base.entity.kv.{ IdPair, OrderedIdPair }
 import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService }
 
 /**
@@ -19,10 +21,11 @@ import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService }
  * @author rconrad
  */
 class UserUserLabelKeyServiceImpl
-    extends SimpleKeyServiceImpl[IdPair, UserUserLabelKey]
-    with UserUserLabelKeyService
-    with IdPairKeyServiceImpl[UserUserLabelKey] {
+    extends SimpleKeyServiceImpl[OrderedIdPair, UserUserLabelKey]
+    with UserUserLabelKeyService {
 
-  def make(id: IdPair)(implicit p: Pipeline) = new UserUserLabelKeyImpl(getKey(id), this)
+  def make(a: UUID, b: UUID)(implicit p: Pipeline) = make(OrderedIdPair(a, b))
+
+  def make(id: OrderedIdPair)(implicit p: Pipeline) = new UserUserLabelKeyImpl(getKey(id), this)
 
 }
