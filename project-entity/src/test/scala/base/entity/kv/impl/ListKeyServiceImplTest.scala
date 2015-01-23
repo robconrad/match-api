@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:30 PM
+ * Last modified by rconrad, 1/22/15 3:20 PM
  */
 
 package base.entity.kv.impl
@@ -25,11 +25,11 @@ class ListKeyServiceImplTest extends KeyServiceImplTest[ListKey[String]] {
   private val val1 = "value1"
   private val val2 = "value2"
 
-  val keyService = new ListKeyServiceImpl[String, ListKey[String]]() {
+  val keyService = new ListKeyServiceImpl[String, ListKey[String]] with StringTypedKeyServiceImpl {
     // scalastyle:off null
     val serviceManifest = null
     def make(id: String)(implicit p: Pipeline) = new ListKeyImpl[String] with StringTypedKeyImpl {
-      val token = id.toString
+      val token = id.getBytes
       val logger = KeyLoggerMock
       protected implicit val p = tp
     }

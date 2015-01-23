@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:00 PM
+ * Last modified by rconrad, 1/22/15 3:16 PM
  */
 
 package base.entity.kv.impl
@@ -24,7 +24,7 @@ class SetKeyImplTest extends KeyImplTest {
   private val val2 = RandomService().uuid
 
   val model = new SetKeyImpl[UUID] with IdTypedKeyImpl {
-    val token = this.getClass.getSimpleName
+    val token = this.getClass.getSimpleName.getBytes
     val logger = KeyLoggerMock
     protected implicit val p = tp
   }
@@ -79,7 +79,7 @@ class SetKeyImplTest extends KeyImplTest {
 
   test("move") {
     val dest = new SetKeyImpl[UUID] with IdTypedKeyImpl {
-      val token = this.getClass.getSimpleName + "destination"
+      val token = "destination".getBytes
       val logger = KeyLoggerMock
       protected implicit val p = tp
     }
@@ -91,12 +91,12 @@ class SetKeyImplTest extends KeyImplTest {
 
   test("diffStore") {
     val all = new SetKeyImpl[UUID] with IdTypedKeyImpl {
-      val token = this.getClass.getSimpleName + "all"
+      val token = "all".getBytes
       val logger = KeyLoggerMock
       protected implicit val p = tp
     }
     val remove = new SetKeyImpl[UUID] with IdTypedKeyImpl {
-      val token = this.getClass.getSimpleName + "remove"
+      val token = "remove".getBytes
       val logger = KeyLoggerMock
       protected implicit val p = tp
     }

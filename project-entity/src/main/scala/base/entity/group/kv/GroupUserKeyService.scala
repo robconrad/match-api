@@ -2,15 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:30 PM
+ * Last modified by rconrad, 1/22/15 4:07 PM
  */
 
 package base.entity.group.kv
 
-import java.util.UUID
-
-import base.entity.kv.Key._
-import base.entity.kv.{ KeyPrefixes, KeyService, KeyServiceCompanion }
+import base.entity.kv._
 
 /**
  * {{ Describe the high level purpose of UserKeyService here. }}
@@ -18,7 +15,7 @@ import base.entity.kv.{ KeyPrefixes, KeyService, KeyServiceCompanion }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupUserKeyService extends KeyService[(UUID, UUID), GroupUserKey] {
+trait GroupUserKeyService extends IdPairKeyService[GroupUserKey] {
 
   final val serviceManifest = manifest[GroupUserKeyService]
 

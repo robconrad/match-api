@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:31 PM
+ * Last modified by rconrad, 1/22/15 3:30 PM
  */
 
 package base.entity.kv
@@ -20,7 +20,7 @@ object KeyPrefixes extends Enumeration {
   type KeyPrefix = Value
 
   implicit class Props(v: Value) {
-    def toBytes = ByteBuffer.allocate(4).putInt(v.id).array().slice(0, 2)
+    def toBytes = ByteBuffer.allocate(2).putShort(v.id.toShort).array()
   }
 
   /**

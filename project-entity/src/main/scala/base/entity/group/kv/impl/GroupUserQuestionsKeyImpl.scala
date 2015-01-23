@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:54 AM
+ * Last modified by rconrad, 1/22/15 3:07 PM
  */
 
 package base.entity.group.kv.impl
@@ -19,7 +19,8 @@ import base.entity.question.QuestionIdComposite
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupUserQuestionsKeyImpl(val token: String, protected val logger: KeyLogger)(implicit protected val p: Pipeline)
+class GroupUserQuestionsKeyImpl(val token: Array[Byte],
+                                protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends SetKeyImpl[QuestionIdComposite] with GroupUserQuestionsKey with QuestionIdCompositeTypedKeyImpl {
 
 }

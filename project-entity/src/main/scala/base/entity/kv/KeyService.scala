@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 1:30 PM
+ * Last modified by rconrad, 1/22/15 3:03 PM
  */
 
 package base.entity.kv
@@ -19,11 +19,11 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait KeyService[A, B <: Key] extends Service with KeyLogger {
+trait KeyService[A, B <: Key] extends Service with TypedKeyService[A] with KeyLogger {
 
-  protected val prefix: KeyPrefix
+  protected def prefix: KeyPrefix
 
-  protected def getKey(id: A): String
+  protected def getKey(id: A): Array[Byte]
 
   def make(id: A)(implicit p: Pipeline): B
 

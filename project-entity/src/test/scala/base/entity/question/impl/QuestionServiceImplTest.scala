@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:59 PM
+ * Last modified by rconrad, 1/22/15 3:12 PM
  */
 
 package base.entity.question.impl
@@ -75,7 +75,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val groupId = RandomService().uuid
     val key = mock[GroupUserQuestionsTempKey]
     key.del _ expects () returning Future.successful(false)
-    key.token _ expects () returning ""
+    key.token _ expects () returning Array[Byte]()
 
     val method = new service.GetQuestionsMethod(groupId)
     intercept[RedisException] {

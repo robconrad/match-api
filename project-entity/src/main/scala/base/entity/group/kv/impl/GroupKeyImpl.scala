@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:42 PM
+ * Last modified by rconrad, 1/22/15 3:07 PM
  */
 
 package base.entity.group.kv.impl
@@ -23,7 +23,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupKeyImpl(val token: String,
+class GroupKeyImpl(val token: Array[Byte],
                    protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends HashKeyImpl with GroupKey {
 

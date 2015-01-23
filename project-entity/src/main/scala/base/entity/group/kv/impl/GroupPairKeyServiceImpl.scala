@@ -2,16 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:49 PM
+ * Last modified by rconrad, 1/22/15 4:15 PM
  */
 
 package base.entity.group.kv.impl
 
-import java.util.UUID
-
 import base.entity.group.kv.{ GroupPairKey, GroupPairKeyService }
+import base.entity.kv.IdPair
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.SimpleKeyServiceImpl
+import base.entity.kv.impl.{ IdPairKeyServiceImpl, IdPairTypedKeyServiceImpl, SimpleKeyServiceImpl }
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -19,15 +18,18 @@ import base.entity.kv.impl.SimpleKeyServiceImpl
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupPairKeyServiceImpl extends SimpleKeyServiceImpl[(UUID, UUID), GroupPairKey] with GroupPairKeyService {
+class GroupPairKeyServiceImpl
+    extends SimpleKeyServiceImpl[IdPair, GroupPairKey]
+    with GroupPairKeyService
+    with IdPairKeyServiceImpl[GroupPairKey]
+    with IdPairTypedKeyServiceImpl {
 
-  def make(id: (UUID, UUID))(implicit p: Pipeline) = {
-    val ordered = id._1.compareTo(id._2) match {
-      case -1 => (id._1, id._2)
-      case 1  => (id._2, id._1)
+  def make(id: IdPair)(implicit p: Pipeline) = {
+    val ordered = id.a.compareTo(id.b) match {
+      case -1 => IdPair(id.a, id.b)
+      case 1  => IdPair(id.b, id.a)
       case 0  => throw new RuntimeException("userA and userB are equal")
     }
-    // todo these uuids are just getting stringified, lets store them as byte arrays
     new GroupPairKeyImpl(getKey(ordered), this)
   }
 

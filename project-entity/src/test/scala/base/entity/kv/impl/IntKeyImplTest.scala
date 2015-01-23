@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:40 PM
+ * Last modified by rconrad, 1/22/15 3:16 PM
  */
 
 package base.entity.kv.impl
@@ -20,7 +20,7 @@ class IntKeyImplTest extends KeyImplTest {
   private val int = 10
 
   val model = new IntKeyImpl {
-    val token = this.getClass.getSimpleName
+    val token = this.getClass.getSimpleName.getBytes
     val logger = KeyLoggerMock
     protected implicit val p = tp
   }

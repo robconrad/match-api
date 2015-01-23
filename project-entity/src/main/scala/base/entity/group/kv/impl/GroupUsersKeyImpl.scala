@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:16 AM
+ * Last modified by rconrad, 1/22/15 3:05 PM
  */
 
 package base.entity.group.kv.impl
@@ -20,7 +20,7 @@ import base.entity.kv.impl.{ IdTypedKeyImpl, SetKeyImpl }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupUsersKeyImpl(val token: String, protected val logger: KeyLogger)(implicit protected val p: Pipeline)
+class GroupUsersKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends SetKeyImpl[UUID] with IdTypedKeyImpl with GroupUsersKey {
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:09 PM
+ * Last modified by rconrad, 1/22/15 3:16 PM
  */
 
 package base.entity.kv.impl
@@ -34,7 +34,7 @@ class HashKeyImplTest extends KeyImplTest {
 
   val model = new HashKeyImpl {
     val logger = KeyLoggerMock
-    val token = getClass.getSimpleName
+    val token = getClass.getSimpleName.getBytes
     val p = KvFactoryService().pipeline
   }
 

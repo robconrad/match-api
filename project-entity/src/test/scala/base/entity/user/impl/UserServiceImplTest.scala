@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 1:02 PM
+ * Last modified by rconrad, 1/22/15 4:14 PM
  */
 
 package base.entity.user.impl
@@ -16,7 +16,7 @@ import base.entity.error.ApiError
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
-import base.entity.kv.KvTest
+import base.entity.kv.{ IdPair, KvTest }
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
 import base.entity.user.kv.{ UserGroupsKey, UserUserLabelKey, UserUserLabelKeyService }
@@ -62,8 +62,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     key2.get _ expects () returning Future.successful(None)
 
     val keyService = mock[UserUserLabelKeyService]
-    (keyService.make(_: (UUID, UUID))(_: Pipeline)) expects (*, *) returning key1
-    (keyService.make(_: (UUID, UUID))(_: Pipeline)) expects (*, *) returning key2
+    (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key1
+    (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key2
 
     assert(service.getUsers(userIds, keyService).await() == Right(models))
   }

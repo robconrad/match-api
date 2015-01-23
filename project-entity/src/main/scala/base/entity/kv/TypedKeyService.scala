@@ -2,21 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:08 PM
+ * Last modified by rconrad, 1/22/15 3:38 PM
  */
 
 package base.entity.kv
 
 /**
- * {{ Describe the high level purpose of KeyLogger here. }}
+ * {{ Describe the high level purpose of TypedKeyService here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait KeyLogger {
+trait TypedKeyService[T] {
 
-  def log(cmd: String, msg: String)
-
-  def log(cmd: String, token: Array[Byte], msg: String = "")
+  protected def toBytes(id: T): Array[Byte]
+  protected def fromBytes(id: Array[Byte]): T
 
 }
