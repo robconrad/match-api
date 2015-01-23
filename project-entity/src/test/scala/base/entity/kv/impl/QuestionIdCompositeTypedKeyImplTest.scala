@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:16 PM
+ * Last modified by rconrad, 1/22/15 5:00 PM
  */
 
 package base.entity.kv.impl
@@ -21,7 +21,7 @@ class QuestionIdCompositeTypedKeyImplTest extends KeyImplTest {
 
   private val id = QuestionIdComposite(RandomService().uuid, QuestionSides.SIDE_A)
 
-  val model = new SimpleKeyImpl[QuestionIdComposite] with QuestionIdCompositeTypedKeyImpl {
+  val model = new SimpleKeyImpl[QuestionIdComposite] {
     val token = this.getClass.getSimpleName.getBytes
     val logger = KeyLoggerMock
     protected implicit val p = tp

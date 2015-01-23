@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:12 PM
+ * Last modified by rconrad, 1/22/15 4:56 PM
  */
 
 package base.entity.user.kv.impl
 
 import base.entity.kv.IdPair
 import base.entity.kv.Key._
-import base.entity.kv.impl.{ IdPairKeyServiceImpl, IdPairTypedKeyServiceImpl, SimpleKeyServiceImpl }
+import base.entity.kv.impl.{ IdPairKeyServiceImpl, SimpleKeyServiceImpl }
 import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService }
 
 /**
@@ -21,8 +21,7 @@ import base.entity.user.kv.{ UserUserLabelKey, UserUserLabelKeyService }
 class UserUserLabelKeyServiceImpl
     extends SimpleKeyServiceImpl[IdPair, UserUserLabelKey]
     with UserUserLabelKeyService
-    with IdPairKeyServiceImpl[UserUserLabelKey]
-    with IdPairTypedKeyServiceImpl {
+    with IdPairKeyServiceImpl[UserUserLabelKey] {
 
   def make(id: IdPair)(implicit p: Pipeline) = new UserUserLabelKeyImpl(getKey(id), this)
 

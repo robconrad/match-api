@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:05 PM
+ * Last modified by rconrad, 1/22/15 4:56 PM
  */
 
 package base.entity.user.kv.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.KeyLogger
-import base.entity.kv.impl.{ IdTypedKeyImpl, SetKeyImpl }
+import base.entity.kv.impl.SetKeyImpl
 import base.entity.user.kv.UserGroupsKey
 
 /**
@@ -21,6 +21,6 @@ import base.entity.user.kv.UserGroupsKey
  * @author rconrad
  */
 class UserGroupsKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SetKeyImpl[UUID] with UserGroupsKey with IdTypedKeyImpl {
+    extends SetKeyImpl[UUID] with UserGroupsKey {
 
 }

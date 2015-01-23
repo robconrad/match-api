@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:16 PM
+ * Last modified by rconrad, 1/22/15 5:00 PM
  */
 
 package base.entity.kv.impl
@@ -23,7 +23,7 @@ class IdTypedKeyImplTest extends KeyImplTest {
 
   private val id = RandomService().uuid
 
-  val model = new SimpleKeyImpl[UUID] with IdTypedKeyImpl {
+  val model = new SimpleKeyImpl[UUID] {
     val token = this.getClass.getSimpleName.getBytes
     val logger = KeyLoggerMock
     protected implicit val p = tp

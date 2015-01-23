@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:20 PM
+ * Last modified by rconrad, 1/22/15 5:00 PM
  */
 
 package base.entity.kv.impl
@@ -21,7 +21,7 @@ class IntKeyServiceImplTest extends KeyServiceImplTest[IntKey] {
 
   private val int = 10
 
-  val keyService = new IntKeyServiceImpl[String, IntKey] with StringTypedKeyServiceImpl {
+  val keyService = new IntKeyServiceImpl[String, IntKey] {
     // scalastyle:off null
     val serviceManifest = null
     def make(id: String)(implicit p: Pipeline) = new IntKeyImpl {

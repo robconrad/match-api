@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:14 PM
+ * Last modified by rconrad, 1/22/15 4:43 PM
  */
 
 package base.entity.kv
@@ -15,7 +15,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait SimpleKey[T] extends TypedKey[T] {
+trait SimpleKey[T] extends Key {
 
   def get: Future[Option[T]]
   def set(v: T): Future[Boolean]

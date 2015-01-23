@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:37 PM
+ * Last modified by rconrad, 1/22/15 4:56 PM
  */
 
 package base.entity.kv.impl
@@ -23,7 +23,9 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-abstract class HashKeyServiceImpl[A, B <: Key] extends KeyServiceImpl[A, B] with HashKeyService[A, B] {
+abstract class HashKeyServiceImpl[A, B <: Key](implicit m: Manifest[A])
+    extends KeyServiceImpl[A, B]
+    with HashKeyService[A, B] {
 
   def make(id: A)(implicit p: Pipeline): B
 

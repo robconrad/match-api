@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:36 PM
+ * Last modified by rconrad, 1/22/15 4:56 PM
  */
 
 package base.entity.kv.impl
@@ -18,7 +18,9 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class SetKeyServiceImpl[A, B <: SetKey[_]] extends KeyServiceImpl[A, B] with SetKeyService[A, B] {
+abstract class SetKeyServiceImpl[A, B <: SetKey[_]](implicit m: Manifest[A])
+    extends KeyServiceImpl[A, B]
+    with SetKeyService[A, B] {
 
   def remove(sets: List[SetKey[_]], value: Any)(implicit p: Pipeline) = {
     if (isDebugEnabled) log("SREM-MULTI", s"sets: ${sets.map(s => s.token)}, value: $value")

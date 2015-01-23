@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:15 PM
+ * Last modified by rconrad, 1/22/15 4:46 PM
  */
 
 package base.entity.group.kv.impl
@@ -10,7 +10,7 @@ package base.entity.group.kv.impl
 import base.entity.group.kv.{ GroupPairKey, GroupPairKeyService }
 import base.entity.kv.IdPair
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.{ IdPairKeyServiceImpl, IdPairTypedKeyServiceImpl, SimpleKeyServiceImpl }
+import base.entity.kv.impl.{ IdPairKeyServiceImpl, SimpleKeyServiceImpl }
 
 /**
  * {{ Describe the high level purpose of UserKeyServiceImpl here. }}
@@ -21,8 +21,7 @@ import base.entity.kv.impl.{ IdPairKeyServiceImpl, IdPairTypedKeyServiceImpl, Si
 class GroupPairKeyServiceImpl
     extends SimpleKeyServiceImpl[IdPair, GroupPairKey]
     with GroupPairKeyService
-    with IdPairKeyServiceImpl[GroupPairKey]
-    with IdPairTypedKeyServiceImpl {
+    with IdPairKeyServiceImpl[GroupPairKey] {
 
   def make(id: IdPair)(implicit p: Pipeline) = {
     val ordered = id.a.compareTo(id.b) match {

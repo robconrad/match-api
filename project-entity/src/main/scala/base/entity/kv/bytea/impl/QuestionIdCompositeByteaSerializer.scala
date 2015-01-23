@@ -2,29 +2,34 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:04 PM
+ * Last modified by rconrad, 1/22/15 5:18 PM
  */
 
-package base.entity.kv.impl
+package base.entity.kv.bytea.impl
 
-import base.common.logging.Loggable
-import base.entity.kv.TypedKey
+import base.entity.kv.bytea.ByteaSerializer
 import base.entity.question.{ QuestionIdComposite, QuestionSides }
 import redis.client.RedisException
 
 /**
- * {{ Describe the high level purpose of IdTypedKeyImpl here. }}
+ * {{ Describe the high level purpose of QuestionIdCompositeByteaSerializer here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
 // scalastyle:off null
-trait QuestionIdCompositeTypedKeyImpl extends TypedKey[QuestionIdComposite] with Loggable {
+object QuestionIdCompositeByteaSerializer extends ByteaSerializer[QuestionIdComposite] {
 
   val compositeIdLength = 17
   val uuidLength = 16
 
-  protected def toType(data: Array[Byte]) = {
+  def serialize(data: QuestionIdComposite) = {
+    val side = data.side.toString.getBytes
+    assert(side.length == 1)
+    UuidUtil.fromUuid(data.questionId) ++ side
+  }
+
+  def deserialize(data: Array[Byte]) = {
     data match {
       case null =>
         throw new RedisException("toType received null")
@@ -37,12 +42,6 @@ trait QuestionIdCompositeTypedKeyImpl extends TypedKey[QuestionIdComposite] with
         val side = QuestionSides.withName(new String(data.slice(uuidLength, compositeIdLength)))
         QuestionIdComposite(uuid, side)
     }
-  }
-
-  protected def fromType(data: QuestionIdComposite) = {
-    val side = data.side.toString.getBytes
-    assert(side.length == 1)
-    UuidUtil.fromUuid(data.questionId) ++ side
   }
 
 }

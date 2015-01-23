@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:36 PM
+ * Last modified by rconrad, 1/22/15 4:58 PM
  */
 
 package base.entity.kv.impl
@@ -15,6 +15,8 @@ import base.entity.kv._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class IntKeyServiceImpl[A, B <: IntKey] extends KeyServiceImpl[A, B] with IntKeyService[A, B] {
+abstract class IntKeyServiceImpl[A, B <: IntKey](implicit m: Manifest[A])
+    extends KeyServiceImpl[A, B]
+    with IntKeyService[A, B] {
 
 }

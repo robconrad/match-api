@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 11:28 PM
+ * Last modified by rconrad, 1/22/15 5:11 PM
  */
 
-package base.entity.kv.impl
+package base.entity.kv.bytea.impl
 
 import java.nio.ByteBuffer
 import java.util.UUID
@@ -19,7 +19,7 @@ import base.common.lib.Tryo
  * @author rconrad
  */
 // scalastyle:off
-object UuidUtil {
+private[impl] object UuidUtil {
 
   def isValid(data: Array[Byte]) = data match {
     case null                      => false

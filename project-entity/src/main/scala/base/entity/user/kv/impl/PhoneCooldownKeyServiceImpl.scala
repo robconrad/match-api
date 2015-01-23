@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:12 PM
+ * Last modified by rconrad, 1/22/15 4:56 PM
  */
 
 package base.entity.user.kv.impl
 
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.{ StringTypedKeyServiceImpl, IntKeyServiceImpl }
+import base.entity.kv.impl.IntKeyServiceImpl
 import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService }
 
 /**
@@ -19,8 +19,7 @@ import base.entity.user.kv.{ PhoneCooldownKey, PhoneCooldownKeyService }
  */
 class PhoneCooldownKeyServiceImpl
     extends IntKeyServiceImpl[String, PhoneCooldownKey]
-    with PhoneCooldownKeyService
-    with StringTypedKeyServiceImpl {
+    with PhoneCooldownKeyService {
 
   def make(id: String)(implicit p: Pipeline) = new PhoneCooldownKeyImpl(getKey(id), this)
 

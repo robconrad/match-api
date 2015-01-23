@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:16 PM
+ * Last modified by rconrad, 1/22/15 5:00 PM
  */
 
 package base.entity.kv.impl
@@ -29,7 +29,7 @@ class HashKeyServiceImplTest extends KeyServiceImplTest[HashKey] {
   private val string = "value"
   private val long = 1L
 
-  val keyService = new HashKeyServiceImpl[String, HashKey] with StringTypedKeyServiceImpl {
+  val keyService = new HashKeyServiceImpl[String, HashKey] {
     // scalastyle:off null
     val serviceManifest = null
     def make(id: String)(implicit p: Pipeline) = new HashKeyImpl {

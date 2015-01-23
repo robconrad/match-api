@@ -2,20 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:38 PM
+ * Last modified by rconrad, 1/22/15 5:18 PM
  */
 
-package base.entity.kv
+package base.entity.kv.bytea
 
 /**
- * {{ Describe the high level purpose of TypedKeyService here. }}
+ * {{ Describe the high level purpose of ByteaSerializer here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait TypedKeyService[T] {
+trait ByteaSerializer[T] {
 
-  protected def toBytes(id: T): Array[Byte]
-  protected def fromBytes(id: Array[Byte]): T
+  def serialize(v: T): Array[Byte]
+
+  def deserialize(v: Array[Byte]): T
 
 }

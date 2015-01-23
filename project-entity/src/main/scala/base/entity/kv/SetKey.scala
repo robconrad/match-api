@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:18 AM
+ * Last modified by rconrad, 1/22/15 4:43 PM
  */
 
 package base.entity.kv
@@ -15,7 +15,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait SetKey[T] extends TypedKey[T] {
+trait SetKey[T] extends Key {
 
   def members(): Future[Set[T]]
 

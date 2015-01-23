@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:05 PM
+ * Last modified by rconrad, 1/22/15 5:04 PM
  */
 
 package base.entity.group.kv.impl
@@ -23,15 +23,5 @@ import org.json4s.native.{ Serialization, JsonMethods }
  */
 class GroupEventsKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends ListKeyImpl[EventModel] with GroupEventsKey {
-
-  implicit val formats = JsonFormats.withEnumsAndFields
-
-  protected def toType(data: Array[Byte]) = {
-    JsonMethods.parse(new String(data)).extract[EventModel]
-  }
-
-  protected def fromType(data: EventModel) = {
-    Serialization.write(data).getBytes
-  }
 
 }

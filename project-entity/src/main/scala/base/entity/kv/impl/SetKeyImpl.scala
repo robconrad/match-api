@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:20 AM
+ * Last modified by rconrad, 1/22/15 4:58 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.SetKey
+import base.entity.kv.bytea.ByteaSerializers._
 import redis.client.RedisException
 import redis.reply.{ BulkReply, MultiBulkReply }
 
@@ -15,12 +16,12 @@ import redis.reply.{ BulkReply, MultiBulkReply }
  * Base model for set keys
  */
 // scalastyle:off null
-abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
+abstract class SetKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with SetKey[T] {
 
   def members() = {
     p.smembers(token).map { v =>
       val res = v.data().map { x =>
-        toType(x.data().asInstanceOf[Array[Byte]])
+        deserialize[T](x.data().asInstanceOf[Array[Byte]])
       }.toSet
       if (isDebugEnabled) log("SMEMBERS", "props: " + res.toString)
       res
@@ -28,7 +29,7 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
   }
 
   def isMember(value: T) = {
-    p.sismember(token, fromType(value)).map { v =>
+    p.sismember(token, serialize(value)).map { v =>
       val isMember = v.data() == 1L
       if (isDebugEnabled) log("SISMEMBER", s"value: $value res: $isMember")
       isMember
@@ -40,7 +41,7 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
       val res = v match {
         case null                  => None
         case v if v.data() == null => None
-        case v: BulkReply          => Option(toType(v.data()))
+        case v: BulkReply          => Option(deserialize(v.data()))
         case v                     => throw new RedisException(s"SRANDMEMBER received sth. other than BulkReply: $v")
       }
       if (isDebugEnabled) log("SRANDMEMBER", s"result: $res")
@@ -54,7 +55,7 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
       case v if v.data() == null => Set()
       case v: MultiBulkReply =>
         val res = v.data() map {
-          case v: BulkReply => toType(v.data())
+          case v: BulkReply => deserialize(v.data())
           case v            => throw new RedisException(s"SRANDMEMBER got something other than BulkReply: $v")
         }
         if (isDebugEnabled) log("SRANDMEMBER", s"count: $count, result: $res")
@@ -68,7 +69,7 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
       val res = v match {
         case null                  => None
         case v if v.data() == null => None
-        case v                     => Option(toType(v.data()))
+        case v                     => Option(deserialize(v.data()))
       }
       if (isDebugEnabled) log("SPOP", s"result: $res")
       res
@@ -76,7 +77,7 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
   }
 
   def add(value: T*) = {
-    val args = token +: value.map(fromType)
+    val args = token +: value.map(v => serialize(v))
     p.sadd_(args: _*).map { v =>
       val res = v.data()
       if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
@@ -85,14 +86,14 @@ abstract class SetKeyImpl[T] extends KeyImpl with SetKey[T] {
   }
 
   def remove(value: T) =
-    p.srem_(token, fromType(value)).map { v =>
+    p.srem_(token, serialize(value)).map { v =>
       val res = v.data() > 0L
       if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
       res
     }
 
   def move(to: SetKey[T], member: T) =
-    p.smove(token, to.token, fromType(member)).map { v =>
+    p.smove(token, to.token, serialize(member)).map { v =>
       val res = v.data()
       if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member, result: $res")
       res > 0
