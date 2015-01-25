@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 7:48 PM
+ * Last modified by rconrad, 1/25/15 11:45 AM
  */
 
 package base.entity.user.model
@@ -21,6 +21,7 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = userResponse)
+// todo convert to interface for mocking
 case class UserModel(
   @(ApiModelProperty @field)(required = true,  value = idDesc)    id: UUID,
   @(ApiModelProperty @field)(required = true,  value = emailDesc) label: Option[String])

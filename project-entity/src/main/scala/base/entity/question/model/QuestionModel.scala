@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 11:39 AM
+ * Last modified by rconrad, 1/25/15 11:45 AM
  */
 
 package base.entity.question.model
@@ -23,6 +23,7 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
+// todo convert to interface for mocking
 case class QuestionModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     id: UUID,
   @(ApiModelProperty @field)(required = true, value = emailDesc)     a: String,

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/11/15 2:39 PM
+ * Last modified by rconrad, 1/25/15 11:45 AM
  */
 
 package base.entity.user.model
@@ -24,6 +24,7 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
+// todo convert to interface for mocking
 case class VerifyModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     apiVersion: ApiVersion,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  name: Option[String],
