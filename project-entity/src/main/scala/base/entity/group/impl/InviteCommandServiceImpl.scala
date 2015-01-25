@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:52 AM
+ * Last modified by rconrad, 1/25/15 10:17 AM
  */
 
 package base.entity.group.impl
@@ -118,7 +118,6 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
         case _ => Errors.userGroupsAddFailed
       }
 
-    // todo test this
     def registerGroupListener(userId: UUID, groupId: UUID) =
       GroupListenerService().register(authCtx.userId, Set(groupId)).flatMap { x =>
         groupEventsPrepend(userId, groupId)

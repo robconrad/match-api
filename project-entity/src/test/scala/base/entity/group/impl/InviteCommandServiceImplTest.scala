@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 9:42 PM
+ * Last modified by rconrad, 1/25/15 10:17 AM
  */
 
 package base.entity.group.impl
@@ -20,7 +20,7 @@ import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupEventsService, GroupService }
+import base.entity.group.{ GroupListenerService, GroupEventsService, GroupService }
 import base.entity.kv.Key._
 import base.entity.user.kv._
 import base.entity.user.model.UserModel
@@ -72,9 +72,14 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupId = randomMock.nextUuid(1)
     val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupService = mock[GroupService]
+    val groupListenerService = mock[GroupListenerService]
+
     (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(Option(group)))
-    val unregister = TestServices.register(groupService)
+    (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Unit)
+
+    val unregister = TestServices.register(groupService, groupListenerService)
     val response = InviteResponseModel(userId, group)
     assert(service.innerExecute(model).await() == Right(response))
 
@@ -117,9 +122,14 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupId = randomMock.nextUuid()
     val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
     val groupService = mock[GroupService]
+    val groupListenerService = mock[GroupListenerService]
+
     (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(Option(group)))
-    val unregister = TestServices.register(groupService)
+    (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Unit)
+
+    val unregister = TestServices.register(groupService, groupListenerService)
     val response = InviteResponseModel(userId, group)
     assert(service.innerExecute(model).await() == Right(response))
 
