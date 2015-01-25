@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:52 PM
+ * Last modified by rconrad, 1/22/15 9:57 PM
  */
 
 package base.entity.user.impl
@@ -13,7 +13,7 @@ import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.AuthContextDataFactory
+import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.user.VerifyCommandService
 import base.entity.user.impl.RegisterCommandServiceImpl._
@@ -37,8 +37,8 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val registerModel = RegisterModel(ApiVersions.V01, phone)
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val model = RegisterModel(ApiVersions.V01, phone)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   override def beforeAll() {
     super.beforeAll()
@@ -64,8 +64,8 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("without perms") {
-    assertPermException(authCtx => {
-      service.execute(registerModel)(authCtx)
+    assertPermException(channelCtx => {
+      service.execute(model)(channelCtx)
     })
   }
 
@@ -75,7 +75,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     verifyService.makeVerifyCode _ expects () returning verifyCode
     verifyService.sendVerifySms _ expects (*, *) returning Future.successful(true)
     val unregister = TestServices.register(verifyService)
-    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
     unregister()
   }
@@ -89,19 +89,19 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     verifyService.sendVerifySms _ expects (*, *) returning Future.successful(true)
     val unregister = TestServices.register(verifyService)
 
-    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
 
     val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
     assert(phoneCooldownKey.del().await())
 
-    assert(service.innerExecute(registerModel).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
     assertSuccessConditions(userId)
     unregister()
   }
 
   test("phone cooldown in effect") {
-    val key = PhoneCooldownKeyService().make(registerModel.phone)
+    val key = PhoneCooldownKeyService().make(model.phone)
     assert(key.set(1).await())
     assert(command.phoneCooldownExists(key).await() == Errors.phoneCooldown.await())
   }

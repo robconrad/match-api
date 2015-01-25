@@ -2,16 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 10:09 AM
+ * Last modified by rconrad, 1/22/15 9:54 PM
  */
 
 package base.entity.logging
 
 import base.common.logging._
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
-import base.entity.perm.PermSetGroups
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.test.EntityBaseSuite
-import base.entity.user.User
 
 /**
  * Test the AuthLoggable context imprint extension to the base logger to ensure it properly adds the
@@ -20,10 +18,10 @@ import base.entity.user.User
  */
 class AuthLoggableTest extends EntityBaseSuite with AuthLoggable {
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
   private val t = new RuntimeException("error!")
 
-  private def logAndAssert(logger: (String, String) => Unit)(implicit authCtx: AuthContext) {
+  private def logAndAssert(logger: (String, String) => Unit)(implicit channelCtx: ChannelContext) {
     LoggableTestUtil.logAndAssert(logger, () => {
       assert(LoggableTestUtil.lastDefault.contains(authCtx.toLogPrefix))
     })

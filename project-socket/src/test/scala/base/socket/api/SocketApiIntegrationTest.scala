@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:58 PM
+ * Last modified by rconrad, 1/24/15 11:48 PM
  */
 
 package base.socket.api
@@ -17,13 +17,14 @@ import base.common.service.{ Services, ServicesBeforeAndAfterAll }
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.{ AuthContext, StandardUserAuthContext }
+import base.entity.auth.context.impl.ChannelContextImpl
+import base.entity.auth.context.{ ChannelContext, StandardUserAuthContext }
 import base.entity.command.CommandServiceCompanion
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.InviteCommandService
+import base.entity.group.{ EventCommandService, InviteCommandService }
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
@@ -37,6 +38,7 @@ import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
 import base.entity.user.model._
 import base.entity.user.{ LoginCommandService, RegisterCommandService, User, VerifyCommandService }
+import base.socket.api.test.SocketConnection
 import base.socket.test.SocketBaseSuite
 import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
@@ -57,7 +59,7 @@ abstract class SocketApiIntegrationTest
   val connectionsAllowed = 6
 
   private val totalSides = 6
-  private val questions = List(
+  private val questionDefs = List(
     ("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04", "Doin' it with the lights off", None),
     ("2c75851f-1a87-40ab-9f66-14766fa12c6c", "Liberal use of chocolate sauce", None),
     ("a8d08d2d-d914-4e7b-8ff4-6a9dde02002c", "Giving buttsex", Option("Receiving buttsex")),
@@ -87,18 +89,18 @@ abstract class SocketApiIntegrationTest
 
     // use real user service but ensure a constant ordering of users
     Services.register(new UserServiceImpl() {
-      override def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) =
-        super.getUsers(userIds)(p, authCtx).map {
-          case Right(users) => Right(users.sortBy(_.label.getOrElse("")))
+      override def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) =
+        super.getUsers(userId, userIds)(p, channelCtx).map {
+          case Right(users) => Right(sortUsers(users))
           case x            => x
         }
     })
 
     // use real question service but control what questions are used and order they are returned
-    Services.register(new QuestionServiceImpl(questions, totalSides) {
-      override def getQuestions(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
-        super.getQuestions(groupId)(p, authCtx).map {
-          case Right(questions) => Right(questions.sortBy(q => q.id.toString + q.side))
+    Services.register(new QuestionServiceImpl(questionDefs, totalSides) {
+      override def getQuestions(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+        super.getQuestions(groupId)(p, channelCtx).map {
+          case Right(questions) => Right(sortQuestions(questions))
         }
       }
     })
@@ -112,90 +114,156 @@ abstract class SocketApiIntegrationTest
     assert(SocketApiService().stop().await())
   }
 
+  private def sortUsers(users: List[UserModel]) = users.sortBy(_.id.toString)
+  private def sortQuestions(questions: List[QuestionModel]) = questions.sortBy(q => q.id.toString + q.side)
+
   def handlerService: SocketApiHandlerService
-  def connect()
-  def disconnect()
-  def writeRead(json: String): String
+  def connect(): SocketConnection
 
   private def execute[A, B](companion: CommandServiceCompanion[_],
-                            model: A, responseModel: B)(implicit m: Manifest[B]) {
+                            model: A, responseModel: Option[B])(implicit m: Manifest[B], socket: SocketConnection) {
 
     val command = CommandModel(companion.inCmd, model)
     val json = Serialization.write(command)
 
-    val expectedResponse = CommandModel(companion.outCmd, responseModel)
-    val actualResponse = JsonMethods.parse(writeRead(json)).extract[CommandModel[B]]
+    socket.write(json)
 
-    debug("  actual: " + actualResponse.toString)
-    debug("expected: " + expectedResponse.toString)
+    responseModel foreach { responseModel =>
+      assertResult(companion, responseModel)
+    }
+  }
+
+  private def assertResult[B](companion: CommandServiceCompanion[_],
+                              responseModel: B)(implicit m: Manifest[B], socket: SocketConnection) {
+    val expectedResponse = CommandModel(companion.outCmd.get, responseModel)
+    val actualResponse = JsonMethods.parse(socket.read).extract[CommandModel[B]]
+
+    debug(socket.hashCode() + "   actual: " + actualResponse.toString)
+    debug(socket.hashCode() + " expected: " + expectedResponse.toString)
 
     assert(actualResponse == expectedResponse)
   }
 
   test("integration test - runs all commands", Tags.SLOW) {
-    connect()
 
-    val phone = "555-1234"
+    def register(phone: String)(implicit s: SocketConnection) {
+      val registerModel = RegisterModel(ApiVersions.V01, phone)
+      val registerResponseModel = RegisterResponseModel()
+      execute(RegisterCommandService, registerModel, Option(registerResponseModel))
+    }
+
+    def verify(phone: String, deviceId: UUID, token: UUID)(implicit s: SocketConnection) {
+      val code = "code!"
+      val verifyModel = VerifyModel(ApiVersions.V01, Option("name"), Option(Genders.other), phone, deviceId, code)
+      val verifyResponseModel = VerifyResponseModel(token)
+      execute(VerifyCommandService, verifyModel, Option(verifyResponseModel))
+    }
+
+    def login(deviceId: UUID, token: UUID, userId: UUID, groups: List[GroupModel])(implicit s: SocketConnection) {
+      val deviceModel = DeviceModel(deviceId, "", "", "", "", "")
+      val loginModel = LoginModel(token, None, "", ApiVersions.V01, "", deviceModel)
+      val loginResponseModel = LoginResponseModel(userId, groups, None, None, None)
+      execute(LoginCommandService, loginModel, Option(loginResponseModel))
+    }
+
+    def invite(phone: String, userId: UUID, inviteUserId: UUID, groupId: UUID)(implicit s: SocketConnection) {
+      val label = "bob"
+      val userModel = UserModel(userId, None)
+      val inviteUserModel = UserModel(inviteUserId, Option(label))
+
+      val groupModel = GroupModel(groupId, sortUsers(List(userModel, inviteUserModel)), None, None, 0)
+      val inviteModel = InviteModel(phone, label)
+      val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
+      execute(InviteCommandService, inviteModel, Option(inviteResponseModel))
+    }
+
+    def questions(groupId: UUID, questionModels: List[QuestionModel])(implicit s: SocketConnection) {
+      val questionsModel = QuestionsModel(groupId)
+      val questionsResponseModel = QuestionsResponseModel(groupId, sortQuestions(questionModels))
+      execute(QuestionsCommandService, questionsModel, Option(questionsResponseModel))
+    }
+
+    def message(groupId: UUID, userId: UUID)(implicit s: SocketConnection) = {
+      val messageBody = "a message!"
+      val messageEventId = randomMock.nextUuid()
+
+      val messageModel = MessageModel(groupId, messageBody)
+      val eventModel = EventModel(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
+      execute(MessageCommandService, messageModel, None)
+      assertResult(EventCommandService, eventModel)
+      eventModel
+    }
+
+    def answer(groupId: UUID, otherUserId: UUID, questionId: UUID)(implicit s: SocketConnection) = {
+      val answer = true
+      val side = QuestionSides.SIDE_A
+      val answerEventId = randomMock.nextUuid()
+      val answerBody = questionDefs.find(_.id == questionId).get + " is a match"
+
+      val inviteUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherUserId)), None)
+      val inviteUserAnswerModel = AnswerModel(questionId, groupId, side, answer)
+      QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
+
+      val answerModel = AnswerModel(questionId, groupId, side, answer)
+      val eventModel = EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time)
+      execute(AnswerCommandService, answerModel, None)
+      assertResult(EventCommandService, eventModel)
+      eventModel
+    }
+
+    val socket = connect()
+
     val deviceId = RandomService().uuid
     val userId = randomMock.nextUuid()
+    val phone = "555-1234"
+    val phone2 = "555-4321"
 
-    val registerModel = RegisterModel(ApiVersions.V01, phone)
-    val registerResponseModel = RegisterResponseModel()
-    execute(RegisterCommandService, registerModel, registerResponseModel)
+    register(phone)(socket)
 
-    val code = "code!"
     val token = randomMock.nextUuid()
+    verify(phone, deviceId, token)(socket)
 
-    val verifyModel = VerifyModel(ApiVersions.V01, Option("name"), Option(Genders.other), phone, deviceId, code)
-    val verifyResponseModel = VerifyResponseModel(token)
-    execute(VerifyCommandService, verifyModel, verifyResponseModel)
-
-    val deviceModel = DeviceModel(deviceId, "", "", "", "", "")
-    val loginModel = LoginModel(token, None, "", ApiVersions.V01, "", deviceModel)
-    val loginResponseModel = LoginResponseModel(userId, List(), None, None, None)
-    execute(LoginCommandService, loginModel, loginResponseModel)
+    login(deviceId, token, userId, groups = List())(socket)
 
     val inviteUserId = randomMock.nextUuid()
     val groupId = randomMock.nextUuid(1)
-    val label = "bob"
-    val userModel = UserModel(userId, None)
-    val inviteUserModel = UserModel(inviteUserId, Option(label))
+    invite(phone2, userId, inviteUserId, groupId)(socket)
 
-    val groupModel = GroupModel(groupId, List(userModel, inviteUserModel), None, None, 0)
-    val inviteModel = InviteModel("555-5432", label)
-    val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
-    execute(InviteCommandService, inviteModel, inviteResponseModel)
-
-    val questionModels = questions.map(QuestionModel(_, QuestionSides.SIDE_A)) ++
-      questions.collect {
+    val questionModels = questionDefs.map(QuestionModel(_, QuestionSides.SIDE_A)) ++
+      questionDefs.collect {
         case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
       }
-    val questionsModel = QuestionsModel(groupId)
-    val questionsResponseModel = QuestionsResponseModel(groupId, questionModels.sortBy(q => q.id.toString + q.side))
-    execute(QuestionsCommandService, questionsModel, questionsResponseModel)
+    questions(groupId, questionModels)(socket)
 
-    val messageBody = "a message!"
-    val messageEventId = randomMock.nextUuid()
+    message(groupId, userId)(socket)
 
-    val messageModel = MessageModel(groupId, messageBody)
-    val eventModel = EventModel(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
-    execute(MessageCommandService, messageModel, eventModel)
+    answer(groupId, inviteUserId, questionDefs(0).id)(socket)
 
-    val answer = true
-    val questionId = questions(0).id
-    val side = QuestionSides.SIDE_A
-    val answerEventId = randomMock.nextUuid()
-    val answerBody = questions(0) + " is a match"
+    val socket2 = connect()
+    val deviceId2 = RandomService().uuid
 
-    val inviteUserAuthCtx = new StandardUserAuthContext(new User(inviteUserId))
-    val inviteUserAnswerModel = AnswerModel(questionId, groupId, side, answer)
-    QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
+    register(phone2)(socket2)
 
-    val answerModel = AnswerModel(questionId, groupId, side, answer)
-    val answerResponseModel = List(EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time))
-    execute(AnswerCommandService, answerModel, answerResponseModel)
+    val token2 = randomMock.nextUuid()
+    verify(phone2, deviceId2, token2)(socket2)
 
-    disconnect()
+    val users = sortUsers(List(UserModel(userId, None), UserModel(inviteUserId, None)))
+    val groups = List(GroupModel(groupId, users, None, None, 0))
+    login(deviceId2, token2, inviteUserId, groups)(socket2)
+
+    // skip invite for user2
+
+    val questionModels2 = questionModels.filter(_.id != questionDefs(0).id)
+    questions(groupId, questionModels2)(socket2)
+
+    val messageEvent = message(groupId, inviteUserId)(socket2)
+    assertResult(EventCommandService, messageEvent)(manifest[EventModel], socket)
+
+    val answerEvent = answer(groupId, userId, questionDefs(1).id)(socket2)
+    assertResult(EventCommandService, answerEvent)(manifest[EventModel], socket)
+
+    socket.disconnect()
+    socket2.disconnect()
   }
 
 }

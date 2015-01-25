@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:58 PM
+ * Last modified by rconrad, 1/24/15 9:19 PM
  */
 
 package base.socket.api
@@ -11,6 +11,7 @@ import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
 import java.net.Socket
 
 import base.socket.api.impl.RawSocketApiHandlerServiceImpl
+import base.socket.api.test.SocketConnection
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
@@ -18,28 +19,31 @@ import base.socket.api.impl.RawSocketApiHandlerServiceImpl
  */
 class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
 
-  var socket: Socket = _
-  var out: PrintWriter = _
-  var in: BufferedReader = _
-
   def handlerService = new RawSocketApiHandlerServiceImpl
 
-  def connect() {
-    socket = new Socket(SocketApiService().host, SocketApiService().port)
+  def connect() = {
+    val socket = new Socket(SocketApiService().host, SocketApiService().port)
     socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
 
-    out = new PrintWriter(socket.getOutputStream, true)
-    in = new BufferedReader(new InputStreamReader(socket.getInputStream))
-  }
+    val out = new PrintWriter(socket.getOutputStream, true)
+    val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
 
-  def disconnect() {
-    socket.close()
-  }
+    new SocketConnection {
 
-  def writeRead(json: String) = {
-    out.write(json + "\r\n")
-    out.flush()
-    in.readLine()
+      def disconnect() {
+        socket.close()
+      }
+
+      def read = {
+        in.readLine()
+      }
+
+      def write(json: String) {
+        out.write(json + "\r\n")
+        out.flush()
+      }
+
+    }
   }
 
 }

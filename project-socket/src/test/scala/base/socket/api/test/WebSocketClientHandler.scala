@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 8:55 PM
+ * Last modified by rconrad, 1/24/15 11:20 PM
  */
 
 package base.socket.api.test
@@ -32,14 +32,14 @@ class WebSocketClientHandler(handshaker: WebSocketClientHandshaker) extends Simp
   }
 
   override def channelInactive(ctx: ChannelHandlerContext) {
-    System.out.println("WebSocket Client disconnected!")
+    System.out.println(s"WebSocket Client $this disconnected!")
   }
 
   def channelRead0(ctx: ChannelHandlerContext, msg: AnyRef) {
     val ch: Channel = ctx.channel
     if (!handshaker.isHandshakeComplete) {
       handshaker.finishHandshake(ch, msg.asInstanceOf[FullHttpResponse])
-      System.out.println("WebSocket Client connected!")
+      System.out.println(s"WebSocket Client $this connected!")
       handshakeFuture.setSuccess()
       return
     }
@@ -51,11 +51,11 @@ class WebSocketClientHandler(handshaker: WebSocketClientHandshaker) extends Simp
     val frame: WebSocketFrame = msg.asInstanceOf[WebSocketFrame]
     if (frame.isInstanceOf[TextWebSocketFrame]) {
       val textFrame: TextWebSocketFrame = frame.asInstanceOf[TextWebSocketFrame]
-      System.out.println("WebSocket Client received message: " + textFrame.text)
+      System.out.println(s"WebSocket Client $this received message: " + textFrame.text)
     } else if (frame.isInstanceOf[PongWebSocketFrame]) {
-      System.out.println("WebSocket Client received pong")
+      System.out.println(s"WebSocket Client $this received pong")
     } else if (frame.isInstanceOf[CloseWebSocketFrame]) {
-      System.out.println("WebSocket Client received closing")
+      System.out.println(s"WebSocket Client $this received closing")
       ch.close
     }
   }

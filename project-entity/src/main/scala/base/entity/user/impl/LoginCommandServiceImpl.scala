@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.entity.user.impl
@@ -10,12 +10,12 @@ package base.entity.user.impl
 import java.util.UUID
 
 import base.entity.api.ApiErrorCodes._
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.model.EventModel
 import base.entity.group.model.GroupModel
-import base.entity.group.{ GroupEventsService, UserService }
+import base.entity.group.{ GroupListenerService, GroupEventsService, UserService }
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
@@ -33,7 +33,7 @@ private[entity] class LoginCommandServiceImpl()
     extends CommandServiceImpl[LoginModel, LoginResponseModel]
     with LoginCommandService {
 
-  def innerExecute(input: LoginModel)(implicit authCtx: AuthContext) = {
+  def innerExecute(input: LoginModel)(implicit channelCtx: ChannelContext) = {
     new LoginCommand(input).execute()
   }
 
@@ -47,10 +47,10 @@ private[entity] class LoginCommandServiceImpl()
    * - optionally retrieve current group questions
    * - update user attributes (last login)
    */
-  private[impl] class LoginCommand(val input: LoginModel)(implicit val authCtx: AuthContext)
+  private[impl] class LoginCommand(val input: LoginModel)(implicit val channelCtx: ChannelContext)
       extends Command[LoginModel, LoginResponseModel] {
 
-    def execute() = {
+    def execute(): Response = {
       deviceGetToken(DeviceKeyService().make(input.device.uuid))
     }
 
@@ -115,9 +115,16 @@ private[entity] class LoginCommandServiceImpl()
                             questions: Option[List[QuestionModel]]): Response = {
       key.getLastLogin.flatMap { lastLogin =>
         key.setLastLogin().flatMap {
-          case true  => LoginResponseModel(userId, groups.toList, events, questions, lastLogin)
+          case true  => registerGroupListeners(LoginResponseModel(userId, groups.toList, events, questions, lastLogin))
           case false => Errors.userSetFailed
         }
+      }
+    }
+
+    // todo test this
+    def registerGroupListeners(response: LoginResponseModel): Response = {
+      GroupListenerService().register(response.userId, response.groups.map(_.id).toSet) map { x =>
+        response
       }
     }
 

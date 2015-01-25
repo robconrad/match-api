@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 4:01 PM
+ * Last modified by rconrad, 1/25/15 12:01 AM
  */
 
 package base.entity.message.impl
@@ -11,12 +11,13 @@ import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.AuthContextDataFactory
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
+import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.GroupEventsService
+import base.entity.group.{ GroupListenerService, GroupEventsService }
 import base.entity.kv.Key._
 import base.entity.message.model.MessageModel
 
@@ -38,7 +39,7 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
   private implicit val model = MessageModel(groupId, body)
 
   override def beforeAll() {
@@ -50,8 +51,8 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   private def command(implicit input: MessageModel) = new service.MessageCommand(input)
 
   test("without perms") {
-    assertPermException(authCtx => {
-      service.execute(model)(authCtx)
+    assertPermException(channelCtx => {
+      service.execute(model)(channelCtx)
     })
   }
 
@@ -59,10 +60,13 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
     val messageId = randomMock.nextUuid()
     val event = EventModel(messageId, groupId, Option(authCtx.userId), EventTypes.MESSAGE, body)
     val groupEventsService = mock[GroupEventsService]
+    val groupListenerService = mock[GroupListenerService]
     (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
       (*, *, *) returning Future.successful(Right(event))
-    val unregister = TestServices.register(groupEventsService)
-    assert(service.innerExecute(model).await() == Right(event))
+    (groupListenerService.publish(_: CommandModel[EventModel])(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Unit)
+    val unregister = TestServices.register(groupEventsService, groupListenerService)
+    assert(service.innerExecute(model).await() == Right(()))
     unregister()
   }
 

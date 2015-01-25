@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:55 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.entity.user.impl
@@ -10,14 +10,15 @@ package base.entity.user.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiError
+import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
-import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key._
 import base.entity.service.CrudErrorImplicits
+import base.entity.user.UserService
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService }
+import base.entity.user.kv.{UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService}
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 
@@ -31,39 +32,39 @@ import scala.concurrent.Future
  */
 class UserServiceImpl extends ServiceImpl with UserService {
 
-  def getUser(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
-    val key = UserUserLabelKeyService().make(authCtx.userId, userId)
+  def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    val key = UserUserLabelKeyService().make(channelCtx.authCtx.userId, userId)
     getUser(userId, key)
   }
 
-  private[impl] def getUser(userId: UUID, key: UserUserLabelKey)(implicit p: Pipeline, authCtx: AuthContext) =
+  private[impl] def getUser(userId: UUID, key: UserUserLabelKey)(implicit p: Pipeline, channelCtx: ChannelContext) =
     key.get.map { label =>
       Right(UserModel(userId, label))
     }
 
-  def getUsers(userIds: List[UUID])(implicit p: Pipeline, authCtx: AuthContext) = {
-    getUsers(userIds, UserUserLabelKeyService())
+  def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    getUsers(userId, userIds, UserUserLabelKeyService())
   }
 
-  private[impl] def getUsers(userIds: List[UUID],
-                             keyService: UserUserLabelKeyService)(implicit p: Pipeline, authCtx: AuthContext) = {
+  private[impl] def getUsers(contextUserId: UUID, userIds: List[UUID],
+                             keyService: UserUserLabelKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
-      keyService.make(authCtx.userId, userId).get.map { label =>
+      keyService.make(contextUserId, userId).get.map { label =>
         UserModel(userId, label)
       }
     }
     Future.sequence(futures).map(Right.apply)
   }
 
-  def getGroups(userId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
+  def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val key = UserGroupsKeyService().make(userId)
     getGroups(userId, key)
   }
 
-  private[impl] def getGroups(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline, authCtx: AuthContext) = {
+  private[impl] def getGroups(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     key.members().flatMap { groupIds =>
       val futures = groupIds.map { groupId =>
-        GroupService().getGroup(groupId)
+        GroupService().getGroup(userId, groupId)
       }
       Future.sequence(futures).map { eithers =>
         lazy val errors = eithers.collect { case Left(error) => error }

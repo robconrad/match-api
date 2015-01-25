@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:52 AM
+ * Last modified by rconrad, 1/22/15 9:53 PM
  */
 
 package base.entity.auth.context
@@ -80,8 +80,8 @@ class AuthContextTest extends EntityBaseSuite {
 
   test("UserAuthContext") {
     assertContext(
-      AuthContextDataFactory.userAuth,
-      AuthContextDataFactory.userAuth.user.map(_.id),
+      ChannelContextDataFactory.userAuth.authCtx,
+      ChannelContextDataFactory.userAuth.authCtx.user.map(_.id),
       PermSetGroups.user)
   }
 

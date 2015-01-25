@@ -2,23 +2,22 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:55 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.entity.user.impl
 
 import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.error.ApiError
-import base.entity.kv._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.RegisterCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
+import base.entity.user.model.{RegisterModel, RegisterResponseModel}
 import spray.http.StatusCodes
 
 import scala.concurrent.duration.FiniteDuration
@@ -31,7 +30,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
     extends CommandServiceImpl[RegisterModel, RegisterResponseModel]
     with RegisterCommandService {
 
-  def innerExecute(input: RegisterModel)(implicit authCtx: AuthContext) = {
+  def innerExecute(input: RegisterModel)(implicit channelCtx: ChannelContext) = {
     new RegisterCommand(input).execute()
   }
 
@@ -43,7 +42,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
    * - update phone key attributes
    * - send SMS verification
    */
-  private[impl] class RegisterCommand(val input: RegisterModel)(implicit val authCtx: AuthContext)
+  private[impl] class RegisterCommand(val input: RegisterModel)(implicit val channelCtx: ChannelContext)
       extends Command[RegisterModel, RegisterResponseModel] {
 
     def execute() = {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/22/15 9:43 PM
  */
 
 package base.entity.question.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.{ CommonService, ServiceImpl }
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.kv._
@@ -53,10 +53,10 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     QuestionIdComposite(questionMap(questionId), side, inverse)
   }
 
-  def getQuestions(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) =
+  def getQuestions(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
     new GetQuestionsMethod(groupId).execute()
 
-  def answer(input: AnswerModel)(implicit p: Pipeline, authCtx: AuthContext) =
+  def answer(input: AnswerModel)(implicit p: Pipeline, channelCtx: ChannelContext) =
     new AnswerMethod(input).execute()
 
   /**
@@ -65,12 +65,12 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
    * - delete stored set
    * - return questions
    */
-  private[impl] class GetQuestionsMethod(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext)
+  private[impl] class GetQuestionsMethod(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
       extends CrudImplicits[List[QuestionModel]] {
 
     def execute() = {
-      val temp = GroupUserQuestionsTempKeyService().make(groupId, authCtx.userId)
-      val answered = GroupUserQuestionsKeyService().make(groupId, authCtx.userId)
+      val temp = GroupUserQuestionsTempKeyService().make(groupId, channelCtx.authCtx.userId)
+      val answered = GroupUserQuestionsKeyService().make(groupId, channelCtx.authCtx.userId)
       groupUserQuestionsTempDiffStore(temp, answered)
     }
 
@@ -107,11 +107,11 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
    *    - notify other group members of match events (???)
    *    - return match events for all matches
    */
-  private[impl] class AnswerMethod(input: AnswerModel)(implicit p: Pipeline, authCtx: AuthContext)
+  private[impl] class AnswerMethod(input: AnswerModel)(implicit p: Pipeline, channelCtx: ChannelContext)
       extends CrudImplicits[List[EventModel]] {
 
     def execute() = {
-      val key = GroupUserQuestionsKeyService().make(input.groupId, authCtx.userId)
+      val key = GroupUserQuestionsKeyService().make(input.groupId, channelCtx.authCtx.userId)
       groupUserQuestionAdd(key)
     }
 
@@ -124,7 +124,8 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def questionResponse(id: QuestionIdComposite) =
       input.response match {
-        case true  => groupUserQuestionYesAdd(id, GroupUserQuestionsYesKeyService().make(input.groupId, authCtx.userId))
+        case true => groupUserQuestionYesAdd(id,
+          GroupUserQuestionsYesKeyService().make(input.groupId, channelCtx.authCtx.userId))
         case false => Future.successful(Right(List()))
       }
 
@@ -136,7 +137,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     def groupUsersGet(key: GroupUsersKey) =
       key.members().flatMap { allUserIds =>
         val otherUserIds = allUserIds.collect {
-          case userId if userId != authCtx.userId => userId
+          case userId if userId != channelCtx.authCtx.userId => userId
         }
         groupUsersQuestionYesGet(otherUserIds)
       }

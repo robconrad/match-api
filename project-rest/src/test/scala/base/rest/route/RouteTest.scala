@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:36 PM
+ * Last modified by rconrad, 1/24/15 6:47 PM
  */
 
 package base.rest.route
@@ -22,7 +22,7 @@ private[rest] abstract class RouteTest(companion: RouteTestCompanion)
 
   lazy val sealedRoute = sealRoute(routes)
 
-  def actorRefFactory = system
+  implicit def actorRefFactory = system
 
   def decompressed = RouteTest.decompressed(body)
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:55 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.entity.user.impl
@@ -12,7 +12,7 @@ import java.util.UUID
 import base.common.lib.Genders.Gender
 import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.service.CrudErrorImplicits
@@ -30,7 +30,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     extends CommandServiceImpl[VerifyModel, VerifyResponseModel]
     with VerifyCommandService {
 
-  def innerExecute(input: VerifyModel)(implicit authCtx: AuthContext) = {
+  def innerExecute(input: VerifyModel)(implicit channelCtx: ChannelContext) = {
     new VerifyCommand(input).execute()
   }
 
@@ -56,7 +56,7 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
    * - create device
    * - store attributes on device with token
    */
-  private[impl] class VerifyCommand(val input: VerifyModel)(implicit val authCtx: AuthContext)
+  private[impl] class VerifyCommand(val input: VerifyModel)(implicit val channelCtx: ChannelContext)
       extends Command[VerifyModel, VerifyResponseModel] {
 
     def execute() = {

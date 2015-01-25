@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:12 PM
+ * Last modified by rconrad, 1/24/15 6:21 PM
  */
 
 package base.socket.api.mock
@@ -22,13 +22,15 @@ import io.netty.util.CharsetUtil
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-@Sharable
+@Sharable // scalastyle:off null
 class RawSocketApiHandlerServiceMock(channelReadResponse: Option[String] = None)
     extends ChannelInboundHandlerAdapter
     with SocketApiHandlerService
     with Loggable {
 
   def stop() {}
+
+  def write(json: String)(implicit ctx: ChannelHandlerContext) = null
 
   override def channelRead(ctx: ChannelHandlerContext, msg: Any) {
     debug("received '%s'", msg)

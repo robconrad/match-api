@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:52 AM
+ * Last modified by rconrad, 1/24/15 6:51 PM
  */
 
 package base.entity.auth.context
@@ -17,11 +17,6 @@ import base.entity.user.User
  * @author rconrad
  */
 trait AuthContext {
-
-  /**
-   * Whether this AuthContext profile has access to a given permission
-   */
-  final def has(perm: Perm) = perms.contains(perm)
 
   /**
    * Group of permissions associated with this AuthContext profile

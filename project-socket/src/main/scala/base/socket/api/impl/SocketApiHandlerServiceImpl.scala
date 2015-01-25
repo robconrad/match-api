@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:19 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.socket.api.impl
@@ -11,17 +11,19 @@ import base.common.lib.Dispatchable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.NoAuthContext
+import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.command.CommandService
 import base.entity.error.ApiError
+import base.entity.group.GroupListenerService
 import base.entity.json.JsonFormats
-import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
+import base.socket.api.{SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService}
 import base.socket.command.CommandProcessingService
-import base.socket.logging.{ LoggableChannelInfo, SocketLoggable }
-import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter }
+import base.socket.logging.{LoggableChannelInfo, SocketLoggable}
+import io.netty.channel.{ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter}
 import org.json4s.native.Serialization
 import spray.http.StatusCodes
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 /**
  * {{ Describe the high level purpose of SocketApiHandlerServiceImpl here. }}
@@ -39,8 +41,6 @@ abstract class SocketApiHandlerServiceImpl
   private var running = true
 
   protected implicit def ctx2AuthCtx(implicit ctx: ChannelHandlerContext): LoggableChannelInfo = ctx.channel
-
-  def write(json: String)(implicit ctx: ChannelHandlerContext): ChannelFuture
 
   final override def exceptionCaught(ctx: ChannelHandlerContext, t: Throwable) {
     implicit val iCtx = ctx
@@ -74,10 +74,10 @@ abstract class SocketApiHandlerServiceImpl
       case false => write(SocketApiHandlerServiceImpl.runningJson)
       case true =>
         if (isDebugEnabled) debug("message received: " + msg)
-        CommandProcessingService().process(msg)(ctx.channel.authCtx).onComplete {
+        CommandProcessingService().process(msg)(ctx.channel.channelCtx).onComplete {
           case Success(Right(result)) =>
             result.authContext.foreach { authCtx =>
-              ctx.channel.authCtx = authCtx
+              ctx.channel.channelCtx.authCtx = authCtx
             }
             result.message.foreach { json =>
               write(json)
@@ -92,16 +92,21 @@ abstract class SocketApiHandlerServiceImpl
     }
   }
 
+  // todo refactor this to make it testable
   final override def channelActive(ctx: ChannelHandlerContext) {
     implicit val iCtx = ctx
-    ctx.channel.authCtx = NoAuthContext
+    ctx.channel.channelCtx = ChannelContextImpl(NoAuthContext, new SocketPushChannel())
 
     if (SocketApiService().isConnectionAllowed) {
       SocketApiStatsService().increment(SocketApiStats.CONNECTIONS)
 
+      // todo test this
       ctx.channel.closeFuture().addListener(new ChannelFutureListener {
         override def operationComplete(channelFuture: ChannelFuture) {
           SocketApiStatsService().decrement(SocketApiStats.CONNECTIONS)
+          ctx.channel.authCtx.user map { user =>
+            GroupListenerService().unregister(user.id)(ctx.channel.channelCtx)
+          }
         }
       })
     } else {

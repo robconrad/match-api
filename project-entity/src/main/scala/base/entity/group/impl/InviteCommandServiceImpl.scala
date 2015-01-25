@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.entity.group.impl
@@ -10,7 +10,7 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
@@ -18,7 +18,7 @@ import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupEventsService, GroupService, InviteCommandService }
+import base.entity.group.{ GroupListenerService, GroupEventsService, GroupService, InviteCommandService }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
 
@@ -30,7 +30,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
     extends CommandServiceImpl[InviteModel, InviteResponseModel]
     with InviteCommandService {
 
-  def innerExecute(input: InviteModel)(implicit authCtx: AuthContext) = {
+  def innerExecute(input: InviteModel)(implicit channelCtx: ChannelContext) = {
     new InviteCommand(input).execute()
   }
 
@@ -47,7 +47,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
    * - add welcome message to group events
    * - get and return group
    */
-  private[impl] class InviteCommand(val input: InviteModel)(implicit val authCtx: AuthContext)
+  private[impl] class InviteCommand(val input: InviteModel)(implicit val channelCtx: ChannelContext)
       extends Command[InviteModel, InviteResponseModel] {
 
     def execute() = {
@@ -112,8 +112,14 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
 
     def invitingUserGroupsAdd(userId: UUID, groupId: UUID, key: UserGroupsKey) =
       key.add(groupId).flatMap {
-        case 1 => groupEventsPrepend(userId, groupId)
+        case 1 => registerGroupListener(userId, groupId)
         case _ => Errors.userGroupsAddFailed
+      }
+
+    // todo test this
+    def registerGroupListener(userId: UUID, groupId: UUID) =
+      GroupListenerService().register(authCtx.userId, Set(groupId)).flatMap { x =>
+        groupEventsPrepend(userId, groupId)
       }
 
     def groupEventsPrepend(userId: UUID, groupId: UUID) = {
@@ -129,7 +135,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
     }
 
     def groupGet(userId: UUID, groupId: UUID) =
-      GroupService().getGroup(groupId).flatMap {
+      GroupService().getGroup(authCtx.userId, groupId).flatMap {
         case Right(Some(group)) => InviteResponseModel(userId, group)
         case Right(None)        => Errors.groupGetFailed
         case Left(error)        => error

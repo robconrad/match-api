@@ -2,15 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 11:04 PM
+ * Last modified by rconrad, 1/24/15 11:47 PM
  */
 
 package base.socket.command.impl
 
 import base.common.lib.Tryo
 import base.common.service.ServiceImpl
-import base.entity.auth.context.{ AuthContext, StandardUserAuthContext }
-import base.entity.command.CommandService
+import base.entity.auth.context.{ ChannelContext, AuthContext, StandardUserAuthContext }
 import base.entity.command.model.CommandModel
 import base.entity.group.InviteCommandService
 import base.entity.group.model.InviteModel
@@ -42,11 +41,11 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
 
   implicit def response2Future(r: Response) = Future.successful(r)
 
-  def process(input: String)(implicit authCtx: AuthContext) = {
+  def process(input: String)(implicit channelCtx: ChannelContext) = {
     new ProcessCommand().parseInput(input)
   }
 
-  private[impl] class ProcessCommand()(implicit authCtx: AuthContext) {
+  private[impl] class ProcessCommand()(implicit channelCtx: ChannelContext) {
 
     def parseInput(input: String): FutureResponse = {
       try {
@@ -77,37 +76,37 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
     }
 
     def processCommand(cmd: String, body: JObject): FutureResponse = {
-      val response: Option[Future[_]] = cmd match {
-        case RegisterCommandService.inCmd  => Option(RegisterCommandService().execute(body.extract[RegisterModel]))
-        case VerifyCommandService.inCmd    => Option(VerifyCommandService().execute(body.extract[VerifyModel]))
-        case LoginCommandService.inCmd     => Option(LoginCommandService().execute(body.extract[LoginModel]))
-        case InviteCommandService.inCmd    => Option(InviteCommandService().execute(body.extract[InviteModel]))
-        case QuestionsCommandService.inCmd => Option(QuestionsCommandService().execute(body.extract[QuestionsModel]))
-        case MessageCommandService.inCmd   => Option(MessageCommandService().execute(body.extract[MessageModel]))
-        case AnswerCommandService.inCmd    => Option(AnswerCommandService().execute(body.extract[AnswerModel]))
-        case "heartbeat"                   => None
-        case cmd                           => error("'%s' is not a valid command for this handler", cmd); None
+      val response: Future[Option[_]] = cmd match {
+        case RegisterCommandService.inCmd  => RegisterCommandService().execute(body.extract[RegisterModel])
+        case VerifyCommandService.inCmd    => VerifyCommandService().execute(body.extract[VerifyModel])
+        case LoginCommandService.inCmd     => LoginCommandService().execute(body.extract[LoginModel])
+        case InviteCommandService.inCmd    => InviteCommandService().execute(body.extract[InviteModel])
+        case QuestionsCommandService.inCmd => QuestionsCommandService().execute(body.extract[QuestionsModel])
+        case MessageCommandService.inCmd   => MessageCommandService().execute(body.extract[MessageModel])
+        case AnswerCommandService.inCmd    => AnswerCommandService().execute(body.extract[AnswerModel])
+        case "heartbeat"                   => Future.successful(None)
+        case cmd =>
+          error("'%s' is not a valid command for this handler", cmd)
+          Future.successful(None)
       }
       addAuthContext(cmd, response)
     }
 
-    def addAuthContext(cmd: String, response: Option[Future[_]]): FutureResponse = {
-      val newAuthCtx: Future[Option[AuthContext]] = response match {
-        case Some(future) if cmd == "login" => future.map {
-          case CommandModel(LoginCommandService.outCmd, model: LoginResponseModel) =>
-            Option(new StandardUserAuthContext(new User(model.userId)))
-          case _ => None
-        }
-        case _ => Future.successful(None)
+    def addAuthContext(cmd: String, response: Future[Option[_]]): FutureResponse = {
+      val newAuthCtx: Future[Option[AuthContext]] = response.map {
+        // todo fix loginResponse shouldn't be string
+        case Some(CommandModel("loginResponse", model: LoginResponseModel)) =>
+          Option(new StandardUserAuthContext(new User(model.userId)))
+        case _ => None
       }
       combineResponseAndAuthCtx(response, newAuthCtx)
     }
 
-    def combineResponseAndAuthCtx(response: Option[Future[_]],
+    def combineResponseAndAuthCtx(response: Future[Option[_]],
                                   newAuthCtx: Future[Option[AuthContext]]): FutureResponse = {
       newAuthCtx.flatMap { newAuthCtx =>
-        response match {
-          case Some(response) => response.map(response => result(response, newAuthCtx))
+        response.map {
+          case Some(response) => result(response, newAuthCtx)
           case None           => Right(CommandProcessResult(None, newAuthCtx))
         }
       }

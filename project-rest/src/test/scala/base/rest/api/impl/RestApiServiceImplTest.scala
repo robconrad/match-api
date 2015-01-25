@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:00 PM
+ * Last modified by rconrad, 1/24/15 6:46 PM
  */
 
 package base.rest.api.impl
@@ -26,7 +26,6 @@ class RestApiServiceImplTest extends RestBaseSuite with Dispatchable with Loggab
   implicit def json4sFormats = DefaultFormats
 
   test("server startup", Tags.SLOW) {
-    implicit val system = Actors.actorSystem
     implicit val defaultTimeout = longTimeout
 
     val expected = Serialization.write(RestVersionsRoute.nakedResponse)

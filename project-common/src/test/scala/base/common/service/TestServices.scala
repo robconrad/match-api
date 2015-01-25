@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 1/24/15 11:51 PM
  */
 
 package base.common.service
@@ -13,10 +13,13 @@ package base.common.service
  */
 object TestServices {
 
-  def register(item: Service) = {
-    val current = Services.get(item.serviceManifest)
-    Services.register(item)
-    () => Services.register(current)
+  def register(item: Service*) = {
+    val currents = item.map { item =>
+      val current = Services.get(item.serviceManifest)
+      Services.register(item)
+      current
+    }
+    () => currents.foreach(current => Services.register(current))
   }
 
 }

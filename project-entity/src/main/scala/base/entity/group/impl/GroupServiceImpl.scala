@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/24/15 9:55 PM
  */
 
 package base.entity.group.impl
@@ -10,7 +10,7 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.group.kv._
 import base.entity.group.model.{ GroupModel, GroupModelBuilder }
 import base.entity.group.{ GroupService, UserService }
@@ -25,15 +25,15 @@ import base.entity.service.CrudImplicits
  */
 class GroupServiceImpl extends ServiceImpl with GroupService {
 
-  def getGroup(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext) = {
-    new GetGroupMethod(groupId).execute()
+  def getGroup(userId: UUID, groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    new GetGroupMethod(userId, groupId).execute()
   }
 
-  private[impl] class GetGroupMethod(groupId: UUID)(implicit p: Pipeline, authCtx: AuthContext)
+  private[impl] class GetGroupMethod(userId: UUID, groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
       extends CrudImplicits[Option[GroupModel]] {
 
     def execute(): Response = {
-      val key = GroupUserKeyService().make(groupId, authCtx.userId)
+      val key = GroupUserKeyService().make(groupId, userId)
       groupUserGetSetLastRead(key, GroupModelBuilder(id = Option(groupId)))
     }
 
@@ -55,11 +55,12 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
         usersGet(userIds.toList, builder)
       }
 
-    def usersGet(userIds: List[UUID], builder: GroupModelBuilder): Response =
-      UserService().getUsers(userIds).map {
+    def usersGet(userIds: List[UUID], builder: GroupModelBuilder): Response = {
+      UserService().getUsers(userId, userIds).map {
         case Right(users) => Option(builder.copy(users = Option(users)).build)
         case Left(error)  => error
       }
+    }
 
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:43 PM
+ * Last modified by rconrad, 1/22/15 9:50 PM
  */
 
 package base.entity.user.impl
@@ -13,7 +13,7 @@ import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.AuthContextDataFactory
+import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.VerifyCommandServiceImpl._
@@ -42,7 +42,7 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
   private implicit val model = VerifyModel(ApiVersions.V01, Option(name), Option(gender), phone, device, code)
 
   override def beforeAll() {
@@ -55,8 +55,8 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
   private def command(implicit input: VerifyModel) = new service.VerifyCommand(input)
 
   test("without perms") {
-    assertPermException(authCtx => {
-      service.execute(model)(authCtx)
+    assertPermException(channelCtx => {
+      service.execute(model)(channelCtx)
     })
   }
 

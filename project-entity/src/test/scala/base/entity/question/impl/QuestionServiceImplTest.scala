@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:12 PM
+ * Last modified by rconrad, 1/22/15 9:50 PM
  */
 
 package base.entity.question.impl
@@ -13,7 +13,7 @@ import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.AuthContextDataFactory
+import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.EventModel
 import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
@@ -46,7 +46,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   override def beforeAll() {
     super.beforeAll()

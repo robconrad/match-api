@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:59 PM
+ * Last modified by rconrad, 1/24/15 9:45 PM
  */
 
 package base.entity.group.impl
@@ -12,7 +12,7 @@ import java.util.UUID
 import base.common.random.RandomService
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiError
 import base.entity.group.UserService
 import base.entity.group.kv.{ GroupKeyService, GroupUserKeyService }
@@ -34,7 +34,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
 
   val service = new GroupServiceImpl()
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   private val time = TimeServiceConstantMock.now
 
@@ -43,7 +43,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
   private val groupId = RandomService().uuid
   private val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
 
-  private val method = new service.GetGroupMethod(groupId)
+  private val method = new service.GetGroupMethod(channelCtx.authCtx.userId, groupId)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,15 +52,15 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroup - success") {
     val userService = mock[UserService]
-    (userService.getUsers(_: List[UUID])(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Right(users))
+    (userService.getUsers(_: UUID, _: List[UUID])(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(users))
     val unregister = TestServices.register(userService)
 
-    assert(GroupUserKeyService().make(groupId, authCtx.userId).setLastRead(time).await())
+    assert(GroupUserKeyService().make(groupId, channelCtx.authCtx.userId).setLastRead(time).await())
     assert(GroupKeyService().make(groupId).setLastEvent(time).await())
     assert(GroupKeyService().make(groupId).setEventCount(eventCount).await())
 
-    assert(service.getGroup(groupId).await() == Right(Option(group)))
+    assert(service.getGroup(authCtx.userId, groupId).await() == Right(Option(group)))
 
     unregister()
   }
@@ -71,8 +71,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val userIds = List(userId)
     val builder = GroupModelBuilder()
     val userService = mock[UserService]
-    (userService.getUsers(_: List[UUID])(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Left(error))
+    (userService.getUsers(_: UUID, _: List[UUID])(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(userService)
     assert(method.usersGet(userIds, builder).await() == Left(error))
     unregister()

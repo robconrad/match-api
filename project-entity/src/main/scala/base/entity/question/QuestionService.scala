@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 1/22/15 9:43 PM
  */
 
 package base.entity.question
@@ -10,7 +10,7 @@ package base.entity.question
 import java.util.UUID
 
 import base.common.service.{ Service, ServiceCompanion }
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.{ ChannelContext, AuthContext }
 import base.entity.error.ApiError
 import base.entity.event.model.EventModel
 import base.entity.kv.Key.Pipeline
@@ -27,10 +27,10 @@ trait QuestionService extends Service {
   final val serviceManifest = manifest[QuestionService]
 
   def getQuestions(groupId: UUID)(implicit p: Pipeline,
-                                  authCtx: AuthContext): Future[Either[ApiError, List[QuestionModel]]]
+                                  channelCtx: ChannelContext): Future[Either[ApiError, List[QuestionModel]]]
 
   def answer(input: AnswerModel)(implicit p: Pipeline,
-                                 authCtx: AuthContext): Future[Either[ApiError, List[EventModel]]]
+                                 channelCtx: ChannelContext): Future[Either[ApiError, List[EventModel]]]
 
 }
 

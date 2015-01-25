@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 1:55 PM
+ * Last modified by rconrad, 1/22/15 9:44 PM
  */
 
 package base.entity.command
 
-import base.entity.auth.context.AuthContext
+import base.entity.auth.context.ChannelContext
 import base.entity.kv.KvFactoryService
 import base.entity.service.CrudImplicits
 
@@ -21,7 +21,7 @@ private[entity] abstract class Command[A, B] extends CrudImplicits[B] {
 
   protected implicit lazy val p = KvFactoryService().pipeline
 
-  implicit def authCtx: AuthContext
+  implicit def channelCtx: ChannelContext
 
   def input: A
 

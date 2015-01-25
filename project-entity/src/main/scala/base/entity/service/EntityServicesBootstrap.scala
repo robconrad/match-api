@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 12:14 PM
+ * Last modified by rconrad, 1/24/15 6:31 PM
  */
 
 package base.entity.service
 
 import base.common.lib.BaseConfig
 import base.common.service.{ Services, ServicesBootstrap }
-import base.entity.group.impl.{ GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
+import base.entity.group.impl.{ GroupListenerServiceImpl, GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
 import base.entity.group.kv.impl._
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
@@ -89,6 +89,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new GroupEventsServiceImpl(
       Keys(MATCH_GROUP_EVENT, "count")))
+
+    Services.register(new GroupListenerServiceImpl(
+      GroupListenerServiceImpl.makeActor))
 
     Services.register(new QuestionServiceImpl(
       getConfigList(Keys(MATCH_QUESTION, "questions")).map { tsConfig =>

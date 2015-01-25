@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:00 PM
+ * Last modified by rconrad, 1/25/15 12:19 AM
  */
 
 package base.socket.api
 
 import base.socket.api.impl.WebSocketApiHandlerServiceImpl
 import base.socket.api.test._
-import io.netty.channel.Channel
 import io.netty.handler.codec.http.websocketx._
 import org.scalatest.concurrent.Eventually
 
@@ -22,29 +21,33 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
 
   override implicit val patienceConfig = PatienceConfig(defaultSpan)
 
-  private var ch: Channel = _
-
   def handlerService = new WebSocketApiHandlerServiceImpl
 
-  def connect() {
-    ch = WebSocketClientFactory.connect()
-  }
+  def connect() = {
+    val ch = WebSocketClientFactory.connect()
 
-  def disconnect() {
-    ch.close
-  }
+    new SocketConnection {
 
-  def writeRead(json: String) = {
-    ch.write(new TextWebSocketFrame(json))
-    ch.flush()
+      def disconnect() {
+        ch.close
+      }
 
-    eventually {
-      assert(ch.lastMessage.isDefined)
+      def read = {
+        eventually {
+          assert(ch.lastMessage.isDefined)
+        }
+        val response = ch.lastMessage.get
+
+        ch.lastMessage = None
+        response
+      }
+
+      def write(json: String) {
+        ch.write(new TextWebSocketFrame(json))
+        ch.flush()
+      }
+
     }
-    val response = ch.lastMessage.get
-
-    ch.lastMessage = None
-    response
   }
 
 }

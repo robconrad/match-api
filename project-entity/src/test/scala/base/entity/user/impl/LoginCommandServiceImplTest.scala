@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:39 PM
+ * Last modified by rconrad, 1/22/15 9:54 PM
  */
 
 package base.entity.user.impl
@@ -14,7 +14,7 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
@@ -46,7 +46,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private val apiError = ApiError("test error")
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
   private implicit val model = LoginModel(token, Option(groupId), appVersion, apiVersion, locale, deviceModel)
 
   override def beforeAll() {
@@ -57,9 +57,9 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private def registerQuestionMock() {
     val questionMock = mock[QuestionService]
-    (questionMock.answer(_: AnswerModel)(_: Pipeline, _: AuthContext)) expects
+    (questionMock.answer(_: AnswerModel)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
-    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: AuthContext)) expects
+    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
     Services.register(questionMock)
   }
@@ -86,8 +86,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("without perms") {
-    assertPermException(authCtx => {
-      service.execute(model)(authCtx)
+    assertPermException(channelCtx => {
+      service.execute(model)(channelCtx)
     })
   }
 
@@ -129,7 +129,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to get groups") {
     val userService = mock[UserService]
-    (userService.getGroups(_: UUID)(_: Pipeline, _: AuthContext)) expects
+    (userService.getGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(userService)
     assert(command.groupsGet(RandomService().uuid).await() == Left(apiError))
@@ -151,7 +151,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val key = mock[UserKey]
     val questionMock = mock[QuestionService]
-    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: AuthContext)) expects
+    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(questionMock)
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 4:19 PM
+ * Last modified by rconrad, 1/24/15 11:45 PM
  */
 
 package base.entity.question
@@ -29,6 +29,6 @@ trait QuestionsCommandService extends CommandService[QuestionsModel, QuestionsRe
 object QuestionsCommandService extends CommandServiceCompanion[QuestionsCommandService] {
 
   final val inCmd = "questions"
-  final val outCmd = "questionsResponse"
+  final val outCmd = Option("questionsResponse")
 
 }

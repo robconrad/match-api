@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:14 PM
+ * Last modified by rconrad, 1/24/15 9:45 PM
  */
 
 package base.entity.user.impl
@@ -11,12 +11,12 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.TestServices
-import base.entity.auth.context.{ AuthContext, AuthContextDataFactory }
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiError
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
-import base.entity.kv.{ IdPair, KvTest }
+import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
 import base.entity.user.kv.{ UserGroupsKey, UserUserLabelKey, UserUserLabelKeyService }
@@ -41,7 +41,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   private val groupId1 = RandomService().uuid
   private val groupId2 = RandomService().uuid
 
-  private implicit val authCtx = AuthContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   test("getUser") {
     val key = mock[UserUserLabelKey]
@@ -65,7 +65,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key1
     (keyService.make(_: UUID, _: UUID)(_: Pipeline)) expects (*, *, *) returning key2
 
-    assert(service.getUsers(userIds, keyService).await() == Right(models))
+    assert(service.getUsers(authCtx.userId, userIds, keyService).await() == Right(models))
   }
 
   test("getGroups - success") {
@@ -75,10 +75,10 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID)(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group1)))
-    (groupService.getGroup(_: UUID)(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group2)))
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group1)))
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group2)))
     val unregister = TestServices.register(groupService)
     assert(service.getGroups(userId, key).await() == Right(List(group1, group2)))
     unregister()
@@ -90,8 +90,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     key.members _ expects () returning Future.successful(groups)
     val error = ApiError("whatever")
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID)(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Left(error)) twice ()
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error)) twice ()
     val unregister = TestServices.register(groupService)
     assert(service.getGroups(userId, key).await() == Left(error))
     unregister()
@@ -103,8 +103,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID)(_: Pipeline, _: AuthContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group))) twice ()
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group))) twice ()
     val unregister = TestServices.register(groupService)
     assert(service.getGroups(userId, key).await() == Errors.notAllGroupsReturned)
     unregister()
