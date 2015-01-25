@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 4:07 PM
+ * Last modified by rconrad, 1/25/15 12:21 PM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -69,6 +69,7 @@ object BaseBuild extends Build {
       slickTaskKey <<= slickTask,
       libraryDependencies ++=
         Dependencies.coreBundle ++
+        Dependencies.facebook ++
         Dependencies.json ++
         Dependencies.redis ++
         Dependencies.sprayCaching ++

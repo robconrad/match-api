@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:16 PM
+ * Last modified by rconrad, 1/25/15 1:09 PM
  */
 
 package base.entity.kv.mock
@@ -23,7 +23,9 @@ object KeyLoggerMock extends KeyLogger with Loggable {
   }
 
   def log(cmd: String, token: Array[Byte], msg: String = "") {
-    debug(s"Redis.$cmd:: token: ${new String(token)}, $msg")
+    debug(s"Redis.$cmd:: token: ${tokenToString(token)}, $msg")
   }
+
+  def tokenToString(token: Array[Byte]) = new String(token)
 
 }

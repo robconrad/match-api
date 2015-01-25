@@ -2,13 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:31 PM
+ * Last modified by rconrad, 1/25/15 1:43 PM
  */
 
 package base.entity.service
 
 import base.common.lib.BaseConfig
 import base.common.service.{ Services, ServicesBootstrap }
+import base.entity.facebook.impl.FacebookServiceImpl
+import base.entity.facebook.kv.impl.FacebookInfoKeyServiceImpl
 import base.entity.group.impl.{ GroupListenerServiceImpl, GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
 import base.entity.group.kv.impl._
 import base.entity.kv.impl.KvFactoryServiceImpl
@@ -31,6 +33,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   protected val DB = "db"
   protected val KV = "kv"
+  protected val FACEBOOK = "facebook"
   protected val TWILIO = "twilio"
 
   protected val MATCH = "match"
@@ -64,6 +67,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new QuestionsKeyServiceImpl())
 
+    Services.register(new FacebookInfoKeyServiceImpl())
+
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())
     Services.register(new PhoneKeyServiceImpl())
@@ -84,6 +89,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
       Keys(TWILIO, "sid"),
       Keys(TWILIO, "token"),
       Keys(TWILIO, "from")))
+
+    Services.register(new FacebookServiceImpl(
+      Keys(FACEBOOK, "infoExpireTime")))
 
     Services.register(new GroupServiceImpl())
 

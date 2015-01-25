@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:31 PM
+ * Last modified by rconrad, 1/25/15 12:21 PM
  */
 
 import sbt._
@@ -38,6 +38,9 @@ object Dependencies {
 
   lazy val config = Seq(
     "com.typesafe" % "config" % "1.2.1")
+
+  lazy val facebook = Seq(
+    "com.restfb" % "restfb" % "1.7.1")
 
   lazy val guava = Seq(
     "com.google.guava" % "guava" % "18.0")

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:10 PM
+ * Last modified by rconrad, 1/25/15 1:05 PM
  */
 
 package base.entity.kv.impl
@@ -34,10 +34,14 @@ private[impl] abstract class KeyServiceImpl[A, B <: Key](implicit m: Manifest[A]
 
   def log(cmd: String, token: Array[Byte], msg: String = "") {
     if (isDebugEnabled) {
-      val keyPrefix = KeyPrefixes.values.find(_.id == ByteBuffer.wrap(token.slice(0, prefixBytesLength)).getShort)
-      val keyString = ByteaSerializers.deserialize[A](token.slice(prefixBytesLength, token.length))
-      debug(s"Redis.$cmd:: prefix: ${keyPrefix.getOrElse("unknown")}-$keyString, $msg")
+      debug(s"Redis.$cmd:: prefix: ${tokenToString(token)}, $msg")
     }
+  }
+
+  def tokenToString(token: Array[Byte]) = {
+    val keyPrefix = KeyPrefixes.values.find(_.id == ByteBuffer.wrap(token.slice(0, prefixBytesLength)).getShort)
+    val keyString = ByteaSerializers.deserialize[A](token.slice(prefixBytesLength, token.length))
+    s"${keyPrefix.getOrElse("unknown")}-$keyString"
   }
 
   def del(items: Iterable[B])(implicit p: Pipeline) = {
