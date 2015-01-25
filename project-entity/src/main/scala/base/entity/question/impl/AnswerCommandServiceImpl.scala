@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:41 AM
+ * Last modified by rconrad, 1/25/15 11:51 AM
  */
 
 package base.entity.question.impl
@@ -46,7 +46,6 @@ private[entity] class AnswerCommandServiceImpl()
         case Left(error)   => error
       }
 
-    // todo test this
     def publishMatches(events: List[EventModel]): Response = {
       val futures = events.map { event =>
         GroupListenerService().publish(CommandModel(event))

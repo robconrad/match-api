@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:23 AM
+ * Last modified by rconrad, 1/25/15 12:08 PM
  */
 
 package base.socket.api.impl
@@ -24,21 +24,26 @@ import scala.concurrent.{ Promise, Future }
  */
 class SocketPushChannel(implicit ctx: ChannelHandlerContext) extends PushChannel {
 
-  implicit val formats = JsonFormats.withModels
+  private implicit val formats = JsonFormats.withModels
 
-  // todo test this
   def push[T <: CommandModel[_]](command: T)(implicit m: Manifest[T]) = {
     ctx.channel.isOpen match {
       case false => Future.successful(false)
       case true =>
         val p = Promise[Boolean]()
-        SocketApiHandlerService().write(Serialization.write(command)).addListener(new ChannelFutureListener {
+        val json = serialize(command)
+        val channelFuture = SocketApiHandlerService().write(json)
+        channelFuture.addListener(new ChannelFutureListener {
           def operationComplete(future: ChannelFuture) {
             p success true
           }
         })
         p.future
     }
+  }
+
+  def serialize[T <: CommandModel[_]](command: T)(implicit m: Manifest[T]) = {
+    Serialization.write(command)
   }
 
 }
