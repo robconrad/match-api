@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.rest.route
@@ -28,7 +28,7 @@ import scala.util.{ Failure, Success }
  */
 private[rest] trait RestRoute extends BaseRoute {
 
-  override implicit val json4sFormats = JsonFormats.withEnumsAndFields
+  override implicit val json4sFormats = JsonFormats.withModels
 
   /**
    * Endpoints supported by this RestRoute, will be used to generate OPTIONS support for CORS

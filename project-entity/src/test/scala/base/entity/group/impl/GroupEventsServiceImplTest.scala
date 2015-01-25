@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 8:25 PM
+ * Last modified by rconrad, 1/25/15 11:21 AM
  */
 
 package base.entity.group.impl
@@ -11,9 +11,9 @@ import base.common.random.RandomService
 import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.event.EventTypes
-import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.impl.GroupEventsServiceImpl.Errors
-import base.entity.kv.{ KvTest, KvFactoryService }
+import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 
 /**
@@ -31,7 +31,7 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
   private val groupId = RandomService().uuid
   private val body = "some event body"
 
-  private lazy val event = EventModel(
+  private lazy val event = EventModelImpl(
     id = RandomService().uuid,
     groupId = groupId,
     userId = None,

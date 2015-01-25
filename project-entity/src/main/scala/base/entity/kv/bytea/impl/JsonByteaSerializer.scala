@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:19 PM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.entity.kv.bytea.impl
@@ -19,7 +19,7 @@ import org.json4s.native.{ JsonMethods, Serialization }
  */
 trait JsonByteaSerializer[T <: AnyRef] extends ByteaSerializer[T] {
 
-  implicit val formats = JsonFormats.withEnumsAndFields
+  implicit val formats = JsonFormats.withModels
 
   implicit val m: Manifest[T]
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 10:06 AM
+ * Last modified by rconrad, 1/25/15 11:21 AM
  */
 
 package base.entity.group.impl
@@ -17,6 +17,7 @@ import base.entity.auth.context.PushChannel
 import base.entity.command.model.CommandModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.impl.GroupListenerActor.{ Publish, Register, Unregister }
 import base.entity.test.EntityBaseSuite
 
@@ -34,7 +35,7 @@ class GroupListenerActorTest extends EntityBaseSuite with ActorTestHelper with L
     val channel = mock[PushChannel]
     val userId = RandomService().uuid
     val groupId = RandomService().uuid
-    val event = EventModel(RandomService().uuid, groupId, None, EventTypes.MESSAGE, "")
+    val event: EventModel = EventModelImpl(RandomService().uuid, groupId, None, EventTypes.MESSAGE, "")
     val command = CommandModel(event)
 
     actor ? Register(Set(groupId), userId, channel) await ()

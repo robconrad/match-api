@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:45 AM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.socket.api
@@ -23,6 +23,7 @@ import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
@@ -52,7 +53,7 @@ abstract class SocketApiIntegrationTest
     with Loggable
     with KvTest {
 
-  private implicit val formats = JsonFormats.withEnumsAndFields
+  private implicit val formats = JsonFormats.withModels
   val connectionsAllowed = 6
 
   private val totalSides = 6
@@ -184,7 +185,8 @@ abstract class SocketApiIntegrationTest
       val messageEventId = randomMock.nextUuid()
 
       val messageModel = MessageModel(groupId, messageBody)
-      val eventModel = EventModel(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
+      val eventModel: EventModel =
+        EventModelImpl(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
       execute(messageModel, None)
       assertResponse(eventModel)
       eventModel
@@ -201,7 +203,7 @@ abstract class SocketApiIntegrationTest
       QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
 
       val answerModel = AnswerModel(questionId, groupId, side, answer)
-      val eventModel = EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time)
+      val eventModel: EventModel = EventModelImpl(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time)
       execute(answerModel, None)
       assertResponse(eventModel)
       eventModel

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:01 AM
+ * Last modified by rconrad, 1/25/15 11:38 AM
  */
 
 package base.entity.message.impl
@@ -15,9 +15,8 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
-import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.{ GroupListenerService, GroupEventsService }
+import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.kv.Key._
 import base.entity.message.model.MessageModel
 
@@ -57,8 +56,7 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
-    val messageId = randomMock.nextUuid()
-    val event = EventModel(messageId, groupId, Option(authCtx.userId), EventTypes.MESSAGE, body)
+    val event = mock[EventModel]
     val groupEventsService = mock[GroupEventsService]
     val groupListenerService = mock[GroupListenerService]
     (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects

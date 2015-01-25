@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:01 AM
+ * Last modified by rconrad, 1/25/15 10:28 AM
  */
 
 package base.entity.question.impl
@@ -11,7 +11,10 @@ import base.common.random.RandomService
 import base.common.service.TestServices
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
+import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
+import base.entity.event.model.EventModel
+import base.entity.group.GroupListenerService
 import base.entity.kv.Key.Pipeline
 import base.entity.question.model.AnswerModel
 import base.entity.question.{ QuestionService, QuestionSides }
@@ -44,10 +47,14 @@ class AnswerCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
+    val eventModel = mock[EventModel]
     val questionService = mock[QuestionService]
+    val groupListenerService = mock[GroupListenerService]
     (questionService.answer(_: AnswerModel)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List()))
-    val unregister = TestServices.register(questionService)
+      (*, *, *) returning Future.successful(Right(List(eventModel)))
+    (groupListenerService.publish(_: CommandModel[EventModel])(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Unit)
+    val unregister = TestServices.register(questionService, groupListenerService)
     assert(service.innerExecute(model).await() == Right(()))
     unregister()
   }

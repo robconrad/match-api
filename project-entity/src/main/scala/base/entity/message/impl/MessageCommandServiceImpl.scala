@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:41 AM
+ * Last modified by rconrad, 1/25/15 11:19 AM
  */
 
 package base.entity.message.impl
@@ -14,6 +14,7 @@ import base.entity.command.impl.CommandServiceImpl
 import base.entity.command.model.CommandModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
@@ -42,7 +43,7 @@ private[entity] class MessageCommandServiceImpl()
     }
 
     def groupEventSet(): Response = {
-      val event = EventModel(
+      val event = EventModelImpl(
         id = RandomService().uuid,
         groupId = input.groupId,
         userId = Option(authCtx.userId),
@@ -54,7 +55,6 @@ private[entity] class MessageCommandServiceImpl()
       }
     }
 
-    // todo test this
     def publishEvent(event: EventModel): Response = {
       GroupListenerService().publish(CommandModel(event)).map { x =>
         Right(Unit)

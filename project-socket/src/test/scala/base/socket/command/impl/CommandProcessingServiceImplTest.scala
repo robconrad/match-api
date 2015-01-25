@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:46 AM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.socket.command.impl
@@ -29,7 +29,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
 
   val service = new CommandProcessingServiceImpl()
 
-  implicit val formats = JsonFormats.withEnumsAndFields
+  implicit val formats = JsonFormats.withModels
   implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   def testCommand[A, B <: AnyRef](model: A, response: B)(implicit channelCtx: ChannelContext,

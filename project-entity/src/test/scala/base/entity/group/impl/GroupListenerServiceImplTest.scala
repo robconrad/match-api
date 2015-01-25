@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:44 AM
+ * Last modified by rconrad, 1/25/15 11:38 AM
  */
 
 package base.entity.group.impl
@@ -11,7 +11,6 @@ import akka.testkit.TestProbe
 import base.common.random.RandomService
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.model.CommandModel
-import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.impl.GroupListenerActor.{ Publish, Register, Unregister }
 import base.entity.service.EntityServiceTest
@@ -44,7 +43,7 @@ class GroupListenerServiceImplTest extends EntityServiceTest {
   }
 
   test("publish") {
-    val event = EventModel(RandomService().uuid, RandomService().uuid, None, EventTypes.MESSAGE, "")
+    val event = mock[EventModel]
     val command = CommandModel(event)
     service.publish(command)
     expect(Publish(command))

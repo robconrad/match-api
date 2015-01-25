@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:50 PM
+ * Last modified by rconrad, 1/25/15 11:21 AM
  */
 
 package base.entity.question.impl
@@ -15,7 +15,7 @@ import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes._
-import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
 import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
@@ -96,7 +96,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
     val model = AnswerModel(questionId, groupId, SIDE_A, questionResponse)
     val eventId = randomMock.nextUuid()
-    val response = EventModel(eventId, groupId, None, MATCH, questions(3) + " is a match")
+    val response = EventModelImpl(eventId, groupId, None, MATCH, questions(3) + " is a match")
 
     val actual = service.answer(model).await()
     val expected = Right(List(response))

@@ -2,16 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:59 AM
+ * Last modified by rconrad, 1/25/15 10:57 AM
  */
 
 package base.entity.command
 
 import base.entity.error.ApiError
 import base.entity.event.model.EventModel
-import base.entity.group.model.{ InviteResponseModel, InviteModel }
+import base.entity.group.model.{ InviteModel, InviteResponseModel }
 import base.entity.message.model.MessageModel
-import base.entity.question.model.{ AnswerModel, QuestionsResponseModel, QuestionsModel }
+import base.entity.question.model.{ AnswerModel, QuestionsModel, QuestionsResponseModel }
 import base.entity.user.model._
 
 /**

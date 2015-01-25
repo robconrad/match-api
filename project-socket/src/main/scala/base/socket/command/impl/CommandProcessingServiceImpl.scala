@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:59 AM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.socket.command.impl
@@ -39,7 +39,7 @@ import scala.concurrent.Future
  */
 class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingService with AuthLoggable {
 
-  implicit val formats = JsonFormats.withEnumsAndFields
+  implicit val formats = JsonFormats.withModels
 
   implicit def response2Future(r: Response) = Future.successful(r)
 

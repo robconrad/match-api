@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 12:54 PM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.entity.group.impl
@@ -34,7 +34,7 @@ class GroupEventsServiceImpl(count: Int)
     with GroupEventsService
     with AuthLoggable {
 
-  private implicit val formats = JsonFormats.withEnumsAndFields
+  private implicit val formats = JsonFormats.withModels
 
   def getEvents(groupId: UUID)(implicit p: Pipeline) = {
     val key = GroupEventsKeyService().make(groupId)

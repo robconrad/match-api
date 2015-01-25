@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.entity.json
@@ -77,39 +77,39 @@ class JsonFormatsTest extends EntityBaseSuite with Loggable {
   }
 
   test("ApiVersionsSerializer") {
-    testStringSerializer(withEnumsAndFields, ApiVersions.V01)
+    testStringSerializer(withModels, ApiVersions.V01)
   }
 
   test("ApiErrorCodesSerializer") {
-    testStringSerializer(withEnumsAndFields, ApiErrorCodes.TEST)
+    testStringSerializer(withModels, ApiErrorCodes.TEST)
   }
 
   test("GendersSerializer") {
-    testStringSerializer(withEnumsAndFields, Genders.male)
+    testStringSerializer(withModels, Genders.male)
   }
 
   test("CurrenciesSerializer") {
-    testStringSerializer(withEnumsAndFields, Currencies.USD)
+    testStringSerializer(withModels, Currencies.USD)
   }
 
   test("LanguagesSerializer") {
-    testStringSerializer(withEnumsAndFields, Languages.eng)
+    testStringSerializer(withModels, Languages.eng)
   }
 
   test("EmailSerializer") {
-    testStringSerializer(withEnumsAndFields, Email("email"))
+    testStringSerializer(withModels, Email("email"))
   }
 
   test("IdentifierSerializer") {
-    testStringSerializer(withEnumsAndFields, Identifier("identifier"))
+    testStringSerializer(withModels, Identifier("identifier"))
   }
 
   test("NameSerializer") {
-    testStringSerializer(withEnumsAndFields, Name("name"))
+    testStringSerializer(withModels, Name("name"))
   }
 
   test("UrlSerializer") {
-    testStringSerializer(withEnumsAndFields, Url("url"))
+    testStringSerializer(withModels, Url("url"))
   }
 
 }

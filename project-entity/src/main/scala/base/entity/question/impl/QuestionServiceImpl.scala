@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:43 PM
+ * Last modified by rconrad, 1/25/15 11:19 AM
  */
 
 package base.entity.question.impl
@@ -14,6 +14,7 @@ import base.common.service.{ CommonService, ServiceImpl }
 import base.entity.auth.context.ChannelContext
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.Key._
 import base.entity.kv.KvFactoryService
@@ -164,7 +165,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       val matches = userIds.map { userId =>
         val eventId = RandomService().uuid
         val body = questionMap(input.questionId) + " is a match"
-        EventModel(eventId, input.groupId, userId = None, EventTypes.MATCH, body)
+        EventModelImpl(eventId, input.groupId, userId = None, EventTypes.MATCH, body)
       }
       Right(matches.toList)
     }

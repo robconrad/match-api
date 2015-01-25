@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 10:17 AM
+ * Last modified by rconrad, 1/25/15 11:19 AM
  */
 
 package base.entity.group.impl
@@ -14,11 +14,11 @@ import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
-import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupListenerService, GroupEventsService, GroupService, InviteCommandService }
+import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService, InviteCommandService }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv._
 
@@ -124,7 +124,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
       }
 
     def groupEventsPrepend(userId: UUID, groupId: UUID) = {
-      val event = EventModel(
+      val event = EventModelImpl(
         id = RandomService().uuid,
         groupId = groupId,
         `type` = EventTypes.MESSAGE,

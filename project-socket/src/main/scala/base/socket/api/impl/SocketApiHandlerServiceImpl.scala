@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:59 AM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.socket.api.impl
@@ -126,7 +126,7 @@ abstract class SocketApiHandlerServiceImpl
 
 object SocketApiHandlerServiceImpl {
 
-  implicit val formats = JsonFormats.withEnumsAndFields
+  implicit val formats = JsonFormats.withModels
 
   lazy val runningText = "The server is not processing commands right now."
   lazy val runningApiError = ApiError(runningText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_NOT_RUNNING)

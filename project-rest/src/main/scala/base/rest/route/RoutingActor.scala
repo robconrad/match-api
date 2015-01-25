@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 6:35 PM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.rest.route
@@ -26,7 +26,7 @@ import spray.routing.directives.LoggingMagnet
  */
 private[rest] class RoutingActor extends Actor with HttpService with Json4sSupport with RoutingHandlers with Loggable {
 
-  implicit val json4sFormats: Formats = JsonFormats.withEnumsAndFields
+  implicit val json4sFormats: Formats = JsonFormats.withModels
 
   def actorRefFactory = context
 

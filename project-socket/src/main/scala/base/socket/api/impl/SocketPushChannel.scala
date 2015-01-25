@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 11:23 AM
  */
 
 package base.socket.api.impl
@@ -24,7 +24,7 @@ import scala.concurrent.{ Promise, Future }
  */
 class SocketPushChannel(implicit ctx: ChannelHandlerContext) extends PushChannel {
 
-  implicit val formats = JsonFormats.withEnumsAndFields
+  implicit val formats = JsonFormats.withModels
 
   // todo test this
   def push[T <: CommandModel[_]](command: T)(implicit m: Manifest[T]) = {

@@ -2,16 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 10:37 PM
+ * Last modified by rconrad, 1/25/15 11:33 AM
  */
 
 package base.entity.event.model
 
 import java.util.UUID
 
-import base.common.time.TimeService
 import base.entity.api.ApiStrings.User._
 import base.entity.event.EventTypes.EventType
+import base.entity.event.model.impl.EventModelImpl
+import base.entity.model.{ Model, ModelCompanion }
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 import org.joda.time.DateTime
 
@@ -24,13 +25,16 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
-case class EventModel(
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) id: UUID,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) groupId: UUID,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) userId: Option[UUID] = None,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) `type`: EventType,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) body: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) time: DateTime = TimeService().now) {
-  // format: ON
+trait EventModel extends Model {
+
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def id: UUID
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def groupId: UUID
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def userId: Option[UUID]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def `type`: EventType
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def body: String
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def time: DateTime
 
 }
+// format: ON
+
+object EventModel extends ModelCompanion[EventModel, EventModelImpl]

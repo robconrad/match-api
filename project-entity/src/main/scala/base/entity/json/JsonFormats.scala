@@ -2,20 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 8:51 AM
+ * Last modified by rconrad, 1/25/15 11:30 AM
  */
 
 package base.entity.json
 
-import base.common.lib.{ Genders, Currencies, Languages }
+import base.common.lib.{ Currencies, Genders, Languages }
 import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.command.CommandNames
 import base.entity.event.EventTypes
-import base.entity.model.{ Email, Identifier, Name, Url }
+import base.entity.event.model.EventModel
+import base.entity.model._
 import base.entity.question.QuestionSides
 import org.json4s.DefaultFormats
 import org.json4s.ext.EnumNameSerializer
-import spray.http.StatusCodes
 
 /**
  * Json4s formats
@@ -40,5 +40,7 @@ object JsonFormats {
     Identifier.serializer +
     Name.serializer +
     Url.serializer
+
+  val withModels = withEnumsAndFields + EventModel.serializer
 
 }
