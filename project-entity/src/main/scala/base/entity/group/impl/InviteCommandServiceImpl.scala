@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:52 AM
  */
 
 package base.entity.group.impl
@@ -29,6 +29,8 @@ import base.entity.user.kv._
 private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
     extends CommandServiceImpl[InviteModel, InviteResponseModel]
     with InviteCommandService {
+
+  override protected val responseManifest = Option(manifest[InviteResponseModel])
 
   def innerExecute(input: InviteModel)(implicit channelCtx: ChannelContext) = {
     new InviteCommand(input).execute()

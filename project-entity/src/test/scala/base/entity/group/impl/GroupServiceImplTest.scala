@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 9:45 PM
+ * Last modified by rconrad, 1/25/15 9:15 AM
  */
 
 package base.entity.group.impl
@@ -14,12 +14,12 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiError
-import base.entity.group.UserService
 import base.entity.group.kv.{ GroupKeyService, GroupUserKeyService }
 import base.entity.group.model.{ GroupModel, GroupModelBuilder }
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
+import base.entity.user.UserService
 import base.entity.user.model.UserModel
 
 import scala.concurrent.Future

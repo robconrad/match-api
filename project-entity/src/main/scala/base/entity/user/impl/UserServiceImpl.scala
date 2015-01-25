@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 8:51 AM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.kv.Key._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService}
+import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService }
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 

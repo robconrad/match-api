@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:41 AM
  */
 
 package base.entity.question.impl
@@ -12,7 +12,7 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.command.model.CommandModel
 import base.entity.event.model.EventModel
-import base.entity.group.{ EventCommandService, GroupListenerService }
+import base.entity.group.GroupListenerService
 import base.entity.question.model.AnswerModel
 import base.entity.question.{ AnswerCommandService, QuestionService }
 
@@ -49,8 +49,7 @@ private[entity] class AnswerCommandServiceImpl()
     // todo test this
     def publishMatches(events: List[EventModel]): Response = {
       val futures = events.map { event =>
-        val command = CommandModel(EventCommandService.outCmd.get, event)
-        GroupListenerService().publish(command)
+        GroupListenerService().publish(CommandModel(event))
       }
       Future.sequence(futures).map { x =>
         Right(Unit)

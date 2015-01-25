@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 11:45 PM
+ * Last modified by rconrad, 1/25/15 9:47 AM
  */
 
 package base.entity.user
 
-import base.entity.command.{ CommandService, CommandServiceCompanion }
+import base.entity.command.{ CommandNames, CommandService, CommandServiceCompanion }
 import base.entity.perm.Perms
 import base.entity.user.model._
 
@@ -17,18 +17,10 @@ import base.entity.user.model._
  */
 trait LoginCommandService extends CommandService[LoginModel, LoginResponseModel] {
 
-  final val inCmd = LoginCommandService.inCmd
-  final val outCmd = LoginCommandService.outCmd
-
   final val serviceManifest = manifest[LoginCommandService]
 
   final val perms = Set(Perms.LOGIN)
 
 }
 
-object LoginCommandService extends CommandServiceCompanion[LoginCommandService] {
-
-  final val inCmd = "login"
-  final val outCmd = Option("loginResponse")
-
-}
+object LoginCommandService extends CommandServiceCompanion[LoginCommandService]

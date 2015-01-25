@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:59 AM
  */
 
 package base.socket.api.impl
@@ -12,18 +12,18 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.NoAuthContext
 import base.entity.auth.context.impl.ChannelContextImpl
-import base.entity.command.CommandService
+import base.entity.command.model.CommandModel
 import base.entity.error.ApiError
 import base.entity.group.GroupListenerService
 import base.entity.json.JsonFormats
-import base.socket.api.{SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService}
+import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
 import base.socket.command.CommandProcessingService
-import base.socket.logging.{LoggableChannelInfo, SocketLoggable}
-import io.netty.channel.{ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter}
+import base.socket.logging.{ LoggableChannelInfo, SocketLoggable }
+import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter }
 import org.json4s.native.Serialization
 import spray.http.StatusCodes
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 /**
  * {{ Describe the high level purpose of SocketApiHandlerServiceImpl here. }}
@@ -130,11 +130,11 @@ object SocketApiHandlerServiceImpl {
 
   lazy val runningText = "The server is not processing commands right now."
   lazy val runningApiError = ApiError(runningText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_NOT_RUNNING)
-  lazy val runningJson = Serialization.write(CommandService.errorCommand(runningApiError))
+  lazy val runningJson = Serialization.write(CommandModel(runningApiError))
 
   lazy val busyText = "The server is too busy to accept new connections right now."
   lazy val busyApiError = ApiError(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
-  lazy val busyJson = Serialization.write(CommandService.errorCommand(busyApiError))
+  lazy val busyJson = Serialization.write(CommandModel(busyApiError))
 
 }
 

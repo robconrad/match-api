@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:52 AM
  */
 
 package base.entity.user.impl
@@ -15,9 +15,9 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.model.EventModel
 import base.entity.group.model.GroupModel
-import base.entity.group.{ GroupListenerService, GroupEventsService, UserService }
+import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
-import base.entity.question.model.QuestionModel
+import base.entity.question.model.{ QuestionsResponseModel, QuestionModel }
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
@@ -32,6 +32,8 @@ import spray.http.StatusCodes._
 private[entity] class LoginCommandServiceImpl()
     extends CommandServiceImpl[LoginModel, LoginResponseModel]
     with LoginCommandService {
+
+  override protected val responseManifest = Option(manifest[LoginResponseModel])
 
   def innerExecute(input: LoginModel)(implicit channelCtx: ChannelContext) = {
     new LoginCommand(input).execute()

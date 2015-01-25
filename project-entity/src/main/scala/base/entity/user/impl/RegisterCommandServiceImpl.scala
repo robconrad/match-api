@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:52 AM
  */
 
 package base.entity.user.impl
@@ -13,11 +13,12 @@ import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.error.ApiError
+import base.entity.question.model.QuestionsResponseModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.RegisterCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{RegisterModel, RegisterResponseModel}
+import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
 import spray.http.StatusCodes
 
 import scala.concurrent.duration.FiniteDuration
@@ -29,6 +30,8 @@ import scala.concurrent.duration.FiniteDuration
 private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
     extends CommandServiceImpl[RegisterModel, RegisterResponseModel]
     with RegisterCommandService {
+
+  override protected val responseManifest = Option(manifest[RegisterResponseModel])
 
   def innerExecute(input: RegisterModel)(implicit channelCtx: ChannelContext) = {
     new RegisterCommand(input).execute()

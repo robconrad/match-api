@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:44 PM
+ * Last modified by rconrad, 1/25/15 9:52 AM
  */
 
 package base.entity.question.impl
 
-import base.entity.auth.context.{ AuthContext, ChannelContext }
+import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
@@ -20,6 +20,8 @@ import base.entity.question.{ QuestionService, QuestionsCommandService }
 private[entity] class QuestionsCommandServiceImpl()
     extends CommandServiceImpl[QuestionsModel, QuestionsResponseModel]
     with QuestionsCommandService {
+
+  override protected val responseManifest = Option(manifest[QuestionsResponseModel])
 
   def innerExecute(input: QuestionsModel)(implicit channelCtx: ChannelContext) = {
     new QuestionsCommand(input).execute()

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:54 PM
+ * Last modified by rconrad, 1/25/15 9:15 AM
  */
 
 package base.entity.user.impl
@@ -18,10 +18,11 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
-import base.entity.group.{ GroupEventsService, UserService }
+import base.entity.group.GroupEventsService
 import base.entity.kv.Key._
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
+import base.entity.user.UserService
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv.{ DeviceKey, DeviceKeyService, UserKey, UserKeyService }
 import base.entity.user.model.{ LoginModel, LoginResponseModel }

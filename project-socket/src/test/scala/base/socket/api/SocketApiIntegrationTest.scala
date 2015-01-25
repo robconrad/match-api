@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 11:48 PM
+ * Last modified by rconrad, 1/25/15 9:45 AM
  */
 
 package base.socket.api
@@ -19,25 +19,22 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
 import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.auth.context.{ ChannelContext, StandardUserAuthContext }
-import base.entity.command.CommandServiceCompanion
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.{ EventCommandService, InviteCommandService }
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
-import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
 import base.entity.question._
 import base.entity.question.impl.QuestionServiceImpl
 import base.entity.question.model.{ AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel }
 import base.entity.sms.mock.SmsServiceMock
+import base.entity.user.User
 import base.entity.user.impl.{ UserServiceImpl, VerifyCommandServiceImpl }
 import base.entity.user.model._
-import base.entity.user.{ LoginCommandService, RegisterCommandService, User, VerifyCommandService }
 import base.socket.api.test.SocketConnection
 import base.socket.test.SocketBaseSuite
 import org.json4s.jackson.JsonMethods
@@ -120,22 +117,21 @@ abstract class SocketApiIntegrationTest
   def handlerService: SocketApiHandlerService
   def connect(): SocketConnection
 
-  private def execute[A, B](companion: CommandServiceCompanion[_],
-                            model: A, responseModel: Option[B])(implicit m: Manifest[B], socket: SocketConnection) {
-
-    val command = CommandModel(companion.inCmd, model)
+  private def execute[A, B](model: A, responseModel: Option[B])(implicit mA: Manifest[A],
+                                                                mB: Manifest[B],
+                                                                socket: SocketConnection) {
+    val command = CommandModel(model)
     val json = Serialization.write(command)
 
     socket.write(json)
 
     responseModel foreach { responseModel =>
-      assertResult(companion, responseModel)
+      assertResponse(responseModel)
     }
   }
 
-  private def assertResult[B](companion: CommandServiceCompanion[_],
-                              responseModel: B)(implicit m: Manifest[B], socket: SocketConnection) {
-    val expectedResponse = CommandModel(companion.outCmd.get, responseModel)
+  private def assertResponse[B](responseModel: B)(implicit m: Manifest[B], socket: SocketConnection) {
+    val expectedResponse = CommandModel(responseModel)
     val actualResponse = JsonMethods.parse(socket.read).extract[CommandModel[B]]
 
     debug(socket.hashCode() + "   actual: " + actualResponse.toString)
@@ -149,21 +145,21 @@ abstract class SocketApiIntegrationTest
     def register(phone: String)(implicit s: SocketConnection) {
       val registerModel = RegisterModel(ApiVersions.V01, phone)
       val registerResponseModel = RegisterResponseModel()
-      execute(RegisterCommandService, registerModel, Option(registerResponseModel))
+      execute(registerModel, Option(registerResponseModel))
     }
 
     def verify(phone: String, deviceId: UUID, token: UUID)(implicit s: SocketConnection) {
       val code = "code!"
       val verifyModel = VerifyModel(ApiVersions.V01, Option("name"), Option(Genders.other), phone, deviceId, code)
       val verifyResponseModel = VerifyResponseModel(token)
-      execute(VerifyCommandService, verifyModel, Option(verifyResponseModel))
+      execute(verifyModel, Option(verifyResponseModel))
     }
 
     def login(deviceId: UUID, token: UUID, userId: UUID, groups: List[GroupModel])(implicit s: SocketConnection) {
       val deviceModel = DeviceModel(deviceId, "", "", "", "", "")
       val loginModel = LoginModel(token, None, "", ApiVersions.V01, "", deviceModel)
       val loginResponseModel = LoginResponseModel(userId, groups, None, None, None)
-      execute(LoginCommandService, loginModel, Option(loginResponseModel))
+      execute(loginModel, Option(loginResponseModel))
     }
 
     def invite(phone: String, userId: UUID, inviteUserId: UUID, groupId: UUID)(implicit s: SocketConnection) {
@@ -174,13 +170,13 @@ abstract class SocketApiIntegrationTest
       val groupModel = GroupModel(groupId, sortUsers(List(userModel, inviteUserModel)), None, None, 0)
       val inviteModel = InviteModel(phone, label)
       val inviteResponseModel = InviteResponseModel(inviteUserId, groupModel)
-      execute(InviteCommandService, inviteModel, Option(inviteResponseModel))
+      execute(inviteModel, Option(inviteResponseModel))
     }
 
     def questions(groupId: UUID, questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val questionsModel = QuestionsModel(groupId)
       val questionsResponseModel = QuestionsResponseModel(groupId, sortQuestions(questionModels))
-      execute(QuestionsCommandService, questionsModel, Option(questionsResponseModel))
+      execute(questionsModel, Option(questionsResponseModel))
     }
 
     def message(groupId: UUID, userId: UUID)(implicit s: SocketConnection) = {
@@ -189,8 +185,8 @@ abstract class SocketApiIntegrationTest
 
       val messageModel = MessageModel(groupId, messageBody)
       val eventModel = EventModel(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
-      execute(MessageCommandService, messageModel, None)
-      assertResult(EventCommandService, eventModel)
+      execute(messageModel, None)
+      assertResponse(eventModel)
       eventModel
     }
 
@@ -206,8 +202,8 @@ abstract class SocketApiIntegrationTest
 
       val answerModel = AnswerModel(questionId, groupId, side, answer)
       val eventModel = EventModel(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time)
-      execute(AnswerCommandService, answerModel, None)
-      assertResult(EventCommandService, eventModel)
+      execute(answerModel, None)
+      assertResponse(eventModel)
       eventModel
     }
 
@@ -257,10 +253,10 @@ abstract class SocketApiIntegrationTest
     questions(groupId, questionModels2)(socket2)
 
     val messageEvent = message(groupId, inviteUserId)(socket2)
-    assertResult(EventCommandService, messageEvent)(manifest[EventModel], socket)
+    assertResponse(messageEvent)(manifest[EventModel], socket)
 
     val answerEvent = answer(groupId, userId, questionDefs(1).id)(socket2)
-    assertResult(EventCommandService, answerEvent)(manifest[EventModel], socket)
+    assertResponse(answerEvent)(manifest[EventModel], socket)
 
     socket.disconnect()
     socket2.disconnect()

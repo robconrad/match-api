@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 11:46 PM
+ * Last modified by rconrad, 1/25/15 9:44 AM
  */
 
 package base.entity.group.impl
@@ -13,9 +13,7 @@ import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.model.CommandModel
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.EventCommandService
-import base.entity.group.impl.GroupListenerActor.{ Publish, Unregister, Register }
-import base.entity.message.MessageCommandService
+import base.entity.group.impl.GroupListenerActor.{ Publish, Register, Unregister }
 import base.entity.service.EntityServiceTest
 
 /**
@@ -47,7 +45,7 @@ class GroupListenerServiceImplTest extends EntityServiceTest {
 
   test("publish") {
     val event = EventModel(RandomService().uuid, RandomService().uuid, None, EventTypes.MESSAGE, "")
-    val command = CommandModel(EventCommandService.outCmd.get, event)
+    val command = CommandModel(event)
     service.publish(command)
     expect(Publish(command))
   }

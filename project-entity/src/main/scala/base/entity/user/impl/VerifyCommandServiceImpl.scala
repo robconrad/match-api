@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/25/15 9:52 AM
  */
 
 package base.entity.user.impl
@@ -29,6 +29,8 @@ import base.entity.user.model._
 class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
     extends CommandServiceImpl[VerifyModel, VerifyResponseModel]
     with VerifyCommandService {
+
+  override protected val responseManifest = Option(manifest[VerifyResponseModel])
 
   def innerExecute(input: VerifyModel)(implicit channelCtx: ChannelContext) = {
     new VerifyCommand(input).execute()

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 9:55 PM
+ * Last modified by rconrad, 1/25/15 9:01 AM
  */
 
 package base.entity.group.impl
@@ -11,11 +11,12 @@ import java.util.UUID
 
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
+import base.entity.group.GroupService
 import base.entity.group.kv._
 import base.entity.group.model.{ GroupModel, GroupModelBuilder }
-import base.entity.group.{ GroupService, UserService }
 import base.entity.kv.Key.Pipeline
 import base.entity.service.CrudImplicits
+import base.entity.user.UserService
 
 /**
  * {{ Describe the high level purpose of GroupServiceImpl here. }}

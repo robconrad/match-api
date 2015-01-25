@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 11:47 PM
+ * Last modified by rconrad, 1/25/15 9:59 AM
  */
 
 package base.socket.command.impl
@@ -10,6 +10,8 @@ package base.socket.command.impl
 import base.common.lib.Tryo
 import base.common.service.ServiceImpl
 import base.entity.auth.context.{ ChannelContext, AuthContext, StandardUserAuthContext }
+import base.entity.command.CommandNames
+import base.entity.command.CommandNames.CommandName
 import base.entity.command.model.CommandModel
 import base.entity.group.InviteCommandService
 import base.entity.group.model.InviteModel
@@ -65,9 +67,13 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
         case json: JObject =>
           json \ "cmd" match {
             case cmd: JString =>
-              json \ "body" match {
-                case body: JObject => processCommand(cmd.s, body)
-                case _             => error("unable to parse body from message: %s", json)
+              CommandNames.findByName(cmd.s) match {
+                case Some(cmd) =>
+                  json \ "body" match {
+                    case body: JObject => processCommand(cmd, body)
+                    case _             => error("unable to parse body from message: %s", json)
+                  }
+                case None => error("unable to match cmd from message: %s", json)
               }
             case _ => error("unable to parse cmd from message: %s", json)
           }
@@ -75,27 +81,26 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
       }
     }
 
-    def processCommand(cmd: String, body: JObject): FutureResponse = {
+    def processCommand(cmd: CommandName, body: JObject): FutureResponse = {
       val response: Future[Option[_]] = cmd match {
-        case RegisterCommandService.inCmd  => RegisterCommandService().execute(body.extract[RegisterModel])
-        case VerifyCommandService.inCmd    => VerifyCommandService().execute(body.extract[VerifyModel])
-        case LoginCommandService.inCmd     => LoginCommandService().execute(body.extract[LoginModel])
-        case InviteCommandService.inCmd    => InviteCommandService().execute(body.extract[InviteModel])
-        case QuestionsCommandService.inCmd => QuestionsCommandService().execute(body.extract[QuestionsModel])
-        case MessageCommandService.inCmd   => MessageCommandService().execute(body.extract[MessageModel])
-        case AnswerCommandService.inCmd    => AnswerCommandService().execute(body.extract[AnswerModel])
-        case "heartbeat"                   => Future.successful(None)
-        case cmd =>
-          error("'%s' is not a valid command for this handler", cmd)
+        case CommandNames.register  => RegisterCommandService().execute(body.extract[RegisterModel])
+        case CommandNames.verify    => VerifyCommandService().execute(body.extract[VerifyModel])
+        case CommandNames.login     => LoginCommandService().execute(body.extract[LoginModel])
+        case CommandNames.invite    => InviteCommandService().execute(body.extract[InviteModel])
+        case CommandNames.questions => QuestionsCommandService().execute(body.extract[QuestionsModel])
+        case CommandNames.message   => MessageCommandService().execute(body.extract[MessageModel])
+        case CommandNames.answer    => AnswerCommandService().execute(body.extract[AnswerModel])
+        case CommandNames.heartbeat => Future.successful(None)
+        case _ =>
+          warn("command %s not handled", cmd)
           Future.successful(None)
       }
       addAuthContext(cmd, response)
     }
 
-    def addAuthContext(cmd: String, response: Future[Option[_]]): FutureResponse = {
+    def addAuthContext(cmd: CommandName, response: Future[Option[_]]): FutureResponse = {
       val newAuthCtx: Future[Option[AuthContext]] = response.map {
-        // todo fix loginResponse shouldn't be string
-        case Some(CommandModel("loginResponse", model: LoginResponseModel)) =>
+        case Some(CommandModel(CommandNames.loginResponse, model: LoginResponseModel)) =>
           Option(new StandardUserAuthContext(new User(model.userId)))
         case _ => None
       }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 11:09 PM
+ * Last modified by rconrad, 1/25/15 9:46 AM
  */
 
 package base.socket.command.impl
@@ -11,7 +11,6 @@ import base.common.random.RandomService
 import base.common.service.TestServices
 import base.entity.api.ApiVersions
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
-import base.entity.command.CommandService
 import base.entity.command.model.CommandModel
 import base.entity.json.JsonFormats
 import base.entity.user.model._
@@ -33,11 +32,9 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
   implicit val formats = JsonFormats.withEnumsAndFields
   implicit val channelCtx = ChannelContextDataFactory.userAuth
 
-  def testCommand[A, T <: AnyRef](model: A,
-                                  response: T,
-                                  cmdService: CommandService[_, _])(implicit channelCtx: ChannelContext,
-                                                                    m: Manifest[T]) {
-    val cmd = CommandModel(cmdService.inCmd, model)
+  def testCommand[A, B <: AnyRef](model: A, response: B)(implicit channelCtx: ChannelContext,
+                                                         mA: Manifest[A], mB: Manifest[B]) {
+    val cmd = CommandModel(model)
     val input = Serialization.write(cmd)
 
     val responseJson = Serialization.write(response)
@@ -53,22 +50,22 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
   test("command - register") {
     val model = RegisterModel(ApiVersions.V01, "555-5555")
     val response = RegisterResponseModel()
-    val command = RegisterCommandService.inCommand(response)
+    val command = CommandModel(response)
     val service = mock[RegisterCommandService]
     (service.execute(_: RegisterModel)(_: ChannelContext)) expects (*, *) returning Future.successful(Option(command))
     val unregister = TestServices.register(service)
-    testCommand(model, command, service)
+    testCommand(model, command)
     unregister()
   }
 
   test("command - verify") {
     val model = VerifyModel(ApiVersions.V01, None, None, "", RandomService().uuid, "")
     val response = VerifyResponseModel(RandomService().uuid)
-    val command = VerifyCommandService.inCommand(response)
+    val command = CommandModel(response)
     val service = mock[VerifyCommandService]
     (service.execute(_: VerifyModel)(_: ChannelContext)) expects (*, *) returning Future.successful(Option(command))
     val unregister = TestServices.register(service)
-    testCommand(model, command, service)
+    testCommand(model, command)
     unregister()
   }
 
