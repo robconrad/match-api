@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:52 AM
+ * Last modified by rconrad, 1/25/15 11:50 AM
  */
 
 package base.entity.user.impl
@@ -123,7 +123,6 @@ private[entity] class LoginCommandServiceImpl()
       }
     }
 
-    // todo test this
     def registerGroupListeners(response: LoginResponseModel): Response = {
       GroupListenerService().register(response.userId, response.groups.map(_.id).toSet) map { x =>
         response

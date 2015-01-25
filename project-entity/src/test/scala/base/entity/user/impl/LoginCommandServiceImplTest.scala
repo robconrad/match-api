@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:15 AM
+ * Last modified by rconrad, 1/25/15 11:49 AM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiError
-import base.entity.group.GroupEventsService
+import base.entity.group.{ GroupListenerService, GroupEventsService }
 import base.entity.kv.Key._
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
@@ -72,6 +72,11 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userKey = UserKeyService().make(userId)
     val deviceKey = DeviceKeyService().make(deviceUuid)
 
+    val groupListener = mock[GroupListenerService]
+    val unregister = TestServices.register(groupListener)
+    (groupListener.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Unit)
+
     assert(deviceKey.setToken(token).await())
     assert(deviceKey.setUserId(userId).await())
 
@@ -84,6 +89,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(deviceKey.getCordova.await().contains(deviceModel.cordova))
     assert(deviceKey.getPlatform.await().contains(deviceModel.platform))
     assert(deviceKey.getVersion.await().contains(deviceModel.version))
+
+    unregister()
   }
 
   test("without perms") {
