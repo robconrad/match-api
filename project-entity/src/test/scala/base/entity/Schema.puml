@@ -1,0 +1,173 @@
+@startuml
+!define id(x) class x << U,white,Id >>
+!define hash(x) class x << H,white,Hash >>
+!define int(x) class x << I,white,Int >>
+!define list(x) class x << L,white,List >>
+!define set(x) class x << S,white,Set >>
+!define json(x) class x << J,white,Json >>
+!define simple(x) class x << K,white,Simple >>
+!define key(x) <u><b>x</b></u>
+hide methods
+hide stereotypes
+
+skinparam class {
+    borderColor Black
+    backgroundColor<<Id>> LightBlue
+    backgroundColor<<Hash>> LightSalmon
+    backgroundColor<<Int>> LightBlue
+    backgroundColor<<List>> GreenYellow
+    backgroundColor<<Set>> Plum
+    backgroundColor<<Json>> Pink
+    backgroundColor<<Simple>> LightBlue
+}
+
+package user {
+
+    id(UserId)
+
+    hash(Device)<<OO>> {
+        key(deviceId)
+        + userId
+        + token
+        + appVersion
+        + locale
+        + model
+        + cordova
+        + platform
+        + version
+    }
+
+    hash(User) {
+        key(userId)
+        + name
+        + gender
+        + lastLoginTime
+    }
+
+    hash(Phone) {
+        key(phone)
+        + userId
+        + code
+    }
+
+    int(PhoneCooldown) {
+        key(phone)
+        Exists
+    }
+
+    set(UserGroups) {
+        key(userId)
+        GroupId
+    }
+
+}
+
+package group {
+
+    id(GroupId)
+
+    hash(Group) {
+        key(groupId)
+        + lastEventTime
+        + eventCount
+    }
+
+    hash(GroupUser) {
+        key(groupId+userId)
+        + lastReadTime
+    }
+
+    list(GroupEvents) {
+        key(groupId)
+        - id
+        - groupId
+        - userId
+        - type
+        - body
+        - time
+    }
+
+    set(GroupUserQuestions) {
+        key(groupId+userId)
+        QuestionIdComposite
+    }
+
+    set(GroupUserQuestionsTemp) {
+        key(groupId+userId)
+        QuestionIdComposite
+    }
+
+    set(GroupUserQuestionsYes) {
+        key(groupId+userId)
+        QuestionIdComposite
+    }
+
+    set(GroupUsers) {
+        key(groupId)
+        UserId
+    }
+
+    simple(GroupPair) {
+        key(userId+userId)
+        GroupId
+    }
+
+}
+
+package question {
+
+    id(QuestionIdComposite)
+
+    set(Questions) {
+        key("standard")
+        QuestionIdComposite
+    }
+
+}
+
+package facebook {
+
+    json(FacebookInfo) {
+        key(token)
+        - id
+        - firstName
+        - username
+        - locale
+    }
+
+}
+
+package userland <<Cloud>> {
+
+    hash(PhysicalDevice) {
+        + phone
+        + deviceId
+    }
+
+    hash(FacebookAccount) {
+        + token
+    }
+
+}
+
+FacebookAccount --* FacebookInfo
+GroupId -* Group
+GroupId --* GroupEvents
+GroupId --* GroupUser
+GroupId --* GroupUsers
+GroupId ---* GroupUserQuestions
+GroupId ---* GroupUserQuestionsTemp
+GroupId ---* GroupUserQuestionsYes
+PhysicalDevice -* Device
+PhysicalDevice -* Phone
+PhysicalDevice -* PhoneCooldown
+UserId --* User
+UserId --* GroupPair
+UserId --* GroupPair
+UserId --* GroupUser
+UserId --* UserGroups
+UserId ---* GroupUserQuestions
+UserId ---* GroupUserQuestionsTemp
+UserId ---* GroupUserQuestionsYes
+
+@enduml
