@@ -11,6 +11,7 @@ hide methods
 hide stereotypes
 
 skinparam class {
+
     borderColor Black
     backgroundColor<<Id>> LightBlue
     backgroundColor<<Hash>> LightSalmon
@@ -19,6 +20,11 @@ skinparam class {
     backgroundColor<<Set>> Plum
     backgroundColor<<Json>> Pink
     backgroundColor<<Simple>> LightBlue
+
+}
+
+skinparam package {
+    backgroundColor<<Rect>> White/Plum
 }
 
 package user {
@@ -87,19 +93,23 @@ package group {
         - time
     }
 
-    set(GroupUserQuestions) {
-        key(groupId+userId)
-        QuestionIdComposite
-    }
+    package GroupUserQuestion <<Rect>> {
 
-    set(GroupUserQuestionsTemp) {
-        key(groupId+userId)
-        QuestionIdComposite
-    }
+        set(GroupUserQuestions) {
+            key(groupId+userId)
+            QuestionIdComposite
+        }
 
-    set(GroupUserQuestionsYes) {
-        key(groupId+userId)
-        QuestionIdComposite
+        set(GroupUserQuestionsTemp) {
+            key(groupId+userId)
+            QuestionIdComposite
+        }
+
+        set(GroupUserQuestionsYes) {
+            key(groupId+userId)
+            QuestionIdComposite
+        }
+
     }
 
     set(GroupUsers) {
@@ -152,22 +162,18 @@ package userland <<Cloud>> {
 
 FacebookAccount --* FacebookInfo
 GroupId -* Group
+GroupId --* GroupUserQuestion
 GroupId --* GroupEvents
 GroupId --* GroupUser
 GroupId --* GroupUsers
-GroupId ---* GroupUserQuestions
-GroupId ---* GroupUserQuestionsTemp
-GroupId ---* GroupUserQuestionsYes
-PhysicalDevice -* Device
-PhysicalDevice -* Phone
-PhysicalDevice -* PhoneCooldown
+PhysicalDevice --* Device
+PhysicalDevice --* Phone
+PhysicalDevice --* PhoneCooldown
+UserId --* GroupUserQuestion
 UserId --* User
 UserId --* GroupPair
 UserId --* GroupPair
 UserId --* GroupUser
 UserId --* UserGroups
-UserId ---* GroupUserQuestions
-UserId ---* GroupUserQuestionsTemp
-UserId ---* GroupUserQuestionsYes
 
 @enduml
