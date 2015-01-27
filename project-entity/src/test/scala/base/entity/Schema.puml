@@ -13,18 +13,14 @@ hide stereotypes
 skinparam class {
 
     borderColor Black
-    backgroundColor<<Id>> LightBlue
+    backgroundColor<<Id>> Gold
     backgroundColor<<Hash>> LightSalmon
-    backgroundColor<<Int>> LightBlue
+    backgroundColor<<Int>> Gold
     backgroundColor<<List>> GreenYellow
     backgroundColor<<Set>> Plum
     backgroundColor<<Json>> Pink
     backgroundColor<<Simple>> LightBlue
 
-}
-
-skinparam package {
-    backgroundColor<<Rect>> White/Plum
 }
 
 package user {
@@ -34,7 +30,6 @@ package user {
     hash(Device)<<OO>> {
         key(deviceId)
         + userId
-        + token
         + appVersion
         + locale
         + model
@@ -47,13 +42,25 @@ package user {
         key(userId)
         + name
         + gender
+        + facebookId
+        + phone
+        + phoneVerified
         + lastLoginTime
     }
 
-    hash(Phone) {
+    simple(FacebookToken) {
+        key(token)
+        facebookId
+    }
+
+    simple(FacebookUser) {
+        key(facebookId)
+        + userId
+    }
+
+    simple(Phone) {
         key(phone)
         + userId
-        + code
     }
 
     int(PhoneCooldown) {
@@ -93,7 +100,7 @@ package group {
         - time
     }
 
-    package GroupUserQuestion <<Rect>> {
+    package GroupUserQuestion #White/Plum {
 
         set(GroupUserQuestions) {
             key(groupId+userId)
@@ -135,18 +142,6 @@ package question {
 
 }
 
-package facebook {
-
-    json(FacebookInfo) {
-        key(token)
-        - id
-        - firstName
-        - username
-        - locale
-    }
-
-}
-
 package userland <<Cloud>> {
 
     hash(PhysicalDevice) {
@@ -160,7 +155,56 @@ package userland <<Cloud>> {
 
 }
 
-FacebookAccount --* FacebookInfo
+package legend <<Rect>> #White/Gainsboro {
+
+    note top of "Id Key"
+        Id keys are special,
+        they produce auto-
+        incrementing ints
+    end note
+
+    id("Id Key")
+
+    hash("Hash Key") {
+        key(token)
+        + prop 1
+        + prop 2
+        + ...
+        + prop n
+    }
+
+    int("Int Key") {
+        key(token)
+        $intval
+    }
+
+    list("List Key") {
+        key(token)
+        $type
+    }
+
+    set("Set Key") {
+        key(token)
+        $type
+    }
+
+    json("Json Key") {
+        key(token)
+        - json field 1
+        - json field 2
+        - ...
+        - json field n
+    }
+
+    simple("Simple Key") {
+        key(token)
+        $type
+    }
+
+}
+
+FacebookAccount -* FacebookToken
+FacebookToken --* FacebookUser
 GroupId -* Group
 GroupId --* GroupUserQuestion
 GroupId --* GroupEvents
