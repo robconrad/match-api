@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:45 AM
+ * Last modified by rconrad, 1/26/15 9:18 PM
  */
 
 package base.entity.user.model
@@ -26,7 +26,7 @@ import scala.annotation.meta.field
 @ApiModel(description = createRequestDesc)
 // todo convert to interface for mocking
 case class LoginModel(
-  @(ApiModelProperty @field)(required = true, value = emailDesc)     token: UUID,
+  @(ApiModelProperty @field)(required = true, value = emailDesc)     fbToken: String,
   @(ApiModelProperty @field)(required = false, value = passwordDesc) groupId: Option[UUID],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  appVersion: String,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  apiVersion: ApiVersion,

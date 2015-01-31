@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:23 AM
+ * Last modified by rconrad, 1/31/15 9:44 AM
  */
 
 package base.socket.command.impl
@@ -21,8 +21,8 @@ import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
 import base.entity.question.model.{ AnswerModel, QuestionsModel }
 import base.entity.question.{ AnswerCommandService, QuestionsCommandService }
-import base.entity.user.model.{ LoginModel, LoginResponseModel, RegisterModel, VerifyModel }
-import base.entity.user.{ LoginCommandService, RegisterCommandService, User, VerifyCommandService }
+import base.entity.user.model.{ LoginModel, LoginResponseModel, RegisterPhoneModel, VerifyPhoneModel }
+import base.entity.user.{ LoginCommandService, RegisterPhoneCommandService, User, VerifyPhoneCommandService }
 import base.socket.command.CommandProcessingService
 import base.socket.command.CommandProcessingService.{ CommandProcessError, CommandProcessResult, FutureResponse, Response }
 import org.json4s.JValue
@@ -83,14 +83,14 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
 
     def processCommand(cmd: CommandName, body: JObject): FutureResponse = {
       val response: Future[Option[_]] = cmd match {
-        case CommandNames.register  => RegisterCommandService().execute(body.extract[RegisterModel])
-        case CommandNames.verify    => VerifyCommandService().execute(body.extract[VerifyModel])
-        case CommandNames.login     => LoginCommandService().execute(body.extract[LoginModel])
-        case CommandNames.invite    => InviteCommandService().execute(body.extract[InviteModel])
-        case CommandNames.questions => QuestionsCommandService().execute(body.extract[QuestionsModel])
-        case CommandNames.message   => MessageCommandService().execute(body.extract[MessageModel])
-        case CommandNames.answer    => AnswerCommandService().execute(body.extract[AnswerModel])
-        case CommandNames.heartbeat => Future.successful(None)
+        case CommandNames.`registerPhone` => RegisterPhoneCommandService().execute(body.extract[RegisterPhoneModel])
+        case CommandNames.`verifyPhone`   => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
+        case CommandNames.login           => LoginCommandService().execute(body.extract[LoginModel])
+        case CommandNames.invite          => InviteCommandService().execute(body.extract[InviteModel])
+        case CommandNames.questions       => QuestionsCommandService().execute(body.extract[QuestionsModel])
+        case CommandNames.message         => MessageCommandService().execute(body.extract[MessageModel])
+        case CommandNames.answer          => AnswerCommandService().execute(body.extract[AnswerModel])
+        case CommandNames.heartbeat       => Future.successful(None)
         case _ =>
           warn("command %s not handled", cmd)
           Future.successful(None)

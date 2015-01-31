@@ -2,26 +2,28 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:50 AM
+ * Last modified by rconrad, 1/27/15 6:40 PM
  */
 
 package base.entity.user.impl
 
 import java.util.UUID
 
+import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.model.EventModel
+import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.model.GroupModel
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
-import base.entity.question.model.{ QuestionsResponseModel, QuestionModel }
+import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
-import base.entity.user.kv.{ DeviceKey, DeviceKeyService, UserKey, UserKeyService }
+import base.entity.user.kv._
 import base.entity.user.model.{ LoginModel, LoginResponseModel }
 import spray.http.StatusCodes._
 
@@ -40,10 +42,10 @@ private[entity] class LoginCommandServiceImpl()
   }
 
   /**
-   * - get device token
-   * - validate provided token
+   * - get fbInfo from token
+   * - get userId from fbId
+   * - store fbInfo on user
    * - update device attributes
-   * - get userId
    * - retrieve groups
    * - optionally retrieve current group events
    * - optionally retrieve current group questions
@@ -53,18 +55,31 @@ private[entity] class LoginCommandServiceImpl()
       extends Command[LoginModel, LoginResponseModel] {
 
     def execute(): Response = {
-      deviceGetToken(DeviceKeyService().make(input.device.uuid))
+      facebookInfoGet()
     }
 
-    def deviceGetToken(key: DeviceKey): Response = {
-      key.getToken.flatMap {
-        case Some(token) if input.token == token => deviceSet(key)
-        case Some(token)                         => Errors.tokenInvalid
-        case None                                => Errors.deviceUnverified
+    def facebookInfoGet(): Response = {
+      FacebookService().getInfo(input.fbToken) flatMap {
+        case Some(fbInfo) => facebookUserGet(FacebookUserKeyService() make fbInfo.id, fbInfo)
+        case None         => Errors.tokenInvalid
       }
     }
 
-    def deviceSet(key: DeviceKey): Response = {
+    def facebookUserGet(key: FacebookUserKey, fbInfo: FacebookInfo): Response = {
+      key.get flatMap { userIdOpt =>
+        val userId = userIdOpt.getOrElse(RandomService().uuid)
+        userSet(UserKeyService().make(userId), userId, fbInfo)
+      }
+    }
+
+    def userSet(key: UserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
+      key.setFacebookInfo(fbInfo) flatMap {
+        case true  => deviceSet(DeviceKeyService() make input.device.uuid, userId)
+        case false => Errors.userSetFailed
+      }
+    }
+
+    def deviceSet(key: DeviceKey, userId: UUID): Response = {
       key.set(
         input.appVersion,
         input.locale,
@@ -73,16 +88,9 @@ private[entity] class LoginCommandServiceImpl()
         input.device.platform,
         input.device.version
       ).flatMap {
-          case true  => deviceGetUserId(key)
+          case true  => groupsGet(userId)
           case false => Errors.deviceSetFailed
         }
-    }
-
-    def deviceGetUserId(key: DeviceKey): Response = {
-      key.getUserId.flatMap {
-        case Some(userId) => groupsGet(userId)
-        case None         => Errors.userIdGetFailed
-      }
     }
 
     def groupsGet(userId: UUID): Response = {
@@ -139,13 +147,10 @@ object LoginCommandServiceImpl {
 
     override protected val externalErrorText = "There was a problem during login."
 
-    private val deviceUnverifiedText = "This device has not been verified."
-    private val tokenInvalidText = "The supplied token is not valid."
+    private val tokenInvalidText = "The supplied Facebook token is not valid."
 
-    lazy val deviceUnverified: Response = (deviceUnverifiedText, DEVICE_NOT_VERIFIED)
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_NOT_VALID)
     lazy val deviceSetFailed: Response = "failed to set device attributes"
-    lazy val userIdGetFailed: Response = "failed to get user id from device"
     lazy val userSetFailed: Response = "failed to set user attributes"
 
   }

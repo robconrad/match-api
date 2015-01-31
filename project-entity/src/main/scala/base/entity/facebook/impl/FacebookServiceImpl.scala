@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 2:31 PM
+ * Last modified by rconrad, 1/27/15 6:34 PM
  */
 
 package base.entity.facebook.impl
@@ -43,10 +43,10 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
 
     val fieldId = "id"
     val fieldFirstName = "first_name"
-    val fieldUsername = "username"
+    val fieldGender = "gender"
     val fieldLocale = "locale"
     val objectMe = "me"
-    val fieldParameters = Parameter.`with`("fields", s"$fieldId,$fieldUsername,$fieldFirstName,$fieldLocale")
+    val fieldParameters = Parameter.`with`("fields", s"$fieldId,$fieldFirstName,$fieldGender,$fieldLocale")
 
     def execute() = {
       getCachedInfo(FacebookInfoKeyService().make(token))
@@ -79,11 +79,11 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
       val jsonObject = client.fetchObject(objectMe, classOf[JsonObject], fieldParameters)
 
       val id = jsonObject getString fieldId
-      val firstName = Option(jsonObject.optString(fieldFirstName, null))
-      val username = Option(jsonObject.optString(fieldUsername, null))
+      val firstName = jsonObject getString fieldFirstName
+      val gender = jsonObject getString fieldGender
       val locale = jsonObject getString fieldLocale
 
-      val info = FacebookInfo(id, firstName, username, locale)
+      val info = FacebookInfo(id, firstName, gender, locale)
 
       setInfo(key, info)
     }

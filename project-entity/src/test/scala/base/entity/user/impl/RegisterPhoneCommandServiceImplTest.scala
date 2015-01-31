@@ -2,23 +2,23 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:57 PM
+ * Last modified by rconrad, 1/31/15 9:41 AM
  */
 
 package base.entity.user.impl
 
 import java.util.UUID
 
+import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.ApiVersions
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.user.VerifyCommandService
-import base.entity.user.impl.RegisterCommandServiceImpl._
+import base.entity.user.VerifyPhoneCommandService
+import base.entity.user.impl.RegisterPhoneCommandServiceImpl._
 import base.entity.user.kv._
-import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
+import base.entity.user.model.{ RegisterPhoneModel, RegisterPhoneResponseModel }
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -28,16 +28,16 @@ import scala.concurrent.duration._
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class RegisterCommandServiceImplTest extends CommandServiceImplTest {
+class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
-  val service = new RegisterCommandServiceImpl(10.minutes)
+  val service = new RegisterPhoneCommandServiceImpl(10.minutes)
 
   private val phone = "555-1234"
   private val verifyCode = "verifyCode"
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val model = RegisterModel(ApiVersions.V01, phone)
+  private implicit val model = RegisterPhoneModel(phone)
   private implicit val channelCtx = ChannelContextDataFactory.userAuth
 
   override def beforeAll() {
@@ -46,7 +46,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(randomMock)
   }
 
-  private def command(implicit input: RegisterModel) = new service.RegisterCommand(input)
+  private def command(implicit input: RegisterPhoneModel) = new service.RegisterCommand(input)
 
   private def assertSuccessConditions(userId: UUID) {
     val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
@@ -71,31 +71,31 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
 
   test("success - no existing phone or user") {
     val userId = randomMock.nextUuid()
-    val verifyService = mock[VerifyCommandService]
+    val verifyService = mock[VerifyPhoneCommandService]
     verifyService.makeVerifyCode _ expects () returning verifyCode
     verifyService.sendVerifySms _ expects (*, *) returning Future.successful(true)
     val unregister = TestServices.register(verifyService)
-    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterPhoneResponseModel(phone)))
     assertSuccessConditions(userId)
     unregister()
   }
 
   test("success - existing phone and user") {
     val userId = randomMock.nextUuid()
-    val verifyService = mock[VerifyCommandService]
+    val verifyService = mock[VerifyPhoneCommandService]
     verifyService.makeVerifyCode _ expects () returning verifyCode
     verifyService.sendVerifySms _ expects (*, *) returning Future.successful(true)
     verifyService.makeVerifyCode _ expects () returning verifyCode
     verifyService.sendVerifySms _ expects (*, *) returning Future.successful(true)
     val unregister = TestServices.register(verifyService)
 
-    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterPhoneResponseModel(phone)))
     assertSuccessConditions(userId)
 
     val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
     assert(phoneCooldownKey.del().await())
 
-    assert(service.innerExecute(model).await() == Right(RegisterResponseModel()))
+    assert(service.innerExecute(model).await() == Right(RegisterPhoneResponseModel(phone)))
     assertSuccessConditions(userId)
     unregister()
   }
@@ -119,9 +119,20 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to create user") {
-    val key = mock[PhoneKey]
-    key.setUserId _ expects * returning Future.successful(false)
-    assert(command.userCreate(key).await() == Errors.userSetFailed.await())
+    val userId = RandomService().uuid
+    val userKey = mock[UserKey]
+    val phoneKey = mock[PhoneKey]
+    userKey.create _ expects () returning Future.successful(false)
+    assert(command.userCreate(userId, userKey, phoneKey).await() == Errors.userSetFailed.await())
+  }
+
+  test("failed to set phone userId on create") {
+    val userId = RandomService().uuid
+    val userKey = mock[UserKey]
+    val phoneKey = mock[PhoneKey]
+    userKey.create _ expects () returning Future.successful(true)
+    phoneKey.setUserId _ expects * returning Future.successful(false)
+    assert(command.userCreate(userId, userKey, phoneKey).await() == Errors.userSetFailed.await())
   }
 
   test("failed to set phone updates") {
@@ -131,7 +142,7 @@ class RegisterCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("failed to send sms") {
-    val verifyCommandService = mock[VerifyCommandService]
+    val verifyCommandService = mock[VerifyPhoneCommandService]
     verifyCommandService.sendVerifySms _ expects (*, *) returning Future.successful(false)
     val unregister = TestServices.register(verifyCommandService)
     assert(command.smsSend(code = "code").await() == Left(Errors.smsSendFailed))

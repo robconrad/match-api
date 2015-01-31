@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 1:43 PM
+ * Last modified by rconrad, 1/31/15 9:14 AM
  */
 
 package base.entity.service
@@ -68,6 +68,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new QuestionsKeyServiceImpl())
 
     Services.register(new FacebookInfoKeyServiceImpl())
+    Services.register(new FacebookUserKeyServiceImpl())
 
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())
@@ -113,10 +114,10 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new UserServiceImpl())
 
-    Services.register(new RegisterCommandServiceImpl(
+    Services.register(new RegisterPhoneCommandServiceImpl(
       Keys(MATCH_USER, "phoneCooldown")))
 
-    Services.register(new VerifyCommandServiceImpl(
+    Services.register(new VerifyPhoneCommandServiceImpl(
       Keys(MATCH_USER, "verifyCodeLength"),
       Keys(MATCH_USER, "verifySmsBody")))
 

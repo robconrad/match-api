@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:52 AM
+ * Last modified by rconrad, 1/31/15 9:40 AM
  */
 
 package base.entity.user.impl
+
+import java.util.UUID
 
 import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
@@ -13,12 +15,11 @@ import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.error.ApiError
-import base.entity.question.model.QuestionsResponseModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
-import base.entity.user.impl.RegisterCommandServiceImpl.Errors
+import base.entity.user.impl.RegisterPhoneCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{ RegisterModel, RegisterResponseModel }
+import base.entity.user.model.{ RegisterPhoneModel, RegisterPhoneResponseModel }
 import spray.http.StatusCodes
 
 import scala.concurrent.duration.FiniteDuration
@@ -27,13 +28,13 @@ import scala.concurrent.duration.FiniteDuration
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
-    extends CommandServiceImpl[RegisterModel, RegisterResponseModel]
-    with RegisterCommandService {
+private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDuration)
+    extends CommandServiceImpl[RegisterPhoneModel, RegisterPhoneResponseModel]
+    with RegisterPhoneCommandService {
 
-  override protected val responseManifest = Option(manifest[RegisterResponseModel])
+  override protected val responseManifest = Option(manifest[RegisterPhoneResponseModel])
 
-  def innerExecute(input: RegisterModel)(implicit channelCtx: ChannelContext) = {
+  def innerExecute(input: RegisterPhoneModel)(implicit channelCtx: ChannelContext) = {
     new RegisterCommand(input).execute()
   }
 
@@ -45,8 +46,8 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
    * - update phone key attributes
    * - send SMS verification
    */
-  private[impl] class RegisterCommand(val input: RegisterModel)(implicit val channelCtx: ChannelContext)
-      extends Command[RegisterModel, RegisterResponseModel] {
+  private[impl] class RegisterCommand(val input: RegisterPhoneModel)(implicit val channelCtx: ChannelContext)
+      extends Command[RegisterPhoneModel, RegisterPhoneResponseModel] {
 
     def execute() = {
       phoneCooldownExists(PhoneCooldownKeyService().make(input.phone))
@@ -59,7 +60,7 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       }
 
     def phoneCooldownSet(key: PhoneCooldownKey): Response =
-      key.set(RegisterCommandServiceImpl.phoneCooldownValue).flatMap {
+      key.set(RegisterPhoneCommandServiceImpl.phoneCooldownValue).flatMap {
         case true  => phoneCooldownExpire(key)
         case false => Errors.phoneCooldownSetFailed
       }
@@ -75,25 +76,26 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
       phoneKey.create().flatMap { exists =>
         phoneKey.getUserId.flatMap {
           case Some(userId) => phoneSetCode(phoneKey)
-          case None         => userCreate(phoneKey)
+          case None =>
+            val userId = RandomService().uuid
+            userCreate(userId, UserKeyService().make(userId), phoneKey)
         }
       }
     }
 
-    def userCreate(key: PhoneKey): Response = {
-      val userId = RandomService().uuid
-      UserKeyService().make(userId).create().flatMap {
+    def userCreate(userId: UUID, userKey: UserKey, phoneKey: PhoneKey): Response = {
+      userKey.create().flatMap {
         case false => Errors.userSetFailed
         case true =>
-          key.setUserId(userId).flatMap {
-            case true  => phoneSetCode(key)
+          phoneKey.setUserId(userId).flatMap {
+            case true  => phoneSetCode(phoneKey)
             case false => Errors.userSetFailed
           }
       }
     }
 
     def phoneSetCode(key: PhoneKey): Response = {
-      val code = VerifyCommandService().makeVerifyCode()
+      val code = VerifyPhoneCommandService().makeVerifyCode()
       key.setCode(code).flatMap {
         case true  => smsSend(code: String)
         case false => Errors.phoneSetFailed
@@ -101,8 +103,8 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
     }
 
     def smsSend(code: String): Response =
-      VerifyCommandService().sendVerifySms(input.phone, code).map {
-        case true  => RegisterResponseModel()
+      VerifyPhoneCommandService().sendVerifySms(input.phone, code).map {
+        case true  => RegisterPhoneResponseModel(input.phone)
         case false => Errors.smsSendFailed
       }
 
@@ -110,11 +112,11 @@ private[entity] class RegisterCommandServiceImpl(phoneCooldown: FiniteDuration)
 
 }
 
-object RegisterCommandServiceImpl {
+object RegisterPhoneCommandServiceImpl {
 
   val phoneCooldownValue = 1
 
-  object Errors extends CrudErrorImplicits[RegisterResponseModel] {
+  object Errors extends CrudErrorImplicits[RegisterPhoneResponseModel] {
 
     override protected val externalErrorText = "There was a problem with registration."
 

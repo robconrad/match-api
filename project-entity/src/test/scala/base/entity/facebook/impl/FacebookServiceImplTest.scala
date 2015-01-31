@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 2:41 PM
+ * Last modified by rconrad, 1/27/15 6:55 PM
  */
 
 package base.entity.facebook.impl
@@ -30,7 +30,7 @@ import scala.concurrent.duration._
 class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
 
   private val token = "token"
-  private val fbInfo = FacebookInfo("", None, None, "")
+  private val fbInfo = FacebookInfo("", "", "", "")
   private val expireTime = 1.day
 
   private implicit def service = new FacebookServiceImpl(expireTime)
@@ -48,8 +48,8 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
     (client.fetchObject[JsonObject](_: String, _: Class[JsonObject], _: Parameter)) expects
       (method.objectMe, classOf[JsonObject], *) returning jsonObject
     jsonObject.getString _ expects method.fieldId returning ""
-    (jsonObject.optString(_: String, _: String)) expects (method.fieldFirstName, null) returning null
-    (jsonObject.optString(_: String, _: String)) expects (method.fieldUsername, null) returning null
+    jsonObject.getString _ expects method.fieldFirstName returning ""
+    jsonObject.getString _ expects method.fieldGender returning ""
     jsonObject.getString _ expects method.fieldLocale returning ""
 
     // uncached call (calls fb client mock)

@@ -2,14 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:52 AM
+ * Last modified by rconrad, 1/31/15 9:15 AM
  */
 
 package base.entity.user.impl
 
-import java.util.UUID
-
-import base.common.lib.Genders.Gender
 import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
@@ -18,7 +15,7 @@ import base.entity.command.impl.CommandServiceImpl
 import base.entity.service.CrudErrorImplicits
 import base.entity.sms.SmsService
 import base.entity.user._
-import base.entity.user.impl.VerifyCommandServiceImpl.Errors
+import base.entity.user.impl.VerifyPhoneCommandServiceImpl.Errors
 import base.entity.user.kv._
 import base.entity.user.model._
 
@@ -26,13 +23,13 @@ import base.entity.user.model._
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
-    extends CommandServiceImpl[VerifyModel, VerifyResponseModel]
-    with VerifyCommandService {
+class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
+    extends CommandServiceImpl[VerifyPhoneModel, VerifyPhoneResponseModel]
+    with VerifyPhoneCommandService {
 
-  override protected val responseManifest = Option(manifest[VerifyResponseModel])
+  override protected val responseManifest = Option(manifest[VerifyPhoneResponseModel])
 
-  def innerExecute(input: VerifyModel)(implicit channelCtx: ChannelContext) = {
+  def innerExecute(input: VerifyPhoneModel)(implicit channelCtx: ChannelContext) = {
     new VerifyCommand(input).execute()
   }
 
@@ -53,13 +50,10 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
    * - get code
    * - verify code
    * - get userId
-   * - get user attributes, reject if none exist and none supplied
-   * - store attributes on user
-   * - create device
-   * - store attributes on device with token
+   * - set phone verified
    */
-  private[impl] class VerifyCommand(val input: VerifyModel)(implicit val channelCtx: ChannelContext)
-      extends Command[VerifyModel, VerifyResponseModel] {
+  private[impl] class VerifyCommand(val input: VerifyPhoneModel)(implicit val channelCtx: ChannelContext)
+      extends Command[VerifyPhoneModel, VerifyPhoneResponseModel] {
 
     def execute() = {
       phoneGetCode(PhoneKeyService().make(input.phone))
@@ -79,59 +73,33 @@ class VerifyCommandServiceImpl(codeLength: Int, smsBody: String)
 
     def phoneGetUserId(key: PhoneKey): Response =
       key.getUserId.flatMap {
-        case Some(userId) => userGet(userId, UserKeyService().make(userId))
+        case Some(userId) => userSet(UserKeyService().make(userId))
         case None         => Errors.userIdMissing
       }
 
-    def userGet(userId: UUID, key: UserKey): Response =
-      key.getNameAndGender.flatMap {
-        case (None, _) if input.name.isEmpty   => Errors.paramsMissing
-        case (_, None) if input.gender.isEmpty => Errors.paramsMissing
-        case (name, gender) =>
-          // TODO this is weird get rid of it
-          val n = input.name.getOrElse(name.getOrElse(throw new RuntimeException("missing name")))
-          val g = input.gender.getOrElse(gender.getOrElse(throw new RuntimeException("missing gender")))
-          userSet(userId, key, n, g)
-      }
-
-    def userSet(userId: UUID,
-                key: UserKey,
-                name: String,
-                gender: Gender): Response =
-      key.setNameAndGender(name, gender).flatMap {
-        case true  => deviceSet(userId, DeviceKeyService().make(input.deviceUuid))
+    def userSet(key: UserKey): Response =
+      key.setPhoneVerified(input.phone, verified = true).flatMap {
+        case true  => VerifyPhoneResponseModel(input.phone)
         case false => Errors.userSetFailed
-      }
-
-    def deviceSet(userId: UUID, key: DeviceKey): Response =
-      key.create().flatMap { exists =>
-        val token = RandomService().uuid
-        key.setTokenAndUserId(token, userId).flatMap {
-          case true  => VerifyResponseModel(token)
-          case false => Errors.deviceSetFailed
-        }
       }
 
   }
 
 }
 
-object VerifyCommandServiceImpl {
+object VerifyPhoneCommandServiceImpl {
 
-  object Errors extends CrudErrorImplicits[VerifyResponseModel] {
+  object Errors extends CrudErrorImplicits[VerifyPhoneResponseModel] {
 
     override protected val externalErrorText = "There was a problem with verification."
 
     private val codeMissingText = "A verification code has not been sent for this phone number."
     private val codeValidationText = "The supplied verification code does not validate."
-    private val paramsMissingText = "Name and gender must be supplied upon first verification."
 
     lazy val codeMissing: Response = (codeMissingText, NO_VERIFY_CODE)
     lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_VALIDATION)
-    lazy val paramsMissing: Response = (paramsMissingText, REQUIRED_PARAMS)
     lazy val userIdMissing: Response = "user id is missing"
     lazy val userSetFailed: Response = "failed to set user attributes"
-    lazy val deviceSetFailed: Response = "failed to set device attributes"
 
   }
 

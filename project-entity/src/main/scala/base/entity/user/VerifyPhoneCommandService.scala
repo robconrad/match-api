@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:49 AM
+ * Last modified by rconrad, 1/31/15 9:34 AM
  */
 
 package base.entity.user
 
-import base.entity.command.{ CommandNames, CommandService, CommandServiceCompanion }
+import base.entity.command.{ CommandService, CommandServiceCompanion }
 import base.entity.perm.Perms
 import base.entity.user.model._
 
@@ -17,9 +17,9 @@ import scala.concurrent.Future
  * User CRUD, etc.
  * @author rconrad
  */
-trait VerifyCommandService extends CommandService[VerifyModel, VerifyResponseModel] {
+trait VerifyPhoneCommandService extends CommandService[VerifyPhoneModel, VerifyPhoneResponseModel] {
 
-  final val serviceManifest = manifest[VerifyCommandService]
+  final val serviceManifest = manifest[VerifyPhoneCommandService]
 
   final val perms = Set(Perms.VERIFY)
 
@@ -31,4 +31,4 @@ trait VerifyCommandService extends CommandService[VerifyModel, VerifyResponseMod
 
 }
 
-object VerifyCommandService extends CommandServiceCompanion[VerifyCommandService]
+object VerifyPhoneCommandService extends CommandServiceCompanion[VerifyPhoneCommandService]

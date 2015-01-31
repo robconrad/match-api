@@ -2,23 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:50 PM
+ * Last modified by rconrad, 1/31/15 9:15 AM
  */
 
 package base.entity.user.impl
 
-import base.common.lib.Genders
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.ApiVersions
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.impl.VerifyCommandServiceImpl._
+import base.entity.user.impl.VerifyPhoneCommandServiceImpl._
 import base.entity.user.kv._
-import base.entity.user.model.{ VerifyModel, VerifyResponseModel }
+import base.entity.user.model.{ VerifyPhoneModel, VerifyPhoneResponseModel }
 
 import scala.concurrent.Future
 
@@ -27,23 +25,19 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class VerifyCommandServiceImplTest extends CommandServiceImplTest {
+class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   val codeLength = 6
 
-  val service = new VerifyCommandServiceImpl(codeLength, "body %s")
+  val service = new VerifyPhoneCommandServiceImpl(codeLength, "body %s")
 
   private val code = "Some Code"
   private val phone = "555-1234"
-  private val name = "bob"
-  private val gender = Genders.male
-  private val device = RandomService().uuid
-  private val userId = RandomService().uuid
 
   private val randomMock = new RandomServiceMock()
 
   private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = VerifyModel(ApiVersions.V01, Option(name), Option(gender), phone, device, code)
+  private implicit val model = VerifyPhoneModel(phone, code)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,7 +46,7 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(randomMock)
   }
 
-  private def command(implicit input: VerifyModel) = new service.VerifyCommand(input)
+  private def command(implicit input: VerifyPhoneModel) = new service.VerifyCommand(input)
 
   test("without perms") {
     assertPermException(channelCtx => {
@@ -62,21 +56,15 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
 
   test("success") {
     val userId = RandomService().uuid
-    val token = randomMock.nextUuid()
     val phoneKey = PhoneKeyService().make(phone)
+
     assert(phoneKey.setUserId(userId).await())
     assert(phoneKey.setCode(code).await())
-    assert(service.innerExecute(model).await() == Right(VerifyResponseModel(token)))
+
+    assert(service.innerExecute(model).await() == Right(VerifyPhoneResponseModel(phone)))
 
     val userKey = UserKeyService().make(userId)
-    assert(userKey.getNameAndGender.await() == (Option(name), Option(gender)))
-    assert(userKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
-
-    val deviceKey = DeviceKeyService().make(device)
-    assert(deviceKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
-    assert(deviceKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
-    assert(deviceKey.getToken.await().contains(token))
-    assert(deviceKey.getUserId.await().contains(userId))
+    assert(userKey.getPhoneVerified.await() == (Option(phone), Option(true)))
   }
 
   test("failed to get phone verification code") {
@@ -97,31 +85,10 @@ class VerifyCommandServiceImplTest extends CommandServiceImplTest {
     assert(command.phoneGetUserId(key).await() == Errors.userIdMissing.await())
   }
 
-  test("failed to provide name on first verify") {
-    val myModel = model.copy(name = None)
-    val key = mock[UserKey]
-    key.getNameAndGender _ expects () returning Future.successful(None, Option(gender))
-    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
-  }
-
-  test("failed to provide gender on first verify") {
-    val myModel = model.copy(gender = None)
-    val key = mock[UserKey]
-    key.getNameAndGender _ expects () returning Future.successful(Option(name), None)
-    assert(command(myModel).userGet(userId, key).await() == Errors.paramsMissing.await())
-  }
-
   test("failed to set user attributes") {
     val key = mock[UserKey]
-    key.setNameAndGender _ expects (*, *) returning Future.successful(false)
-    assert(command.userSet(userId, key, name, gender).await() == Errors.userSetFailed.await())
-  }
-
-  test("failed to set device attributes") {
-    val key = mock[DeviceKey]
-    key.create _ expects () returning Future.successful(true)
-    key.setTokenAndUserId _ expects (*, *) returning Future.successful(false)
-    assert(command.deviceSet(userId, key).await() == Errors.deviceSetFailed.await())
+    key.setPhoneVerified _ expects (*, *) returning Future.successful(false)
+    assert(command.userSet(key).await() == Errors.userSetFailed.await())
   }
 
   test("send verify sms") {

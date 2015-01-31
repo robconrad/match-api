@@ -43,14 +43,11 @@ package user {
         + name
         + gender
         + facebookId
+        + deviceId
         + phone
         + phoneVerified
+        + locale
         + lastLoginTime
-    }
-
-    simple(FacebookToken) {
-        key(token)
-        facebookId
     }
 
     simple(FacebookUser) {
@@ -68,9 +65,31 @@ package user {
         Exists
     }
 
+    set(PhoneInvitations) {
+        key(phone)
+        UserId
+    }
+
     set(UserGroups) {
         key(userId)
         GroupId
+    }
+
+}
+
+package facebook {
+
+    note left of "FacebookInfo"
+        Expires after 30 days,
+        is intended as a cache
+    end note
+
+    json(FacebookInfo) {
+        key(token)
+        - facebookId
+        - firstName
+        - gender
+        - locale
     }
 
 }
@@ -160,7 +179,7 @@ package legend <<Rect>> #White/Gainsboro {
     note top of "Id Key"
         Id keys are special,
         they produce auto-
-        incrementing ints
+        incrementing units
     end note
 
     id("Id Key")
@@ -203,13 +222,14 @@ package legend <<Rect>> #White/Gainsboro {
 
 }
 
-FacebookAccount -* FacebookToken
-FacebookToken --* FacebookUser
+FacebookAccount -* FacebookInfo
+FacebookInfo --* FacebookUser
 GroupId -* Group
 GroupId --* GroupUserQuestion
 GroupId --* GroupEvents
 GroupId --* GroupUser
 GroupId --* GroupUsers
+Phone --* PhoneInvitations
 PhysicalDevice --* Device
 PhysicalDevice --* Phone
 PhysicalDevice --* PhoneCooldown

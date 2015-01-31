@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 10:57 AM
+ * Last modified by rconrad, 1/31/15 9:30 AM
  */
 
 package base.entity.command
@@ -27,14 +27,14 @@ object CommandNames extends Enumeration {
 
   val heartbeat = Value
 
-  val register = Value
-  val registerResponse = Value
-
-  val verify = Value
-  val verifyResponse = Value
-
   val login = Value
   val loginResponse = Value
+
+  val registerPhone = Value
+  val registerPhoneResponse = Value
+
+  val verifyPhone = Value
+  val verifyPhoneResponse = Value
 
   val invite = Value
   val inviteResponse = Value
@@ -53,12 +53,12 @@ object CommandNames extends Enumeration {
 
   private val typeValue = Map[Any, Value](
     manifest[ApiError] -> error,
-    manifest[RegisterModel] -> register,
-    manifest[RegisterResponseModel] -> registerResponse,
-    manifest[VerifyModel] -> verify,
-    manifest[VerifyResponseModel] -> verifyResponse,
     manifest[LoginModel] -> login,
     manifest[LoginResponseModel] -> loginResponse,
+    manifest[RegisterPhoneModel] -> registerPhone,
+    manifest[RegisterPhoneResponseModel] -> registerPhoneResponse,
+    manifest[VerifyPhoneModel] -> verifyPhone,
+    manifest[VerifyPhoneResponseModel] -> verifyPhoneResponse,
     manifest[InviteModel] -> invite,
     manifest[InviteResponseModel] -> inviteResponse,
     manifest[QuestionsModel] -> questions,

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 5:22 PM
+ * Last modified by rconrad, 1/27/15 6:46 PM
  */
 
 package base.entity.user.kv
@@ -18,10 +18,13 @@ import base.entity.kv.KeyProp
 object UserKeyProps {
 
   object UserIdProp extends KeyProp("userId")
+  object FacebookIdProp extends KeyProp("facebookId")
   object CodeProp extends KeyProp("code")
   object GenderProp extends KeyProp("gender")
   object NameProp extends KeyProp("name")
   object TokenProp extends KeyProp("token")
+  object PhoneProp extends KeyProp("phone")
+  object PhoneVerifiedProp extends KeyProp("phoneVerified")
 
   // user shiz
   object LastLoginProp extends KeyProp("lastLogin")
