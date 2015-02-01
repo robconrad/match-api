@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:16 AM
+ * Last modified by rconrad, 2/1/15 10:44 AM
  */
 
 package base.socket.api
@@ -330,7 +330,7 @@ abstract class SocketApiIntegrationTest
     socket3.disconnect()
   }
 
-  test("error") {
+  test("error", Tags.SLOW) {
     implicit val socket = connect()
     assert(socket.isActive)
     socket.write("")

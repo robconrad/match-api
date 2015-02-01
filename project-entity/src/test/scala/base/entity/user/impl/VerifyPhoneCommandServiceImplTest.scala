@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:54 PM
+ * Last modified by rconrad, 2/1/15 10:42 AM
  */
 
 package base.entity.user.impl
@@ -111,11 +111,13 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("make verify code") {
-    val randomMock = new RandomServiceMock()
+    val intMin = 100000
+    val intMax = 1000000
+    val randomMock = new RandomServiceMock(intMin = intMin, intMax = intMax)
     val unregister = TestServices.register(randomMock)
-    val nextMd5 = randomMock.nextMd5()
+    val nextInt = randomMock.nextInt()
     val code = service.makeVerifyCode()
-    assert(code == nextMd5.toString.substring(0, codeLength).toUpperCase)
+    assert(code == nextInt.toString)
     unregister()
   }
 

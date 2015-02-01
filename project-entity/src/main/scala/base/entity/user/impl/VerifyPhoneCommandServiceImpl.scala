@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:28 PM
+ * Last modified by rconrad, 2/1/15 10:33 AM
  */
 
 package base.entity.user.impl
@@ -29,6 +29,9 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
 
   override protected val responseManifest = Option(manifest[VerifyPhoneResponseModel])
 
+  private val codeMin = Math.pow(10, codeLength - 1).toInt
+  private val codeMax = Math.pow(10, codeLength).toInt
+
   def innerExecute(input: VerifyPhoneModel)(implicit channelCtx: ChannelContext) = {
     new VerifyCommand(input).execute()
   }
@@ -38,7 +41,7 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
   }
 
   def makeVerifyCode() = {
-    RandomService().md5.toString.substring(0, codeLength).toUpperCase
+    RandomService().int(codeMin, codeMax).toString
   }
 
   def validateVerifyCodes(code1: String, code2: String) = {

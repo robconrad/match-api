@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:20 PM
+ * Last modified by rconrad, 2/1/15 10:43 AM
  */
 
 package base.entity.user.impl
@@ -32,7 +32,9 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
   private val phone = "555-1234"
   private val verifyCode = "verifyCode"
 
-  private val randomMock = new RandomServiceMock()
+  private val intMin = 100000
+  private val intMax = 1000000
+  private val randomMock = new RandomServiceMock(intMin = intMin, intMax = intMax)
 
   private implicit val model = RegisterPhoneModel(phone)
   private implicit val channelCtx = ChannelContextDataFactory.userAuth

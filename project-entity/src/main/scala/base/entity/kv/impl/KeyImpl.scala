@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:58 PM
+ * Last modified by rconrad, 2/1/15 10:47 AM
  */
 
 package base.entity.kv.impl
@@ -38,7 +38,7 @@ private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable
 
   def expire(seconds: Long) = {
     val res = p.expire(token, seconds).map(_.data().intValue() == 1)
-    if (isDebugEnabled) log("EXPIRE", s"$seconds secondsm, result: $res")
+    if (isDebugEnabled) log("EXPIRE", s"$seconds seconds, result: $res")
     res
   }
 

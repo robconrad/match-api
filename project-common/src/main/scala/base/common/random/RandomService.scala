@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 2/1/15 10:39 AM
  */
 
 package base.common.random
@@ -19,6 +19,11 @@ import com.google.common.hash.HashCode
 trait RandomService extends Service {
 
   final val serviceManifest = manifest[RandomService]
+
+  /**
+   * Generates a random int within the bounds specified (min inclusive, max exclusive)
+   */
+  def int(min: Int = 0, max: Int = Integer.MAX_VALUE): Int
 
   /**
    * Generate a random md5 hashcode

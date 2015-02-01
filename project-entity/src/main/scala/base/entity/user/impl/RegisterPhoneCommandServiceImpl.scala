@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:12 AM
+ * Last modified by rconrad, 2/1/15 10:13 AM
  */
 
 package base.entity.user.impl
@@ -69,7 +69,7 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
 
     def userSetPhoneAttributes(key: UserKey): Response = {
       val code = VerifyPhoneCommandService().makeVerifyCode()
-      debug("phone verification code for %s is %s", input.phone, code)
+      info("phone verification code for %s is %s", input.phone, code)
       key.setPhoneAttributes(UserPhoneAttributes(input.phone, code, verified = false)) flatMap {
         case true  => smsSend(code)
         case false => Errors.userSetFailed

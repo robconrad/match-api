@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 2/1/15 10:28 AM
  */
 
 package base.common.random.impl
@@ -21,6 +21,14 @@ import com.google.common.hash.Hashing
 class RandomServiceImpl extends ServiceImpl with RandomService {
 
   private val random = new SecureRandom()
+
+  /**
+   * Generates a random int within the bounds specified (min inclusive, max exclusive)
+   */
+  def int(min: Int, max: Int) = {
+    val exclusive = max - min
+    random.nextInt(exclusive) + min
+  }
 
   /**
    * Generate a random md5 hashcode
