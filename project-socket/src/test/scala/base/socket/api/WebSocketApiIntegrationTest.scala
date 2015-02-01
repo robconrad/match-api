@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 1/31/15 7:33 PM
  */
 
 package base.socket.api
@@ -46,6 +46,8 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
         ch.write(new TextWebSocketFrame(json))
         ch.flush()
       }
+
+      def isActive = ch.isActive
 
     }
   }

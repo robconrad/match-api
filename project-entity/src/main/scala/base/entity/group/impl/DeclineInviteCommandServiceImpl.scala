@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:53 PM
+ * Last modified by rconrad, 1/31/15 7:54 PM
  */
 
 package base.entity.group.impl
@@ -12,9 +12,9 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.group._
 import base.entity.group.impl.DeclineInviteCommandServiceImpl.Errors
-import base.entity.group.model.{DeclineInviteModel, DeclineInviteResponseModel}
+import base.entity.group.model.{ DeclineInviteModel, DeclineInviteResponseModel }
 import base.entity.service.CrudErrorImplicits
-import base.entity.user.kv.{UserGroupsInvitedKey, UserGroupsInvitedKeyService}
+import base.entity.user.kv.{ UserGroupsInvitedKey, UserGroupsInvitedKeyService }
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)

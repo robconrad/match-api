@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:20 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.group.impl
@@ -15,7 +15,7 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.error.ApiError
+import base.entity.error.{ApiErrorService, ApiError}
 import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
@@ -46,7 +46,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   private val userId = RandomService().uuid
   private val groupId = RandomService().uuid
 
-  private val error = ApiError("test")
+  private val error = ApiErrorService().badRequest("test")
 
   private val randomMock = new RandomServiceMock()
 

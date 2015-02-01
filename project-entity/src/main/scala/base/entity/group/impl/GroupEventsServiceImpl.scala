@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:23 AM
+ * Last modified by rconrad, 2/1/15 8:59 AM
  */
 
 package base.entity.group.impl
@@ -10,7 +10,7 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
-import base.entity.error.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.GroupEventsService
 import base.entity.group.impl.GroupEventsServiceImpl.Errors
@@ -61,7 +61,8 @@ object GroupEventsServiceImpl {
 
   object Errors extends CrudErrorImplicits[EventModel] {
 
-    lazy val setEventFailed = Left(ApiError(externalErrorText, InternalServerError, "failed to set event"))
+    lazy val setEventFailed =
+      Left(ApiErrorService().statusCodeSeed(externalErrorText, InternalServerError, "failed to set event"))
 
   }
 

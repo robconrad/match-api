@@ -2,21 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:29 PM
+ * Last modified by rconrad, 1/31/15 7:54 PM
  */
 
 package base.entity.user.impl
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{Services, TestServices}
+import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.VerifyPhoneCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{VerifyPhoneModel, VerifyPhoneResponseModel}
+import base.entity.user.model.{ VerifyPhoneModel, VerifyPhoneResponseModel }
 
 import scala.concurrent.Future
 

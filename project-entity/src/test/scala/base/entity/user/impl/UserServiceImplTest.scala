@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:20 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.user.impl
@@ -11,8 +11,8 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.TestServices
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
-import base.entity.error.ApiError
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.impl.GroupModelImpl
 import base.entity.kv.Key._
@@ -88,7 +88,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     val groups = Set(groupId1, groupId2)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
-    val error = ApiError("whatever")
+    val error = ApiErrorService().badRequest("whatever")
     val groupService = mock[GroupService]
     (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Left(error)) twice ()

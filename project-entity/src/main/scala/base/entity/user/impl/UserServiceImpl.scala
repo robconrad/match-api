@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 1:28 PM
+ * Last modified by rconrad, 2/1/15 8:59 AM
  */
 
 package base.entity.user.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
-import base.entity.error.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
@@ -85,7 +85,8 @@ object UserServiceImpl {
 
   object Errors extends CrudErrorImplicits[Iterable[GroupModel]] {
 
-    lazy val notAllGroupsReturned = Left(ApiError(externalErrorText, InternalServerError, "not all groups returned"))
+    lazy val notAllGroupsReturned =
+      Left(ApiErrorService().statusCodeSeed(externalErrorText, InternalServerError, "not all groups returned"))
 
   }
 

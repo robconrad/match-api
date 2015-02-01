@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/8/15 5:24 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.model
 
-import base.entity.error.ApiError
+import base.entity.error.{ApiErrorService, ApiError}
 import spray.http.StatusCodes
 
 /**
@@ -26,7 +26,7 @@ private[model] trait Field[T] {
    * Frequently field validation functions must return errors, these implicits allow those errors to be
    *  bare API Strings since a validation error almost invariably results in a BadRequest ApiError
    */
-  implicit def string2Error(s: String) = ApiError(s, StatusCodes.BadRequest)
+  implicit def string2Error(s: String) = ApiErrorService().statusCode(s, StatusCodes.BadRequest)
   implicit def error2Option(e: ApiError) = Some(e)
 
   /**

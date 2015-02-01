@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/15/15 11:11 AM
+ * Last modified by rconrad, 2/1/15 8:59 AM
  */
 
 package base.entity.service
 
 import base.entity.api.ApiErrorCodes
-import base.entity.error.ApiError
+import base.entity.error.{ApiErrorService, ApiError}
 import base.entity.test.EntityBaseSuite
 import spray.http.StatusCodes
 
@@ -33,19 +33,19 @@ class CrudImplicitsTest extends EntityBaseSuite {
       private val code = ApiErrorCodes.TEST
 
       private val tuple2ApiError: Result = (error, status)
-      assert(tuple2ApiError == Left(ApiError(error, status)))
+      assert(tuple2ApiError == Left(ApiErrorService().statusCode(error, status)))
 
       private val stringTuple2ApiError: Result = (error, status, seed)
-      assert(stringTuple2ApiError == Left(ApiError(error, status, seed)))
+      assert(stringTuple2ApiError == Left(ApiErrorService().statusCodeSeed(error, status, seed)))
 
       private val codeTuple2ApiError: Result = (error, status, code)
-      assert(codeTuple2ApiError == Left(ApiError(error, status, code)))
+      assert(codeTuple2ApiError == Left(ApiErrorService().errorCode(error, status, code)))
 
       private val result2Right: Result = value
       assert(result2Right == Right(value))
 
-      private val apiError2Left: Result = ApiError(error)
-      assert(apiError2Left == Left(ApiError(error)))
+      private val apiError2Left: Result = ApiErrorService().badRequest(error)
+      assert(apiError2Left == Left(ApiErrorService().badRequest(error)))
 
       private val either2Future: Future[Result] = Right[ApiError, T](value)
       assert(either2Future.await() == Right(value))

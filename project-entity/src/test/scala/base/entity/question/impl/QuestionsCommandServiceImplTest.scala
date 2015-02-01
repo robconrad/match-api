@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:54 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.question.impl
@@ -11,12 +11,12 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.TestServices
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.error.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.kv.Key.Pipeline
 import base.entity.question.QuestionService
-import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
+import base.entity.question.model.{QuestionsModel, QuestionsResponseModel}
 
 import scala.concurrent.Future
 
@@ -31,7 +31,7 @@ class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
 
   private val groupId = RandomService().uuid
 
-  private val error = ApiError("test")
+  private val error = ApiErrorService().badRequest("test")
 
   private implicit val channelCtx = ChannelContextDataFactory.userAuth
   private implicit val model = QuestionsModel(groupId)

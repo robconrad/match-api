@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 9:19 PM
+ * Last modified by rconrad, 1/31/15 7:33 PM
  */
 
 package base.socket.api.test
@@ -20,5 +20,7 @@ trait SocketConnection {
   def read: String
 
   def write(json: String)
+
+  def isActive: Boolean
 
 }

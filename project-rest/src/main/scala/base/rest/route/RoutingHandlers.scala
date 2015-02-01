@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 2/1/15 9:09 AM
  */
 
 package base.rest.route
 
 import base.common.logging.Loggable
 import base.entity.api.ApiStrings
-import base.entity.error.{ ApiException, ApiError }
+import base.entity.error.{ApiErrorService, ApiException, ApiError}
 import base.entity.perm.PermException
 import org.json4s.native.Serialization
 import spray.http.StatusCodes._
@@ -57,7 +57,7 @@ private[rest] trait RoutingHandlers extends HttpService with Json4sSupport with 
             case false => asString
           }
           val noNewlines = unquoted.replace("\n", " ")
-          val errorString = Serialization.write(ApiError(noNewlines, response.status))
+          val errorString = ApiErrorService().toJson(ApiErrorService().statusCode(noNewlines, response.status))
           response
             .withEntity(HttpEntity(ContentType(MediaTypes.`application/json`), errorString))
             .withHeaders(RoutingActor.corsHeaders)
@@ -70,7 +70,7 @@ private[rest] trait RoutingHandlers extends HttpService with Json4sSupport with 
   /**
    * See notes for customRejectionHandler above
    */
-  implicit def customExceptionHandler(implicit log: LoggingContext) = ExceptionHandler {
+  implicit def customExceptionHandler(implicit log: LoggingContext): ExceptionHandler = ExceptionHandler {
     case t: Throwable =>
       compressResponse() {
         respondWithHeaders(RoutingActor.corsHeaders) {
@@ -80,7 +80,7 @@ private[rest] trait RoutingHandlers extends HttpService with Json4sSupport with 
               case true  => t.asInstanceOf[ApiException].status
               case false => StatusCodes.InternalServerError
             }
-            val apiError = ApiError(ApiStrings.serverErrorCodeDesc, status, t)
+            val apiError = ApiErrorService().throwable(ApiStrings.serverErrorCodeDesc, status, t)
             respondWithStatus(StatusCodes.InternalServerError).apply { ctx =>
               ctx.complete(apiError)
             }

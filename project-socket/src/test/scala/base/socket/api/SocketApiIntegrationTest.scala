@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:05 PM
+ * Last modified by rconrad, 2/1/15 9:16 AM
  */
 
 package base.socket.api
@@ -12,35 +12,38 @@ import java.util.UUID
 import base.common.logging.Loggable
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, ServicesBeforeAndAfterAll, TestServices }
+import base.common.service.{Services, ServicesBeforeAndAfterAll, TestServices}
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.ApiVersions
+import base.entity.api.{ApiErrorCodes, ApiVersions}
 import base.entity.auth.context.impl.ChannelContextImpl
-import base.entity.auth.context.{ ChannelContext, StandardUserAuthContext }
+import base.entity.auth.context.{ChannelContext, StandardUserAuthContext}
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
+import base.entity.error.ApiErrorService
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.facebook.{ FacebookInfo, FacebookService }
-import base.entity.group.model.impl.GroupModelImpl
+import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.group.model._
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.message.model.MessageModel
 import base.entity.question._
 import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.{ AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel }
+import base.entity.question.model.{AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel}
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.User
-import base.entity.user.impl.{ UserServiceImpl, VerifyPhoneCommandServiceImpl }
+import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
 import base.entity.user.model._
 import base.socket.api.test.SocketConnection
+import base.socket.command.impl.CommandProcessingServiceImpl
 import base.socket.test.SocketBaseSuite
 import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
+import spray.http.StatusCodes
 
 import scala.concurrent.Future
 
@@ -287,7 +290,7 @@ abstract class SocketApiIntegrationTest
     val eventId2 = randomMock.nextUuid()
     val events2 = events1 ++ List(messageEventModel,
       EventModelImpl(eventId2, groupId, Option(inviteUserId), EventTypes.JOIN,
-      "A user joined Scandal.ly chat! (hush, Michi)"))
+        "A user joined Scandal.ly chat! (hush, Michi)"))
     acceptInvite(inviteUserId, users2, groupId, events2.reverse, questionModels)(socket2)
 
     // socket1 answer is down here so that we have a valid match user id
@@ -325,6 +328,18 @@ abstract class SocketApiIntegrationTest
     socket.disconnect()
     socket2.disconnect()
     socket3.disconnect()
+  }
+
+  test("error") {
+    implicit val socket = connect()
+    assert(socket.isActive)
+    socket.write("")
+    assertResponse(ApiErrorService().errorCodeSeed(
+      CommandProcessingServiceImpl.Errors.externalErrorText,
+      StatusCodes.BadRequest,
+      ApiErrorCodes.JSON_NOT_FOUND,
+      "no json received in msg: JNothing"))
+    assert(!socket.isActive)
   }
 
 }

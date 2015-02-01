@@ -2,16 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.model
 
 import java.net.{ MalformedURLException, URL }
 import base.entity.api.ApiStrings
-import base.entity.error.ApiError
+import base.entity.error.{ApiErrorService, ApiError}
 import org.json4s.CustomSerializer
 import org.json4s.JsonAST.JString
+import spray.http.StatusCodes
 
 /**
  * URL field usable from DB to API layer, provides validation, etc.
@@ -31,7 +32,7 @@ case class Url(v: String) extends StringField {
       None
     } catch {
       case e: MalformedURLException =>
-        ApiError(ApiStrings.Field.urlMalformedErrorDesc)
+        ApiErrorService().statusCode(ApiStrings.Field.urlMalformedErrorDesc, StatusCodes.BadRequest)
     }
   }
 

@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:31 PM
+ * Last modified by rconrad, 1/31/15 10:55 PM
  */
 
 package base.entity.service
 
 import base.common.lib.BaseConfig
 import base.common.service.{ Services, ServicesBootstrap }
+import base.entity.error.impl.ApiErrorServiceImpl
 import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.facebook.kv.impl.FacebookInfoKeyServiceImpl
 import base.entity.group.impl._
@@ -87,6 +88,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new GroupUserQuestionsYesKeyServiceImpl())
     Services.register(new GroupUserQuestionsTempKeyServiceImpl())
     Services.register(new GroupEventsKeyServiceImpl())
+
+    Services.register(new ApiErrorServiceImpl(
+      Keys(MATCH, "debug")))
 
     Services.register(new TwilioSmsServiceImpl(
       Keys(TWILIO, "sid"),

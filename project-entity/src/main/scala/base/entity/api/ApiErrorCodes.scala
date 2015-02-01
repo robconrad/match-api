@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 1:30 PM
+ * Last modified by rconrad, 2/1/15 9:23 AM
  */
 
 package base.entity.api
@@ -15,6 +15,11 @@ object ApiErrorCodes extends Enumeration {
   type ErrorCode = Value
 
   val TEST = Value
+
+  val JSON_NOT_FOUND = Value
+  val JSON_COMMAND_NOT_FOUND = Value
+  val JSON_BODY_NOT_FOUND = Value
+  val COMMAND_NOT_HANDLED = Value
 
   val PHONE_RATE_LIMIT = Value
   val NO_VERIFY_CODE = Value

@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:39 PM
+ * Last modified by rconrad, 2/1/15 9:13 AM
  */
 
 package base.socket.command
 
-import base.common.service.{ Service, ServiceCompanion }
-import base.entity.auth.context.{ ChannelContext, AuthContext }
+import base.common.service.{Service, ServiceCompanion}
+import base.entity.auth.context.{AuthContext, ChannelContext}
+import base.entity.error.ApiError
 import base.socket.command.CommandProcessingService.FutureResponse
 
 import scala.concurrent.Future
@@ -30,7 +31,7 @@ object CommandProcessingService extends ServiceCompanion[CommandProcessingServic
   type Response = Either[CommandProcessError, CommandProcessResult]
   type FutureResponse = Future[Response]
 
-  case class CommandProcessError(reason: String)
+  case class CommandProcessError(message: ApiError)
   case class CommandProcessResult(message: Option[String], authContext: Option[AuthContext])
 
 }

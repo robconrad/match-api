@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:53 PM
+ * Last modified by rconrad, 2/1/15 9:48 AM
  */
 
 package base.socket.api.impl
@@ -12,18 +12,17 @@ import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.NoAuthContext
 import base.entity.auth.context.impl.ChannelContextImpl
-import base.entity.command.model.CommandModel
-import base.entity.error.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.group.GroupListenerService
 import base.entity.json.JsonFormats
-import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
+import base.socket.api.{SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService}
 import base.socket.command.CommandProcessingService
-import base.socket.logging.{ LoggableChannelInfo, SocketLoggable }
-import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter }
-import org.json4s.native.Serialization
+import base.socket.command.impl.CommandProcessingServiceImpl.Errors
+import base.socket.logging.{LoggableChannelInfo, SocketLoggable}
+import io.netty.channel.{ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter}
 import spray.http.StatusCodes
 
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 /**
  * {{ Describe the high level purpose of SocketApiHandlerServiceImpl here. }}
@@ -64,7 +63,7 @@ abstract class SocketApiHandlerServiceImpl
     } else {
       warn("command handler caught ", t)
       if (ctx.channel.isOpen) {
-        ctx.channel.close()
+        ctx.channel().close(ApiErrorService().throwable(Errors.externalErrorText, StatusCodes.InternalServerError, t))
       }
     }
   }
@@ -83,12 +82,12 @@ abstract class SocketApiHandlerServiceImpl
             result.message.foreach { json =>
               write(json)
             }
-          case Success(Left(error)) =>
-            warn("processing failed with %s", error.reason)
-            ctx.channel.close()
+          case Success(Left(processingError)) =>
+            warn("processing failed with %s", processingError.message)
+            ctx.channel().close(processingError.message)
           case Failure(t) =>
             error("processing threw", t)
-            ctx.channel.close()
+            ctx.channel().close(ApiErrorService().throwable(Errors.externalErrorText, StatusCodes.InternalServerError, t))
         }
     }
   }
@@ -114,8 +113,7 @@ abstract class SocketApiHandlerServiceImpl
       if (System.nanoTime() % 10 == 0) {
         warn("currentConnectionCount has exceeded maximum value")
       }
-      write(SocketApiHandlerServiceImpl.busyJson)
-        .addListener(ChannelFutureListener.CLOSE)
+      ctx.channel.close(SocketApiHandlerServiceImpl.busyJson)
     }
   }
 
@@ -130,12 +128,13 @@ object SocketApiHandlerServiceImpl {
   implicit val formats = JsonFormats.withModels
 
   lazy val runningText = "The server is not processing commands right now."
-  lazy val runningApiError = ApiError(runningText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_NOT_RUNNING)
-  lazy val runningJson = Serialization.write(CommandModel(runningApiError))
+  lazy val runningApiError =
+    ApiErrorService().errorCode(runningText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_NOT_RUNNING)
+  lazy val runningJson = ApiErrorService().toJson(runningApiError)
 
   lazy val busyText = "The server is too busy to accept new connections right now."
-  lazy val busyApiError = ApiError(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
-  lazy val busyJson = Serialization.write(CommandModel(busyApiError))
+  lazy val busyApiError = ApiErrorService().errorCode(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
+  lazy val busyJson = ApiErrorService().toJson(busyApiError)
 
 }
 

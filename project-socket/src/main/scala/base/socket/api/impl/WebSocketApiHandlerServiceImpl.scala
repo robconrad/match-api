@@ -2,16 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:11 PM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.socket.api.impl
 
+import base.entity.error.ApiErrorService
+import base.socket.api.impl.WebSocketApiHandlerServiceImpl.Errors
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel._
 import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod._
 import io.netty.handler.codec.http.websocketx._
+import spray.http.StatusCodes
 
 @Sharable // scalastyle:off
 class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
@@ -27,7 +30,7 @@ class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
       case msg: FullHttpRequest if isHttpValid(msg) => sendHandshake(msg)
       case msg: CloseWebSocketFrame                 => closeHandshake(msg)
       case msg: TextWebSocketFrame                  => read(msg.text())
-      case msg                                      => ctx.close()
+      case msg                                      => ctx.channel.close(Errors.unexpectedContentError)
     }
   }
 
@@ -50,5 +53,15 @@ class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
   }
 
   def makeInitializer = new WebSocketChannelInitializer(this)
+
+}
+
+object WebSocketApiHandlerServiceImpl {
+
+  object Errors {
+
+    val unexpectedContentError = ApiErrorService().statusCode("Unexpected message content.", StatusCodes.BadRequest)
+
+  }
 
 }

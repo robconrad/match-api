@@ -2,16 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:34 PM
+ * Last modified by rconrad, 1/31/15 8:05 PM
  */
 
 package base.socket.api.impl
 
-import base.socket.api.SocketApiHandlerService
+import io.netty.channel.ChannelHandler
 import io.netty.channel.socket.SocketChannel
-import io.netty.channel.{ ChannelHandler, ChannelHandlerContext, ChannelInitializer }
-import io.netty.handler.codec.http.{ HttpObjectAggregator, HttpServerCodec }
-import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
+import io.netty.handler.codec.http.{HttpObjectAggregator, HttpServerCodec}
 
 /**
  * {{ Describe the high level purpose of WebSocketChannelInitializer here. }}
@@ -19,20 +17,14 @@ import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class WebSocketChannelInitializer(commandHandler: ChannelHandler) extends ChannelInitializer[SocketChannel] {
+class WebSocketChannelInitializer(commandHandler: ChannelHandler) extends SocketChannelInitializer {
 
   private val maxContentLength = 65536
-  private val readWriteIdleTime = 0
-  private val allIdleTime = 60
 
   override def initChannel(ch: SocketChannel) {
     val pipeline = ch.pipeline
 
-    pipeline.addLast("timeout", new IdleStateHandler(readWriteIdleTime, readWriteIdleTime, allIdleTime) {
-      override def channelIdle(ctx: ChannelHandlerContext, evt: IdleStateEvent) {
-        ctx.close()
-      }
-    })
+    addIdleHandler(pipeline)
 
     pipeline.addLast("codec", new HttpServerCodec())
     pipeline.addLast("aggregator", new HttpObjectAggregator(maxContentLength))

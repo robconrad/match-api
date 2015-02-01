@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 6:25 PM
+ * Last modified by rconrad, 2/1/15 9:49 AM
  */
 
 package base.entity.error
@@ -22,7 +22,6 @@ import spray.http.StatusCodes
 class ApiErrorTest extends EntityBaseSuite {
 
   private val msg = "error message"
-  private val cmd = "command"
   private val status = StatusCodes.Forbidden
   private val defaultStatus = StatusCodes.BadRequest
   private val code = ApiErrorCodes.TEST
@@ -33,7 +32,7 @@ class ApiErrorTest extends EntityBaseSuite {
   private def uniqueId(seed: String) = Hashing.md5.hashString(seed, Encoding.CHARSET_UTF8).toString
 
   test("apply(message: String)") {
-    val e = ApiError(msg)
+    val e = ApiErrorService().badRequest(msg)
     assert(e.command == None)
     assert(e.status == defaultStatus)
     assert(e.code == None)
@@ -42,10 +41,10 @@ class ApiErrorTest extends EntityBaseSuite {
     assert(e.uniqueId == uniqueId(s"$defaultStatus, $msg"))
   }
 
-  test("apply(message: String, code: ErrorCode, uniqueIdSeed: String)") {
-    val e = ApiError(msg, code, uniqueIdSeed)
+  test("apply(message: String, status: StatusCode, code: ErrorCode, uniqueIdSeed: String)") {
+    val e = ApiErrorService().errorCodeSeed(msg, status, code, uniqueIdSeed)
     assert(e.command == None)
-    assert(e.status == defaultStatus)
+    assert(e.status == status)
     assert(e.code == Option(code))
     assert(e.param == None)
     assert(e.message == msg)
@@ -53,7 +52,7 @@ class ApiErrorTest extends EntityBaseSuite {
   }
 
   test("apply(message: String, status: StatusCode)") {
-    val e = ApiError(msg, status)
+    val e = ApiErrorService().statusCode(msg, status)
     assert(e.command == None)
     assert(e.status == status)
     assert(e.code == None)
@@ -63,7 +62,7 @@ class ApiErrorTest extends EntityBaseSuite {
   }
 
   test("apply(message: String, status: StatusCode, code: ErrorCode)") {
-    val e = ApiError(msg, status, code)
+    val e = ApiErrorService().errorCode(msg, status, code)
     assert(e.command == None)
     assert(e.status == status)
     assert(e.code == Option(code))
@@ -73,7 +72,7 @@ class ApiErrorTest extends EntityBaseSuite {
   }
 
   test("apply(message: String, status: StatusCode, uniqueIdSeed: Throwable)") {
-    val e = ApiError(msg, status, uniqueIdThrowable)
+    val e = ApiErrorService().throwable(msg, status, uniqueIdThrowable)
     assert(e.command == None)
     assert(e.status == status)
     assert(e.code == None)
@@ -83,7 +82,7 @@ class ApiErrorTest extends EntityBaseSuite {
   }
 
   test("apply(message: String, status: StatusCode, uniqueIdSeed: String)") {
-    val e = ApiError(msg, status, uniqueIdSeed)
+    val e = ApiErrorService().statusCodeSeed(msg, status, uniqueIdSeed)
     assert(e.command == None)
     assert(e.status == status)
     assert(e.code == None)
@@ -93,7 +92,7 @@ class ApiErrorTest extends EntityBaseSuite {
   }
 
   test("apply(msg: String, status: StatusCode, code: Option[ErrorCode], param: Option[String], uniqueIdSeed: String)") {
-    val e = ApiError(msg, status, Option(code), Option(param), uniqueIdSeed)
+    val e = ApiErrorService().full(msg, status, Option(code), Option(param), uniqueIdSeed)
     assert(e.command == None)
     assert(e.status == status)
     assert(e.code == Option(code))

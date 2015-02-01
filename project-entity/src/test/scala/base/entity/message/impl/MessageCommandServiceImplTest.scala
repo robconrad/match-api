@@ -2,21 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:38 AM
+ * Last modified by rconrad, 2/1/15 8:57 AM
  */
 
 package base.entity.message.impl
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, TestServices }
+import base.common.service.{Services, TestServices}
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.command.model.CommandModel
-import base.entity.error.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
-import base.entity.group.{ GroupEventsService, GroupListenerService }
+import base.entity.group.{GroupEventsService, GroupListenerService}
 import base.entity.kv.Key._
 import base.entity.message.model.MessageModel
 
@@ -34,7 +34,7 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   private val body = "a message"
   private val groupId = RandomService().uuid
 
-  private val error = ApiError("test")
+  private val error = ApiErrorService().badRequest("test")
 
   private val randomMock = new RandomServiceMock()
 

@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:19 AM
+ * Last modified by rconrad, 2/1/15 9:53 AM
  */
 
 package base.socket.api
 
 import base.common.logging.Loggable
 import base.entity.auth.context.ChannelContext
+import base.entity.error.{ApiError, ApiErrorService}
 import base.socket.logging.LoggableChannelInfo
 import io.netty.channel._
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker
@@ -22,7 +23,9 @@ package object impl {
 
   implicit class ChannelInfo(val ch: Channel) extends LoggableChannelInfo with Loggable {
 
-    def authCtx = channelCtx.authCtx
+    def authCtx = {
+      channelCtx.authCtx
+    }
 
     def channelCtx = {
       ch.attr(channelCtxAttr).get()
@@ -38,7 +41,21 @@ package object impl {
       ch.attr(handshakerAttr).set(h)
     }
 
-    def remoteAddress = ch.remoteAddress().toString
+    def remoteAddress = {
+      ch.remoteAddress().toString
+    }
+
+    def close(apiError: ApiError)(implicit ctx: ChannelHandlerContext): ChannelFuture = {
+      close(ApiErrorService().toJson(apiError))
+    }
+
+    def close(json: String)(implicit ctx: ChannelHandlerContext): ChannelFuture = {
+      val channelFuture = SocketApiHandlerService().write(json)
+      if (channelFuture != null) {
+        channelFuture.addListener(ChannelFutureListener.CLOSE)
+      }
+      channelFuture
+    }
 
   }
 

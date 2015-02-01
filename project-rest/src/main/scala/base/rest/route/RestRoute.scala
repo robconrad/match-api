@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:23 AM
+ * Last modified by rconrad, 2/1/15 9:49 AM
  */
 
 package base.rest.route
 
 import base.entity.api.ApiStrings
-import base.entity.error.ApiError
+import base.entity.error.{ApiErrorService, ApiError}
 import base.entity.json.JsonFormats
 import base.rest.Endpoint
 import base.rest.Locations._
@@ -192,7 +192,7 @@ private[rest] trait RestRoute extends BaseRoute {
    * Convenience directive for not yet implemented api methods
    */
   def completeNotImplemented = completeError {
-    ApiError(ApiStrings.notYetImplementedNote, StatusCodes.NotImplemented)
+    ApiErrorService().statusCode(ApiStrings.notYetImplementedNote, StatusCodes.NotImplemented)
   }
 
   /**

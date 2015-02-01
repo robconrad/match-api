@@ -2,16 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 5:29 PM
+ * Last modified by rconrad, 2/1/15 8:59 AM
  */
 
 package base.entity.service
 
 import base.entity.api.ApiErrorCodes
-import base.entity.error.ApiError
+import base.entity.error.{ApiError, ApiErrorService}
 import base.entity.test.EntityBaseSuite
 import spray.http.StatusCodes
-import spray.http.StatusCodes._
 
 /**
  * {{ Describe the high level purpose of CrudImplicitsTest here. }}
@@ -32,10 +31,12 @@ class CrudErrorImplicitsTest extends EntityBaseSuite {
       private val code = ApiErrorCodes.TEST
 
       private val externalTuple2ApiError: Result = (error, code)
-      assert(externalTuple2ApiError == Left(ApiError(error, StatusCodes.BadRequest, code)))
+      assert(externalTuple2ApiError ==
+        Left(ApiErrorService().errorCode(error, StatusCodes.BadRequest, code)))
 
       private val internalTuple2ApiError: Result = error
-      assert(internalTuple2ApiError == Left(ApiError(externalErrorText, StatusCodes.InternalServerError, error)))
+      assert(internalTuple2ApiError ==
+        Left(ApiErrorService().statusCodeSeed(externalErrorText, StatusCodes.InternalServerError, error)))
 
     }
 
