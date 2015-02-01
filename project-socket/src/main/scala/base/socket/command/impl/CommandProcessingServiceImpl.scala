@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/1/15 11:52 AM
  */
 
 package base.socket.command.impl
 
 import base.common.lib.Tryo
+import base.common.logging.Loggable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.{ AuthContext, ChannelContext, StandardUserAuthContext }
@@ -57,10 +58,10 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
     def parseInput(input: String): FutureResponse = {
       try {
         extractCommand(JsonMethods.parse(input)) recover {
-          case t => returnError("parse threw exception %s", t)
+          case t => returnError("parse threw exception %s", Loggable.stackTraceToString(t))
         }
       } catch {
-        case e: Exception => returnError("parse threw exception %s", e)
+        case e: Exception => returnError("parse threw exception %s", Loggable.stackTraceToString(e))
       }
     }
 

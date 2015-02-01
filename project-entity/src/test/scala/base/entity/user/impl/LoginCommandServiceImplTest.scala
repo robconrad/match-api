@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/1/15 11:58 AM
  */
 
 package base.entity.user.impl
@@ -66,8 +66,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val questionMock = mock[QuestionService]
     (questionMock.answer(_: AnswerModel)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
-    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
+    (questionMock.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
     Services.register(questionMock)
   }
 
@@ -113,7 +113,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   test("success - new user") {
     val userId = randomMock.nextUuid()
     val myModel = model.copy(groupId = None)
-    val response = LoginResponseModel(userId, List(), None, None, None)
+    val response = LoginResponseModel(userId, None, phoneVerified = false, List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -121,7 +121,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userId = RandomService().uuid
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
-    val response = LoginResponseModel(userId, List(), None, None, None)
+    val response = LoginResponseModel(userId, None, phoneVerified = false, List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -129,7 +129,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     registerQuestionMock()
     val userId = RandomService().uuid
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
-    val response = LoginResponseModel(userId, List(), Option(List()), Option(List()), None)
+    val response = LoginResponseModel(userId, None, phoneVerified = false, List(), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
   }
 
@@ -139,6 +139,14 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val unregister = TestServices.register(facebook)
     assert(command.facebookInfoGet().await() == Errors.tokenInvalid.await())
     unregister()
+  }
+
+  test("failed to set user to facebook id") {
+    val userId = RandomService().uuid
+    val fbInfo = FacebookInfo("", "", "", "")
+    val key = mock[FacebookUserKey]
+    key.set _ expects * returning Future.successful(false)
+    assert(command.facebookUserSet(key, userId, fbInfo).await() == Errors.facebookUserSetFailed.await())
   }
 
   test("failed to set facebook info to user") {
@@ -180,8 +188,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val key = mock[UserKey]
     val questionMock = mock[QuestionService]
-    (questionMock.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(apiError))
+    (questionMock.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(questionMock)
     assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
     unregister()
@@ -191,6 +199,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val key = mock[UserKey]
     key.getLastLogin _ expects () returning Future.successful(None)
+    key.getPhoneAttributes _ expects () returning Future.successful(None)
     key.setLastLogin _ expects * returning Future.successful(false)
     val future = command.userGetSetLastLogin(key, uuid, List(), None, None)
     assert(future.await() == Errors.userSetFailed.await())

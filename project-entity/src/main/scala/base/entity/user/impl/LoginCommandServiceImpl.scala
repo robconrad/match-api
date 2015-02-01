@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 6:40 PM
+ * Last modified by rconrad, 2/1/15 11:56 AM
  */
 
 package base.entity.user.impl
@@ -66,9 +66,16 @@ private[entity] class LoginCommandServiceImpl()
     }
 
     def facebookUserGet(key: FacebookUserKey, fbInfo: FacebookInfo): Response = {
-      key.get flatMap { userIdOpt =>
-        val userId = userIdOpt.getOrElse(RandomService().uuid)
-        userSet(UserKeyService().make(userId), userId, fbInfo)
+      key.get flatMap {
+        case Some(userId) => userSet(UserKeyService().make(userId), userId, fbInfo)
+        case None => facebookUserSet(key, RandomService().uuid, fbInfo)
+      }
+    }
+
+    def facebookUserSet(key: FacebookUserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
+      key.set(userId) flatMap {
+        case true => userSet(UserKeyService().make(userId), userId, fbInfo)
+        case false => Errors.facebookUserSetFailed
       }
     }
 
@@ -111,7 +118,7 @@ private[entity] class LoginCommandServiceImpl()
       GroupEventsService().getEvents(groupId).flatMap {
         case Left(error) => error
         case Right(events) =>
-          QuestionService().getQuestions(groupId).flatMap {
+          QuestionService().getQuestions(groupId, userId).flatMap {
             case Left(error)      => error
             case Right(questions) => userGetSetLastLogin(key, userId, groups, Option(events), Option(questions))
           }
@@ -123,10 +130,19 @@ private[entity] class LoginCommandServiceImpl()
                             groups: Iterable[GroupModel],
                             events: Option[List[EventModel]],
                             questions: Option[List[QuestionModel]]): Response = {
-      key.getLastLogin.flatMap { lastLogin =>
-        key.setLastLogin().flatMap {
-          case true  => registerGroupListeners(LoginResponseModel(userId, groups.toList, events, questions, lastLogin))
-          case false => Errors.userSetFailed
+      key.getLastLogin flatMap { lastLogin =>
+        key.getPhoneAttributes flatMap { phoneAttributes =>
+          key.setLastLogin() flatMap {
+            case false => Errors.userSetFailed
+            case true => registerGroupListeners(LoginResponseModel(
+              userId,
+              phoneAttributes.map(_.phone),
+              phoneAttributes.exists(_.verified),
+              groups.toList,
+              events,
+              questions,
+              lastLogin))
+          }
         }
       }
     }
@@ -151,6 +167,7 @@ object LoginCommandServiceImpl {
 
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_NOT_VALID)
     lazy val deviceSetFailed: Response = "failed to set device attributes"
+    lazy val facebookUserSetFailed: Response = "failed to set facebook user"
     lazy val userSetFailed: Response = "failed to set user attributes"
 
   }

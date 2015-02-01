@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:49 AM
+ * Last modified by rconrad, 2/1/15 11:18 AM
  */
 
 package base.entity.error
 
 import base.common.lib.Encoding
+import base.common.logging.Loggable
 import base.entity.api.ApiErrorCodes
 import base.entity.test.EntityBaseSuite
 import com.google.common.hash.Hashing
@@ -78,7 +79,7 @@ class ApiErrorTest extends EntityBaseSuite {
     assert(e.code == None)
     assert(e.param == None)
     assert(e.message == msg)
-    assert(e.uniqueId == uniqueId(s"$status, $uniqueIdThrowable"))
+    assert(e.uniqueId == uniqueId(s"$status, ${Loggable.stackTraceToString(uniqueIdThrowable)}"))
   }
 
   test("apply(message: String, status: StatusCode, uniqueIdSeed: String)") {

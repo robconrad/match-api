@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:45 AM
+ * Last modified by rconrad, 2/1/15 11:15 AM
  */
 
 package base.entity.user.model
@@ -28,6 +28,8 @@ import scala.annotation.meta.field
 // todo convert to interface for mocking
 case class LoginResponseModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     userId: UUID,
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) phone: Option[String],
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) phoneVerified: Boolean,
   @(ApiModelProperty @field)(required = false, value = passwordDesc) groups: List[GroupModel],
   @(ApiModelProperty @field)(required = false, value = passwordDesc) events: Option[List[EventModel]],
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  questions: Option[List[QuestionModel]],

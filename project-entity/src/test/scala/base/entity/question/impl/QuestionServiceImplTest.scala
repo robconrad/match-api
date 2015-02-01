@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:59 PM
+ * Last modified by rconrad, 2/1/15 11:58 AM
  */
 
 package base.entity.question.impl
@@ -66,7 +66,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
         case q if q.b.isDefined => QuestionModel(q, SIDE_B)
       }
 
-    service.getQuestions(groupId).await() match {
+    service.getQuestions(groupId, authCtx.userId).await() match {
       case Right(models) => assert(models.toSet == questionModels.toSet)
     }
   }
@@ -77,7 +77,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     key.del _ expects () returning Future.successful(false)
     key.tokenToString _ expects () returning ""
 
-    val method = new service.GetQuestionsMethod(groupId)
+    val method = new service.GetQuestionsMethod(groupId, authCtx.userId)
     intercept[RedisException] {
       method.groupUserQuestionTempDel(key, Iterable[QuestionIdComposite]()).await()
     }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:25 PM
+ * Last modified by rconrad, 2/1/15 11:56 AM
  */
 
 package base.entity.group.impl
@@ -135,7 +135,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
       }
 
     def questionsGet(groupId: UUID, group: GroupModel) =
-      QuestionService().getQuestions(groupId).flatMap {
+      QuestionService().getQuestions(groupId, authCtx.userId).flatMap {
         case Right(questions) => eventsGet(groupId, group, questions)
         case Left(error)      => error
       }

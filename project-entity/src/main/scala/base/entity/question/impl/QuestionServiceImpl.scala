@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:56 PM
+ * Last modified by rconrad, 2/1/15 11:55 AM
  */
 
 package base.entity.question.impl
@@ -54,8 +54,8 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     QuestionIdComposite(questionMap(questionId), side, inverse)
   }
 
-  def getQuestions(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
-    new GetQuestionsMethod(groupId).execute()
+  def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
+    new GetQuestionsMethod(groupId, userId: UUID).execute()
 
   def answer(input: AnswerModel)(implicit p: Pipeline, channelCtx: ChannelContext) =
     new AnswerMethod(input).execute()
@@ -66,12 +66,12 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
    * - delete stored set
    * - return questions
    */
-  private[impl] class GetQuestionsMethod(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
+  private[impl] class GetQuestionsMethod(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
       extends CrudImplicits[List[QuestionModel]] {
 
     def execute() = {
-      val temp = GroupUserQuestionsTempKeyService().make(groupId, channelCtx.authCtx.userId)
-      val answered = GroupUserQuestionsKeyService().make(groupId, channelCtx.authCtx.userId)
+      val temp = GroupUserQuestionsTempKeyService().make(groupId, userId)
+      val answered = GroupUserQuestionsKeyService().make(groupId, userId)
       groupUserQuestionsTempDiffStore(temp, answered)
     }
 

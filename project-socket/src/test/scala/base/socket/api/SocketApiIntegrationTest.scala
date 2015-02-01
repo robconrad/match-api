@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:44 AM
+ * Last modified by rconrad, 2/1/15 12:42 PM
  */
 
 package base.socket.api
@@ -41,6 +41,7 @@ import base.entity.user.model._
 import base.socket.api.test.SocketConnection
 import base.socket.command.impl.CommandProcessingServiceImpl
 import base.socket.test.SocketBaseSuite
+import org.joda.time.DateTime
 import org.json4s.jackson.JsonMethods
 import org.json4s.native.Serialization
 import spray.http.StatusCodes
@@ -71,10 +72,11 @@ abstract class SocketApiIntegrationTest
   ).map(q => QuestionDef(UUID.fromString(q._1), q._2, q._3))
 
   private val randomMock = new RandomServiceMock()
-  private val time = TimeServiceConstantMock.now
 
   override def beforeAll() {
     super.beforeAll()
+    Services.register(randomMock)
+    Services.register(TimeServiceConstantMock)
     Services.register(handlerService)
     assert(SocketApiService().start().await())
   }
@@ -91,26 +93,28 @@ abstract class SocketApiIntegrationTest
       override def validateVerifyCodes(code1: String, code2: String) = true
     })
 
-    // use real user service but ensure a constant ordering of users
+    // use real user service but ensure a constant ordering of users and groups
     Services.register(new UserServiceImpl() {
       override def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) =
         super.getUsers(userId, userIds)(p, channelCtx).map {
           case Right(users) => Right(sortUsers(users))
           case x            => x
         }
+      override def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
+        super.getGroups(userId)(p, channelCtx).map {
+          case Right(groups) => Right(sortGroups(groups))
+          case x => x
+        }
     })
 
     // use real question service but control what questions are used and order they are returned
     Services.register(new QuestionServiceImpl(questionDefs, totalSides) {
-      override def getQuestions(groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-        super.getQuestions(groupId)(p, channelCtx).map {
+      override def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+        super.getQuestions(groupId, userId)(p, channelCtx).map {
           case Right(questions) => Right(sortQuestions(questions))
         }
       }
     })
-
-    Services.register(randomMock)
-    Services.register(TimeServiceConstantMock)
   }
 
   override def afterAll() {
@@ -119,6 +123,7 @@ abstract class SocketApiIntegrationTest
   }
 
   private def sortUsers(users: List[UserModel]) = users.sortBy(_.id.toString)
+  private def sortGroups(groups: List[GroupModel]) = groups.sortBy(_.id.toString)
   private def sortQuestions(questions: List[QuestionModel]) = questions.sortBy(q => q.id.toString + q.side)
 
   def handlerService: SocketApiHandlerService
@@ -138,21 +143,30 @@ abstract class SocketApiIntegrationTest
   }
 
   private def assertResponse[B](responseModel: B)(implicit m: Manifest[B], socket: SocketConnection) {
+    val rawResponse = socket.read
+
     val expectedResponse = CommandModel(responseModel)
-    val actualResponse = JsonMethods.parse(socket.read).extract[CommandModel[B]]
+    val actualResponse = JsonMethods.parse(rawResponse).extract[CommandModel[B]]
 
     debug(socket.hashCode() + "   actual: " + actualResponse.toString)
     debug(socket.hashCode() + " expected: " + expectedResponse.toString)
+
+    debug(socket.hashCode() + "   pretty actual:\n" + Serialization.writePretty(JsonMethods.parse(rawResponse)))
+    debug(socket.hashCode() + " pretty expected:\n" + Serialization.writePretty(expectedResponse))
 
     assert(actualResponse == expectedResponse)
   }
 
   test("integration test - runs all commands", Tags.SLOW) {
 
-    def login(deviceId: UUID, fbToken: String, name: String, userId: UUID, groups: List[GroupModel])(implicit s: SocketConnection) {
+    def login(deviceId: UUID, fbToken: String, name: String, userId: UUID,
+              groups: List[GroupModel], groupId: Option[UUID], phone: Option[String],
+               events: Option[List[EventModel]] = None, questions: Option[List[QuestionModel]] = None,
+               lastLogin: Option[DateTime] = None)(implicit s: SocketConnection) {
       val deviceModel = DeviceModel(deviceId)
-      val loginModel = LoginModel(fbToken, None, "", ApiVersions.V01, "", deviceModel)
-      val loginResponseModel = LoginResponseModel(userId, groups, None, None, None)
+      val loginModel = LoginModel(fbToken, groupId, "", ApiVersions.V01, "", deviceModel)
+      val loginResponseModel = LoginResponseModel(userId, phone, phone.isDefined, sortGroups(groups),
+        events, questions.map(sortQuestions), lastLogin)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
       val facebookService = mock[FacebookService]
       val unregister = TestServices.register(facebookService)
@@ -224,33 +238,33 @@ abstract class SocketApiIntegrationTest
       QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
 
       val answerModel = AnswerModel(questionId, groupId, side, answer)
-      val eventModel: EventModel = EventModelImpl(answerEventId, groupId, None, EventTypes.MATCH, answerBody, time)
+      val eventModel: EventModel = EventModelImpl(answerEventId, groupId, None, EventTypes.MATCH, answerBody)
       execute(answerModel, None)
       assertResponse(eventModel)
       eventModel
     }
 
-    val socket = connect()
+    val socket1 = connect()
 
-    val fbToken = "a token"
-    val fbToken2 = "a token2"
-    val fbToken3 = "a token3"
+    val fbToken1 = "fbToken1"
+    val fbToken2 = "fbToken2"
+    val fbToken3 = "fbToken3"
 
     val name1 = "first name"
     val name2 = "first name2"
     val name3 = "first name3"
 
-    val deviceId = RandomService().uuid
-    val userId = randomMock.nextUuid()
-    val phone = "555-1234"
+    val deviceId1 = RandomService().uuid
+    val userId1 = randomMock.nextUuid()
+    val phone1 = "555-1234"
     val phone2 = "555-4321"
     val phone3 = "555-4322"
 
-    login(deviceId, fbToken, name1, userId, groups = List())(socket)
+    login(deviceId1, fbToken1, name1, userId1, groups = List(), None, None)(socket1)
 
-    register(phone)(socket)
+    register(phone1)(socket1)
 
-    verify(phone)(socket)
+    verify(phone1)(socket1)
 
     val groupId = randomMock.nextUuid()
     val eventId = randomMock.nextUuid(1)
@@ -260,23 +274,23 @@ abstract class SocketApiIntegrationTest
         case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
       }
 
-    val users1 = List(UserModel(userId, Option(name1)))
+    val users1 = List(UserModel(userId1, Option(name1)))
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    invite(phone2, users1, groupId, events1, questionModels)(socket)
+    invite(phone2, users1, groupId, events1, questionModels)(socket1)
 
-    questions(groupId, questionModels)(socket)
+    questions(groupId, questionModels)(socket1)
 
     val messageBody = "a message!"
     val messageEventId = randomMock.nextUuid()
     val messageEventModel: EventModel =
-      EventModelImpl(messageEventId, groupId, Option(userId), EventTypes.MESSAGE, messageBody, time)
-    message(groupId, messageEventModel)(socket)
+      EventModelImpl(messageEventId, groupId, Option(userId1), EventTypes.MESSAGE, messageBody)
+    message(groupId, messageEventModel)(socket1)
 
     val socket2 = connect()
     val deviceId2 = RandomService().uuid
-    val inviteUserId = randomMock.nextUuid()
-    login(deviceId2, fbToken2, name2, inviteUserId, List())(socket2)
+    val userId2 = randomMock.nextUuid()
+    login(deviceId2, fbToken2, name2, userId2, List(), None, None)(socket2)
 
     register(phone2)(socket2)
 
@@ -285,16 +299,16 @@ abstract class SocketApiIntegrationTest
     // skip invite for user2
 
     val users2 = List(
-      UserModel(userId, Option(name1)),
-      UserModel(inviteUserId, Option(name2)))
+      UserModel(userId1, Option(name1)),
+      UserModel(userId2, Option(name2)))
     val eventId2 = randomMock.nextUuid()
     val events2 = events1 ++ List(messageEventModel,
-      EventModelImpl(eventId2, groupId, Option(inviteUserId), EventTypes.JOIN,
+      EventModelImpl(eventId2, groupId, Option(userId2), EventTypes.JOIN,
         "A user joined Scandal.ly chat! (hush, Michi)"))
-    acceptInvite(inviteUserId, users2, groupId, events2.reverse, questionModels)(socket2)
+    acceptInvite(userId2, users2, groupId, events2.reverse, questionModels)(socket2)
 
     // socket1 answer is down here so that we have a valid match user id
-    val answerEvent = answer(groupId, inviteUserId, questionDefs(0).id)(socket)
+    val answerEvent = answer(groupId, userId2, questionDefs(0).id)(socket1)
     assertResponse(answerEvent)(manifest[EventModel], socket2)
 
     val questionModels2 = questionModels.filter(_.id != questionDefs(0).id)
@@ -302,22 +316,22 @@ abstract class SocketApiIntegrationTest
 
     val messageEventId2 = randomMock.nextUuid()
     val messageEventModel2: EventModel =
-      EventModelImpl(messageEventId2, groupId, Option(inviteUserId), EventTypes.MESSAGE, messageBody, time)
+      EventModelImpl(messageEventId2, groupId, Option(userId2), EventTypes.MESSAGE, messageBody)
     message(groupId, messageEventModel2)(socket2)
-    assertResponse(messageEventModel2)(manifest[EventModel], socket)
+    assertResponse(messageEventModel2)(manifest[EventModel], socket1)
 
-    val answerEvent2 = answer(groupId, userId, questionDefs(1).id)(socket2)
-    assertResponse(answerEvent2)(manifest[EventModel], socket)
+    val answerEvent2 = answer(groupId, userId1, questionDefs(1).id)(socket2)
+    assertResponse(answerEvent2)(manifest[EventModel], socket1)
 
     val socket3 = connect()
     val deviceId3 = RandomService().uuid
     val userId3 = randomMock.nextUuid()
-    login(deviceId3, fbToken3, name3, userId3, List())(socket3)
+    login(deviceId3, fbToken3, name3, userId3, List(), None, None)(socket3)
 
     val groupId2 = randomMock.nextUuid()
     val events3 = List(EventModelImpl(randomMock.nextUuid(1), groupId2, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    invite(phone3, users1, groupId2, events3, questionModels)(socket)
+    invite(phone3, users1, groupId2, events3, questionModels)(socket1)
 
     register(phone3)(socket3)
 
@@ -325,9 +339,18 @@ abstract class SocketApiIntegrationTest
 
     declineInvite(groupId2)(socket3)
 
-    socket.disconnect()
+    socket1.disconnect()
     socket2.disconnect()
     socket3.disconnect()
+
+    // original user login again
+    val socket4 = connect()
+    val groups = List(
+      GroupModelImpl(groupId, sortUsers(users2), None, None, 0),
+      GroupModelImpl(groupId2, sortUsers(users2.slice(0,1)), None, None, 0))
+    login(deviceId1, fbToken1, name1, userId1, groups, Option(groupId), Option(phone1),
+      Option((events2 ++ List(messageEventModel2)).reverse), Option(questionModels2.filter(_.id != questionDefs(1).id)),
+      Option(TimeServiceConstantMock.now))(socket4)
   }
 
   test("error", Tags.SLOW) {

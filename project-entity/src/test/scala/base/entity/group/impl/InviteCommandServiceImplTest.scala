@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/1/15 11:58 AM
  */
 
 package base.entity.group.impl
@@ -79,8 +79,8 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
       (*, *, *) returning Future.successful(Unit)
     (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(Option(group)))
-    (questionService.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List()))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(List()))
     (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects
       (*, *) returning Future.successful(Right(List()))
 
@@ -219,8 +219,8 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   test("questions get returned error") {
     val groupModel = mock[GroupModel]
     val questionService = mock[QuestionService]
-    (questionService.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(error))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(questionService)
     assert(command.questionsGet(groupId, groupModel).await() == Left(error))
     unregister()

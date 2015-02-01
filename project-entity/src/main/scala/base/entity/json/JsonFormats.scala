@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:02 AM
+ * Last modified by rconrad, 2/1/15 12:38 PM
  */
 
 package base.entity.json
 
-import base.common.lib.{ Currencies, Genders, Languages }
-import base.entity.api.{ ApiErrorCodes, ApiVersions }
+import base.common.lib.{Currencies, Genders, Languages}
+import base.entity.api.{ApiErrorCodes, ApiVersions}
 import base.entity.command.CommandNames
 import base.entity.error.model.ApiError
 import base.entity.event.EventTypes
@@ -25,7 +25,11 @@ import org.json4s.ext.EnumNameSerializer
  */
 object JsonFormats {
 
-  val default = DefaultFormats + StatusCodeSerializer + UuidSerializer + UrlSerializer
+  val default = DefaultFormats +
+    DateTimeSerializer +
+    StatusCodeSerializer +
+    UuidSerializer +
+    UrlSerializer
 
   val withHttpData = default + HttpDataSerializer
 

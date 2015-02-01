@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/1/15 11:55 AM
  */
 
 package base.entity.question
@@ -26,7 +26,7 @@ trait QuestionService extends Service {
 
   final val serviceManifest = manifest[QuestionService]
 
-  def getQuestions(groupId: UUID)(implicit p: Pipeline,
+  def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline,
                                   channelCtx: ChannelContext): Future[Either[ApiError, List[QuestionModel]]]
 
   def answer(input: AnswerModel)(implicit p: Pipeline,

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:52 AM
+ * Last modified by rconrad, 2/1/15 11:58 AM
  */
 
 package base.entity.question.impl
@@ -38,7 +38,7 @@ private[entity] class QuestionsCommandServiceImpl()
     }
 
     def questionsGet(): Response =
-      QuestionService().getQuestions(input.groupId).map {
+      QuestionService().getQuestions(input.groupId, authCtx.userId).map {
         case Right(questions) => QuestionsResponseModel(input.groupId, questions)
         case Left(error)      => error
       }
