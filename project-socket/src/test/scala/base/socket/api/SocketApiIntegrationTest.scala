@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 1:03 PM
+ * Last modified by rconrad, 2/1/15 3:19 PM
  */
 
 package base.socket.api
@@ -12,32 +12,33 @@ import java.util.UUID
 import base.common.logging.Loggable
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{Services, ServicesBeforeAndAfterAll, TestServices}
+import base.common.service.{ Services, ServicesBeforeAndAfterAll, TestServices }
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.{ApiErrorCodes, ApiVersions}
+import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.auth.context.impl.ChannelContextImpl
-import base.entity.auth.context.{ChannelContext, StandardUserAuthContext}
+import base.entity.auth.context.{ ChannelContext, StandardUserAuthContext }
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.facebook.{FacebookInfo, FacebookService}
+import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.model._
-import base.entity.group.model.impl.GroupModelImpl
+import base.entity.group.model.impl.{ InviteModelImpl, GroupModelImpl }
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.message.model.MessageModel
 import base.entity.question._
 import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.{AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel}
+import base.entity.question.model.{ AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel }
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.User
-import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
+import base.entity.user.impl.{ UserServiceImpl, VerifyPhoneCommandServiceImpl }
 import base.entity.user.model._
+import base.entity.user.model.impl.LoginResponseModelImpl
 import base.socket.api.test.SocketConnection
 import base.socket.command.impl.CommandProcessingServiceImpl
 import base.socket.test.SocketBaseSuite
@@ -103,7 +104,7 @@ abstract class SocketApiIntegrationTest
       override def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
         super.getGroups(userId)(p, channelCtx).map {
           case Right(groups) => Right(sortGroups(groups))
-          case x => x
+          case x             => x
         }
     })
 
@@ -159,14 +160,16 @@ abstract class SocketApiIntegrationTest
 
   test("integration test - runs all commands", Tags.SLOW) {
 
+    // todo remove scala style suppression
+    // scalastyle:off parameter.number
     def login(deviceId: UUID, fbToken: String, name: String, userId: UUID,
               groups: List[GroupModel], groupId: Option[UUID], phone: Option[String],
-               events: Option[List[EventModel]] = None, questions: Option[List[QuestionModel]] = None,
-               lastLogin: Option[DateTime] = None)(implicit s: SocketConnection) {
+              events: Option[List[EventModel]] = None, questions: Option[List[QuestionModel]] = None,
+              lastLogin: Option[DateTime] = None)(implicit s: SocketConnection) {
       val deviceModel = DeviceModel(deviceId)
       val loginModel = LoginModel(fbToken, groupId, "", ApiVersions.V01, "", deviceModel)
-      val loginResponseModel = LoginResponseModel(UserModel(userId, Option(name)), phone, phone.isDefined, sortGroups(groups),
-        events, questions.map(sortQuestions), lastLogin)
+      val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(UserModel(userId, Option(name)), phone,
+        phone.isDefined, List(), List(), sortGroups(groups), events, questions.map(sortQuestions), lastLogin)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
       val facebookService = mock[FacebookService]
       val unregister = TestServices.register(facebookService)
@@ -182,15 +185,15 @@ abstract class SocketApiIntegrationTest
       execute(registerModel, Option(registerResponseModel))
     }
 
-    def verify(phone: String)(implicit s: SocketConnection) {
+    def verify(phone: String, invites: List[InviteModel] = List())(implicit s: SocketConnection) {
       val code = "code!"
       val verifyModel = VerifyPhoneModel(phone, code)
-      val verifyResponseModel = VerifyPhoneResponseModel(phone)
+      val verifyResponseModel = VerifyPhoneResponseModel(phone, invites)
       execute(verifyModel, Option(verifyResponseModel))
     }
 
-    def sendInvite(phone: String, users: List[UserModel],
-               groupId: UUID, events: List[EventModel], questionModels: List[QuestionModel])(implicit s: SocketConnection) {
+    def sendInvite(phone: String, users: List[UserModel], groupId: UUID, events: List[EventModel],
+                   questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val label = "bob"
       val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
 
@@ -294,7 +297,8 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    verify(phone2)(socket2)
+    val invites2 = List(InviteModelImpl(groupId, None, None, ""))
+    verify(phone2, invites2)(socket2)
 
     // skip invite for user2
 
@@ -335,7 +339,8 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    verify(phone3)(socket3)
+    val invites3 = List(InviteModelImpl(groupId2, None, None, ""))
+    verify(phone3, invites3)(socket3)
 
     declineInvite(groupId2)(socket3)
 
@@ -347,7 +352,7 @@ abstract class SocketApiIntegrationTest
     val socket4 = connect()
     val groups = List(
       GroupModelImpl(groupId, sortUsers(users2), None, None, 0),
-      GroupModelImpl(groupId2, sortUsers(users2.slice(0,1)), None, None, 0))
+      GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), None, None, 0))
     login(deviceId1, fbToken1, name1, userId1, groups, Option(groupId), Option(phone1),
       Option((events2 ++ List(messageEventModel2)).reverse), Option(questionModels2.filter(_.id != questionDefs(1).id)),
       Option(TimeServiceConstantMock.now))(socket4)

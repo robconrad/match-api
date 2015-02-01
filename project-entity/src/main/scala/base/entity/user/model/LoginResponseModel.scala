@@ -2,16 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:46 PM
+ * Last modified by rconrad, 2/1/15 3:28 PM
  */
 
 package base.entity.user.model
 
 import base.entity.api.ApiStrings.User._
 import base.entity.event.model.EventModel
-import base.entity.group.model.GroupModel
+import base.entity.group.model.{ GroupModel, InviteModel }
+import base.entity.json.JsonFormats
+import base.entity.model.{ Model, ModelCompanion }
 import base.entity.question.model.QuestionModel
-import com.wordnik.swagger.annotations.{ApiModel, ApiModelProperty}
+import base.entity.user.model.impl.LoginResponseModelImpl
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 import org.joda.time.DateTime
 
 import scala.annotation.meta.field
@@ -23,15 +26,26 @@ import scala.annotation.meta.field
  */
 // format: OFF
 @ApiModel(description = createRequestDesc)
-// todo convert to interface for mocking
-case class LoginResponseModel(
-  @(ApiModelProperty @field)(required = true, value = emailDesc)     user: UserModel,
-  @(ApiModelProperty @field)(required = false, value = passwordDesc) phone: Option[String],
-  @(ApiModelProperty @field)(required = false, value = passwordDesc) phoneVerified: Boolean,
-  @(ApiModelProperty @field)(required = false, value = passwordDesc) groups: List[GroupModel],
-  @(ApiModelProperty @field)(required = false, value = passwordDesc) events: Option[List[EventModel]],
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  questions: Option[List[QuestionModel]],
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  lastLoginTime: Option[DateTime]) {
-  // format: ON
+trait LoginResponseModel extends Model {
+
+  @(ApiModelProperty @field)(required = true, value = emailDesc)     def user: UserModel
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def phone: Option[String]
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def phoneVerified: Boolean
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def invitesOut: List[InviteModel]
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def invitesIn: List[InviteModel]
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def groups: List[GroupModel]
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def events: Option[List[EventModel]]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  def questions: Option[List[QuestionModel]]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  def lastLoginTime: Option[DateTime]
+
+}
+// format: ON
+
+object LoginResponseModel extends ModelCompanion[LoginResponseModel, LoginResponseModelImpl] {
+
+  override val formats = JsonFormats.withEnumsAndFields +
+    GroupModel.serializer +
+    EventModel.serializer +
+    InviteModel.serializer
 
 }

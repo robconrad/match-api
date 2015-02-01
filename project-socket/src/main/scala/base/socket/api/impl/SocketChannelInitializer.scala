@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:22 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.socket.api.impl
@@ -10,8 +10,8 @@ package base.socket.api.impl
 import base.entity.error.ApiErrorService
 import base.socket.api.impl.SocketChannelInitializer.Errors
 import io.netty.channel.socket.SocketChannel
-import io.netty.channel.{ChannelHandlerContext, ChannelInitializer, ChannelPipeline}
-import io.netty.handler.timeout.{IdleStateEvent, IdleStateHandler}
+import io.netty.channel.{ ChannelHandlerContext, ChannelInitializer, ChannelPipeline }
+import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
 import spray.http.StatusCodes
 
 /**

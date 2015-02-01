@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:45 AM
+ * Last modified by rconrad, 2/1/15 2:55 PM
  */
 
 package base.socket.command.impl
@@ -12,11 +12,11 @@ import base.common.service.TestServices
 import base.common.test.TestExceptions.TestRuntimeException
 import base.entity.api.ApiErrorCodes
 import base.entity.api.ApiErrorCodes.ErrorCode
-import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.model.CommandModel
 import base.entity.json.JsonFormats
 import base.entity.user.model._
-import base.entity.user.{RegisterPhoneCommandService, VerifyPhoneCommandService}
+import base.entity.user.{ RegisterPhoneCommandService, VerifyPhoneCommandService }
 import base.socket.command.CommandProcessingService._
 import base.socket.command.impl.CommandProcessingServiceImpl.Errors
 import base.socket.service.SocketServiceTest
@@ -52,7 +52,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
 
   def assertError(input: String, errorCode: ErrorCode): Unit = {
     service.process(input).await() match {
-      case Left(error) => assert(error.message.code.contains(errorCode))
+      case Left(error)   => assert(error.message.code.contains(errorCode))
       case Right(result) => fail(result.toString)
     }
   }
@@ -64,7 +64,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
       }
     }
     val error = command.parseInput("").await() match {
-      case Left(error) => error.message
+      case Left(error)   => error.message
       case Right(result) => fail(result.toString)
     }
     assert(error.message == Errors.externalErrorText)
@@ -94,7 +94,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
     }
     command.returnResult("", None) match {
       case Right(result) => fail(result.toString)
-      case Left(error) => assert(error.message.debug.exists(_.contains("failed to serialize message")))
+      case Left(error)   => assert(error.message.debug.exists(_.contains("failed to serialize message")))
     }
   }
 
@@ -112,7 +112,7 @@ class CommandProcessingServiceImplTest extends SocketServiceTest {
 
   test("command - verify") {
     val model = VerifyPhoneModel(phone, "code")
-    val response = VerifyPhoneResponseModel(RandomService().uuid.toString)
+    val response = VerifyPhoneResponseModel(RandomService().uuid.toString, List())
     val command = CommandModel(response)
     val service = mock[VerifyPhoneCommandService]
     (service.execute(_: VerifyPhoneModel)(_: ChannelContext)) expects

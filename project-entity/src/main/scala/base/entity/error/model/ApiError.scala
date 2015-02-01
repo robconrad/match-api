@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:00 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.error.model
@@ -10,8 +10,8 @@ package base.entity.error.model
 import base.entity.api.ApiErrorCodes._
 import base.entity.api.ApiStrings._
 import base.entity.error.model.impl.ApiErrorImpl
-import base.entity.model.{Model, ModelCompanion}
-import com.wordnik.swagger.annotations.{ApiModel, ApiModelProperty}
+import base.entity.model.{ Model, ModelCompanion }
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 import spray.http.StatusCode
 
 import scala.annotation.meta.field

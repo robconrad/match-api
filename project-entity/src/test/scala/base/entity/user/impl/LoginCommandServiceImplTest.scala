@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:50 PM
+ * Last modified by rconrad, 2/1/15 3:13 PM
  */
 
 package base.entity.user.impl
@@ -12,6 +12,7 @@ import java.util.UUID
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
+import base.common.test.TestExceptions.TestRuntimeException
 import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
@@ -27,7 +28,8 @@ import base.entity.question.model.AnswerModel
 import base.entity.user.UserService
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv._
-import base.entity.user.model.{UserModel, LoginModel, LoginResponseModel}
+import base.entity.user.model.impl.{ LoginResponseModelBuilder, LoginResponseModelImpl }
+import base.entity.user.model.{ UserModel, LoginModel, LoginResponseModel }
 
 import scala.concurrent.Future
 
@@ -114,7 +116,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userId = randomMock.nextUuid()
     val userModel = UserModel(userId, Option(name))
     val myModel = model.copy(groupId = None)
-    val response = LoginResponseModel(userModel, None, phoneVerified = false, List(), None, None, None)
+    val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
+      List(), List(), List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -123,7 +126,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userModel = UserModel(userId, Option(name))
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
-    val response = LoginResponseModel(userModel, None, phoneVerified = false, List(), None, None, None)
+    val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
+      List(), List(), List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -132,7 +136,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(name))
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
-    val response = LoginResponseModel(userModel, None, phoneVerified = false, List(), Option(List()), Option(List()), None)
+    val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
+      List(), List(), List(), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
   }
 
@@ -183,7 +188,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val groupEventsService = mock[GroupEventsService]
     (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects (*, *) returning result
     val unregister = TestServices.register(groupEventsService)
-    assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(key, uuid, uuid, LoginResponseModelBuilder()).await() == Left(apiError))
     unregister()
   }
 
@@ -194,19 +199,39 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     (questionMock.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(questionMock)
-    assert(command.eventsGet(key, uuid, List(), uuid).await() == Left(apiError))
+    assert(command.eventsGet(key, uuid, uuid, LoginResponseModelBuilder()).await() == Left(apiError))
     unregister()
   }
 
-  test("failed to set user attributes") {
+  test("failed to get user login attributes") {
     val uuid = RandomService().uuid
     val key = mock[UserKey]
-    key.getLastLogin _ expects () returning Future.successful(None)
-    key.getPhoneAttributes _ expects () returning Future.successful(None)
-    key.getName _ expects () returning Future.successful(None)
+    key.getLoginAttributes _ expects () returning Future.failed(new TestRuntimeException)
+    intercept[TestRuntimeException] {
+      command.userGetLoginAttributes(key, uuid, LoginResponseModelBuilder()).await()
+    }
+  }
+
+  test("failed to get invites in") {
+    val userId = RandomService().uuid
+    val service = mock[UserService]
+    (service.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(apiError))
+    assert(command.userGetInvitesIn(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
+  }
+
+  test("failed to get invites out") {
+    val userId = RandomService().uuid
+    val service = mock[UserService]
+    (service.getInvitesOut(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(apiError))
+    assert(command.userGetInvitesOut(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
+  }
+
+  test("failed to set last login") {
+    val key = mock[UserKey]
     key.setLastLogin _ expects * returning Future.successful(false)
-    val future = command.userGetSetLastLogin(key, uuid, List(), None, None)
-    assert(future.await() == Errors.userSetFailed.await())
+    assert(command.setLastLogin(key, LoginResponseModelBuilder()).await() == Errors.userSetFailed.await())
   }
 
 }

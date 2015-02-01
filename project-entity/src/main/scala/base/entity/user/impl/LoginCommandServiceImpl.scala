@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:48 PM
+ * Last modified by rconrad, 2/1/15 3:14 PM
  */
 
 package base.entity.user.impl
@@ -14,17 +14,15 @@ import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.event.model.EventModel
 import base.entity.facebook.{ FacebookInfo, FacebookService }
-import base.entity.group.model.GroupModel
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
-import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{UserModel, LoginModel, LoginResponseModel}
+import base.entity.user.model.impl.LoginResponseModelBuilder
+import base.entity.user.model.{ LoginModel, LoginResponseModel, UserModel }
 import spray.http.StatusCodes._
 
 /**
@@ -68,13 +66,13 @@ private[entity] class LoginCommandServiceImpl()
     def facebookUserGet(key: FacebookUserKey, fbInfo: FacebookInfo): Response = {
       key.get flatMap {
         case Some(userId) => userSet(UserKeyService().make(userId), userId, fbInfo)
-        case None => facebookUserSet(key, RandomService().uuid, fbInfo)
+        case None         => facebookUserSet(key, RandomService().uuid, fbInfo)
       }
     }
 
     def facebookUserSet(key: FacebookUserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
       key.set(userId) flatMap {
-        case true => userSet(UserKeyService().make(userId), userId, fbInfo)
+        case true  => userSet(UserKeyService().make(userId), userId, fbInfo)
         case false => Errors.facebookUserSetFailed
       }
     }
@@ -104,49 +102,55 @@ private[entity] class LoginCommandServiceImpl()
       val key = UserKeyService().make(userId)
       UserService().getGroups(userId).flatMap {
         case Left(error) => error
-        case Right(groups) => input.groupId match {
-          case Some(groupId) => eventsGet(key, userId, groups, groupId)
-          case None          => userGetSetLastLogin(key, userId, groups, None, None)
-        }
+        case Right(groups) =>
+          val builder = LoginResponseModelBuilder(groups = Option(groups))
+          input.groupId match {
+            case Some(groupId) => eventsGet(key, userId, groupId, builder)
+            case None          => userGetLoginAttributes(key, userId, builder)
+          }
       }
     }
 
-    def eventsGet(key: UserKey,
-                  userId: UUID,
-                  groups: Iterable[GroupModel],
-                  groupId: UUID): Response = {
+    def eventsGet(key: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder): Response = {
       GroupEventsService().getEvents(groupId).flatMap {
         case Left(error) => error
         case Right(events) =>
           QuestionService().getQuestions(groupId, userId).flatMap {
-            case Left(error)      => error
-            case Right(questions) => userGetSetLastLogin(key, userId, groups, Option(events), Option(questions))
+            case Left(error) => error
+            case Right(questions) =>
+              userGetLoginAttributes(key, userId, builder.copy(events = Option(events), questions = Option(questions)))
           }
       }
     }
 
-    def userGetSetLastLogin(key: UserKey,
-                            userId: UUID,
-                            groups: Iterable[GroupModel],
-                            events: Option[List[EventModel]],
-                            questions: Option[List[QuestionModel]]): Response = {
-      // todo merge these get calls
-      key.getLastLogin flatMap { lastLogin =>
-        key.getPhoneAttributes flatMap { phoneAttributes =>
-          key.getName flatMap { name =>
-            key.setLastLogin() flatMap {
-              case false => Errors.userSetFailed
-              case true => registerGroupListeners(LoginResponseModel(
-                UserModel(userId, name),
-                phoneAttributes.map(_.phone),
-                phoneAttributes.exists(_.verified),
-                groups.toList,
-                events,
-                questions,
-                lastLogin))
-            }
-          }
-        }
+    def userGetLoginAttributes(key: UserKey, userId: UUID, builder: LoginResponseModelBuilder): Response = {
+      key.getLoginAttributes flatMap { attributes =>
+        userGetInvitesIn(UserService(), userId, builder.copy(
+          phone = attributes.phone,
+          phoneVerified = Option(attributes.phoneVerified),
+          user = Option(UserModel(userId, attributes.name)),
+          lastLoginTime = attributes.lastLogin))
+      }
+    }
+
+    def userGetInvitesIn(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
+      service.getInvitesIn(userId) flatMap {
+        case Right(invites) => userGetInvitesOut(UserService(), userId, builder.copy(invitesIn = Option(invites)))
+        case Left(error)    => error
+      }
+    }
+
+    def userGetInvitesOut(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
+      service.getInvitesOut(userId) flatMap {
+        case Right(invites) => setLastLogin(UserKeyService().make(userId), builder.copy(invitesOut = Option(invites)))
+        case Left(error)    => error
+      }
+    }
+
+    def setLastLogin(key: UserKey, builder: LoginResponseModelBuilder): Response = {
+      key.setLastLogin() flatMap {
+        case true  => registerGroupListeners(builder.build)
+        case false => Errors.userSetFailed
       }
     }
 

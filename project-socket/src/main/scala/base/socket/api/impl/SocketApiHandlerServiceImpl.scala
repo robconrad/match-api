@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:48 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.socket.api.impl
@@ -15,14 +15,14 @@ import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupListenerService
 import base.entity.json.JsonFormats
-import base.socket.api.{SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService}
+import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
 import base.socket.command.CommandProcessingService
 import base.socket.command.impl.CommandProcessingServiceImpl.Errors
-import base.socket.logging.{LoggableChannelInfo, SocketLoggable}
-import io.netty.channel.{ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter}
+import base.socket.logging.{ LoggableChannelInfo, SocketLoggable }
+import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext, ChannelInboundHandlerAdapter }
 import spray.http.StatusCodes
 
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 
 /**
  * {{ Describe the high level purpose of SocketApiHandlerServiceImpl here. }}
@@ -87,7 +87,8 @@ abstract class SocketApiHandlerServiceImpl
             ctx.channel().close(processingError.message)
           case Failure(t) =>
             error("processing threw", t)
-            ctx.channel().close(ApiErrorService().throwable(Errors.externalErrorText, StatusCodes.InternalServerError, t))
+            val apiError = ApiErrorService().throwable(Errors.externalErrorText, StatusCodes.InternalServerError, t)
+            ctx.channel().close(apiError)
         }
     }
   }
@@ -133,7 +134,8 @@ object SocketApiHandlerServiceImpl {
   lazy val runningJson = ApiErrorService().toJson(runningApiError)
 
   lazy val busyText = "The server is too busy to accept new connections right now."
-  lazy val busyApiError = ApiErrorService().errorCode(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
+  lazy val busyApiError =
+    ApiErrorService().errorCode(busyText, StatusCodes.ServiceUnavailable, ApiErrorCodes.SERVER_BUSY)
   lazy val busyJson = ApiErrorService().toJson(busyApiError)
 
 }

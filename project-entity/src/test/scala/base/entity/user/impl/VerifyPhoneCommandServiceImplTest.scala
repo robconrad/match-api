@@ -2,18 +2,23 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:42 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.user.impl
+
+import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.ChannelContextDataFactory
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
+import base.entity.error.model.ApiError
+import base.entity.kv.Key.Pipeline
 import base.entity.sms.mock.SmsServiceMock
+import base.entity.user.UserService
 import base.entity.user.impl.VerifyPhoneCommandServiceImpl.Errors
 import base.entity.user.kv._
 import base.entity.user.model.{ VerifyPhoneModel, VerifyPhoneResponseModel }
@@ -61,6 +66,11 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val phoneKey = PhoneKeyService().make(phone)
     val phoneGroupsInvitedKey = PhoneGroupsInvitedKeyService().make(phone)
     val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
+    val userService = mock[UserService]
+    val unregister = TestServices.register(userService)
+
+    (userService.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
 
     assert(phoneKey.get.await() == None)
 
@@ -69,17 +79,19 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneGroupsInvitedKey.add(groupId1).await() == 1)
     assert(userGroupsInvitedKey.add(groupId2).await() == 1)
 
-    assert(service.innerExecute(model).await() == Right(VerifyPhoneResponseModel(phone)))
+    assert(service.innerExecute(model).await() == Right(VerifyPhoneResponseModel(phone, List())))
 
     val phoneAttributes = userKey.getPhoneAttributes.await()
     assert(phoneAttributes.exists(_.phone == phone))
     assert(phoneAttributes.exists(_.code == code))
-    assert(phoneAttributes.exists(_.verified == true))
+    assert(phoneAttributes.exists(_.verified))
 
     assert(phoneKey.get.await().contains(authCtx.userId))
 
     assert(phoneGroupsInvitedKey.members().await().size == 0)
     assert(userGroupsInvitedKey.members().await().size == 2)
+
+    unregister()
   }
 
   test("failed to get phone attributes") {
@@ -104,6 +116,14 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[PhoneKey]
     key.set _ expects * returning Future.successful(false)
     assert(command.phoneSetUserId(key).await() == Errors.phoneSetUserIdFailed.await())
+  }
+
+  test("get invitesIn returned error") {
+    val apiError = mock[ApiError]
+    val service = mock[UserService]
+    (service.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(apiError))
+    assert(command.userGetInvitesIn(service).await() == Left(apiError))
   }
 
   test("send verify sms") {

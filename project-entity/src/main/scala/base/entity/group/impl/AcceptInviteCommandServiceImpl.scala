@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 1:01 PM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.group.impl
@@ -15,12 +15,12 @@ import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group._
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
-import base.entity.group.kv.{GroupUsersKey, GroupUsersKeyService}
-import base.entity.group.model.{AcceptInviteModel, AcceptInviteResponseModel, GroupModel}
+import base.entity.group.kv.{ GroupUsersKey, GroupUsersKeyService }
+import base.entity.group.model.{ AcceptInviteModel, AcceptInviteResponseModel, GroupModel }
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
-import base.entity.user.kv.{UserGroupsInvitedKey, UserGroupsInvitedKeyService, UserGroupsKey, UserGroupsKeyService}
+import base.entity.user.kv.{ UserGroupsInvitedKey, UserGroupsInvitedKeyService, UserGroupsKey, UserGroupsKeyService }
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)

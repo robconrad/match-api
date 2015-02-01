@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 2/1/15 3:03 PM
  */
 
 package base.common.test
@@ -13,6 +13,6 @@ package base.common.test
  */
 object TestExceptions {
 
-  class TestRuntimeException(s: String) extends RuntimeException(s: String)
+  class TestRuntimeException(s: String = "") extends RuntimeException(s: String)
 
 }

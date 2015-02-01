@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 8:06 PM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.socket.api.impl
 
 import io.netty.channel.ChannelHandler
 import io.netty.channel.socket.SocketChannel
-import io.netty.handler.codec.{DelimiterBasedFrameDecoder, Delimiters}
+import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
 
 /**
  * {{ Describe the high level purpose of RawSocketChannelInitializer here. }}

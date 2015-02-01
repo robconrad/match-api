@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:33 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.user.impl
@@ -29,8 +29,9 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
 
   override protected val responseManifest = Option(manifest[VerifyPhoneResponseModel])
 
-  private val codeMin = Math.pow(10, codeLength - 1).toInt
-  private val codeMax = Math.pow(10, codeLength).toInt
+  private val base = 10
+  private val codeMin = Math.pow(base, codeLength - 1).toInt
+  private val codeMax = Math.pow(base, codeLength).toInt
 
   def innerExecute(input: VerifyPhoneModel)(implicit channelCtx: ChannelContext) = {
     new VerifyCommand(input).execute()
@@ -94,8 +95,14 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
                                   userInvitedKey: UserGroupsInvitedKey): Response =
       PhoneGroupsInvitedKeyService().unionStore(userInvitedKey, userInvitedKey, phoneInvitedKey) flatMap { response =>
         phoneInvitedKey.del() flatMap { response =>
-          VerifyPhoneResponseModel(input.phone)
+          userGetInvitesIn(UserService())
         }
+      }
+
+    def userGetInvitesIn(service: UserService): Response =
+      service.getInvitesIn(authCtx.userId) flatMap {
+        case Right(invitesIn) => VerifyPhoneResponseModel(input.phone, invitesIn)
+        case Left(error)      => error
       }
 
   }

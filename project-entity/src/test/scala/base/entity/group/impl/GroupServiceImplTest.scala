@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/1/15 2:55 PM
  */
 
 package base.entity.group.impl
@@ -10,12 +10,12 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{Services, TestServices}
+import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiErrorService
-import base.entity.group.kv.{GroupKeyService, GroupUserKeyService}
-import base.entity.group.model.impl.{GroupModelBuilder, GroupModelImpl}
+import base.entity.group.kv.{ GroupKeyService, GroupUserKeyService }
+import base.entity.group.model.impl.{ GroupModelBuilder, GroupModelImpl }
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest

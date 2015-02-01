@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 1:27 PM
+ * Last modified by rconrad, 2/1/15 2:16 PM
  */
 
 package base.entity.user.kv
@@ -35,5 +35,7 @@ trait UserKey extends HashKey {
 
   def getLastLogin: Future[Option[DateTime]]
   def setLastLogin(time: DateTime = TimeService().now): Future[Boolean]
+
+  def getLoginAttributes: Future[UserLoginAttributes]
 
 }

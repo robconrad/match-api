@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 2:44 PM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.user.kv.impl
@@ -14,7 +14,7 @@ import base.entity.kv.KeyProps.UpdatedProp
 import base.entity.kv.impl.HashKeyImpl
 import base.entity.kv.{ Key, KeyLogger }
 import base.entity.user.kv.UserKeyProps._
-import base.entity.user.kv.{ UserKey, UserPhoneAttributes }
+import base.entity.user.kv.{ UserLoginAttributes, UserKey, UserPhoneAttributes }
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -71,5 +71,16 @@ class UserKeyImpl(val token: Array[Byte],
 
   def getLastLogin = getDateTime(LastLoginProp)
   def setLastLogin(time: DateTime) = set(LastLoginProp, TimeService().asString(time))
+
+  val loginAttributeProps = Array[Prop](PhoneProp, PhoneVerifiedProp, NameProp, LastLoginProp)
+  def getLoginAttributes = {
+    get(loginAttributeProps) map { props =>
+      UserLoginAttributes(
+        props(PhoneProp),
+        props(PhoneVerifiedProp).map(Key.string2Boolean).contains(true),
+        props(NameProp),
+        props(LastLoginProp).map(TimeService().fromString))
+    }
+  }
 
 }

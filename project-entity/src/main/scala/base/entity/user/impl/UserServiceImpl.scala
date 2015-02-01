@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:59 AM
+ * Last modified by rconrad, 2/1/15 1:16 PM
  */
 
 package base.entity.user.impl
@@ -14,6 +14,7 @@ import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
+import base.entity.group.model.impl.InviteModelImpl
 import base.entity.kv.Key._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
@@ -77,6 +78,24 @@ class UserServiceImpl extends ServiceImpl with UserService {
         }
       }
     }
+  }
+
+  def getInvitesIn(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    getInvitesIn(UserGroupsInvitedKeyService().make(userId))
+  }
+
+  private[impl] def getInvitesIn(key: UserGroupsInvitedKey)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    key.members() map { groupIds =>
+      Right(groupIds.map(groupId => InviteModelImpl(groupId, None, None, "")).toList)
+    }
+  }
+
+  def getInvitesOut(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    getInvitesOut()
+  }
+
+  private[impl] def getInvitesOut()(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    Future.successful(Right(List()))
   }
 
 }

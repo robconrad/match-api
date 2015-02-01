@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:05 AM
+ * Last modified by rconrad, 2/1/15 2:55 PM
  */
 
 package base.socket.api.impl
@@ -16,7 +16,7 @@ import base.common.test.TestExceptions.TestRuntimeException
 import base.entity.auth.context.ChannelContext
 import base.entity.group.GroupListenerService
 import base.socket.service.SocketServiceTest
-import io.netty.channel.{Channel, ChannelFuture, ChannelHandlerContext}
+import io.netty.channel.{ Channel, ChannelFuture, ChannelHandlerContext }
 import io.netty.util.Attribute
 
 /**

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/1/15 2:55 PM
  */
 
 package base.entity.user.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.service.TestServices
-import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.impl.GroupModelImpl

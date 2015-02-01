@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:09 AM
+ * Last modified by rconrad, 2/1/15 3:00 PM
  */
 
 package base.entity.error.impl
 
-import base.common.lib.{Tryo, Encoding}
+import base.common.lib.{ Tryo, Encoding }
 import base.common.logging.Loggable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes.ErrorCode
@@ -19,7 +19,7 @@ import base.entity.json.JsonFormats
 import com.google.common.hash.Hashing
 import org.json4s.native.Serialization
 import spray.caching.LruCache
-import spray.http.{StatusCode, StatusCodes}
+import spray.http.{ StatusCode, StatusCodes }
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -62,12 +62,12 @@ class ApiErrorServiceImpl(debugMode: Boolean) extends ServiceImpl with ApiErrorS
     statusCodeSeed(message, status, s"$status, ${Loggable.stackTraceToString(throwable)}")
 
   def full(message: String,
-            status: StatusCode,
-            code: Option[ErrorCode],
-            param: Option[String],
-            uniqueIdSeed: String) = {
+           status: StatusCode,
+           code: Option[ErrorCode],
+           param: Option[String],
+           uniqueIdSeed: String) = {
     val debugString = debugMode match {
-      case true => Option(uniqueIdSeed)
+      case true  => Option(uniqueIdSeed)
       case false => None
     }
     val apiError = ApiErrorImpl(
