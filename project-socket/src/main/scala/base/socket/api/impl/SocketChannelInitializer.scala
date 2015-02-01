@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/1/15 10:22 AM
  */
 
 package base.socket.api.impl
@@ -24,7 +24,7 @@ abstract class SocketChannelInitializer extends ChannelInitializer[SocketChannel
 
   protected def addIdleHandler(pipeline: ChannelPipeline) {
     val readWriteIdleTime = 0
-    val allIdleTime = 60
+    val allIdleTime = 180
     pipeline.addLast("timeout", new IdleStateHandler(readWriteIdleTime, readWriteIdleTime, allIdleTime) {
       override def channelIdle(ctx: ChannelHandlerContext, evt: IdleStateEvent) {
         ctx.channel().close(Errors.idleError)(ctx)
