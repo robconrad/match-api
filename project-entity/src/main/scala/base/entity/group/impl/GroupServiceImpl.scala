@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:01 AM
+ * Last modified by rconrad, 1/31/15 3:47 PM
  */
 
 package base.entity.group.impl
@@ -13,7 +13,8 @@ import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
 import base.entity.group.GroupService
 import base.entity.group.kv._
-import base.entity.group.model.{ GroupModel, GroupModelBuilder }
+import base.entity.group.model.GroupModel
+import base.entity.group.model.impl.GroupModelBuilder
 import base.entity.kv.Key.Pipeline
 import base.entity.service.CrudImplicits
 import base.entity.user.UserService

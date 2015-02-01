@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:36 PM
+ * Last modified by rconrad, 1/31/15 4:11 PM
  */
 
 package base.socket.api.impl
 
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel._
-import io.netty.channel.socket.SocketChannel
 import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod._
 import io.netty.handler.codec.http.websocketx._
@@ -18,6 +17,7 @@ import io.netty.handler.codec.http.websocketx._
 class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
 
   def write(json: String)(implicit ctx: ChannelHandlerContext) = {
+    debug("message sent: %s", json)
     ctx.channel.writeAndFlush(new TextWebSocketFrame(json))
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 1:20 PM
+ * Last modified by rconrad, 1/31/15 11:02 AM
  */
 
 package base.entity.kv.bytea
@@ -14,6 +14,7 @@ import base.entity.facebook.FacebookInfo
 import base.entity.kv.bytea.impl._
 import base.entity.kv.{ OrderedIdPair, SortedIdPair }
 import base.entity.question.QuestionIdComposite
+import base.entity.user.kv.UserPhone
 
 /**
  * {{ Describe the high level purpose of ByteaSerializers here. }}
@@ -30,7 +31,8 @@ object ByteaSerializers {
     manifest[SortedIdPair] -> IdPairByteaSerializer,
     manifest[OrderedIdPair] -> IdPairByteaSerializer,
     manifest[EventModel] -> EventModelByteaSerializer,
-    manifest[FacebookInfo] -> FacebookInfoByteaSerializer
+    manifest[FacebookInfo] -> FacebookInfoByteaSerializer,
+    manifest[UserPhone] -> UserPhoneByteaSerializer
   )
 
   def serialize[T](v: T)(implicit m: Manifest[T]) = {

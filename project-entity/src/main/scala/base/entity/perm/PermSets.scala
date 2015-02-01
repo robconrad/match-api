@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/16/15 11:07 PM
+ * Last modified by rconrad, 1/31/15 2:25 PM
  */
 
 package base.entity.perm
@@ -14,32 +14,28 @@ package base.entity.perm
  */
 private[perm] object PermSets {
 
-  val register = PermSet(
-    Perms.REGISTER
-  )
-
-  val verify = PermSet(
-    Perms.VERIFY
-  )
-
   val login = PermSet(
     Perms.LOGIN
   )
 
+  val phone = PermSet(
+    Perms.REGISTER_PHONE,
+    Perms.VERIFY_PHONE
+  )
+
   val invite = PermSet(
-    Perms.INVITE
+    Perms.INVITE,
+    Perms.ACCEPT_INVITE,
+    Perms.DECLINE_INVITE
   )
 
   val message = PermSet(
     Perms.MESSAGE
   )
 
-  val answer = PermSet(
-    Perms.ANSWER
-  )
-
   val questions = PermSet(
-    Perms.QUESTIONS
+    Perms.QUESTIONS,
+    Perms.ANSWER
   )
 
 }

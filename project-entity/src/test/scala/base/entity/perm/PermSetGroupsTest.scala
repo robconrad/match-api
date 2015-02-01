@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 7:07 PM
+ * Last modified by rconrad, 1/31/15 4:23 PM
  */
 
 package base.entity.perm
@@ -35,9 +35,11 @@ class PermSetGroupsTest extends EntityBaseSuite {
 
   test("user") {
     assertGroup(user, Set(
-      REGISTER,
-      VERIFY,
+      REGISTER_PHONE,
+      VERIFY_PHONE,
       INVITE,
+      ACCEPT_INVITE,
+      DECLINE_INVITE,
       MESSAGE,
       ANSWER,
       QUESTIONS))

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 6:46 PM
+ * Last modified by rconrad, 1/31/15 11:30 AM
  */
 
 package base.entity.user.kv
@@ -24,6 +24,7 @@ object UserKeyProps {
   object NameProp extends KeyProp("name")
   object TokenProp extends KeyProp("token")
   object PhoneProp extends KeyProp("phone")
+  object PhoneCodeProp extends KeyProp("phoneCode")
   object PhoneVerifiedProp extends KeyProp("phoneVerified")
 
   // user shiz

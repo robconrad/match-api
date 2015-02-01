@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:58 PM
+ * Last modified by rconrad, 1/31/15 4:53 PM
  */
 
 package base.entity.kv.impl
@@ -23,7 +23,7 @@ abstract class SetKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with SetKe
       val res = v.data().map { x =>
         deserialize[T](x.data().asInstanceOf[Array[Byte]])
       }.toSet
-      if (isDebugEnabled) log("SMEMBERS", "props: " + res.toString)
+      if (isDebugEnabled) log("SMEMBERS", "res: " + res.toString)
       res
     }
   }
@@ -87,7 +87,7 @@ abstract class SetKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with SetKe
 
   def remove(value: T) =
     p.srem_(token, serialize(value)).map { v =>
-      val res = v.data() > 0L
+      val res = v.data()
       if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
       res
     }

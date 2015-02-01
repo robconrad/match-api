@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 10:17 AM
+ * Last modified by rconrad, 1/31/15 4:20 PM
  */
 
 package base.entity.group.impl
@@ -19,9 +19,11 @@ import base.entity.error.ApiError
 import base.entity.event.model.EventModel
 import base.entity.group.impl.InviteCommandServiceImpl.Errors
 import base.entity.group.kv._
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupListenerService, GroupEventsService, GroupService }
+import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
 import base.entity.kv.Key._
+import base.entity.question.QuestionService
 import base.entity.user.kv._
 import base.entity.user.model.UserModel
 
@@ -59,6 +61,72 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
 
   private def command(implicit input: InviteModel) = new service.InviteCommand(input)
 
+  private def testSuccess(userExists: Boolean) = {
+    val eventCount = 0
+    val userId = randomMock.nextUuid()
+    val users = List(UserModel(userId, Option(label)))
+    val eventModel = mock[EventModel]
+    val groupId = randomMock.nextUuid()
+    val group = GroupModelImpl(groupId, users, Option(time), Option(time), eventCount)
+    val groupEventsService = mock[GroupEventsService]
+    val groupListenerService = mock[GroupListenerService]
+    val groupService = mock[GroupService]
+    val questionService = mock[QuestionService]
+
+    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
+      (*, *, *) returning Future.successful(Right(eventModel))
+    (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Unit)
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group)))
+    (questionService.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
+    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects
+      (*, *) returning Future.successful(Right(List()))
+
+    val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
+    val response = InviteResponseModel(group, List(), List())
+
+    if (userExists) {
+      val phoneKey = PhoneKeyService().make(phone)
+      phoneKey.set(userId)
+    }
+
+    val actual = service.innerExecute(model).await()
+    val expected = Right(response)
+
+    debug(actual.toString)
+    debug(expected.toString)
+
+    assert(actual == expected)
+
+    val userPhonesInvitedKey = UserPhonesInvitedKeyService().make(authCtx.userId)
+    assert(userPhonesInvitedKey.isMember(phone).await())
+
+    val userPhoneLabelKey = UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone))
+    assert(userPhoneLabelKey.get.await().contains(label))
+
+    val groupKey = GroupKeyService().make(groupId)
+    assert(groupKey.getCreated.await().exists(_.isEqual(time)))
+
+    userExists match {
+      case true =>
+        val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(userId)
+        assert(userGroupsInvitedKey.isMember(groupId).await())
+      case false =>
+        val phoneGroupsInvitedKey = PhoneGroupsInvitedKeyService().make(phone)
+        assert(phoneGroupsInvitedKey.isMember(groupId).await())
+    }
+
+    val groupUsersKey = GroupUsersKeyService().make(groupId)
+    assert(groupUsersKey.isMember(authCtx.userId).await())
+
+    val userGroups = UserGroupsKeyService().make(authCtx.userId)
+    assert(userGroups.isMember(groupId).await())
+
+    unregister()
+  }
+
   test("without perms") {
     assertPermException(channelCtx => {
       service.execute(model)(channelCtx)
@@ -66,177 +134,76 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success - new user") {
-    val eventCount = 0
-    val userId = randomMock.nextUuid()
-    val users = List(UserModel(userId, Option(label)))
-    val groupId = randomMock.nextUuid(1)
-    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
-    val groupService = mock[GroupService]
-    val groupListenerService = mock[GroupListenerService]
-
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(Option(group)))
-    (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Unit)
-
-    val unregister = TestServices.register(groupService, groupListenerService)
-    val response = InviteResponseModel(userId, group)
-    assert(service.innerExecute(model).await() == Right(response))
-
-    val phoneKey = PhoneKeyService().make(phone)
-    assert(phoneKey.getCreated.await().exists(_.isEqual(time)))
-    assert(phoneKey.getUpdated.await().exists(_.isEqual(time)))
-    assert(phoneKey.getUserId.await().contains(userId))
-
-    val userKey = UserKeyService().make(userId)
-    assert(userKey.getCreated.await().exists(_.isEqual(time)))
-
-    val userUserLabelKey = UserUserLabelKeyService().make(authCtx.userId, userId)
-    assert(userUserLabelKey.get.await().contains(label))
-
-    val groupKey = GroupKeyService().make(groupId)
-    assert(groupKey.getCreated.await().exists(_.isEqual(time)))
-
-    val groupPairKey = GroupPairKeyService().make(userId, authCtx.userId)
-    assert(groupPairKey.get.await().contains(groupId))
-
-    val groupUsersKey = GroupUsersKeyService().make(groupId)
-    assert(groupUsersKey.isMember(userId).await())
-    assert(groupUsersKey.isMember(authCtx.userId).await())
-
-    val userGroupsKeyA = UserGroupsKeyService().make(userId)
-    assert(userGroupsKeyA.isMember(groupId).await())
-
-    val userGroupsKeyB = UserGroupsKeyService().make(authCtx.userId)
-    assert(userGroupsKeyB.isMember(groupId).await())
-
-    unregister()
+    testSuccess(userExists = false)
   }
 
   test("success - user exists") {
-    val phoneKey = PhoneKeyService().make(phone)
-    assert(phoneKey.setUserId(userId).await())
-
-    val eventCount = 0
-    val users = List(UserModel(userId, Option(label)))
-    val groupId = randomMock.nextUuid()
-    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
-    val groupService = mock[GroupService]
-    val groupListenerService = mock[GroupListenerService]
-
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(Option(group)))
-    (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Unit)
-
-    val unregister = TestServices.register(groupService, groupListenerService)
-    val response = InviteResponseModel(userId, group)
-    assert(service.innerExecute(model).await() == Right(response))
-
-    val userUserLabelKey = UserUserLabelKeyService().make(authCtx.userId, userId)
-    assert(userUserLabelKey.get.await().contains(label))
-
-    val groupKey = GroupKeyService().make(groupId)
-    assert(groupKey.getCreated.await().exists(_.isEqual(time)))
-
-    val groupPairKey = GroupPairKeyService().make(userId, authCtx.userId)
-    assert(groupPairKey.get.await().contains(groupId))
-
-    val groupUsersKey = GroupUsersKeyService().make(groupId)
-    assert(groupUsersKey.isMember(userId).await())
-    assert(groupUsersKey.isMember(authCtx.userId).await())
-
-    val userGroupsKeyA = UserGroupsKeyService().make(userId)
-    assert(userGroupsKeyA.isMember(groupId).await())
-
-    val userGroupsKeyB = UserGroupsKeyService().make(authCtx.userId)
-    assert(userGroupsKeyB.isMember(groupId).await())
-
-    unregister()
+    testSuccess(userExists = true)
   }
 
-  test("success - group exists") {
-    val phoneKey = PhoneKeyService().make(phone)
-    assert(phoneKey.setUserId(userId).await())
-
-    val groupPairKey = GroupPairKeyService().make(userId, authCtx.userId)
-    assert(groupPairKey.set(groupId).await())
-
-    val eventCount = 0
-    val users = List(UserModel(userId, Option(label)))
-    val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
-    val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(Option(group)))
-    val unregister = TestServices.register(groupService)
-    val response = InviteResponseModel(userId, group)
-    assert(service.innerExecute(model).await() == Right(response))
-
-    unregister()
+  test("user already invited this phone") {
+    val key = mock[UserPhonesInvitedKey]
+    key.add _ expects * returning Future.successful(0L)
+    assert(command.userPhonesInvitedAdd(key).await() == Errors.alreadyInvited.await())
   }
 
-  test("user create failed") {
-    val userKey = mock[UserKey]
-    val phoneKey = mock[PhoneKey]
-    userKey.create _ expects () returning Future.successful(false)
-    val actual = command.userCreate(userId, userKey, phoneKey)
-    assert(actual.await() == Errors.userCreateFailed.await())
+  test("user phones invited add failed") {
+    val key = mock[UserPhonesInvitedKey]
+    key.add _ expects * returning Future.successful(-1L)
+    assert(command.userPhonesInvitedAdd(key).await() == Errors.userInvitedPhonesSetFailed.await())
   }
 
-  test("phone set userId failed") {
-    val key = mock[PhoneKey]
-    key.setUserId _ expects * returning Future.successful(false)
-    assert(command.phoneSetUserId(userId, key).await() == Errors.phoneSetUserIdFailed.await())
-  }
-
-  test("user user label set failed") {
-    val key = mock[UserUserLabelKey]
+  test("user phone label set failed") {
+    val key = mock[UserPhoneLabelKey]
     key.set _ expects * returning Future.successful(false)
-    assert(command.userUserLabelSet(userId, key).await() == Errors.userUserLabelSetFailed.await())
+    assert(command.userPhoneLabelSet(key).await() == Errors.userPhoneLabelSetFailed.await())
   }
 
-  test("group pair set failed") {
-    val groupKey = mock[GroupKey]
-    val pairKey = mock[GroupPairKey]
-    groupKey.create _ expects () returning Future.successful(true)
-    pairKey.set _ expects * returning Future.successful(false)
-    val actual = command.groupPairSet(userId, groupId, groupKey, pairKey)
-    assert(actual.await() == Errors.pairSetFailed.await())
+  test("group create failed") {
+    val key = mock[GroupKey]
+    key.create _ expects () returning Future.successful(false)
+    assert(command.groupCreate(groupId, key).await() == Errors.groupCreateFailed.await())
   }
 
-  test("group user add failed") {
+  test("phone groups invited add failed") {
+    val key = mock[PhoneGroupsInvitedKey]
+    key.add _ expects * returning Future.successful(0L)
+    assert(command.phoneGroupsInvitedAdd(groupId, key).await() == Errors.phoneGroupsInvitedAddFailed.await())
+  }
+
+  test("user groups invited add failed") {
+    val key = mock[UserGroupsInvitedKey]
+    key.add _ expects * returning Future.successful(0L)
+    assert(command.userGroupsInvitedAdd(groupId, key).await() == Errors.userGroupsInvitedAddFailed.await())
+  }
+
+  test("group users add failed") {
     val key = mock[GroupUsersKey]
     key.add _ expects * returning Future.successful(0)
-    assert(command.groupUsersAdd(userId, groupId, key).await() == Errors.groupUsersAddFailed.await())
+    assert(command.groupUsersAdd(groupId, key).await() == Errors.groupUsersAddFailed.await())
   }
 
-  test("invited user groups add failed") {
+  test("user groups add failed") {
     val key = mock[UserGroupsKey]
     key.add _ expects * returning Future.successful(0L)
-    assert(command.invitedUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
-  }
-
-  test("inviting user groups add failed") {
-    val key = mock[UserGroupsKey]
-    key.add _ expects * returning Future.successful(0L)
-    assert(command.invitingUserGroupsAdd(userId, groupId, key).await() == Errors.userGroupsAddFailed.await())
+    assert(command.userGroupsAdd(groupId, key).await() == Errors.userGroupsAddFailed.await())
   }
 
   test("group events prepend returned error") {
-    val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Left(error))
-    val unregister = TestServices.register(groupService)
-    assert(command.groupGet(userId, groupId).await() == Left(error))
-    unregister()
-  }
-
-  test("group get returned error") {
     val groupEventsService = mock[GroupEventsService]
     (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
       (*, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupEventsService)
-    assert(command.groupEventsPrepend(userId, groupId).await() == Left(error))
+    assert(command.groupEventsPrepend(groupId).await() == Left(error))
+    unregister()
+  }
+
+  test("group get returned error") {
+    val groupService = mock[GroupService]
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error))
+    val unregister = TestServices.register(groupService)
+    assert(command.groupGet(groupId).await() == Left(error))
     unregister()
   }
 
@@ -245,7 +212,27 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(None))
     val unregister = TestServices.register(groupService)
-    assert(command.groupGet(userId, groupId).await() == Errors.groupGetFailed.await())
+    assert(command.groupGet(groupId).await() == Errors.groupGetFailed.await())
+    unregister()
+  }
+
+  test("questions get returned error") {
+    val groupModel = mock[GroupModel]
+    val questionService = mock[QuestionService]
+    (questionService.getQuestions(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
+    val unregister = TestServices.register(questionService)
+    assert(command.questionsGet(groupId, groupModel).await() == Left(error))
+    unregister()
+  }
+
+  test("events get returned error") {
+    val groupModel = mock[GroupModel]
+    val groupEventsService = mock[GroupEventsService]
+    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects
+      (*, *) returning Future.successful(Left(error))
+    val unregister = TestServices.register(groupEventsService)
+    assert(command.eventsGet(groupId, groupModel, List()).await() == Left(error))
     unregister()
   }
 

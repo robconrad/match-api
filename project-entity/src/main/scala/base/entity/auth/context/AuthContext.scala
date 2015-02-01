@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:51 PM
+ * Last modified by rconrad, 1/31/15 1:51 PM
  */
 
 package base.entity.auth.context
 
 import base.common.logging.LoggerToken
 import base.entity.perm.PermSetGroup
-import base.entity.perm.Perms.Perm
 import base.entity.user.User
 
 /**

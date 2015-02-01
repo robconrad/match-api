@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 10:09 PM
+ * Last modified by rconrad, 1/31/15 2:42 PM
  */
 
 package base.entity.kv.impl
@@ -90,24 +90,30 @@ abstract class HashKeyImpl extends KeyImpl with HashKey {
   protected[impl] def setFlag(prop: Prop, value: Boolean) =
     set(prop, Key.boolean2Int(value))
 
-  protected[impl] def set(prop: Prop, value: Any): Future[Boolean] = {
-    if (isDebugEnabled) log("HSET", s"prop: $prop, value: $value")
-    p.hset(token, prop, value).map(_.data().intValue() >= 0)
-  }
+  protected[impl] def set(prop: Prop, value: Any): Future[Boolean] =
+    p.hset(token, prop, value).map { v =>
+      val res = v.data().intValue()
+      if (isDebugEnabled) log("HSET", s"prop: $prop, value: $value, result: $res")
+      res >= 0
+    }
 
   protected[impl] def set[T <: Map[Prop, Any]](props: T): Future[Boolean] =
     set_(props.map(_.productIterator.toList).flatten.toArray)
 
   private def set_(propValues: Array[Any]): Future[Boolean] = {
-    if (isDebugEnabled) log("HMSET", "props: " + propValues.map(_.toString).toList)
     assert(propValues.size > 1 && propValues.size % 2 == 0)
     val args = token +: propValues.map(_.asInstanceOf[AnyRef])
-    p.hmset_(args: _*).map(_.data() == Key.STATUS_OK)
+    p.hmset_(args: _*).map { v =>
+      val res = v.data()
+      if (isDebugEnabled) log("HMSET", "props: " + propValues.map(_.toString).toList + ", result: " + res)
+      res == Key.STATUS_OK
+    }
   }
 
-  protected[impl] def setNx(prop: Prop, value: Any) = {
-    if (isDebugEnabled) log("HSETNX", "prop: " + prop + " value: " + value.toString)
-    p.hsetnx(token, prop, value).map(_.data().intValue() == 1)
+  protected[impl] def setNx(prop: Prop, value: Any) = p.hsetnx(token, prop, value).map { v =>
+    val res = v.data().intValue()
+    if (isDebugEnabled) log("HSETNX", s"prop: $prop, value: $value, result: $res")
+    res == 1
   }
 
   protected[impl] def increment(prop: Prop, value: Long) = p.hincrby(token, prop, value).map { v =>

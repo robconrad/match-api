@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:56 PM
+ * Last modified by rconrad, 1/31/15 1:17 PM
  */
 
 package base.entity.user.kv.impl
 
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.impl.HashKeyServiceImpl
+import base.entity.kv.impl.SimpleKeyServiceImpl
 import base.entity.user.kv.{ PhoneKey, PhoneKeyService }
 
 /**
@@ -18,7 +18,7 @@ import base.entity.user.kv.{ PhoneKey, PhoneKeyService }
  * @author rconrad
  */
 class PhoneKeyServiceImpl
-    extends HashKeyServiceImpl[String, PhoneKey]
+    extends SimpleKeyServiceImpl[String, PhoneKey]
     with PhoneKeyService {
 
   def make(id: String)(implicit p: Pipeline) = new PhoneKeyImpl(getKey(id), this)

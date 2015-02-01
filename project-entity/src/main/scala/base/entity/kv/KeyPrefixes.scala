@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/26/15 9:24 PM
+ * Last modified by rconrad, 1/31/15 1:47 PM
  */
 
 package base.entity.kv
@@ -31,24 +31,24 @@ object KeyPrefixes extends Enumeration {
   // format: OFF
   val device                    = Value(10000)
   val facebookInfo              = Value(15000)
-  val facebookToken             = Value(15100)
   val facebookUser              = Value(15200)
   val group                     = Value(20000)
   val groupEvents               = Value(21000)
-  val groupPair                 = Value(22000)
   val groupUser                 = Value(23000)
-  val groupUserQuestion         = Value(24000)
   val groupUserQuestions        = Value(25000)
   val groupUserQuestionsTemp    = Value(26000)
   val groupUserQuestionsYes     = Value(27000)
   val groupUsers                = Value(28000)
   val phone                     = Value(30000)
   val phoneCooldown             = Value(31000)
+  val phoneGroupsInvited        = Value(32000)
   val questions                 = Value(40000)
   val test                      = Value(1000)
   val user                      = Value(50000)
   val userGroups                = Value(51000)
-  val userUserLabel             = Value(52000)
+  val userGroupsInvited         = Value(50250)
+  val userPhonesInvited         = Value(50500)
+  val userPhoneLabel            = Value(52000)
   // format: ON
 
 }

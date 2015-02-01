@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:34 AM
+ * Last modified by rconrad, 1/31/15 10:47 AM
  */
 
 package base.entity.user
@@ -19,7 +19,7 @@ trait RegisterPhoneCommandService extends CommandService[RegisterPhoneModel, Reg
 
   final val serviceManifest = manifest[RegisterPhoneCommandService]
 
-  final val perms = Set(Perms.REGISTER)
+  final val perms = Set(Perms.REGISTER_PHONE)
 
 }
 

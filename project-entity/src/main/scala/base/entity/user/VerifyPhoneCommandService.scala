@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:34 AM
+ * Last modified by rconrad, 1/31/15 10:47 AM
  */
 
 package base.entity.user
@@ -21,7 +21,7 @@ trait VerifyPhoneCommandService extends CommandService[VerifyPhoneModel, VerifyP
 
   final val serviceManifest = manifest[VerifyPhoneCommandService]
 
-  final val perms = Set(Perms.VERIFY)
+  final val perms = Set(Perms.VERIFY_PHONE)
 
   def sendVerifySms(phone: String, code: String): Future[Boolean]
 

@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 7:44 PM
+ * Last modified by rconrad, 1/31/15 1:27 PM
  */
 
 package base.entity.user.kv
 
-import base.common.lib.Genders.Gender
 import base.common.time.TimeService
 import base.entity.facebook.FacebookInfo
 import base.entity.kv.HashKey
@@ -23,10 +22,11 @@ import scala.concurrent.Future
  */
 trait UserKey extends HashKey {
 
-  def getNameAndGender: Future[(Option[String], Option[Gender])]
+  def getName: Future[Option[String]]
 
-  def getPhoneVerified: Future[(Option[String], Option[Boolean])]
-  def setPhoneVerified(phone: String, verified: Boolean): Future[Boolean]
+  def getPhoneAttributes: Future[Option[UserPhoneAttributes]]
+  def setPhoneAttributes(attributes: UserPhoneAttributes): Future[Boolean]
+  def setPhoneVerified(verified: Boolean): Future[Boolean]
 
   def getFacebookId: Future[Option[String]]
   def setFacebookInfo(fbInfo: FacebookInfo): Future[Boolean]

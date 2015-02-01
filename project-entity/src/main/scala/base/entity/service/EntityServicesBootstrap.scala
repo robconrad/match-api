@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:14 AM
+ * Last modified by rconrad, 1/31/15 3:22 PM
  */
 
 package base.entity.service
@@ -11,7 +11,7 @@ import base.common.lib.BaseConfig
 import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.facebook.kv.impl.FacebookInfoKeyServiceImpl
-import base.entity.group.impl.{ GroupListenerServiceImpl, GroupEventsServiceImpl, GroupServiceImpl, InviteCommandServiceImpl }
+import base.entity.group.impl._
 import base.entity.group.kv.impl._
 import base.entity.kv.impl.KvFactoryServiceImpl
 import base.entity.message.impl.MessageCommandServiceImpl
@@ -73,12 +73,14 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())
     Services.register(new PhoneKeyServiceImpl())
+    Services.register(new PhoneGroupsInvitedKeyServiceImpl())
     Services.register(new PhoneCooldownKeyServiceImpl())
     Services.register(new UserGroupsKeyServiceImpl())
-    Services.register(new UserUserLabelKeyServiceImpl())
+    Services.register(new UserGroupsInvitedKeyServiceImpl())
+    Services.register(new UserPhoneLabelKeyServiceImpl())
+    Services.register(new UserPhonesInvitedKeyServiceImpl())
 
     Services.register(new GroupKeyServiceImpl())
-    Services.register(new GroupPairKeyServiceImpl())
     Services.register(new GroupUserKeyServiceImpl())
     Services.register(new GroupUsersKeyServiceImpl())
     Services.register(new GroupUserQuestionsKeyServiceImpl())
@@ -125,6 +127,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new InviteCommandServiceImpl(
       Keys(MATCH_GROUP, "welcomeMessage")))
+
+    Services.register(new AcceptInviteCommandServiceImpl(
+      Keys(MATCH_GROUP, "joinMessage")))
 
     Services.register(new MessageCommandServiceImpl())
 

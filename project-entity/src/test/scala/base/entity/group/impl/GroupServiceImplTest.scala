@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 9:15 AM
+ * Last modified by rconrad, 1/31/15 4:20 PM
  */
 
 package base.entity.group.impl
@@ -15,7 +15,7 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiError
 import base.entity.group.kv.{ GroupKeyService, GroupUserKeyService }
-import base.entity.group.model.{ GroupModel, GroupModelBuilder }
+import base.entity.group.model.impl.{ GroupModelBuilder, GroupModelImpl }
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
@@ -41,7 +41,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
   private val users = List[UserModel]()
   private val eventCount = 101
   private val groupId = RandomService().uuid
-  private val group = GroupModel(groupId, users, Option(time), Option(time), eventCount)
+  private val group = GroupModelImpl(groupId, users, Option(time), Option(time), eventCount)
 
   private val method = new service.GetGroupMethod(channelCtx.authCtx.userId, groupId)
 

@@ -45,6 +45,7 @@ package user {
         + facebookId
         + deviceId
         + phone
+        + phoneCode
         + phoneVerified
         + locale
         + lastLoginTime
@@ -65,9 +66,14 @@ package user {
         Exists
     }
 
-    set(PhoneInvitations) {
+    set(PhoneGroupsInvited) {
         key(phone)
-        UserId
+        GroupId
+    }
+
+    set(UserGroupsInvited) {
+        key(userId)
+        GroupId
     }
 
     set(UserGroups) {
@@ -141,11 +147,6 @@ package group {
     set(GroupUsers) {
         key(groupId)
         UserId
-    }
-
-    simple(GroupPair) {
-        key(userId+userId)
-        GroupId
     }
 
 }
@@ -225,19 +226,18 @@ package legend <<Rect>> #White/Gainsboro {
 FacebookAccount -* FacebookInfo
 FacebookInfo --* FacebookUser
 GroupId -* Group
-GroupId --* GroupUserQuestion
 GroupId --* GroupEvents
 GroupId --* GroupUser
+GroupId --* GroupUserQuestion
 GroupId --* GroupUsers
-Phone --* PhoneInvitations
+Phone --* PhoneGroupsInvited
 PhysicalDevice --* Device
 PhysicalDevice --* Phone
 PhysicalDevice --* PhoneCooldown
+UserId --* GroupUser
 UserId --* GroupUserQuestion
 UserId --* User
-UserId --* GroupPair
-UserId --* GroupPair
-UserId --* GroupUser
 UserId --* UserGroups
+UserId --* UserGroupsInvited
 
 @enduml

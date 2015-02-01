@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:30 AM
+ * Last modified by rconrad, 1/31/15 4:32 PM
  */
 
 package base.entity.json
@@ -12,6 +12,7 @@ import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.command.CommandNames
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
+import base.entity.group.model.GroupModel
 import base.entity.model._
 import base.entity.question.QuestionSides
 import org.json4s.DefaultFormats
@@ -41,6 +42,8 @@ object JsonFormats {
     Name.serializer +
     Url.serializer
 
-  val withModels = withEnumsAndFields + EventModel.serializer
+  val withModels = withEnumsAndFields +
+    EventModel.serializer +
+    GroupModel.serializer
 
 }

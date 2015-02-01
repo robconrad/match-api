@@ -2,21 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:15 AM
+ * Last modified by rconrad, 1/31/15 4:29 PM
  */
 
 package base.entity.user.impl
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, TestServices }
+import base.common.service.{Services, TestServices}
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.impl.VerifyPhoneCommandServiceImpl._
+import base.entity.user.impl.VerifyPhoneCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{ VerifyPhoneModel, VerifyPhoneResponseModel }
+import base.entity.user.model.{VerifyPhoneModel, VerifyPhoneResponseModel}
 
 import scala.concurrent.Future
 
@@ -55,40 +55,55 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
-    val userId = RandomService().uuid
+    val groupId1 = RandomService().uuid
+    val groupId2 = RandomService().uuid
+    val userKey = UserKeyService().make(authCtx.userId)
     val phoneKey = PhoneKeyService().make(phone)
+    val phoneGroupsInvitedKey = PhoneGroupsInvitedKeyService().make(phone)
+    val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
 
-    assert(phoneKey.setUserId(userId).await())
-    assert(phoneKey.setCode(code).await())
+    assert(phoneKey.get.await() == None)
+
+    assert(userKey.setPhoneAttributes(UserPhoneAttributes(phone, code, verified = false)).await())
+
+    assert(phoneGroupsInvitedKey.add(groupId1).await() == 1)
+    assert(userGroupsInvitedKey.add(groupId2).await() == 1)
 
     assert(service.innerExecute(model).await() == Right(VerifyPhoneResponseModel(phone)))
 
-    val userKey = UserKeyService().make(userId)
-    assert(userKey.getPhoneVerified.await() == (Option(phone), Option(true)))
+    val phoneAttributes = userKey.getPhoneAttributes.await()
+    assert(phoneAttributes.exists(_.phone == phone))
+    assert(phoneAttributes.exists(_.code == code))
+    assert(phoneAttributes.exists(_.verified == true))
+
+    assert(phoneKey.get.await().contains(authCtx.userId))
+
+    assert(phoneGroupsInvitedKey.members().await().size == 0)
+    assert(userGroupsInvitedKey.members().await().size == 2)
   }
 
-  test("failed to get phone verification code") {
-    val key = mock[PhoneKey]
-    key.getCode _ expects () returning Future.successful(None)
-    assert(command.phoneGetCode(key).await() == Errors.codeMissing.await())
+  test("failed to get phone attributes") {
+    val key = mock[UserKey]
+    key.getPhoneAttributes _ expects () returning Future.successful(None)
+    assert(command.userGetPhoneAttributes(key).await() == Errors.codeMissing.await())
   }
 
   test("failed to validate phone verification code") {
-    val key = mock[PhoneKey]
-    val code = model.code + "munge"
-    assert(command.phoneVerify(key, code).await() == Errors.codeValidation.await())
-  }
-
-  test("failed to get userId") {
-    val key = mock[PhoneKey]
-    key.getUserId _ expects () returning Future.successful(None)
-    assert(command.phoneGetUserId(key).await() == Errors.userIdMissing.await())
-  }
-
-  test("failed to set user attributes") {
     val key = mock[UserKey]
-    key.setPhoneVerified _ expects (*, *) returning Future.successful(false)
-    assert(command.userSet(key).await() == Errors.userSetFailed.await())
+    val code = model.code + "munge"
+    assert(command.userVerifyPhoneCode(key, code).await() == Errors.codeValidation.await())
+  }
+
+  test("failed to set user phone verified") {
+    val key = mock[UserKey]
+    key.setPhoneVerified _ expects * returning Future.successful(false)
+    assert(command.userSetPhoneVerified(key).await() == Errors.userSetPhoneVerifiedFailed.await())
+  }
+
+  test("failed to set phone user id") {
+    val key = mock[PhoneKey]
+    key.set _ expects * returning Future.successful(false)
+    assert(command.phoneSetUserId(key).await() == Errors.phoneSetUserIdFailed.await())
   }
 
   test("send verify sms") {

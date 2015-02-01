@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:15 AM
+ * Last modified by rconrad, 1/31/15 4:28 PM
  */
 
 package base.entity.user.impl
@@ -47,40 +47,52 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
   }
 
   /**
-   * - get code
+   * - get user phone attributes
    * - verify code
-   * - get userId
-   * - set phone verified
+   * - set user phone verified
+   * - set userId to phone
+   * - transfer invites from phone to user
    */
   private[impl] class VerifyCommand(val input: VerifyPhoneModel)(implicit val channelCtx: ChannelContext)
       extends Command[VerifyPhoneModel, VerifyPhoneResponseModel] {
 
     def execute() = {
-      phoneGetCode(PhoneKeyService().make(input.phone))
+      userGetPhoneAttributes(UserKeyService().make(authCtx.userId))
     }
 
-    def phoneGetCode(key: PhoneKey): Response =
-      key.getCode.flatMap {
-        case Some(code) => phoneVerify(key, code)
-        case None       => Errors.codeMissing
+    def userGetPhoneAttributes(key: UserKey): Response =
+      key.getPhoneAttributes.flatMap {
+        case Some(attributes) => userVerifyPhoneCode(key, attributes.code)
+        case None             => Errors.codeMissing
       }
 
-    def phoneVerify(key: PhoneKey, code: String): Response =
+    def userVerifyPhoneCode(key: UserKey, code: String): Response =
       validateVerifyCodes(input.code, code) match {
-        case true  => phoneGetUserId(key)
+        case true  => userSetPhoneVerified(key)
         case false => Errors.codeValidation
       }
 
-    def phoneGetUserId(key: PhoneKey): Response =
-      key.getUserId.flatMap {
-        case Some(userId) => userSet(UserKeyService().make(userId))
-        case None         => Errors.userIdMissing
+    def userSetPhoneVerified(key: UserKey): Response =
+      key.setPhoneVerified(verified = true) flatMap {
+        case true  => phoneSetUserId(PhoneKeyService().make(input.phone))
+        case false => Errors.userSetPhoneVerifiedFailed
       }
 
-    def userSet(key: UserKey): Response =
-      key.setPhoneVerified(input.phone, verified = true).flatMap {
-        case true  => VerifyPhoneResponseModel(input.phone)
-        case false => Errors.userSetFailed
+    def phoneSetUserId(key: PhoneKey): Response =
+      key.set(authCtx.userId).flatMap {
+        case true =>
+          val phoneInvitedKey = PhoneGroupsInvitedKeyService().make(input.phone)
+          val userInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
+          phoneInvitesToUserInvites(phoneInvitedKey, userInvitedKey)
+        case false => Errors.phoneSetUserIdFailed
+      }
+
+    def phoneInvitesToUserInvites(phoneInvitedKey: PhoneGroupsInvitedKey,
+                                  userInvitedKey: UserGroupsInvitedKey): Response =
+      PhoneGroupsInvitedKeyService().unionStore(userInvitedKey, userInvitedKey, phoneInvitedKey) flatMap { response =>
+        phoneInvitedKey.del() flatMap { response =>
+          VerifyPhoneResponseModel(input.phone)
+        }
       }
 
   }
@@ -98,8 +110,8 @@ object VerifyPhoneCommandServiceImpl {
 
     lazy val codeMissing: Response = (codeMissingText, NO_VERIFY_CODE)
     lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_VALIDATION)
-    lazy val userIdMissing: Response = "user id is missing"
-    lazy val userSetFailed: Response = "failed to set user attributes"
+    lazy val userSetPhoneVerifiedFailed: Response = "failed to set user phone verified"
+    lazy val phoneSetUserIdFailed: Response = "failed to set phone user id"
 
   }
 

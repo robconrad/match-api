@@ -2,20 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 7:48 PM
+ * Last modified by rconrad, 1/31/15 2:44 PM
  */
 
 package base.entity.user.kv.impl
 
-import base.common.lib.{ Genders, Tryo }
 import base.common.time.TimeService
 import base.entity.facebook.FacebookInfo
 import base.entity.kv.Key._
-import base.entity.kv.{ Key, KeyLogger }
 import base.entity.kv.KeyProps.UpdatedProp
 import base.entity.kv.impl.HashKeyImpl
-import base.entity.user.kv.UserKey
+import base.entity.kv.{ Key, KeyLogger }
 import base.entity.user.kv.UserKeyProps._
+import base.entity.user.kv.{ UserKey, UserPhoneAttributes }
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -30,26 +29,30 @@ class UserKeyImpl(val token: Array[Byte],
                   protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends HashKeyImpl with UserKey {
 
-  private val userKeyGetProps = Array[Prop](NameProp, GenderProp)
-  def getNameAndGender = {
-    get(userKeyGetProps).map { props =>
-      val name = props.get(NameProp).flatten
-      val gender = Tryo(props.get(GenderProp).flatten.map(Genders.withName)).flatten
-      (name, gender)
-    }
-  }
+  def getName = getString(NameProp)
 
-  val phoneVerifiedProps = Array[Prop](PhoneProp, PhoneVerifiedProp)
-  def getPhoneVerified: Future[(Option[String], Option[Boolean])] = {
+  val phoneVerifiedProps = Array[Prop](PhoneProp, PhoneCodeProp, PhoneVerifiedProp)
+  def getPhoneAttributes = {
     get(phoneVerifiedProps).map { props =>
-      (props.get(PhoneProp).flatten, props.get(PhoneVerifiedProp).flatten.map(Key.string2Boolean))
+      (props.get(PhoneProp).flatten,
+        props.get(PhoneCodeProp).flatten,
+        props.get(PhoneVerifiedProp).flatten.map(Key.string2Boolean)) match {
+          case (Some(phone), Some(code), Some(verified)) => Option(UserPhoneAttributes(phone, code, verified))
+          case _                                         => None
+        }
     }
   }
 
-  def setPhoneVerified(phone: String, verified: Boolean) = {
-    val setPhone = set(PhoneProp, phone)
-    val setVerified = setFlag(PhoneVerifiedProp, verified)
-    Future.sequence(Set(setPhone, setVerified)).map(_.reduce(_ && _))
+  def setPhoneAttributes(attributes: UserPhoneAttributes) = {
+    val setCreated = create().map(result => true)
+    val setPhone = set(PhoneProp, attributes.phone)
+    val setVerified = setPhoneVerified(attributes.verified)
+    val setCode = set(PhoneCodeProp, attributes.code)
+    Future.sequence(Set(setCreated, setPhone, setVerified, setCode)).map(_.reduce(_ && _))
+  }
+
+  def setPhoneVerified(verified: Boolean) = {
+    setFlag(PhoneVerifiedProp, verified)
   }
 
   def setFacebookInfo(fbInfo: FacebookInfo) = {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 2:14 PM
+ * Last modified by rconrad, 1/31/15 4:27 PM
  */
 
 package base.entity.kv.impl
@@ -29,11 +29,12 @@ private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable
     res
   }
 
-  def del() = {
-    val res = p.del_(token).map(_.data().intValue() == 1)
-    if (isDebugEnabled) log("DEL", s"result: $res")
-    res
-  }
+  def del() =
+    p.del_(token).map { v =>
+      val res = v.data().intValue()
+      if (isDebugEnabled) log("DEL", s"result: $res")
+      res == 1
+    }
 
   def expire(seconds: Long) = {
     val res = p.expire(token, seconds).map(_.data().intValue() == 1)

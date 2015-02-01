@@ -2,19 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:44 AM
+ * Last modified by rconrad, 1/31/15 1:17 PM
  */
 
 package base.socket.command.impl
 
 import base.common.lib.Tryo
 import base.common.service.ServiceImpl
-import base.entity.auth.context.{ ChannelContext, AuthContext, StandardUserAuthContext }
+import base.entity.auth.context.{ AuthContext, ChannelContext, StandardUserAuthContext }
 import base.entity.command.CommandNames
 import base.entity.command.CommandNames.CommandName
 import base.entity.command.model.CommandModel
-import base.entity.group.InviteCommandService
-import base.entity.group.model.InviteModel
+import base.entity.group.model.{ AcceptInviteModel, DeclineInviteModel, InviteModel }
+import base.entity.group.{ AcceptInviteCommandService, DeclineInviteCommandService, InviteCommandService }
 import base.entity.json.JsonFormats
 import base.entity.logging.AuthLoggable
 import base.entity.message.MessageCommandService
@@ -87,6 +87,8 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
         case CommandNames.`verifyPhone`   => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
         case CommandNames.login           => LoginCommandService().execute(body.extract[LoginModel])
         case CommandNames.invite          => InviteCommandService().execute(body.extract[InviteModel])
+        case CommandNames.acceptInvite    => AcceptInviteCommandService().execute(body.extract[AcceptInviteModel])
+        case CommandNames.declineInvite   => DeclineInviteCommandService().execute(body.extract[DeclineInviteModel])
         case CommandNames.questions       => QuestionsCommandService().execute(body.extract[QuestionsModel])
         case CommandNames.message         => MessageCommandService().execute(body.extract[MessageModel])
         case CommandNames.answer          => AnswerCommandService().execute(body.extract[AnswerModel])

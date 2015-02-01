@@ -2,17 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:46 PM
+ * Last modified by rconrad, 1/31/15 10:57 AM
  */
 
-package base.entity.group.kv.impl
+package base.entity.user.kv.impl
 
-import java.util.UUID
-
-import base.entity.group.kv.GroupPairKey
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.KeyLogger
 import base.entity.kv.impl.SimpleKeyImpl
+import base.entity.user.kv.UserPhoneLabelKey
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -20,7 +18,7 @@ import base.entity.kv.impl.SimpleKeyImpl
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupPairKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SimpleKeyImpl[UUID] with GroupPairKey {
+class UserPhoneLabelKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
+    extends SimpleKeyImpl[String] with UserPhoneLabelKey {
 
 }

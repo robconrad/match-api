@@ -2,14 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:40 AM
+ * Last modified by rconrad, 1/31/15 1:17 PM
  */
 
 package base.entity.user.impl
 
-import java.util.UUID
-
-import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
@@ -42,8 +39,7 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
    * - reject if phone in cooldown
    * - set phone cooldown
    * - expire phone cooldown
-   * - createNX phone key attributes, createNX user key attributes
-   * - update phone key attributes
+   * - set user phone attributes
    * - send SMS verification
    */
   private[impl] class RegisterCommand(val input: RegisterPhoneModel)(implicit val channelCtx: ChannelContext)
@@ -67,38 +63,15 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
 
     def phoneCooldownExpire(key: PhoneCooldownKey): Response =
       key.expire(phoneCooldown.toSeconds).flatMap {
-        case true  => phoneCreate()
+        case true  => userSetPhoneAttributes(UserKeyService().make(authCtx.userId))
         case false => Errors.phoneCooldownExpireFailed
       }
 
-    def phoneCreate(): Response = {
-      val phoneKey = PhoneKeyService().make(input.phone)
-      phoneKey.create().flatMap { exists =>
-        phoneKey.getUserId.flatMap {
-          case Some(userId) => phoneSetCode(phoneKey)
-          case None =>
-            val userId = RandomService().uuid
-            userCreate(userId, UserKeyService().make(userId), phoneKey)
-        }
-      }
-    }
-
-    def userCreate(userId: UUID, userKey: UserKey, phoneKey: PhoneKey): Response = {
-      userKey.create().flatMap {
-        case false => Errors.userSetFailed
-        case true =>
-          phoneKey.setUserId(userId).flatMap {
-            case true  => phoneSetCode(phoneKey)
-            case false => Errors.userSetFailed
-          }
-      }
-    }
-
-    def phoneSetCode(key: PhoneKey): Response = {
+    def userSetPhoneAttributes(key: UserKey): Response = {
       val code = VerifyPhoneCommandService().makeVerifyCode()
-      key.setCode(code).flatMap {
-        case true  => smsSend(code: String)
-        case false => Errors.phoneSetFailed
+      key.setPhoneAttributes(UserPhoneAttributes(input.phone, code, verified = false)) flatMap {
+        case true  => smsSend(code)
+        case false => Errors.userSetFailed
       }
     }
 
@@ -125,8 +98,7 @@ object RegisterPhoneCommandServiceImpl {
     lazy val phoneCooldown: Response = (phoneCooldownText, StatusCodes.EnhanceYourCalm, PHONE_RATE_LIMIT)
     lazy val phoneCooldownSetFailed: Response = "failed to set phoneCooldown"
     lazy val phoneCooldownExpireFailed: Response = "failed to expire phoneCooldown"
-    lazy val userSetFailed: Response = "failed to create user"
-    lazy val phoneSetFailed: Response = "failed to set phone updates"
+    lazy val userSetFailed: Response = "failed to set phone attributes on user"
     lazy val smsSendFailed: ApiError = "failed to send sms"
 
   }

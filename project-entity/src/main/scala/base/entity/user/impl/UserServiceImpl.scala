@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 8:51 AM
+ * Last modified by rconrad, 1/31/15 1:28 PM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.kv.Key._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
 import base.entity.user.impl.UserServiceImpl.Errors
-import base.entity.user.kv.{ UserGroupsKey, UserGroupsKeyService, UserUserLabelKey, UserUserLabelKeyService }
+import base.entity.user.kv._
 import base.entity.user.model.UserModel
 import spray.http.StatusCodes._
 
@@ -33,24 +33,24 @@ import scala.concurrent.Future
 class UserServiceImpl extends ServiceImpl with UserService {
 
   def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    val key = UserUserLabelKeyService().make(channelCtx.authCtx.userId, userId)
+    val key = UserKeyService().make(userId)
     getUser(userId, key)
   }
 
-  private[impl] def getUser(userId: UUID, key: UserUserLabelKey)(implicit p: Pipeline, channelCtx: ChannelContext) =
-    key.get.map { label =>
-      Right(UserModel(userId, label))
+  private[impl] def getUser(userId: UUID, key: UserKey)(implicit p: Pipeline, channelCtx: ChannelContext) =
+    key.getName.map { name =>
+      Right(UserModel(userId, name))
     }
 
   def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getUsers(userId, userIds, UserUserLabelKeyService())
+    getUsers(userId, userIds, UserKeyService())
   }
 
   private[impl] def getUsers(contextUserId: UUID, userIds: List[UUID],
-                             keyService: UserUserLabelKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+                             keyService: UserKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
-      keyService.make(contextUserId, userId).get.map { label =>
-        UserModel(userId, label)
+      keyService.make(userId).getName.map { name =>
+        UserModel(userId, name)
       }
     }
     Future.sequence(futures).map(Right.apply)

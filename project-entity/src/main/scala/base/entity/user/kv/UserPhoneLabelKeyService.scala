@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:40 PM
+ * Last modified by rconrad, 1/31/15 11:02 AM
  */
 
 package base.entity.user.kv
@@ -15,12 +15,12 @@ import base.entity.kv._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait UserUserLabelKeyService extends IdPairKeyService[OrderedIdPair, UserUserLabelKey] {
+trait UserPhoneLabelKeyService extends KeyService[UserPhone, UserPhoneLabelKey] {
 
-  final val serviceManifest = manifest[UserUserLabelKeyService]
+  final val serviceManifest = manifest[UserPhoneLabelKeyService]
 
-  final val prefix = KeyPrefixes.userUserLabel
+  final val prefix = KeyPrefixes.userPhoneLabel
 
 }
 
-object UserUserLabelKeyService extends KeyServiceCompanion[UserUserLabelKeyService]
+object UserPhoneLabelKeyService extends KeyServiceCompanion[UserPhoneLabelKeyService]

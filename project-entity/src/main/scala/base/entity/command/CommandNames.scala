@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:30 AM
+ * Last modified by rconrad, 1/31/15 1:17 PM
  */
 
 package base.entity.command
 
 import base.entity.error.ApiError
 import base.entity.event.model.EventModel
-import base.entity.group.model.{ InviteModel, InviteResponseModel }
+import base.entity.group.model._
 import base.entity.message.model.MessageModel
 import base.entity.question.model.{ AnswerModel, QuestionsModel, QuestionsResponseModel }
 import base.entity.user.model._
@@ -39,6 +39,12 @@ object CommandNames extends Enumeration {
   val invite = Value
   val inviteResponse = Value
 
+  val acceptInvite = Value
+  // responds with inviteResponse
+
+  val declineInvite = Value
+  val declineInviteResponse = Value
+
   val questions = Value
   val questionsResponse = Value
 
@@ -61,6 +67,9 @@ object CommandNames extends Enumeration {
     manifest[VerifyPhoneResponseModel] -> verifyPhoneResponse,
     manifest[InviteModel] -> invite,
     manifest[InviteResponseModel] -> inviteResponse,
+    manifest[AcceptInviteModel] -> acceptInvite,
+    manifest[DeclineInviteModel] -> declineInvite,
+    manifest[DeclineInviteResponseModel] -> declineInviteResponse,
     manifest[QuestionsModel] -> questions,
     manifest[QuestionsResponseModel] -> questionsResponse,
     manifest[MessageModel] -> message,
