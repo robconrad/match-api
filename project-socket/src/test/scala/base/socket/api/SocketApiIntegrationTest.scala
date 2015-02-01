@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:42 PM
+ * Last modified by rconrad, 2/1/15 12:51 PM
  */
 
 package base.socket.api
@@ -165,7 +165,7 @@ abstract class SocketApiIntegrationTest
                lastLogin: Option[DateTime] = None)(implicit s: SocketConnection) {
       val deviceModel = DeviceModel(deviceId)
       val loginModel = LoginModel(fbToken, groupId, "", ApiVersions.V01, "", deviceModel)
-      val loginResponseModel = LoginResponseModel(userId, phone, phone.isDefined, sortGroups(groups),
+      val loginResponseModel = LoginResponseModel(UserModel(userId, Option(name)), phone, phone.isDefined, sortGroups(groups),
         events, questions.map(sortQuestions), lastLogin)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
       val facebookService = mock[FacebookService]

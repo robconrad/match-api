@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:56 AM
+ * Last modified by rconrad, 2/1/15 12:48 PM
  */
 
 package base.entity.user.impl
@@ -24,7 +24,7 @@ import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.kv._
-import base.entity.user.model.{ LoginModel, LoginResponseModel }
+import base.entity.user.model.{UserModel, LoginModel, LoginResponseModel}
 import spray.http.StatusCodes._
 
 /**
@@ -130,25 +130,28 @@ private[entity] class LoginCommandServiceImpl()
                             groups: Iterable[GroupModel],
                             events: Option[List[EventModel]],
                             questions: Option[List[QuestionModel]]): Response = {
+      // todo merge these get calls
       key.getLastLogin flatMap { lastLogin =>
         key.getPhoneAttributes flatMap { phoneAttributes =>
-          key.setLastLogin() flatMap {
-            case false => Errors.userSetFailed
-            case true => registerGroupListeners(LoginResponseModel(
-              userId,
-              phoneAttributes.map(_.phone),
-              phoneAttributes.exists(_.verified),
-              groups.toList,
-              events,
-              questions,
-              lastLogin))
+          key.getName flatMap { name =>
+            key.setLastLogin() flatMap {
+              case false => Errors.userSetFailed
+              case true => registerGroupListeners(LoginResponseModel(
+                UserModel(userId, name),
+                phoneAttributes.map(_.phone),
+                phoneAttributes.exists(_.verified),
+                groups.toList,
+                events,
+                questions,
+                lastLogin))
+            }
           }
         }
       }
     }
 
     def registerGroupListeners(response: LoginResponseModel): Response = {
-      GroupListenerService().register(response.userId, response.groups.map(_.id).toSet) map { x =>
+      GroupListenerService().register(response.user.id, response.groups.map(_.id).toSet) map { x =>
         response
       }
     }
