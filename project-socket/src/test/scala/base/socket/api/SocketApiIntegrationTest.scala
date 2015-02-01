@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 5:21 PM
+ * Last modified by rconrad, 1/31/15 6:34 PM
  */
 
 package base.socket.api
@@ -25,7 +25,7 @@ import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.group.model.{AcceptInviteModel, GroupModel, InviteModel, InviteResponseModel}
+import base.entity.group.model._
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
@@ -172,7 +172,7 @@ abstract class SocketApiIntegrationTest
       execute(verifyModel, Option(verifyResponseModel))
     }
 
-    def invite(phone: String, userId: UUID, users: List[UserModel],
+    def invite(phone: String, users: List[UserModel],
                groupId: UUID, events: List[EventModel], questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val label = "bob"
       val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
@@ -190,6 +190,12 @@ abstract class SocketApiIntegrationTest
       val acceptInviteModel = AcceptInviteModel(groupId)
       val inviteResponseModel = InviteResponseModel(groupModel, events, sortQuestions(questionModels))
       execute(acceptInviteModel, Option(inviteResponseModel))
+    }
+
+    def declineInvite(groupId: UUID)(implicit s: SocketConnection) {
+      val declineInviteModel = DeclineInviteModel(groupId)
+      val responseModel = DeclineInviteResponseModel(groupId)
+      execute(declineInviteModel, Option(responseModel))
     }
 
     def questions(groupId: UUID, questionModels: List[QuestionModel])(implicit s: SocketConnection) {
@@ -225,14 +231,17 @@ abstract class SocketApiIntegrationTest
 
     val fbToken = "a token"
     val fbToken2 = "a token2"
+    val fbToken3 = "a token3"
 
     val name1 = "first name"
     val name2 = "first name2"
+    val name3 = "first name3"
 
     val deviceId = RandomService().uuid
     val userId = randomMock.nextUuid()
     val phone = "555-1234"
     val phone2 = "555-4321"
+    val phone3 = "555-4322"
 
     login(deviceId, fbToken, name1, userId, groups = List())(socket)
 
@@ -251,7 +260,7 @@ abstract class SocketApiIntegrationTest
     val users1 = List(UserModel(userId, Option(name1)))
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    invite(phone2, userId, users1, groupId, events1, questionModels)(socket)
+    invite(phone2, users1, groupId, events1, questionModels)(socket)
 
     questions(groupId, questionModels)(socket)
 
@@ -263,7 +272,6 @@ abstract class SocketApiIntegrationTest
 
     val socket2 = connect()
     val deviceId2 = RandomService().uuid
-
     val inviteUserId = randomMock.nextUuid()
     login(deviceId2, fbToken2, name2, inviteUserId, List())(socket2)
 
@@ -298,8 +306,25 @@ abstract class SocketApiIntegrationTest
     val answerEvent2 = answer(groupId, userId, questionDefs(1).id)(socket2)
     assertResponse(answerEvent2)(manifest[EventModel], socket)
 
+    val socket3 = connect()
+    val deviceId3 = RandomService().uuid
+    val userId3 = randomMock.nextUuid()
+    login(deviceId3, fbToken3, name3, userId3, List())(socket3)
+
+    val groupId2 = randomMock.nextUuid()
+    val events3 = List(EventModelImpl(randomMock.nextUuid(1), groupId2, None, EventTypes.MESSAGE,
+      "Welcome to Scandal.ly chat! (hush, Michi)"))
+    invite(phone3, users1, groupId2, events3, questionModels)(socket)
+
+    register(phone3)(socket3)
+
+    verify(phone3)(socket3)
+
+    declineInvite(groupId2)(socket3)
+
     socket.disconnect()
     socket2.disconnect()
+    socket3.disconnect()
   }
 
 }

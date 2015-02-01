@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:05 PM
+ * Last modified by rconrad, 1/31/15 6:58 PM
  */
 
 package base.entity.kv
@@ -33,7 +33,9 @@ trait Key {
 
   def ttl(): Future[Option[Long]]
 
-  override lazy val toString = s"${getClass.getSimpleName}($token)"
+  override lazy val toString = tokenToString
+
+  def tokenToString: String
 
 }
 

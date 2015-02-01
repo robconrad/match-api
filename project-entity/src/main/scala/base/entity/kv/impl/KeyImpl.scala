@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:27 PM
+ * Last modified by rconrad, 1/31/15 6:58 PM
  */
 
 package base.entity.kv.impl
@@ -55,7 +55,7 @@ private[impl] abstract class KeyImpl extends Key with GuavaFutures with Loggable
     logger.log(cmd, token, msg)
   }
 
-  protected def tokenToString = logger.tokenToString(token)
+  def tokenToString = logger.tokenToString(token)
 
 }
 

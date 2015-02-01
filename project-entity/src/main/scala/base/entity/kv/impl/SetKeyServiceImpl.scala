@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:56 PM
+ * Last modified by rconrad, 1/31/15 6:39 PM
  */
 
 package base.entity.kv.impl
@@ -49,7 +49,7 @@ abstract class SetKeyServiceImpl[A, B <: SetKey[_]](implicit m: Manifest[A])
   }
 
   def unionStore(destination: SetKey[_], sets: SetKey[_]*)(implicit p: Pipeline) = {
-    if (isDebugEnabled) log("SUNIONSTORE", s"destination: $destination, sets: $sets")
+    if (isDebugEnabled) log("SUNIONSTORE", s"destination: $destination, sets: $sets}")
     sets.length > 0 match {
       case true  => p.sunionstore(destination.token, sets.map(_.token): _*).map(_.data().intValue())
       case false => Future.successful(0)

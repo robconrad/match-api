@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:23 AM
+ * Last modified by rconrad, 1/31/15 6:53 PM
  */
 
 package base.socket.api.impl
@@ -76,6 +76,7 @@ abstract class SocketApiHandlerServiceImpl
         if (isDebugEnabled) debug("message received: " + msg)
         CommandProcessingService().process(msg)(ctx.channel.channelCtx).onComplete {
           case Success(Right(result)) =>
+            debug("processing succeeded with %s", result)
             result.authContext.foreach { authCtx =>
               ctx.channel.channelCtx.authCtx = authCtx
             }

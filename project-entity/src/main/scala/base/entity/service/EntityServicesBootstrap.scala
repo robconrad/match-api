@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 3:22 PM
+ * Last modified by rconrad, 1/31/15 6:31 PM
  */
 
 package base.entity.service
@@ -130,6 +130,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new AcceptInviteCommandServiceImpl(
       Keys(MATCH_GROUP, "joinMessage")))
+
+    Services.register(new DeclineInviteCommandServiceImpl())
 
     Services.register(new MessageCommandServiceImpl())
 

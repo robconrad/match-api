@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:19 AM
+ * Last modified by rconrad, 1/31/15 6:56 PM
  */
 
 package base.entity.question.impl
@@ -88,8 +88,8 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def groupUserQuestionTempDel(temp: GroupUserQuestionsTempKey, compositeIds: Iterable[QuestionIdComposite]) =
       temp.del().map {
-        case false => throw new RedisException(s"failed to delete $temp")
         case true  => Right(compositeIds.map(makeQuestionModelFromCompositeId).toList)
+        case false => throw new RedisException(s"failed to delete $temp")
       }
 
     def makeQuestionModelFromCompositeId(compositeId: QuestionIdComposite) = {
