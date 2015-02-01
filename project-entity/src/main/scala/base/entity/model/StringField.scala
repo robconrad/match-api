@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2014 Robert Conrad - All Rights Reserved.
+ * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 12/24/14 4:37 PM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.entity.model
 
-import base.entity.error.ApiError
+import base.entity.error.model.ApiError
 
 /**
  * Base type for string fields provides simple length validation only

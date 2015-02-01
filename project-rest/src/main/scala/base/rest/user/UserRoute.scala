@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 2:42 PM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.rest.user
@@ -10,7 +10,7 @@ package base.rest.user
 import base.entity.api.ApiStrings
 import ApiStrings.User._
 import ApiStrings._
-import base.entity.error.ApiError
+import base.entity.error.model.ApiError
 import base.entity.user.model.UserModel
 import base.rest.Endpoint._
 import base.rest.route.{ RestVersionsRoute, VersionedRestRoute }

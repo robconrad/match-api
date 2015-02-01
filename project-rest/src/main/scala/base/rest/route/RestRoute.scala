@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:49 AM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.rest.route
 
 import base.entity.api.ApiStrings
-import base.entity.error.{ApiErrorService, ApiError}
+import base.entity.error.model.ApiError
+import base.entity.error.ApiErrorService
 import base.entity.json.JsonFormats
 import base.rest.Endpoint
 import base.rest.Locations._

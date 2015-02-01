@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:47 AM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.common.random.mock
@@ -12,7 +12,7 @@ import base.common.random.RandomService
 import base.common.random.impl.RandomServiceImpl
 
 /**
- * Prepopulates $range number of hashes allowing peeks at what's coming
+ * Pre-populates $range number of hashes allowing peeks at what's coming
  * @author rconrad
  */
 class RandomServiceMock(range: Int = RandomServiceMock.DEFAULT_RANGE,

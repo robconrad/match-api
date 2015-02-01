@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:59 AM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.entity.service
 
 import base.entity.api.ApiErrorCodes
-import base.entity.error.{ApiError, ApiErrorService}
+import base.entity.error.ApiErrorService
+import base.entity.error.model.ApiError
 import base.entity.test.EntityBaseSuite
 import spray.http.StatusCodes
 

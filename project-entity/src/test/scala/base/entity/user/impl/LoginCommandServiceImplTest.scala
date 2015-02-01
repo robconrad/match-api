@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.entity.user.impl
@@ -18,7 +18,7 @@ import base.entity.api.ApiVersions
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
-import base.entity.error.{ApiErrorService, ApiError}
+import base.entity.error.ApiErrorService
 import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.kv.Key._

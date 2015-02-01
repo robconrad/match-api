@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 9:04 AM
+ * Last modified by rconrad, 2/1/15 11:01 AM
  */
 
 package base.entity.error.impl
@@ -11,7 +11,9 @@ import base.common.lib.{Tryo, Encoding}
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes.ErrorCode
 import base.entity.command.model.CommandModel
-import base.entity.error.{ApiError, ApiErrorService}
+import base.entity.error.ApiErrorService
+import base.entity.error.model.ApiError
+import base.entity.error.model.impl.ApiErrorImpl
 import base.entity.json.JsonFormats
 import com.google.common.hash.Hashing
 import org.json4s.native.Serialization
@@ -67,7 +69,8 @@ class ApiErrorServiceImpl(debugMode: Boolean) extends ServiceImpl with ApiErrorS
       case true => Option(uniqueIdSeed)
       case false => None
     }
-    val apiError = ApiError(
+    val apiError = ApiErrorImpl(
+      command = None,
       status = status,
       code = code,
       message = message,

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 9:39 PM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.entity.group
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.service.{ Service, ServiceCompanion }
 import base.entity.auth.context.{ ChannelContext, AuthContext }
-import base.entity.error.ApiError
+import base.entity.error.model.ApiError
 import base.entity.group.GroupService.GetGroup
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key.Pipeline

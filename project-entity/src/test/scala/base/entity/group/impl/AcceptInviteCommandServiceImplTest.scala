@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/1/15 10:56 AM
  */
 
 package base.entity.group.impl
@@ -15,7 +15,7 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.error.{ApiErrorService, ApiError}
+import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
 import base.entity.group.kv._

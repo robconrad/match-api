@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:32 PM
+ * Last modified by rconrad, 2/1/15 11:02 AM
  */
 
 package base.entity.json
@@ -10,6 +10,7 @@ package base.entity.json
 import base.common.lib.{ Currencies, Genders, Languages }
 import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.command.CommandNames
+import base.entity.error.model.ApiError
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.group.model.GroupModel
@@ -44,6 +45,7 @@ object JsonFormats {
 
   val withModels = withEnumsAndFields +
     EventModel.serializer +
-    GroupModel.serializer
+    GroupModel.serializer +
+    ApiError.serializer
 
 }
