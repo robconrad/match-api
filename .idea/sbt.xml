@@ -4,23 +4,8 @@
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/project" />
-            <option value="$PROJECT_DIR$/project-common" />
-            <option value="$PROJECT_DIR$/project-common/project" />
-            <option value="$PROJECT_DIR$/project-entity" />
-            <option value="$PROJECT_DIR$/project-entity/project" />
-            <option value="$PROJECT_DIR$/project-rest" />
-            <option value="$PROJECT_DIR$/project-rest/project" />
-            <option value="$PROJECT_DIR$/project-server" />
-            <option value="$PROJECT_DIR$/project-server/project" />
-            <option value="$PROJECT_DIR$/project-socket" />
-            <option value="$PROJECT_DIR$/project-socket/project" />
-          </set>
-        </option>
-        <option name="sbtVersion" value="0.13.5" />
+        <option name="jdk" value="1.6" />
+        <option name="resolveClassifiers" value="true" />
         <option name="useAutoImport" value="true" />
       </SbtProjectSettings>
     </option>

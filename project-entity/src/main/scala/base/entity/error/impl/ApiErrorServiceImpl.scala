@@ -2,12 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:01 AM
+ * Last modified by rconrad, 2/1/15 11:09 AM
  */
 
 package base.entity.error.impl
 
 import base.common.lib.{Tryo, Encoding}
+import base.common.logging.Loggable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes.ErrorCode
 import base.entity.command.model.CommandModel
@@ -58,7 +59,7 @@ class ApiErrorServiceImpl(debugMode: Boolean) extends ServiceImpl with ApiErrorS
     full(message, status, Option(code), None, uniqueIdSeed)
 
   def throwable(message: String, status: StatusCode, throwable: Throwable) =
-    statusCodeSeed(message, status, s"$status, $throwable")
+    statusCodeSeed(message, status, s"$status, ${Loggable.stackTraceToString(throwable)}")
 
   def full(message: String,
             status: StatusCode,
