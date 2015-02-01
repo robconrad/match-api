@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:13 PM
+ * Last modified by rconrad, 2/1/15 3:48 PM
  */
 
 package base.entity.user.impl
@@ -212,20 +212,20 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     }
   }
 
-  test("failed to get invites in") {
+  test("failed to get pending groups") {
     val userId = RandomService().uuid
     val service = mock[UserService]
-    (service.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+    (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
-    assert(command.userGetInvitesIn(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
+    assert(command.userGetPendingGroups(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
   }
 
-  test("failed to get invites out") {
+  test("failed to get invites") {
     val userId = RandomService().uuid
     val service = mock[UserService]
-    (service.getInvitesOut(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+    (service.getInvites(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
-    assert(command.userGetInvitesOut(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
+    assert(command.userGetInvites(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
   }
 
   test("failed to set last login") {

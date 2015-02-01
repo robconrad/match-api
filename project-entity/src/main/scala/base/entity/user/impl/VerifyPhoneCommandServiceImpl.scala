@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/1/15 3:48 PM
  */
 
 package base.entity.user.impl
@@ -100,7 +100,7 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
       }
 
     def userGetInvitesIn(service: UserService): Response =
-      service.getInvitesIn(authCtx.userId) flatMap {
+      service.getPendingGroups(authCtx.userId) flatMap {
         case Right(invitesIn) => VerifyPhoneResponseModel(input.phone, invitesIn)
         case Left(error)      => error
       }

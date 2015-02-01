@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/1/15 3:48 PM
  */
 
 package base.entity.user
@@ -33,9 +33,9 @@ trait UserService extends Service {
 
   def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups
 
-  def getInvitesIn(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetInvites
+  def getPendingGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups
 
-  def getInvitesOut(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetInvites
+  def getInvites(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetInvites
 
 }
 

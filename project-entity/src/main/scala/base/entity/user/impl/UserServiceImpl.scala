@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 1:16 PM
+ * Last modified by rconrad, 2/1/15 3:48 PM
  */
 
 package base.entity.user.impl
@@ -14,7 +14,7 @@ import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
-import base.entity.group.model.impl.InviteModelImpl
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.kv.Key._
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
@@ -80,21 +80,21 @@ class UserServiceImpl extends ServiceImpl with UserService {
     }
   }
 
-  def getInvitesIn(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getInvitesIn(UserGroupsInvitedKeyService().make(userId))
+  def getPendingGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    getPendingGroups(UserGroupsInvitedKeyService().make(userId))
   }
 
-  private[impl] def getInvitesIn(key: UserGroupsInvitedKey)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  private[impl] def getPendingGroups(key: UserGroupsInvitedKey)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     key.members() map { groupIds =>
-      Right(groupIds.map(groupId => InviteModelImpl(groupId, None, None, "")).toList)
+      Right(groupIds.map(groupId => GroupModelImpl(groupId, List(), None, None, 0)).toList)
     }
   }
 
-  def getInvitesOut(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getInvitesOut()
+  def getInvites(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+    getInvites()
   }
 
-  private[impl] def getInvitesOut()(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  private[impl] def getInvites()(implicit p: Pipeline, channelCtx: ChannelContext) = {
     Future.successful(Right(List()))
   }
 

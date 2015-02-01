@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:19 PM
+ * Last modified by rconrad, 2/1/15 3:50 PM
  */
 
 package base.socket.api
@@ -12,31 +12,31 @@ import java.util.UUID
 import base.common.logging.Loggable
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, ServicesBeforeAndAfterAll, TestServices }
+import base.common.service.{Services, ServicesBeforeAndAfterAll, TestServices}
 import base.common.test.Tags
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.{ ApiErrorCodes, ApiVersions }
+import base.entity.api.{ApiErrorCodes, ApiVersions}
 import base.entity.auth.context.impl.ChannelContextImpl
-import base.entity.auth.context.{ ChannelContext, StandardUserAuthContext }
+import base.entity.auth.context.{ChannelContext, StandardUserAuthContext}
 import base.entity.command.model.CommandModel
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.group.model._
-import base.entity.group.model.impl.{ InviteModelImpl, GroupModelImpl }
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.message.model.MessageModel
 import base.entity.question._
 import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.{ AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel }
+import base.entity.question.model.{AnswerModel, QuestionModel, QuestionsModel, QuestionsResponseModel}
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.User
-import base.entity.user.impl.{ UserServiceImpl, VerifyPhoneCommandServiceImpl }
+import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
 import base.entity.user.model._
 import base.entity.user.model.impl.LoginResponseModelImpl
 import base.socket.api.test.SocketConnection
@@ -185,10 +185,10 @@ abstract class SocketApiIntegrationTest
       execute(registerModel, Option(registerResponseModel))
     }
 
-    def verify(phone: String, invites: List[InviteModel] = List())(implicit s: SocketConnection) {
+    def verify(phone: String, pendingGroups: List[GroupModel] = List())(implicit s: SocketConnection) {
       val code = "code!"
       val verifyModel = VerifyPhoneModel(phone, code)
-      val verifyResponseModel = VerifyPhoneResponseModel(phone, invites)
+      val verifyResponseModel = VerifyPhoneResponseModel(phone, pendingGroups)
       execute(verifyModel, Option(verifyResponseModel))
     }
 
@@ -297,7 +297,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    val invites2 = List(InviteModelImpl(groupId, None, None, ""))
+    val invites2 = List(GroupModelImpl(groupId, List(), None, None, 0))
     verify(phone2, invites2)(socket2)
 
     // skip invite for user2
@@ -339,7 +339,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    val invites3 = List(InviteModelImpl(groupId2, None, None, ""))
+    val invites3 = List(GroupModelImpl(groupId2, List(), None, None, 0))
     verify(phone3, invites3)(socket3)
 
     declineInvite(groupId2)(socket3)

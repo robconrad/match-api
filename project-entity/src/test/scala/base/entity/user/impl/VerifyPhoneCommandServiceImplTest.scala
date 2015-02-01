@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/1/15 3:48 PM
  */
 
 package base.entity.user.impl
@@ -69,7 +69,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val userService = mock[UserService]
     val unregister = TestServices.register(userService)
 
-    (userService.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+    (userService.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List()))
 
     assert(phoneKey.get.await() == None)
@@ -121,7 +121,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
   test("get invitesIn returned error") {
     val apiError = mock[ApiError]
     val service = mock[UserService]
-    (service.getInvitesIn(_: UUID)(_: Pipeline, _: ChannelContext)) expects
+    (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
     assert(command.userGetInvitesIn(service).await() == Left(apiError))
   }

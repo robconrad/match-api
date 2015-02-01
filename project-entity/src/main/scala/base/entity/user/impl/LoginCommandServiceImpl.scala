@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:14 PM
+ * Last modified by rconrad, 2/1/15 3:52 PM
  */
 
 package base.entity.user.impl
@@ -125,7 +125,7 @@ private[entity] class LoginCommandServiceImpl()
 
     def userGetLoginAttributes(key: UserKey, userId: UUID, builder: LoginResponseModelBuilder): Response = {
       key.getLoginAttributes flatMap { attributes =>
-        userGetInvitesIn(UserService(), userId, builder.copy(
+        userGetPendingGroups(UserService(), userId, builder.copy(
           phone = attributes.phone,
           phoneVerified = Option(attributes.phoneVerified),
           user = Option(UserModel(userId, attributes.name)),
@@ -133,16 +133,16 @@ private[entity] class LoginCommandServiceImpl()
       }
     }
 
-    def userGetInvitesIn(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
-      service.getInvitesIn(userId) flatMap {
-        case Right(invites) => userGetInvitesOut(UserService(), userId, builder.copy(invitesIn = Option(invites)))
+    def userGetPendingGroups(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
+      service.getPendingGroups(userId) flatMap {
+        case Right(groups) => userGetInvites(UserService(), userId, builder.copy(pendingGroups = Option(groups)))
         case Left(error)    => error
       }
     }
 
-    def userGetInvitesOut(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
-      service.getInvitesOut(userId) flatMap {
-        case Right(invites) => setLastLogin(UserKeyService().make(userId), builder.copy(invitesOut = Option(invites)))
+    def userGetInvites(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
+      service.getInvites(userId) flatMap {
+        case Right(invites) => setLastLogin(UserKeyService().make(userId), builder.copy(pendingInvites = Option(invites)))
         case Left(error)    => error
       }
     }

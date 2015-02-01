@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:01 PM
+ * Last modified by rconrad, 2/1/15 3:52 PM
  */
 
 package base.entity.user.model.impl
@@ -22,8 +22,8 @@ import org.joda.time.DateTime
 case class LoginResponseModelImpl(user: UserModel,
                                   phone: Option[String],
                                   phoneVerified: Boolean,
-                                  invitesOut: List[InviteModel],
-                                  invitesIn: List[InviteModel],
+                                  pendingInvites: List[InviteModel],
+                                  pendingGroups: List[GroupModel],
                                   groups: List[GroupModel],
                                   events: Option[List[EventModel]],
                                   questions: Option[List[QuestionModel]],
@@ -33,8 +33,8 @@ case class LoginResponseModelImpl(user: UserModel,
 case class LoginResponseModelBuilder(user: Option[UserModel] = None,
                                      phone: Option[String] = None,
                                      phoneVerified: Option[Boolean] = None,
-                                     invitesOut: Option[List[InviteModel]] = None,
-                                     invitesIn: Option[List[InviteModel]] = None,
+                                     pendingInvites: Option[List[InviteModel]] = None,
+                                     pendingGroups: Option[List[GroupModel]] = None,
                                      groups: Option[List[GroupModel]] = None,
                                      events: Option[List[EventModel]] = None,
                                      questions: Option[List[QuestionModel]] = None,
@@ -44,8 +44,8 @@ case class LoginResponseModelBuilder(user: Option[UserModel] = None,
     user.get,
     phone,
     phoneVerified.get,
-    invitesOut.get,
-    invitesIn.get,
+    pendingInvites.get,
+    pendingGroups.get,
     groups.get,
     events,
     questions,
