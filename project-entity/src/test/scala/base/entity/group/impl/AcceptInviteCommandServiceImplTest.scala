@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:58 AM
+ * Last modified by rconrad, 2/1/15 1:04 PM
  */
 
 package base.entity.group.impl
@@ -19,7 +19,7 @@ import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
-import base.entity.group.model.{ AcceptInviteModel, GroupModel, InviteResponseModel }
+import base.entity.group.model.{AcceptInviteResponseModel, AcceptInviteModel, GroupModel, SendInviteResponseModel}
 import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
 import base.entity.kv.Key._
 import base.entity.question.QuestionService
@@ -81,7 +81,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
       (*, *) returning Future.successful(Right(List()))
 
     val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
-    val response = InviteResponseModel(groupModel, List(), List())
+    val response = AcceptInviteResponseModel(groupModel, List(), List())
 
     val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
     assert(userGroupsInvitedKey.add(groupId).await() == 1L)

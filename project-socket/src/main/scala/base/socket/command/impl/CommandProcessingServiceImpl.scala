@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:51 PM
+ * Last modified by rconrad, 2/1/15 1:01 PM
  */
 
 package base.socket.command.impl
@@ -11,28 +11,28 @@ import base.common.lib.Tryo
 import base.common.logging.Loggable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes._
-import base.entity.auth.context.{ AuthContext, ChannelContext, StandardUserAuthContext }
+import base.entity.auth.context.{AuthContext, ChannelContext, StandardUserAuthContext}
 import base.entity.command.CommandNames
 import base.entity.command.CommandNames.CommandName
 import base.entity.command.model.CommandModel
 import base.entity.error.ApiErrorService
 import base.entity.error.model.ApiError
-import base.entity.group.model.{ AcceptInviteModel, DeclineInviteModel, InviteModel }
-import base.entity.group.{ AcceptInviteCommandService, DeclineInviteCommandService, InviteCommandService }
+import base.entity.group.model.{AcceptInviteModel, DeclineInviteModel, SendInviteModel}
+import base.entity.group.{AcceptInviteCommandService, DeclineInviteCommandService, SendInviteCommandService}
 import base.entity.json.JsonFormats
 import base.entity.logging.AuthLoggable
 import base.entity.message.MessageCommandService
 import base.entity.message.model.MessageModel
-import base.entity.question.model.{ AnswerModel, QuestionsModel }
-import base.entity.question.{ AnswerCommandService, QuestionsCommandService }
-import base.entity.user.model.{ LoginModel, LoginResponseModel, RegisterPhoneModel, VerifyPhoneModel }
-import base.entity.user.{ LoginCommandService, RegisterPhoneCommandService, User, VerifyPhoneCommandService }
+import base.entity.question.model.{AnswerModel, QuestionsModel}
+import base.entity.question.{AnswerCommandService, QuestionsCommandService}
+import base.entity.user.model.{LoginModel, LoginResponseModel, RegisterPhoneModel, VerifyPhoneModel}
+import base.entity.user.{LoginCommandService, RegisterPhoneCommandService, User, VerifyPhoneCommandService}
 import base.socket.command.CommandProcessingService
-import base.socket.command.CommandProcessingService.{ CommandProcessError, CommandProcessResult, FutureResponse, Response }
+import base.socket.command.CommandProcessingService.{CommandProcessError, CommandProcessResult, FutureResponse, Response}
 import base.socket.command.impl.CommandProcessingServiceImpl.Errors
 import org.json4s.JValue
-import org.json4s.JsonAST.{ JObject, JString }
-import org.json4s.native.{ JsonMethods, Serialization }
+import org.json4s.JsonAST.{JObject, JString}
+import org.json4s.native.{JsonMethods, Serialization}
 import spray.http.StatusCodes
 
 import scala.concurrent.Future
@@ -90,7 +90,7 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
         case CommandNames.registerPhone   => RegisterPhoneCommandService().execute(body.extract[RegisterPhoneModel])
         case CommandNames.verifyPhone     => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
         case CommandNames.login           => LoginCommandService().execute(body.extract[LoginModel])
-        case CommandNames.invite          => InviteCommandService().execute(body.extract[InviteModel])
+        case CommandNames.invite          => SendInviteCommandService().execute(body.extract[SendInviteModel])
         case CommandNames.acceptInvite    => AcceptInviteCommandService().execute(body.extract[AcceptInviteModel])
         case CommandNames.declineInvite   => DeclineInviteCommandService().execute(body.extract[DeclineInviteModel])
         case CommandNames.questions       => QuestionsCommandService().execute(body.extract[QuestionsModel])

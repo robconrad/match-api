@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:58 AM
+ * Last modified by rconrad, 2/1/15 12:59 PM
  */
 
 package base.entity.group.impl
@@ -17,10 +17,10 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
-import base.entity.group.impl.InviteCommandServiceImpl.Errors
+import base.entity.group.impl.SendInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
+import base.entity.group.model.{ GroupModel, SendInviteModel, SendInviteResponseModel }
 import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
 import base.entity.kv.Key._
 import base.entity.question.QuestionService
@@ -35,9 +35,9 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class InviteCommandServiceImplTest extends CommandServiceImplTest {
+class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
 
-  val service = new InviteCommandServiceImpl("welcome!")
+  val service = new SendInviteCommandServiceImpl("welcome!")
 
   private val phone = "555-1234"
   private val label = "Bob"
@@ -51,7 +51,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
   private val randomMock = new RandomServiceMock()
 
   private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = InviteModel(phone, label)
+  private implicit val model = SendInviteModel(phone, label)
 
   override def beforeAll() {
     super.beforeAll()
@@ -59,7 +59,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
     Services.register(randomMock)
   }
 
-  private def command(implicit input: InviteModel) = new service.InviteCommand(input)
+  private def command(implicit input: SendInviteModel) = new service.InviteCommand(input)
 
   private def testSuccess(userExists: Boolean) = {
     val eventCount = 0
@@ -85,7 +85,7 @@ class InviteCommandServiceImplTest extends CommandServiceImplTest {
       (*, *) returning Future.successful(Right(List()))
 
     val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
-    val response = InviteResponseModel(group, List(), List())
+    val response = SendInviteResponseModel(group, List(), List())
 
     if (userExists) {
       val phoneKey = PhoneKeyService().make(phone)

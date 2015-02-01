@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 12:51 PM
+ * Last modified by rconrad, 2/1/15 1:03 PM
  */
 
 package base.socket.api
@@ -189,13 +189,13 @@ abstract class SocketApiIntegrationTest
       execute(verifyModel, Option(verifyResponseModel))
     }
 
-    def invite(phone: String, users: List[UserModel],
+    def sendInvite(phone: String, users: List[UserModel],
                groupId: UUID, events: List[EventModel], questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val label = "bob"
       val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
 
-      val inviteModel = InviteModel(phone, label)
-      val inviteResponseModel = InviteResponseModel(groupModel, events, sortQuestions(questionModels))
+      val inviteModel = SendInviteModel(phone, label)
+      val inviteResponseModel = SendInviteResponseModel(groupModel, events, sortQuestions(questionModels))
       execute(inviteModel, Option(inviteResponseModel))
     }
 
@@ -205,7 +205,7 @@ abstract class SocketApiIntegrationTest
       val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
 
       val acceptInviteModel = AcceptInviteModel(groupId)
-      val inviteResponseModel = InviteResponseModel(groupModel, events, sortQuestions(questionModels))
+      val inviteResponseModel = AcceptInviteResponseModel(groupModel, events, sortQuestions(questionModels))
       execute(acceptInviteModel, Option(inviteResponseModel))
     }
 
@@ -277,7 +277,7 @@ abstract class SocketApiIntegrationTest
     val users1 = List(UserModel(userId1, Option(name1)))
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    invite(phone2, users1, groupId, events1, questionModels)(socket1)
+    sendInvite(phone2, users1, groupId, events1, questionModels)(socket1)
 
     questions(groupId, questionModels)(socket1)
 
@@ -331,7 +331,7 @@ abstract class SocketApiIntegrationTest
     val groupId2 = randomMock.nextUuid()
     val events3 = List(EventModelImpl(randomMock.nextUuid(1), groupId2, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    invite(phone3, users1, groupId2, events3, questionModels)(socket1)
+    sendInvite(phone3, users1, groupId2, events3, questionModels)(socket1)
 
     register(phone3)(socket3)
 

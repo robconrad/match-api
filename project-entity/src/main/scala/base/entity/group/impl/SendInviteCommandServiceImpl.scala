@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:56 AM
+ * Last modified by rconrad, 2/1/15 1:01 PM
  */
 
 package base.entity.group.impl
@@ -16,10 +16,10 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.impl.InviteCommandServiceImpl.Errors
+import base.entity.group.impl.SendInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
-import base.entity.group.model.{ GroupModel, InviteModel, InviteResponseModel }
-import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService, InviteCommandService }
+import base.entity.group.model.{ GroupModel, SendInviteModel, SendInviteResponseModel }
+import base.entity.group._
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
@@ -29,13 +29,13 @@ import base.entity.user.kv._
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
-    extends CommandServiceImpl[InviteModel, InviteResponseModel]
-    with InviteCommandService {
+private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
+    extends CommandServiceImpl[SendInviteModel, SendInviteResponseModel]
+    with SendInviteCommandService {
 
-  override protected val responseManifest = Option(manifest[InviteResponseModel])
+  override protected val responseManifest = Option(manifest[SendInviteResponseModel])
 
-  def innerExecute(input: InviteModel)(implicit channelCtx: ChannelContext) = {
+  def innerExecute(input: SendInviteModel)(implicit channelCtx: ChannelContext) = {
     new InviteCommand(input).execute()
   }
 
@@ -52,8 +52,8 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
    * - register group listener
    * - get and return group, events, questions
    */
-  private[impl] class InviteCommand(val input: InviteModel)(implicit val channelCtx: ChannelContext)
-      extends Command[InviteModel, InviteResponseModel] {
+  private[impl] class InviteCommand(val input: SendInviteModel)(implicit val channelCtx: ChannelContext)
+      extends Command[SendInviteModel, SendInviteResponseModel] {
 
     def execute() = {
       userPhonesInvitedAdd(UserPhonesInvitedKeyService().make(authCtx.userId))
@@ -142,7 +142,7 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
 
     def eventsGet(groupId: UUID, group: GroupModel, questions: List[QuestionModel]) =
       GroupEventsService().getEvents(groupId).flatMap {
-        case Right(events) => InviteResponseModel(group, events, questions)
+        case Right(events) => SendInviteResponseModel(group, events, questions)
         case Left(error)   => error
       }
 
@@ -150,9 +150,9 @@ private[entity] class InviteCommandServiceImpl(welcomeMessage: String)
 
 }
 
-object InviteCommandServiceImpl {
+object SendInviteCommandServiceImpl {
 
-  object Errors extends CrudErrorImplicits[InviteResponseModel] {
+  object Errors extends CrudErrorImplicits[SendInviteResponseModel] {
 
     override protected val externalErrorText = "There was a problem during invite."
 

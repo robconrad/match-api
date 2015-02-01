@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/1/15 1:00 PM
  */
 
 package base.entity.command
@@ -40,7 +40,7 @@ object CommandNames extends Enumeration {
   val inviteResponse = Value
 
   val acceptInvite = Value
-  // responds with inviteResponse
+  val acceptInviteResponse = Value
 
   val declineInvite = Value
   val declineInviteResponse = Value
@@ -65,9 +65,10 @@ object CommandNames extends Enumeration {
     manifest[RegisterPhoneResponseModel] -> registerPhoneResponse,
     manifest[VerifyPhoneModel] -> verifyPhone,
     manifest[VerifyPhoneResponseModel] -> verifyPhoneResponse,
-    manifest[InviteModel] -> invite,
-    manifest[InviteResponseModel] -> inviteResponse,
+    manifest[SendInviteModel] -> invite,
+    manifest[SendInviteResponseModel] -> inviteResponse,
     manifest[AcceptInviteModel] -> acceptInvite,
+    manifest[AcceptInviteResponseModel] -> acceptInviteResponse,
     manifest[DeclineInviteModel] -> declineInvite,
     manifest[DeclineInviteResponseModel] -> declineInviteResponse,
     manifest[QuestionsModel] -> questions,
