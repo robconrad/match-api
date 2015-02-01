@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:19 AM
+ * Last modified by rconrad, 2/1/15 10:08 AM
  */
 
 package base.entity.message.impl
@@ -48,7 +48,7 @@ private[entity] class MessageCommandServiceImpl()
         groupId = input.groupId,
         userId = Option(authCtx.userId),
         `type` = EventTypes.MESSAGE,
-        body = input.body)
+        body = input.text)
       GroupEventsService().setEvent(event, createIfNotExists = false).flatMap {
         case Right(event) => publishEvent(event)
         case Left(error)  => error
