@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 2:39 PM
+ * Last modified by rconrad, 1/31/15 7:01 PM
  */
 
 package base.entity.user.kv
@@ -31,10 +31,10 @@ trait DeviceKey extends HashKey {
 
   def set(appVersion: String,
           locale: String,
-          model: String,
-          cordova: String,
-          platform: String,
-          version: String): Future[Boolean]
+          model: Option[String],
+          cordova: Option[String],
+          platform: Option[String],
+          version: Option[String]): Future[Boolean]
 
   def getAppVersion: Future[Option[String]]
   def getLocale: Future[Option[String]]

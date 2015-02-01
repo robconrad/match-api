@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:07 PM
+ * Last modified by rconrad, 1/31/15 7:02 PM
  */
 
 package base.entity.user.kv.impl
@@ -43,17 +43,17 @@ class DeviceKeyImpl(val token: Array[Byte],
 
   def set(appVersion: String,
           locale: String,
-          model: String,
-          cordova: String,
-          platform: String,
-          version: String) = {
+          model: Option[String],
+          cordova: Option[String],
+          platform: Option[String],
+          version: Option[String]) = {
     val props = Map[Prop, Any](
       AppVersionProp -> appVersion,
       LocaleProp -> locale,
-      ModelProp -> model,
-      CordovaProp -> cordova,
-      PlatformProp -> platform,
-      VersionProp -> version)
+      ModelProp -> model.getOrElse(""),
+      CordovaProp -> cordova.getOrElse(""),
+      PlatformProp -> platform.getOrElse(""),
+      VersionProp -> version.getOrElse(""))
     set(props)
   }
 

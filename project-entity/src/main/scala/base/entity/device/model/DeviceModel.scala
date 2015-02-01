@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:45 AM
+ * Last modified by rconrad, 1/31/15 7:05 PM
  */
 
 package base.entity.device.model
@@ -25,11 +25,10 @@ import scala.annotation.meta.field
 // todo convert to interface for mocking
 case class DeviceModel(
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  uuid: UUID,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  model: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  cordova: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  platform: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  version: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  name: String) {
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  model: Option[String] = None,
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  cordova: Option[String] = None,
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  platform: Option[String] = None,
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  version: Option[String] = None) {
   // format: ON
 
 }

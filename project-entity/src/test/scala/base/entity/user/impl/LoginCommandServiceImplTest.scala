@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:20 PM
+ * Last modified by rconrad, 1/31/15 7:03 PM
  */
 
 package base.entity.user.impl
@@ -46,7 +46,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val apiVersion = ApiVersions.V01
   private val locale = "some locale"
   private val deviceUuid = RandomService().uuid
-  private val deviceModel = DeviceModel(deviceUuid, "Some device", "crdva", "Some platform", "Some ver", "Some name")
+  private val deviceModel = DeviceModel(deviceUuid, Option("Some device"),
+    Option("crdva"), Option("Some platform"), Option("Some ver"))
 
   private val apiError = ApiError("test error")
   private val randomMock = new RandomServiceMock()
@@ -95,10 +96,10 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(userKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getAppVersion.await().contains(appVersion))
     assert(deviceKey.getLocale.await().contains(locale))
-    assert(deviceKey.getModel.await().contains(deviceModel.model))
-    assert(deviceKey.getCordova.await().contains(deviceModel.cordova))
-    assert(deviceKey.getPlatform.await().contains(deviceModel.platform))
-    assert(deviceKey.getVersion.await().contains(deviceModel.version))
+    assert(deviceKey.getModel.await() == deviceModel.model)
+    assert(deviceKey.getCordova.await() == deviceModel.cordova)
+    assert(deviceKey.getPlatform.await() == deviceModel.platform)
+    assert(deviceKey.getVersion.await() == deviceModel.version)
 
     unregister()
   }

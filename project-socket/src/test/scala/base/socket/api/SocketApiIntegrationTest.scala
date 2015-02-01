@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 6:34 PM
+ * Last modified by rconrad, 1/31/15 7:05 PM
  */
 
 package base.socket.api
@@ -147,7 +147,7 @@ abstract class SocketApiIntegrationTest
   test("integration test - runs all commands", Tags.SLOW) {
 
     def login(deviceId: UUID, fbToken: String, name: String, userId: UUID, groups: List[GroupModel])(implicit s: SocketConnection) {
-      val deviceModel = DeviceModel(deviceId, "", "", "", "", "")
+      val deviceModel = DeviceModel(deviceId)
       val loginModel = LoginModel(fbToken, None, "", ApiVersions.V01, "", deviceModel)
       val loginResponseModel = LoginResponseModel(userId, groups, None, None, None)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
