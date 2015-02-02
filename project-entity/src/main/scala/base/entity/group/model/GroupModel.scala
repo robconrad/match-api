@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:54 PM
+ * Last modified by rconrad, 2/1/15 4:29 PM
  */
 
 package base.entity.group.model
@@ -11,9 +11,10 @@ import java.util.UUID
 
 import base.entity.api.ApiStrings.User._
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.model.{ Model, ModelCompanion }
+import base.entity.json.JsonFormats
+import base.entity.model.{Model, ModelCompanion}
 import base.entity.user.model.UserModel
-import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
+import com.wordnik.swagger.annotations.{ApiModel, ApiModelProperty}
 import org.joda.time.DateTime
 
 import scala.annotation.meta.field
@@ -29,6 +30,7 @@ trait GroupModel extends Model {
 
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def id: UUID
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def users: List[UserModel]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def invites: List[InviteModel]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastEventTime: Option[DateTime]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastReadTime: Option[DateTime]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def eventCount: Int
@@ -36,4 +38,9 @@ trait GroupModel extends Model {
 }
 // format: ON
 
-object GroupModel extends ModelCompanion[GroupModel, GroupModelImpl]
+object GroupModel extends ModelCompanion[GroupModel, GroupModelImpl] {
+
+  override val formats = JsonFormats.withEnumsAndFields +
+    InviteModel.serializer
+
+}

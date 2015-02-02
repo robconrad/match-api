@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:05 PM
+ * Last modified by rconrad, 2/1/15 4:30 PM
  */
 
 package base.entity.user.impl
@@ -70,7 +70,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroups - success") {
     val groups = Set(groupId1, groupId2)
-    val group1 = GroupModelImpl(groupId1, List(), None, None, eventCount = 0)
+    val group1 = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
@@ -99,7 +99,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroups - not all groups returned") {
     val groups = Set(groupId1, groupId2)
-    val group = GroupModelImpl(groupId1, List(), None, None, eventCount = 0)
+    val group = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
@@ -112,7 +112,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getPendingGroups - success") {
     val groups = Set(groupId1, groupId2)
-    val group1 = GroupModelImpl(groupId1, List(), None, None, eventCount = 0)
+    val group1 = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
     val key = mock[UserGroupsInvitedKey]
     key.members _ expects() returning Future.successful(groups)

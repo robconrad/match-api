@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/1/15 4:30 PM
  */
 
 package base.entity.group.impl
@@ -41,7 +41,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
   private val users = List[UserModel]()
   private val eventCount = 101
   private val groupId = RandomService().uuid
-  private val group = GroupModelImpl(groupId, users, Option(time), Option(time), eventCount)
+  private val group = GroupModelImpl(groupId, users, List(), Option(time), Option(time), eventCount)
 
   private val method = new service.GetGroupMethod(channelCtx.authCtx.userId, groupId)
 

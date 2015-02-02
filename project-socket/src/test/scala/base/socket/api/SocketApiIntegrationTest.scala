@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:26 PM
+ * Last modified by rconrad, 2/1/15 4:31 PM
  */
 
 package base.socket.api
@@ -195,7 +195,7 @@ abstract class SocketApiIntegrationTest
     def sendInvite(phone: String, users: List[UserModel], groupId: UUID, events: List[EventModel],
                    questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val label = "bob"
-      val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
+      val groupModel = GroupModelImpl(groupId, sortUsers(users), List(), None, None, 0)
 
       val inviteModel = SendInviteModel(phone, label)
       val inviteResponseModel = SendInviteResponseModel(groupModel, events, sortQuestions(questionModels))
@@ -205,7 +205,7 @@ abstract class SocketApiIntegrationTest
     def acceptInvite(userId: UUID, users: List[UserModel],
                      groupId: UUID, events: List[EventModel],
                      questionModels: List[QuestionModel])(implicit s: SocketConnection) {
-      val groupModel = GroupModelImpl(groupId, sortUsers(users), None, None, 0)
+      val groupModel = GroupModelImpl(groupId, sortUsers(users), List(), None, None, 0)
 
       val acceptInviteModel = AcceptInviteModel(groupId)
       val inviteResponseModel = AcceptInviteResponseModel(groupModel, events, sortQuestions(questionModels))
@@ -297,7 +297,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    val invites2 = List(GroupModelImpl(groupId, users1, None, None, 0))
+    val invites2 = List(GroupModelImpl(groupId, users1, List(), None, None, 0))
     verify(phone2, invites2)(socket2)
 
     // skip invite for user2
@@ -339,7 +339,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    val invites3 = List(GroupModelImpl(groupId2, users1, None, None, 0))
+    val invites3 = List(GroupModelImpl(groupId2, users1, List(), None, None, 0))
     verify(phone3, invites3)(socket3)
 
     declineInvite(groupId2)(socket3)
@@ -351,8 +351,8 @@ abstract class SocketApiIntegrationTest
     // original user login again
     val socket4 = connect()
     val groups = List(
-      GroupModelImpl(groupId, sortUsers(users2), None, None, 0),
-      GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), None, None, 0))
+      GroupModelImpl(groupId, sortUsers(users2), List(), None, None, 0),
+      GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), List(), None, None, 0))
     login(deviceId1, fbToken1, name1, userId1, groups, Option(groupId), Option(phone1),
       Option((events2 ++ List(messageEventModel2)).reverse), Option(questionModels2.filter(_.id != questionDefs(1).id)),
       Option(TimeServiceConstantMock.now))(socket4)

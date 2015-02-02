@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 3:47 PM
+ * Last modified by rconrad, 2/1/15 4:33 PM
  */
 
 package base.entity.group.impl
@@ -18,6 +18,8 @@ import base.entity.group.model.impl.GroupModelBuilder
 import base.entity.kv.Key.Pipeline
 import base.entity.service.CrudImplicits
 import base.entity.user.UserService
+
+import scala.concurrent.Future
 
 /**
  * {{ Describe the high level purpose of GroupServiceImpl here. }}
@@ -58,10 +60,14 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
       }
 
     def usersGet(userIds: List[UUID], builder: GroupModelBuilder): Response = {
-      UserService().getUsers(userId, userIds).map {
-        case Right(users) => Option(builder.copy(users = Option(users)).build)
+      UserService().getUsers(userId, userIds).flatMap {
+        case Right(users) => invitesGet(builder.copy(users = Option(users)))
         case Left(error)  => error
       }
+    }
+
+    def invitesGet(builder: GroupModelBuilder): Response = {
+      Future.successful(Right(Option(builder.copy(invites = Option(List())).build)))
     }
 
   }
