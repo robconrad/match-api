@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:29 PM
+ * Last modified by rconrad, 2/1/15 4:35 PM
  */
 
 package base.entity.group.model.impl
@@ -27,16 +27,16 @@ case class GroupModelImpl(id: UUID,
 case class GroupModelBuilder(id: Option[UUID] = None,
                              users: Option[List[UserModel]] = None,
                              invites: Option[List[InviteModel]] = None,
-                             lastEventTime: Option[DateTime] = None,
-                             lastReadTime: Option[DateTime] = None,
+                             lastEventTime: Option[Option[DateTime]] = None,
+                             lastReadTime: Option[Option[DateTime]] = None,
                              eventCount: Option[Int] = None) {
 
   def build = GroupModelImpl(
     id = id.get,
     users = users.get,
     invites = invites.get,
-    lastEventTime = lastEventTime,
-    lastReadTime = lastReadTime,
+    lastEventTime = lastEventTime.get,
+    lastReadTime = lastReadTime.get,
     eventCount = eventCount.get)
 
 }

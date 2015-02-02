@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:33 PM
+ * Last modified by rconrad, 2/1/15 4:35 PM
  */
 
 package base.entity.group.impl
@@ -44,14 +44,14 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
     def groupUserGetSetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
       key.getLastRead.flatMap { lastRead =>
         val key = GroupKeyService().make(groupId)
-        groupGet(key, builder.copy(lastReadTime = lastRead))
+        groupGet(key, builder.copy(lastReadTime = Option(lastRead)))
       }
 
     def groupGet(key: GroupKey, builder: GroupModelBuilder): Response =
       key.getLastEventAndCount.flatMap {
         case (lastEvent, count) =>
           val key = GroupUsersKeyService().make(groupId)
-          groupUsersGet(key, builder.copy(lastEventTime = lastEvent, eventCount = Option(count.getOrElse(0))))
+          groupUsersGet(key, builder.copy(lastEventTime = Option(lastEvent), eventCount = Option(count.getOrElse(0))))
       }
 
     def groupUsersGet(key: GroupUsersKey, builder: GroupModelBuilder): Response =

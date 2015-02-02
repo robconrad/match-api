@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:25 PM
+ * Last modified by rconrad, 2/1/15 4:38 PM
  */
 
 package base.entity.user.impl
@@ -106,7 +106,8 @@ private[entity] class LoginCommandServiceImpl()
           val builder = LoginResponseModelBuilder(groups = Option(groups))
           input.groupId match {
             case Some(groupId) => eventsGet(key, userId, groupId, builder)
-            case None          => userGetLoginAttributes(key, userId, builder)
+            case None          =>
+              userGetLoginAttributes(key, userId, builder.copy(events = Option(None), questions = Option(None)))
           }
       }
     }
@@ -118,7 +119,9 @@ private[entity] class LoginCommandServiceImpl()
           QuestionService().getQuestions(groupId, userId).flatMap {
             case Left(error) => error
             case Right(questions) =>
-              userGetLoginAttributes(key, userId, builder.copy(events = Option(events), questions = Option(questions)))
+              userGetLoginAttributes(key, userId, builder.copy(
+                events = Option(Option(events)),
+                questions = Option(Option(questions))))
           }
       }
     }
@@ -126,10 +129,10 @@ private[entity] class LoginCommandServiceImpl()
     def userGetLoginAttributes(key: UserKey, userId: UUID, builder: LoginResponseModelBuilder): Response = {
       key.getLoginAttributes flatMap { attributes =>
         userGetPendingGroups(UserService(), userId, builder.copy(
-          phone = attributes.phone,
+          phone = Option(attributes.phone),
           phoneVerified = Option(attributes.phoneVerified),
           user = Option(UserModel(userId, attributes.name)),
-          lastLoginTime = attributes.lastLogin))
+          lastLoginTime = Option(attributes.lastLogin)))
       }
     }
 

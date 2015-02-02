@@ -2,15 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:23 PM
+ * Last modified by rconrad, 2/1/15 4:35 PM
  */
 
 package base.entity.user.model.impl
 
 import base.entity.event.model.EventModel
-import base.entity.group.model.{ GroupModel, InviteModel }
+import base.entity.group.model.GroupModel
 import base.entity.question.model.QuestionModel
-import base.entity.user.model.{ UserModel, LoginResponseModel }
+import base.entity.user.model.{LoginResponseModel, UserModel}
 import org.joda.time.DateTime
 
 /**
@@ -30,22 +30,22 @@ case class LoginResponseModelImpl(user: UserModel,
     extends LoginResponseModel
 
 case class LoginResponseModelBuilder(user: Option[UserModel] = None,
-                                     phone: Option[String] = None,
+                                     phone: Option[Option[String]] = None,
                                      phoneVerified: Option[Boolean] = None,
                                      pendingGroups: Option[List[GroupModel]] = None,
                                      groups: Option[List[GroupModel]] = None,
-                                     events: Option[List[EventModel]] = None,
-                                     questions: Option[List[QuestionModel]] = None,
-                                     lastLoginTime: Option[DateTime] = None) {
+                                     events: Option[Option[List[EventModel]]] = None,
+                                     questions: Option[Option[List[QuestionModel]]] = None,
+                                     lastLoginTime: Option[Option[DateTime]] = None) {
 
   def build = LoginResponseModelImpl(
     user.get,
-    phone,
+    phone.get,
     phoneVerified.get,
     pendingGroups.get,
     groups.get,
-    events,
-    questions,
-    lastLoginTime)
+    events.get,
+    questions.get,
+    lastLoginTime.get)
 
 }
