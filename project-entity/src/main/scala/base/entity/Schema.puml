@@ -76,6 +76,16 @@ package user {
         GroupId
     }
 
+    set(UserPhonesInvited) {
+        key(userId)
+        Phone
+    }
+
+    simple(UserPhoneLabel) {
+        key(userId+phone)
+        Label
+    }
+
     set(UserGroups) {
         key(userId)
         GroupId
@@ -231,6 +241,7 @@ GroupId --* GroupUser
 GroupId --* GroupUserQuestion
 GroupId --* GroupUsers
 Phone --* PhoneGroupsInvited
+Phone --* UserPhoneLabel
 PhysicalDevice --* Device
 PhysicalDevice --* Phone
 PhysicalDevice --* PhoneCooldown
@@ -239,5 +250,7 @@ UserId --* GroupUserQuestion
 UserId --* User
 UserId --* UserGroups
 UserId --* UserGroupsInvited
+UserId --* UserPhonesInvited
+UserId --* UserPhoneLabel
 
 @enduml

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:52 PM
+ * Last modified by rconrad, 2/1/15 4:23 PM
  */
 
 package base.entity.user.model.impl
@@ -22,7 +22,6 @@ import org.joda.time.DateTime
 case class LoginResponseModelImpl(user: UserModel,
                                   phone: Option[String],
                                   phoneVerified: Boolean,
-                                  pendingInvites: List[InviteModel],
                                   pendingGroups: List[GroupModel],
                                   groups: List[GroupModel],
                                   events: Option[List[EventModel]],
@@ -33,7 +32,6 @@ case class LoginResponseModelImpl(user: UserModel,
 case class LoginResponseModelBuilder(user: Option[UserModel] = None,
                                      phone: Option[String] = None,
                                      phoneVerified: Option[Boolean] = None,
-                                     pendingInvites: Option[List[InviteModel]] = None,
                                      pendingGroups: Option[List[GroupModel]] = None,
                                      groups: Option[List[GroupModel]] = None,
                                      events: Option[List[EventModel]] = None,
@@ -44,7 +42,6 @@ case class LoginResponseModelBuilder(user: Option[UserModel] = None,
     user.get,
     phone,
     phoneVerified.get,
-    pendingInvites.get,
     pendingGroups.get,
     groups.get,
     events,

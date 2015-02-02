@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:48 PM
+ * Last modified by rconrad, 2/1/15 4:25 PM
  */
 
 package base.entity.user.impl
@@ -117,7 +117,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userModel = UserModel(userId, Option(name))
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), List(), None, None, None)
+      List(), List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -127,7 +127,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), List(), None, None, None)
+      List(), List(), None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -137,7 +137,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userModel = UserModel(userId, Option(name))
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), List(), Option(List()), Option(List()), None)
+      List(), List(), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
   }
 
@@ -218,14 +218,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
     assert(command.userGetPendingGroups(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
-  }
-
-  test("failed to get invites") {
-    val userId = RandomService().uuid
-    val service = mock[UserService]
-    (service.getInvites(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(apiError))
-    assert(command.userGetInvites(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
   }
 
   test("failed to set last login") {

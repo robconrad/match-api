@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:07 PM
+ * Last modified by rconrad, 2/1/15 4:26 PM
  */
 
 package base.socket.api
@@ -160,7 +160,7 @@ abstract class SocketApiIntegrationTest
 
   test("integration test - runs all commands", Tags.SLOW) {
 
-    // todo remove scala style suppression
+    // todo remove scalastyle suppression
     // scalastyle:off parameter.number
     def login(deviceId: UUID, fbToken: String, name: String, userId: UUID,
               groups: List[GroupModel], groupId: Option[UUID], phone: Option[String],
@@ -169,7 +169,7 @@ abstract class SocketApiIntegrationTest
       val deviceModel = DeviceModel(deviceId)
       val loginModel = LoginModel(fbToken, groupId, "", ApiVersions.V01, "", deviceModel)
       val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(UserModel(userId, Option(name)), phone,
-        phone.isDefined, List(), List(), sortGroups(groups), events, questions.map(sortQuestions), lastLogin)
+        phone.isDefined, List(), sortGroups(groups), events, questions.map(sortQuestions), lastLogin)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
       val facebookService = mock[FacebookService]
       val unregister = TestServices.register(facebookService)

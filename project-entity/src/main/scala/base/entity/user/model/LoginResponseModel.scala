@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:52 PM
+ * Last modified by rconrad, 2/1/15 4:23 PM
  */
 
 package base.entity.user.model
@@ -31,7 +31,6 @@ trait LoginResponseModel extends Model {
   @(ApiModelProperty @field)(required = true, value = emailDesc)     def user: UserModel
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def phone: Option[String]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def phoneVerified: Boolean
-  @(ApiModelProperty @field)(required = false, value = passwordDesc) def pendingInvites: List[InviteModel]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def pendingGroups: List[GroupModel]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def groups: List[GroupModel]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def events: Option[List[EventModel]]

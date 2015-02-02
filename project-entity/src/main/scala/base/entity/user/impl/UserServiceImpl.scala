@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:01 PM
+ * Last modified by rconrad, 2/1/15 4:26 PM
  */
 
 package base.entity.user.impl
@@ -96,14 +96,6 @@ class UserServiceImpl extends ServiceImpl with UserService {
         case (_, false) => Errors.notAllGroupsReturned
       }
     }
-  }
-
-  def getInvites(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getInvites()
-  }
-
-  private[impl] def getInvites()(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    Future.successful(Right(List()))
   }
 
 }
