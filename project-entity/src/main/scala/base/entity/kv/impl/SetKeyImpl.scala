@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 4:53 PM
+ * Last modified by rconrad, 2/1/15 5:14 PM
  */
 
 package base.entity.kv.impl
@@ -19,6 +19,7 @@ import redis.reply.{ BulkReply, MultiBulkReply }
 abstract class SetKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with SetKey[T] {
 
   def members() = {
+    if (isDebugEnabled) log("SMEMBERS", "(begin)")
     p.smembers(token).map { v =>
       val res = v.data().map { x =>
         deserialize[T](x.data().asInstanceOf[Array[Byte]])

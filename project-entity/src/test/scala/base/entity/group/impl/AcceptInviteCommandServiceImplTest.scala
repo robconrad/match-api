@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/1/15 5:09 PM
  */
 
 package base.entity.group.impl
@@ -11,16 +11,16 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, TestServices }
+import base.common.service.{Services, TestServices}
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
-import base.entity.group.model.{ AcceptInviteResponseModel, AcceptInviteModel, GroupModel, SendInviteResponseModel }
-import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
+import base.entity.group.model.{AcceptInviteModel, AcceptInviteResponseModel, GroupModel}
+import base.entity.group.{GroupEventsService, GroupListenerService, GroupService}
 import base.entity.kv.Key._
 import base.entity.question.QuestionService
 import base.entity.user.kv._
@@ -61,6 +61,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
+    val phone = "555-1234"
     val groupId = RandomService().uuid
     val eventModel = mock[EventModel]
     val groupModel = mock[GroupModel]
@@ -86,6 +87,12 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
     assert(userGroupsInvitedKey.add(groupId).await() == 1L)
 
+    val groupPhonesInvitedKey = GroupPhonesInvitedKeyService().make(groupId)
+    assert(groupPhonesInvitedKey.add(phone).await() == 1L)
+
+    val userKey = UserKeyService().make(authCtx.userId)
+    assert(userKey.setPhoneAttributes(UserPhoneAttributes(phone, "", verified = true)).await())
+
     val actual = service.innerExecute(AcceptInviteModel(groupId)).await()
     val expected = Right(response)
 
@@ -99,8 +106,10 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupUsersKey = GroupUsersKeyService().make(groupId)
     assert(groupUsersKey.isMember(authCtx.userId).await())
 
-    val userGroups = UserGroupsKeyService().make(authCtx.userId)
-    assert(userGroups.isMember(groupId).await())
+    val userGroupsKey = UserGroupsKeyService().make(authCtx.userId)
+    assert(userGroupsKey.isMember(groupId).await())
+
+    assert(!groupPhonesInvitedKey.isMember(phone).await())
 
     unregister()
   }
@@ -109,6 +118,13 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[UserGroupsInvitedKey]
     key.remove _ expects * returning Future.successful(0)
     assert(command.userGroupsInvitedRemove(key).await() == Errors.userGroupsInvitedRemoveFailed.await())
+  }
+
+  test("user get phone not verified") {
+    val key = mock[UserKey]
+    val attributes = UserPhoneAttributes("", "", verified = false)
+    key.getPhoneAttributes _ expects () returning Future.successful(Option(attributes))
+    assert(command.userGetPhone(key).await() == Errors.userPhoneNotVerified.await())
   }
 
   test("group users add failed") {

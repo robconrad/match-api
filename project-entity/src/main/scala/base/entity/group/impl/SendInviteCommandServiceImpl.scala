@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 1:01 PM
+ * Last modified by rconrad, 2/1/15 4:52 PM
  */
 
 package base.entity.group.impl
@@ -48,6 +48,7 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
    * - add invite to user if yes user id
    * - add inviter to group users
    * - add group to inviter groups
+   * - add invited phone to group phones invited
    * - add welcome message to group events
    * - register group listener
    * - get and return group, events, questions
@@ -106,8 +107,14 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def userGroupsAdd(groupId: UUID, key: UserGroupsKey) =
       key.add(groupId).flatMap {
-        case 1L => groupEventsPrepend(groupId)
+        case 1L => groupPhonesInvitedAdd(groupId, GroupPhonesInvitedKeyService().make(groupId))
         case _  => Errors.userGroupsAddFailed
+      }
+
+    def groupPhonesInvitedAdd(groupId: UUID, key: GroupPhonesInvitedKey) =
+      key.add(input.phone).flatMap {
+        case 1L => groupEventsPrepend(groupId)
+        case _ => Errors.groupPhonesInvitedAddFailed
       }
 
     def groupEventsPrepend(groupId: UUID) = {
@@ -168,6 +175,7 @@ object SendInviteCommandServiceImpl {
     lazy val groupGetFailed: Response = "failed to get group"
     lazy val groupCreateFailed: Response = "failed to create group"
     lazy val groupUsersAddFailed: Response = "failed to add to groupUsers"
+    lazy val groupPhonesInvitedAddFailed: Response = "failed to add to groupPhonesInvited"
     lazy val userGroupsAddFailed: Response = "failed to add to userGroups"
 
   }

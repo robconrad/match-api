@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/1/15 5:02 PM
  */
 
 package base.entity.group.impl
@@ -15,12 +15,12 @@ import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group._
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
-import base.entity.group.kv.{ GroupUsersKey, GroupUsersKeyService }
+import base.entity.group.kv.{GroupPhonesInvitedKeyService, GroupPhonesInvitedKey, GroupUsersKey, GroupUsersKeyService}
 import base.entity.group.model.{ AcceptInviteModel, AcceptInviteResponseModel, GroupModel }
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
-import base.entity.user.kv.{ UserGroupsInvitedKey, UserGroupsInvitedKeyService, UserGroupsKey, UserGroupsKeyService }
+import base.entity.user.kv._
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)
@@ -37,7 +37,9 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
   }
 
   /**
-   * - remove invite
+   * - remove invite from user
+   * - get user phone
+   * - remove invited phone from group
    * - add invitee to group users
    * - add group to invitee groups
    * - add join message to group events
@@ -53,8 +55,21 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
 
     def userGroupsInvitedRemove(key: UserGroupsInvitedKey): Response =
       key.remove(input.groupId) flatMap {
-        case 1L => groupUsersAdd(GroupUsersKeyService().make(input.groupId))
+        case 1L => userGetPhone(UserKeyService().make(authCtx.userId))
         case _  => Errors.userGroupsInvitedRemoveFailed
+      }
+
+    def userGetPhone(key: UserKey): Response =
+      key.getPhoneAttributes flatMap {
+        case None => groupUsersAdd(GroupUsersKeyService().make(input.groupId))
+        case Some(phone) if !phone.verified => Errors.userPhoneNotVerified
+        case Some(phone) if phone.verified =>
+          groupPhonesInvitedRemove(GroupPhonesInvitedKeyService().make(input.groupId), phone.phone)
+      }
+
+    def groupPhonesInvitedRemove(key: GroupPhonesInvitedKey, phone: String): Response =
+      key.remove(phone) flatMap { response =>
+        groupUsersAdd(GroupUsersKeyService().make(input.groupId))
       }
 
     def groupUsersAdd(key: GroupUsersKey): Response =
@@ -116,6 +131,7 @@ object AcceptInviteCommandServiceImpl {
 
     override protected val externalErrorText = "There was a problem during accept invite."
 
+    lazy val userPhoneNotVerified: Response = "user phone not verified, can't resolve"
     lazy val userGroupsInvitedRemoveFailed: Response = "failed to remove invite from user groups invited"
     lazy val groupUsersAddFailed: Response = "failed to add to groupUsers"
     lazy val userGroupsAddFailed: Response = "failed to add to userGroups"

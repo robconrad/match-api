@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:30 PM
+ * Last modified by rconrad, 2/1/15 4:55 PM
  */
 
 package base.entity.group.impl
@@ -43,7 +43,6 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
   private val label = "Bob"
   private val time = TimeServiceConstantMock.now
 
-  private val userId = RandomService().uuid
   private val groupId = RandomService().uuid
 
   private val error = ApiErrorService().badRequest("test")
@@ -124,6 +123,9 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     val userGroups = UserGroupsKeyService().make(authCtx.userId)
     assert(userGroups.isMember(groupId).await())
 
+    val groupPhonesInvitedKey = GroupPhonesInvitedKeyService().make(groupId)
+    assert(groupPhonesInvitedKey.isMember(phone).await())
+
     unregister()
   }
 
@@ -187,6 +189,12 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[UserGroupsKey]
     key.add _ expects * returning Future.successful(0L)
     assert(command.userGroupsAdd(groupId, key).await() == Errors.userGroupsAddFailed.await())
+  }
+
+  test("group phones invited add failed") {
+    val key = mock[GroupPhonesInvitedKey]
+    key.add _ expects * returning Future.successful(0L)
+    assert(command.groupPhonesInvitedAdd(groupId, key).await() == Errors.groupPhonesInvitedAddFailed.await())
   }
 
   test("group events prepend returned error") {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:31 PM
+ * Last modified by rconrad, 2/1/15 6:37 PM
  */
 
 package base.socket.api
@@ -26,7 +26,7 @@ import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.group.model._
-import base.entity.group.model.impl.GroupModelImpl
+import base.entity.group.model.impl.{InviteModelImpl, GroupModelImpl}
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
@@ -195,7 +195,8 @@ abstract class SocketApiIntegrationTest
     def sendInvite(phone: String, users: List[UserModel], groupId: UUID, events: List[EventModel],
                    questionModels: List[QuestionModel])(implicit s: SocketConnection) {
       val label = "bob"
-      val groupModel = GroupModelImpl(groupId, sortUsers(users), List(), None, None, 0)
+      val invite = InviteModelImpl(phone, None, Option(label))
+      val groupModel = GroupModelImpl(groupId, sortUsers(users), List(invite), None, None, 0)
 
       val inviteModel = SendInviteModel(phone, label)
       val inviteResponseModel = SendInviteResponseModel(groupModel, events, sortQuestions(questionModels))
@@ -253,15 +254,15 @@ abstract class SocketApiIntegrationTest
     val fbToken2 = "fbToken2"
     val fbToken3 = "fbToken3"
 
-    val name1 = "first name"
+    val name1 = "first name1"
     val name2 = "first name2"
     val name3 = "first name3"
 
     val deviceId1 = RandomService().uuid
     val userId1 = randomMock.nextUuid()
-    val phone1 = "555-1234"
-    val phone2 = "555-4321"
-    val phone3 = "555-4322"
+    val phone1 = "555-1234 (1)"
+    val phone2 = "555-4321 (2)"
+    val phone3 = "555-4322 (3)"
 
     login(deviceId1, fbToken1, name1, userId1, groups = List(), None, None)(socket1)
 
@@ -297,8 +298,9 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    val invites2 = List(GroupModelImpl(groupId, users1, List(), None, None, 0))
-    verify(phone2, invites2)(socket2)
+    val invite2 = InviteModelImpl(phone2, None, Option(name2))
+    val pendingGroups2 = List(GroupModelImpl(groupId, users1, List(invite2), None, None, 0))
+    verify(phone2, pendingGroups2)(socket2)
 
     // skip invite for user2
 
@@ -339,8 +341,9 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    val invites3 = List(GroupModelImpl(groupId2, users1, List(), None, None, 0))
-    verify(phone3, invites3)(socket3)
+    val invite3 = InviteModelImpl(phone3, None, Option(name3))
+    val pendingGroups3 = List(GroupModelImpl(groupId2, users1, List(invite3), None, None, 0))
+    verify(phone3, pendingGroups3)(socket3)
 
     declineInvite(groupId2)(socket3)
 
@@ -352,7 +355,7 @@ abstract class SocketApiIntegrationTest
     val socket4 = connect()
     val groups = List(
       GroupModelImpl(groupId, sortUsers(users2), List(), None, None, 0),
-      GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), List(), None, None, 0))
+      GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), List(invite3), None, None, 0))
     login(deviceId1, fbToken1, name1, userId1, groups, Option(groupId), Option(phone1),
       Option((events2 ++ List(messageEventModel2)).reverse), Option(questionModels2.filter(_.id != questionDefs(1).id)),
       Option(TimeServiceConstantMock.now))(socket4)

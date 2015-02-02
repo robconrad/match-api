@@ -159,6 +159,11 @@ package group {
         UserId
     }
 
+    set(GroupPhonesInvited) {
+        key(groupId)
+        Phone
+    }
+
 }
 
 package question {
@@ -240,6 +245,7 @@ GroupId --* GroupEvents
 GroupId --* GroupUser
 GroupId --* GroupUserQuestion
 GroupId --* GroupUsers
+GroupId ---* GroupPhonesInvited
 Phone --* PhoneGroupsInvited
 Phone --* UserPhoneLabel
 PhysicalDevice --* Device
