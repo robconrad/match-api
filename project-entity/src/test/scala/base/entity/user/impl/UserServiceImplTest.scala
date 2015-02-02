@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/1/15 4:05 PM
  */
 
 package base.entity.user.impl
@@ -107,6 +107,22 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
       (*, *, *, *) returning Future.successful(Right(Option(group))) twice ()
     val unregister = TestServices.register(groupService)
     assert(service.getGroups(userId, key).await() == Errors.notAllGroupsReturned)
+    unregister()
+  }
+
+  test("getPendingGroups - success") {
+    val groups = Set(groupId1, groupId2)
+    val group1 = GroupModelImpl(groupId1, List(), None, None, eventCount = 0)
+    val group2 = group1.copy(id = groupId2)
+    val key = mock[UserGroupsInvitedKey]
+    key.members _ expects() returning Future.successful(groups)
+    val groupService = mock[GroupService]
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group1)))
+    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group2)))
+    val unregister = TestServices.register(groupService)
+    assert(service.getPendingGroups(userId, key).await() == Right(List(group1, group2)))
     unregister()
   }
 

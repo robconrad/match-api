@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:50 PM
+ * Last modified by rconrad, 2/1/15 4:07 PM
  */
 
 package base.socket.api
@@ -297,7 +297,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    val invites2 = List(GroupModelImpl(groupId, List(), None, None, 0))
+    val invites2 = List(GroupModelImpl(groupId, users1, None, None, 0))
     verify(phone2, invites2)(socket2)
 
     // skip invite for user2
@@ -339,7 +339,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    val invites3 = List(GroupModelImpl(groupId2, List(), None, None, 0))
+    val invites3 = List(GroupModelImpl(groupId2, users1, None, None, 0))
     verify(phone3, invites3)(socket3)
 
     declineInvite(groupId2)(socket3)
