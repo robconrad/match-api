@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:21 PM
+ * Last modified by rconrad, 2/5/15 9:21 AM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -174,7 +174,7 @@ object BaseBuild extends Build {
     ScoverageSbtPlugin.instrumentSettings ++
     ScalastylePlugin.projectSettings ++
     net.virtualvoid.sbt.graph.Plugin.graphSettings ++ Seq(
-      scalaVersion := "2.11.2",
+      scalaVersion := "2.11.5",
       organization := "base",
       autoCompilerPlugins := true,
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:implicitConversions"),
