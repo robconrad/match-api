@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:26 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.user.impl
@@ -15,6 +15,7 @@ import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
 import base.entity.kv.Key._
+import base.entity.kv.MakeKey
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
 import base.entity.user.UserService.GetGroups
@@ -31,7 +32,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserServiceImpl extends ServiceImpl with UserService {
+class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
 
   def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val key = UserKeyService().make(userId)
@@ -44,11 +45,11 @@ class UserServiceImpl extends ServiceImpl with UserService {
     }
 
   def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getUsers(userId, userIds, UserKeyService())
+    getUsersFromKey(userId, userIds, UserKeyService())
   }
 
-  private[impl] def getUsers(contextUserId: UUID, userIds: List[UUID],
-                             keyService: UserKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  private[impl] def getUsersFromKey(contextUserId: UUID, userIds: List[UUID],
+                                    keyService: UserKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
       keyService.make(userId).getName.map { name =>
         UserModel(userId, name)
@@ -58,42 +59,42 @@ class UserServiceImpl extends ServiceImpl with UserService {
   }
 
   def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    val key = UserGroupsKeyService().make(userId)
-    getGroups(userId, key)
+    getGroupsFromKey(userId, make[UserGroupsKey](userId))
   }
 
-  private[impl] def getGroups(userId: UUID,
-                              key: UserGroupsKey)(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups = {
-    key.members() flatMap { groupIds =>
-      getGroups(userId, groupIds)
+  private[impl] def getGroupsFromKey(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline,
+                                                                       channelCtx: ChannelContext): GetGroups = {
+    key.members flatMap { groupIds =>
+      getGroupsFromIds(userId, groupIds)
     }
   }
 
   def getPendingGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getPendingGroups(userId, UserGroupsInvitedKeyService().make(userId))
+    getPendingGroupsFromKey(userId, make[UserGroupsInvitedKey](userId))
   }
 
-  private[impl] def getPendingGroups(userId: UUID,
-                                     key: UserGroupsInvitedKey)(implicit p: Pipeline,
-                                                                channelCtx: ChannelContext): GetGroups = {
-    key.members() flatMap { groupIds =>
-      getGroups(userId, groupIds)
+  private[impl] def getPendingGroupsFromKey(userId: UUID,
+                                            key: UserGroupsInvitedKey)(implicit p: Pipeline,
+                                                                       channelCtx: ChannelContext): GetGroups = {
+    key.members flatMap { groupIds =>
+      getGroupsFromIds(userId, groupIds)
     }
   }
 
-  private[impl] def getGroups(userId: UUID,
-                              groupIds: Set[UUID])(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups = {
+  private[impl] def getGroupsFromIds(userId: UUID,
+                                     groupIds: Set[UUID])(implicit p: Pipeline,
+                                                          channelCtx: ChannelContext): GetGroups = {
     val futures = groupIds.map { groupId =>
       GroupService().getGroup(userId, groupId)
     }
     Future.sequence(futures).map { eithers =>
-      lazy val errors = eithers.collect { case Left(error) => error}
-      lazy val groups = eithers.collect { case Right(Some(group)) => group}
+      lazy val errors = eithers.collect { case Left(error) => error }
+      lazy val groups = eithers.collect { case Right(Some(group)) => group }
 
       (errors.size == 0, groups.size == groupIds.size) match {
         case (true, true) => Right(groups.toList)
-        case (false, _) => Left(errors.head)
-        case (_, false) => Errors.notAllGroupsReturned
+        case (false, _)   => Left(errors.head)
+        case (_, false)   => Errors.notAllGroupsReturned
       }
     }
   }

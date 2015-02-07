@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 1:40 PM
+ * Last modified by rconrad, 2/5/15 8:04 PM
  */
 
 package base.entity.kv
@@ -16,7 +16,7 @@ import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait KvTest extends EntityBaseSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+trait KvTest extends EntityBaseSuite with BeforeAndAfterAll with BeforeAndAfterEach with MakeKey {
 
   implicit val tp = KvFactoryService().client.pipeline()
 

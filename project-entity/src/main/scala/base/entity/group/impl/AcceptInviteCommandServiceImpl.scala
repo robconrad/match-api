@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 5:02 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -15,7 +15,7 @@ import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group._
 import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
-import base.entity.group.kv.{GroupPhonesInvitedKeyService, GroupPhonesInvitedKey, GroupUsersKey, GroupUsersKeyService}
+import base.entity.group.kv.{ GroupPhonesInvitedKey, GroupUsersKey }
 import base.entity.group.model.{ AcceptInviteModel, AcceptInviteResponseModel, GroupModel }
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
@@ -50,31 +50,31 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
       extends Command[AcceptInviteModel, AcceptInviteResponseModel] {
 
     def execute(): Response = {
-      userGroupsInvitedRemove(UserGroupsInvitedKeyService().make(authCtx.userId))
+      userGroupsInvitedRemove(make[UserGroupsInvitedKey](authCtx.userId))
     }
 
     def userGroupsInvitedRemove(key: UserGroupsInvitedKey): Response =
-      key.remove(input.groupId) flatMap {
+      key.rem(input.groupId) flatMap {
         case 1L => userGetPhone(UserKeyService().make(authCtx.userId))
         case _  => Errors.userGroupsInvitedRemoveFailed
       }
 
     def userGetPhone(key: UserKey): Response =
       key.getPhoneAttributes flatMap {
-        case None => groupUsersAdd(GroupUsersKeyService().make(input.groupId))
+        case None                           => groupUsersAdd(make[GroupUsersKey](input.groupId))
         case Some(phone) if !phone.verified => Errors.userPhoneNotVerified
         case Some(phone) if phone.verified =>
-          groupPhonesInvitedRemove(GroupPhonesInvitedKeyService().make(input.groupId), phone.phone)
+          groupPhonesInvitedRemove(make[GroupPhonesInvitedKey](input.groupId), phone.phone)
       }
 
     def groupPhonesInvitedRemove(key: GroupPhonesInvitedKey, phone: String): Response =
-      key.remove(phone) flatMap { response =>
-        groupUsersAdd(GroupUsersKeyService().make(input.groupId))
+      key.rem(phone) flatMap { response =>
+        groupUsersAdd(make[GroupUsersKey](input.groupId))
       }
 
     def groupUsersAdd(key: GroupUsersKey): Response =
       key.add(authCtx.userId).flatMap {
-        case 1L => userGroupsAdd(UserGroupsKeyService().make(authCtx.userId))
+        case 1L => userGroupsAdd(make[UserGroupsKey](authCtx.userId))
         case _  => Errors.groupUsersAddFailed
       }
 

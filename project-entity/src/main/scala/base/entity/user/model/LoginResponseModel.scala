@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:29 PM
+ * Last modified by rconrad, 2/7/15 3:24 PM
  */
 
 package base.entity.user.model
@@ -11,10 +11,10 @@ import base.entity.api.ApiStrings.User._
 import base.entity.event.model.EventModel
 import base.entity.group.model.GroupModel
 import base.entity.json.JsonFormats
-import base.entity.model.{Model, ModelCompanion}
+import base.entity.model.{ Model, ModelCompanion }
 import base.entity.question.model.QuestionModel
 import base.entity.user.model.impl.LoginResponseModelImpl
-import com.wordnik.swagger.annotations.{ApiModel, ApiModelProperty}
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 import org.joda.time.DateTime
 
 import scala.annotation.meta.field

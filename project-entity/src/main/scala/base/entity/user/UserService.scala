@@ -2,19 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:27 PM
+ * Last modified by rconrad, 2/7/15 3:24 PM
  */
 
 package base.entity.user
 
 import java.util.UUID
 
-import base.common.service.{Service, ServiceCompanion}
+import base.common.service.{ Service, ServiceCompanion }
 import base.entity.auth.context.ChannelContext
 import base.entity.error.model.ApiError
-import base.entity.group.model.{GroupModel, InviteModel}
+import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.kv.Key.Pipeline
-import base.entity.user.UserService.{GetGroups, GetUser, GetUsers}
+import base.entity.user.UserService.{ GetGroups, GetUser, GetUsers }
 import base.entity.user.model.UserModel
 
 import scala.concurrent.Future

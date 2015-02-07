@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 5:10 PM
+ * Last modified by rconrad, 2/7/15 3:33 PM
  */
 
 package base.entity.service
@@ -14,11 +14,10 @@ import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.facebook.kv.impl.FacebookInfoKeyServiceImpl
 import base.entity.group.impl._
 import base.entity.group.kv.impl._
-import base.entity.kv.impl.KvFactoryServiceImpl
+import base.entity.kv.impl.{ ScredisKeyFactoryServiceImpl, ScredisFactoryServiceImpl, KvFactoryServiceImpl }
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.question.QuestionDef
 import base.entity.question.impl.{ AnswerCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl }
-import base.entity.question.kv.impl.QuestionsKeyServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 import base.entity.user.kv.impl._
@@ -58,6 +57,11 @@ object EntityServicesBootstrap extends ServicesBootstrap {
       Keys(KV, "host"),
       Keys(KV, "port")))
 
+    Services.register(new ScredisFactoryServiceImpl(
+      Keys(KV, "clientCount"),
+      Keys(KV, "host"),
+      Keys(KV, "port")))
+
     true
   }
 
@@ -66,7 +70,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val otherRegistered = {
 
-    Services.register(new QuestionsKeyServiceImpl())
+    Services.register(new ScredisKeyFactoryServiceImpl())
 
     Services.register(new FacebookInfoKeyServiceImpl())
     Services.register(new FacebookUserKeyServiceImpl())
@@ -74,21 +78,12 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new UserKeyServiceImpl())
     Services.register(new DeviceKeyServiceImpl())
     Services.register(new PhoneKeyServiceImpl())
-    Services.register(new PhoneGroupsInvitedKeyServiceImpl())
     Services.register(new PhoneCooldownKeyServiceImpl())
-    Services.register(new UserGroupsKeyServiceImpl())
-    Services.register(new UserGroupsInvitedKeyServiceImpl())
     Services.register(new UserPhoneLabelKeyServiceImpl())
-    Services.register(new UserPhonesInvitedKeyServiceImpl())
 
     Services.register(new GroupKeyServiceImpl())
     Services.register(new GroupUserKeyServiceImpl())
-    Services.register(new GroupUsersKeyServiceImpl())
-    Services.register(new GroupUserQuestionsKeyServiceImpl())
-    Services.register(new GroupUserQuestionsYesKeyServiceImpl())
-    Services.register(new GroupUserQuestionsTempKeyServiceImpl())
     Services.register(new GroupEventsKeyServiceImpl())
-    Services.register(new GroupPhonesInvitedKeyServiceImpl())
 
     Services.register(new ApiErrorServiceImpl(
       Keys(MATCH, "debug")))

@@ -2,111 +2,67 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 5:14 PM
+ * Last modified by rconrad, 2/7/15 3:40 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.SetKey
-import base.entity.kv.bytea.ByteaSerializers._
-import redis.client.RedisException
-import redis.reply.{ BulkReply, MultiBulkReply }
+import base.entity.kv.{ ScredisFactoryService, SetKey }
 
-/**
- * Base model for set keys
- */
-// scalastyle:off null
-abstract class SetKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with SetKey[T] {
+abstract class SetKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[V])
+    extends ScredisKeyImpl[K, V]
+    with SetKey[K, V] {
 
-  def members() = {
-    if (isDebugEnabled) log("SMEMBERS", "(begin)")
-    p.smembers(token).map { v =>
-      val res = v.data().map { x =>
-        deserialize[T](x.data().asInstanceOf[Array[Byte]])
-      }.toSet
-      if (isDebugEnabled) log("SMEMBERS", "res: " + res.toString)
-      res
-    }
-  }
+  private lazy val commands = ScredisFactoryService().setCommands
 
-  def isMember(value: T) = {
-    p.sismember(token, serialize(value)).map { v =>
-      val isMember = v.data() == 1L
-      if (isDebugEnabled) log("SISMEMBER", s"value: $value res: $isMember")
-      isMember
-    }
-  }
+  protected def keyCommands = commands
 
-  def rand() = {
-    p.srandmember_(token).map { v =>
-      val res = v match {
-        case null                  => None
-        case v if v.data() == null => None
-        case v: BulkReply          => Option(deserialize(v.data()))
-        case v                     => throw new RedisException(s"SRANDMEMBER received sth. other than BulkReply: $v")
-      }
-      if (isDebugEnabled) log("SRANDMEMBER", s"result: $res")
-      res
-    }
-  }
+  def add(members: V*) =
+    commands.sAdd(key, members: _*)
 
-  def rand(count: Int) = {
-    p.srandmember_(token, count.asInstanceOf[AnyRef]).map {
-      case null                  => Set()
-      case v if v.data() == null => Set()
-      case v: MultiBulkReply =>
-        val res = v.data() map {
-          case v: BulkReply => deserialize(v.data())
-          case v            => throw new RedisException(s"SRANDMEMBER got something other than BulkReply: $v")
-        }
-        if (isDebugEnabled) log("SRANDMEMBER", s"count: $count, result: $res")
-        res.toSet
-      case v => throw new RedisException(s"SRANDMEMBER got something other than MultiBulkReply: $v")
-    }
-  }
+  def card =
+    commands.sCard(key)
 
-  def pop() = {
-    p.spop(token).map { v =>
-      val res = v match {
-        case null                  => None
-        case v if v.data() == null => None
-        case v                     => Option(deserialize(v.data()))
-      }
-      if (isDebugEnabled) log("SPOP", s"result: $res")
-      res
-    }
-  }
+  def diff(keys: SetKey[_, V]*) =
+    commands.sDiff(key, keys.map(_.key): _*)
 
-  def add(value: T*) = {
-    val args = token +: value.map(v => serialize(v))
-    p.sadd_(args: _*).map { v =>
-      val res = v.data()
-      if (isDebugEnabled) log("SADD", s" value: $value, result: $res")
-      res
-    }
-  }
+  def diffStore(key1: SetKey[_, V], keys: SetKey[_, V]*) =
+    commands.sDiffStore(key, key1.key, keys.map(_.key): _*)
 
-  def remove(value: T) =
-    p.srem_(token, serialize(value)).map { v =>
-      val res = v.data()
-      if (isDebugEnabled) log("SREM", s" value: $value, result: $res")
-      res
-    }
+  def inter(keys: SetKey[_, V]*) =
+    commands.sInter(key +: keys.map(_.key): _*)
 
-  def move(to: SetKey[T], member: T) =
-    p.smove(token, to.token, serialize(member)).map { v =>
-      val res = v.data()
-      if (isDebugEnabled) log("SMOVE", s" to: ${to.token} value: $member, result: $res")
-      res > 0
-    }
+  def interStore(keys: SetKey[_, V]*) =
+    commands.sInterStore(key, keys.map(_.key): _*)
 
-  def diffStore(sets: SetKey[T]*) = {
-    p.sdiffstore(token, sets.map(_.token): _*).map { v =>
-      val res = v.data()
-      if (isDebugEnabled) log("SDIFFSTORE", s" sets: $sets, result: $res")
-      res
-    }
-  }
+  def isMember(member: V) =
+    commands.sIsMember(key, member)
+
+  def members =
+    commands.sMembers(key)
+
+  def move(destKey: SetKey[_, V], member: V) =
+    commands.sMove(key, destKey.key, member)
+
+  def pop() =
+    commands.sPop(key)
+
+  def randMember =
+    commands.sRandMember(key)
+
+  def randMembers(count: Int) =
+    commands.sRandMembers(key, count)
+
+  def rem(members: V*) =
+    commands.sRem(key, members: _*)
+
+  def scan(cursor: Long, matchOpt: Option[String], countOpt: Option[Int]) =
+    commands.sScan(key, cursor, matchOpt, countOpt)
+
+  def union(keys: SetKey[_, V]*) =
+    commands.sUnion(key +: keys.map(_.key): _*)
+
+  def unionStore(keys: SetKey[_, V]*) =
+    commands.sUnionStore(key, keys.map(_.key): _*)
 
 }
-

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:48 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.user.impl
@@ -64,8 +64,8 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val groupId2 = RandomService().uuid
     val userKey = UserKeyService().make(authCtx.userId)
     val phoneKey = PhoneKeyService().make(phone)
-    val phoneGroupsInvitedKey = PhoneGroupsInvitedKeyService().make(phone)
-    val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
+    val phoneGroupsInvitedKey = make[PhoneGroupsInvitedKey](phone)
+    val userGroupsInvitedKey = make[UserGroupsInvitedKey](authCtx.userId)
     val userService = mock[UserService]
     val unregister = TestServices.register(userService)
 
@@ -88,8 +88,8 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
     assert(phoneKey.get.await().contains(authCtx.userId))
 
-    assert(phoneGroupsInvitedKey.members().await().size == 0)
-    assert(userGroupsInvitedKey.members().await().size == 2)
+    assert(phoneGroupsInvitedKey.members.await().size == 0)
+    assert(userGroupsInvitedKey.members.await().size == 2)
 
     unregister()
   }

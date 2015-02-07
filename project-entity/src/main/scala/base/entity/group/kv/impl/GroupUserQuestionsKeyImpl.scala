@@ -2,14 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:52 PM
+ * Last modified by rconrad, 2/7/15 3:34 PM
  */
 
 package base.entity.group.kv.impl
 
+import java.util.UUID
+
 import base.entity.group.kv.GroupUserQuestionsKey
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.KeyLogger
+import base.entity.kv.OrderedIdPair
 import base.entity.kv.impl.SetKeyImpl
 import base.entity.question.QuestionIdComposite
 
@@ -19,8 +20,11 @@ import base.entity.question.QuestionIdComposite
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupUserQuestionsKeyImpl(val token: Array[Byte],
-                                protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SetKeyImpl[QuestionIdComposite] with GroupUserQuestionsKey {
+class GroupUserQuestionsKeyImpl(val keyValue: OrderedIdPair)
+    extends SetKeyImpl[OrderedIdPair, QuestionIdComposite]
+    with GroupUserQuestionsKey {
+
+  def this(keyValue: (UUID, UUID)) =
+    this(OrderedIdPair(keyValue._1, keyValue._2))
 
 }

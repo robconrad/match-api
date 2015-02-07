@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:55 AM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.question.impl
@@ -17,9 +17,9 @@ import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.Key._
-import base.entity.kv.KvFactoryService
+import base.entity.kv.{ KvFactoryService, MakeKey }
 import base.entity.question.QuestionSides.QuestionSide
-import base.entity.question.kv.QuestionsKeyService
+import base.entity.question.kv.QuestionsKey
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
 import base.entity.service.CrudImplicits
@@ -34,10 +34,10 @@ import scala.concurrent.{ Await, Future }
  * @author rconrad
  */
 class QuestionServiceImpl(questions: Iterable[QuestionDef],
-                          questionCount: Int) extends ServiceImpl with QuestionService {
+                          questionCount: Int) extends ServiceImpl with QuestionService with MakeKey {
 
   private val questionMap = questions.map(q => q.id -> q).toMap
-  private val questionKey = QuestionsKeyService().make("standard")(KvFactoryService().pipeline)
+  private val questionKey = make[QuestionsKey]("standard")
 
   Await.ready(init(), CommonService().defaultDuration)
 
@@ -70,8 +70,8 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       extends CrudImplicits[List[QuestionModel]] {
 
     def execute() = {
-      val temp = GroupUserQuestionsTempKeyService().make(groupId, userId)
-      val answered = GroupUserQuestionsKeyService().make(groupId, userId)
+      val temp = make[GroupUserQuestionsTempKey](groupId, userId)
+      val answered = make[GroupUserQuestionsKey](groupId, userId)
       groupUserQuestionsTempDiffStore(temp, answered)
     }
 
@@ -82,7 +82,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       }
 
     def groupUserQuestionTempRand(temp: GroupUserQuestionsTempKey) =
-      temp.rand(questionCount).flatMap { compositeIds =>
+      temp.randMembers(questionCount).flatMap { compositeIds =>
         groupUserQuestionTempDel(temp, compositeIds)
       }
 
@@ -112,7 +112,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       extends CrudImplicits[List[EventModel]] {
 
     def execute() = {
-      val key = GroupUserQuestionsKeyService().make(input.groupId, channelCtx.authCtx.userId)
+      val key = make[GroupUserQuestionsKey](input.groupId, channelCtx.authCtx.userId)
       groupUserQuestionAdd(key)
     }
 
@@ -125,18 +125,19 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def questionResponse(id: QuestionIdComposite) =
       input.response match {
-        case true => groupUserQuestionYesAdd(id,
-          GroupUserQuestionsYesKeyService().make(input.groupId, channelCtx.authCtx.userId))
-        case false => Future.successful(Right(List()))
+        case true =>
+          groupUserQuestionYesAdd(id, make[GroupUserQuestionsYesKey](input.groupId, channelCtx.authCtx.userId))
+        case false =>
+          Future.successful(Right(List()))
       }
 
     def groupUserQuestionYesAdd(id: QuestionIdComposite, key: GroupUserQuestionsYesKey) =
       key.add(id).flatMap { added =>
-        groupUsersGet(GroupUsersKeyService().make(input.groupId))
+        groupUsersGet(make[GroupUsersKey](input.groupId))
       }
 
     def groupUsersGet(key: GroupUsersKey) =
-      key.members().flatMap { allUserIds =>
+      key.members.flatMap { allUserIds =>
         val otherUserIds = allUserIds.collect {
           case userId if userId != channelCtx.authCtx.userId => userId
         }
@@ -146,7 +147,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     def groupUsersQuestionYesGet(userIds: Iterable[UUID]) = {
       val inverseId = compositeId(input.questionId, input.side, inverse = true)
       val futures = userIds.map { userId =>
-        groupUserQuestionYesGet(userId, inverseId, GroupUserQuestionsYesKeyService().make(input.groupId, userId))
+        groupUserQuestionYesGet(userId, inverseId, make[GroupUserQuestionsYesKey](input.groupId, userId))
       }
       val matches = Future.sequence(futures).map(_.collect {
         case (userId, res) if res => userId

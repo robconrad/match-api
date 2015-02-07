@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:55 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -99,7 +99,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
 
     assert(actual == expected)
 
-    val userPhonesInvitedKey = UserPhonesInvitedKeyService().make(authCtx.userId)
+    val userPhonesInvitedKey = make[UserPhonesInvitedKey](authCtx.userId)
     assert(userPhonesInvitedKey.isMember(phone).await())
 
     val userPhoneLabelKey = UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone))
@@ -110,20 +110,20 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
 
     userExists match {
       case true =>
-        val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(userId)
+        val userGroupsInvitedKey = make[UserGroupsInvitedKey](userId)
         assert(userGroupsInvitedKey.isMember(groupId).await())
       case false =>
-        val phoneGroupsInvitedKey = PhoneGroupsInvitedKeyService().make(phone)
+        val phoneGroupsInvitedKey = make[PhoneGroupsInvitedKey](phone)
         assert(phoneGroupsInvitedKey.isMember(groupId).await())
     }
 
-    val groupUsersKey = GroupUsersKeyService().make(groupId)
+    val groupUsersKey = make[GroupUsersKey](groupId)
     assert(groupUsersKey.isMember(authCtx.userId).await())
 
-    val userGroups = UserGroupsKeyService().make(authCtx.userId)
+    val userGroups = make[UserGroupsKey](authCtx.userId)
     assert(userGroups.isMember(groupId).await())
 
-    val groupPhonesInvitedKey = GroupPhonesInvitedKeyService().make(groupId)
+    val groupPhonesInvitedKey = make[GroupPhonesInvitedKey](groupId)
     assert(groupPhonesInvitedKey.isMember(phone).await())
 
     unregister()

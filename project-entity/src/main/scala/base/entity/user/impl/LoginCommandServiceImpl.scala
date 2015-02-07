@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:38 PM
+ * Last modified by rconrad, 2/7/15 3:24 PM
  */
 
 package base.entity.user.impl
@@ -106,7 +106,7 @@ private[entity] class LoginCommandServiceImpl()
           val builder = LoginResponseModelBuilder(groups = Option(groups))
           input.groupId match {
             case Some(groupId) => eventsGet(key, userId, groupId, builder)
-            case None          =>
+            case None =>
               userGetLoginAttributes(key, userId, builder.copy(events = Option(None), questions = Option(None)))
           }
       }
@@ -139,7 +139,7 @@ private[entity] class LoginCommandServiceImpl()
     def userGetPendingGroups(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
       service.getPendingGroups(userId) flatMap {
         case Right(groups) => setLastLogin(UserKeyService().make(userId), builder.copy(pendingGroups = Option(groups)))
-        case Left(error)    => error
+        case Left(error)   => error
       }
     }
 

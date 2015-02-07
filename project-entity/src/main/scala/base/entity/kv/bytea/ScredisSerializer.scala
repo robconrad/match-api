@@ -2,23 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:34 PM
+ * Last modified by rconrad, 2/7/15 3:41 PM
  */
 
-package base.entity.user.kv
+package base.entity.kv.bytea
 
-import java.util.UUID
-
-import base.entity.kv.{ KeyPrefixes, SetKey }
+import scredis.serialization.{ Reader, Writer }
 
 /**
- * {{ Describe the high level purpose of UserKey here. }}
+ * {{ Describe the high level purpose of ScredisSerializer here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait UserGroupsKey extends SetKey[UUID, UUID] {
-
-  final val keyPrefix = KeyPrefixes.userGroups
+trait ScredisSerializer[T] extends Writer[T] with Reader[T] {
 
 }

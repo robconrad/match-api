@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 6:36 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -13,12 +13,13 @@ import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
 import base.entity.group.GroupService
 import base.entity.group.kv._
-import base.entity.group.model.{InviteModel, GroupModel}
-import base.entity.group.model.impl.{GroupModelBuilder, InviteModelImpl}
+import base.entity.group.model.impl.{ GroupModelBuilder, InviteModelImpl }
+import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.kv.Key.Pipeline
+import base.entity.kv.MakeKey
 import base.entity.service.CrudImplicits
 import base.entity.user.UserService
-import base.entity.user.kv.{PhoneKeyService, UserPhone, UserPhoneLabelKeyService}
+import base.entity.user.kv.{ PhoneKeyService, UserPhone, UserPhoneLabelKeyService }
 
 import scala.concurrent.Future
 
@@ -28,7 +29,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupServiceImpl extends ServiceImpl with GroupService {
+class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
 
   def getGroup(userId: UUID, groupId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     new GetGroupMethod(userId, groupId).execute()
@@ -51,25 +52,25 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
     def groupGet(key: GroupKey, builder: GroupModelBuilder): Response =
       key.getLastEventAndCount.flatMap {
         case (lastEvent, count) =>
-          val key = GroupUsersKeyService().make(groupId)
+          val key = make[GroupUsersKey](groupId)
           groupUsersGet(key, builder.copy(lastEventTime = Option(lastEvent), eventCount = Option(count.getOrElse(0))))
       }
 
     def groupUsersGet(key: GroupUsersKey, builder: GroupModelBuilder): Response =
-      key.members().flatMap { userIds =>
+      key.members.flatMap { userIds =>
         usersGet(userIds.toList, builder)
       }
 
     def usersGet(userIds: List[UUID], builder: GroupModelBuilder): Response = {
       UserService().getUsers(userId, userIds).flatMap {
-        case Left(error)  => error
+        case Left(error) => error
         case Right(users) =>
-          groupPhonesInvitedGet(GroupPhonesInvitedKeyService().make(groupId), builder.copy(users = Option(users)))
+          groupPhonesInvitedGet(make[GroupPhonesInvitedKey](groupId), builder.copy(users = Option(users)))
       }
     }
 
     def groupPhonesInvitedGet(key: GroupPhonesInvitedKey, builder: GroupModelBuilder): Response = {
-      key.members() flatMap { phones =>
+      key.members flatMap { phones =>
         val userIds = phones.map { phone =>
           PhoneKeyService().make(phone).get.map(userId => phone -> userId)
         }
@@ -86,9 +87,10 @@ class GroupServiceImpl extends ServiceImpl with GroupService {
           case Right(users) =>
             users.map { user =>
               userIdOpts.find(_._2.contains(user.id)).map(_._1 -> user)
-            }.collect { case Some((phone, user)) =>
-              // todo pictureUrl
-              phone -> InviteModelImpl(phone, None, user.label)
+            }.collect {
+              case Some((phone, user)) =>
+                // todo pictureUrl
+                phone -> InviteModelImpl(phone, None, user.label)
             }.toMap[String, InviteModel]
           case Left(apiError) =>
             error("received error but continuing anyway, %s", apiError)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 6:17 PM
+ * Last modified by rconrad, 2/5/15 7:34 PM
  */
 
 package base.entity.kv
@@ -20,8 +20,12 @@ object KeyPrefixes extends Enumeration {
   type KeyPrefix = Value
 
   implicit class Props(v: Value) {
-    def toBytes = ByteBuffer.allocate(2).putShort(v.id.toShort).array()
+    def toBytes = bytes(v)
   }
+
+  private lazy val bytes = values.toList.map { v =>
+    v -> ByteBuffer.allocate(2).putShort(v.id.toShort).array()
+  }.toMap
 
   /**
    * WARNING: DANGER: VERY IMPORTANT: these can never change value or the kv store is hosed!

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:48 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.user.impl
@@ -85,15 +85,15 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
     def phoneSetUserId(key: PhoneKey): Response =
       key.set(authCtx.userId).flatMap {
         case true =>
-          val phoneInvitedKey = PhoneGroupsInvitedKeyService().make(input.phone)
-          val userInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
+          val phoneInvitedKey = make[PhoneGroupsInvitedKey](input.phone)
+          val userInvitedKey = make[UserGroupsInvitedKey](authCtx.userId)
           phoneInvitesToUserInvites(phoneInvitedKey, userInvitedKey)
         case false => Errors.phoneSetUserIdFailed
       }
 
     def phoneInvitesToUserInvites(phoneInvitedKey: PhoneGroupsInvitedKey,
                                   userInvitedKey: UserGroupsInvitedKey): Response =
-      PhoneGroupsInvitedKeyService().unionStore(userInvitedKey, userInvitedKey, phoneInvitedKey) flatMap { response =>
+      userInvitedKey.unionStore(userInvitedKey, phoneInvitedKey) flatMap { response =>
         phoneInvitedKey.del() flatMap { response =>
           userGetInvitesIn(UserService())
         }

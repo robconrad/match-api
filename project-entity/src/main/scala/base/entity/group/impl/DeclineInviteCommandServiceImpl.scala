@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:54 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -14,7 +14,7 @@ import base.entity.group._
 import base.entity.group.impl.DeclineInviteCommandServiceImpl.Errors
 import base.entity.group.model.{ DeclineInviteModel, DeclineInviteResponseModel }
 import base.entity.service.CrudErrorImplicits
-import base.entity.user.kv.{ UserGroupsInvitedKey, UserGroupsInvitedKeyService }
+import base.entity.user.kv.UserGroupsInvitedKey
 
 /**
  * User processing (CRUD - i.e. external / customer-facing)
@@ -37,11 +37,11 @@ private[entity] class DeclineInviteCommandServiceImpl()
       extends Command[DeclineInviteModel, DeclineInviteResponseModel] {
 
     def execute() = {
-      userGroupsInvitedRemove(UserGroupsInvitedKeyService().make(authCtx.userId))
+      userGroupsInvitedRemove(make[UserGroupsInvitedKey](authCtx.userId))
     }
 
     def userGroupsInvitedRemove(key: UserGroupsInvitedKey) =
-      key.remove(input.groupId) flatMap {
+      key.rem(input.groupId) flatMap {
         case 1L => DeclineInviteResponseModel(input.groupId)
         case _  => Errors.userGroupsInvitedRemoveFailed
       }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -58,7 +58,7 @@ class DeclineInviteCommandServiceImplTest extends CommandServiceImplTest {
 
     val response = DeclineInviteResponseModel(groupId)
 
-    val userGroupsInvitedKey = UserGroupsInvitedKeyService().make(authCtx.userId)
+    val userGroupsInvitedKey = make[UserGroupsInvitedKey](authCtx.userId)
     assert(userGroupsInvitedKey.add(groupId).await() == 1L)
 
     val actual = service.innerExecute(DeclineInviteModel(groupId)).await()
@@ -70,7 +70,7 @@ class DeclineInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   test("user groups invited remove failed") {
     val key = mock[UserGroupsInvitedKey]
-    key.remove _ expects * returning Future.successful(0)
+    key.rem _ expects * returning Future.successful(0)
     assert(command.userGroupsInvitedRemove(key).await() == Errors.userGroupsInvitedRemoveFailed.await())
   }
 

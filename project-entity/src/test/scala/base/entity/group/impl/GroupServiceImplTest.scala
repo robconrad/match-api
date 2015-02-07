@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 6:27 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -10,17 +10,17 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{Services, TestServices}
+import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiErrorService
-import base.entity.group.kv.{GroupKeyService, GroupPhonesInvitedKeyService, GroupUserKeyService}
-import base.entity.group.model.impl.{GroupModelBuilder, GroupModelImpl, InviteModelImpl}
+import base.entity.group.kv.{ GroupPhonesInvitedKey, GroupKeyService, GroupUserKeyService }
+import base.entity.group.model.impl.{ GroupModelBuilder, GroupModelImpl, InviteModelImpl }
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 import base.entity.user.UserService
-import base.entity.user.kv.{PhoneKeyService, UserPhone, UserPhoneLabelKeyService}
+import base.entity.user.kv.{ UserPhoneLabelKey, PhoneKeyService, UserPhone, UserPhoneLabelKeyService }
 import base.entity.user.model.UserModel
 
 import scala.concurrent.Future
@@ -81,10 +81,10 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val label = "bob"
 
     val expectedGroup = group.copy(invites = List(
-      InviteModelImpl(phone1, None, Option(label)),
-      InviteModelImpl(phone2, None, None)))
+      InviteModelImpl(phone2, None, None),
+      InviteModelImpl(phone1, None, Option(label))))
 
-    assert(GroupPhonesInvitedKeyService().make(groupId).add(phone1, phone2).await() == 2L)
+    assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone1)).set(label).await())
 
     assert(GroupUserKeyService().make(groupId, channelCtx.authCtx.userId).setLastRead(time).await())
@@ -120,7 +120,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
       InviteModelImpl(phone1, None, Option(label)),
       InviteModelImpl(phone2, None, None)))
 
-    assert(GroupPhonesInvitedKeyService().make(groupId).add(phone1, phone2).await() == 2L)
+    assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(PhoneKeyService().make(phone1).set(userId1).await())
     assert(PhoneKeyService().make(phone2).set(userId2).await())
 
@@ -156,7 +156,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
       InviteModelImpl(phone2, None, Option(label)),
       InviteModelImpl(phone1, None, Option(label))))
 
-    assert(GroupPhonesInvitedKeyService().make(groupId).add(phone1, phone2).await() == 2L)
+    assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(PhoneKeyService().make(phone1).set(userId1).await())
     assert(UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone2)).set(label).await())
 

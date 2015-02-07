@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:52 PM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.group.impl
@@ -16,10 +16,10 @@ import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
+import base.entity.group._
 import base.entity.group.impl.SendInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ GroupModel, SendInviteModel, SendInviteResponseModel }
-import base.entity.group._
 import base.entity.question.QuestionService
 import base.entity.question.model.QuestionModel
 import base.entity.service.CrudErrorImplicits
@@ -57,7 +57,7 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
       extends Command[SendInviteModel, SendInviteResponseModel] {
 
     def execute() = {
-      userPhonesInvitedAdd(UserPhonesInvitedKeyService().make(authCtx.userId))
+      userPhonesInvitedAdd(make[UserPhonesInvitedKey](authCtx.userId))
     }
 
     def userPhonesInvitedAdd(key: UserPhonesInvitedKey) =
@@ -83,38 +83,38 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def phoneGetUserId(groupId: UUID, key: PhoneKey) =
       key.get.flatMap {
-        case Some(userId) => userGroupsInvitedAdd(groupId, UserGroupsInvitedKeyService().make(userId))
-        case None         => phoneGroupsInvitedAdd(groupId, PhoneGroupsInvitedKeyService().make(input.phone))
+        case Some(userId) => userGroupsInvitedAdd(groupId, make[UserGroupsInvitedKey](userId))
+        case None         => phoneGroupsInvitedAdd(groupId, make[PhoneGroupsInvitedKey](input.phone))
       }
 
     def phoneGroupsInvitedAdd(groupId: UUID, key: PhoneGroupsInvitedKey) =
       key.add(groupId) flatMap {
-        case 1L => groupUsersAdd(groupId, GroupUsersKeyService().make(groupId))
+        case 1L => groupUsersAdd(groupId, make[GroupUsersKey](groupId))
         case _  => Errors.phoneGroupsInvitedAddFailed
       }
 
     def userGroupsInvitedAdd(groupId: UUID, key: UserGroupsInvitedKey) =
       key.add(groupId) flatMap {
-        case 1L => groupUsersAdd(groupId, GroupUsersKeyService().make(groupId))
+        case 1L => groupUsersAdd(groupId, make[GroupUsersKey](groupId))
         case _  => Errors.userGroupsInvitedAddFailed
       }
 
     def groupUsersAdd(groupId: UUID, key: GroupUsersKey) =
       key.add(authCtx.userId).flatMap {
-        case 1L => userGroupsAdd(groupId, UserGroupsKeyService().make(authCtx.userId))
+        case 1L => userGroupsAdd(groupId, make[UserGroupsKey](authCtx.userId))
         case _  => Errors.groupUsersAddFailed
       }
 
     def userGroupsAdd(groupId: UUID, key: UserGroupsKey) =
       key.add(groupId).flatMap {
-        case 1L => groupPhonesInvitedAdd(groupId, GroupPhonesInvitedKeyService().make(groupId))
+        case 1L => groupPhonesInvitedAdd(groupId, make[GroupPhonesInvitedKey](groupId))
         case _  => Errors.userGroupsAddFailed
       }
 
     def groupPhonesInvitedAdd(groupId: UUID, key: GroupPhonesInvitedKey) =
       key.add(input.phone).flatMap {
         case 1L => groupEventsPrepend(groupId)
-        case _ => Errors.groupPhonesInvitedAddFailed
+        case _  => Errors.groupPhonesInvitedAddFailed
       }
 
     def groupEventsPrepend(groupId: UUID) = {

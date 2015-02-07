@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 11:58 AM
+ * Last modified by rconrad, 2/7/15 3:26 PM
  */
 
 package base.entity.question.impl
@@ -16,7 +16,7 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.kv.{ GroupUserQuestionsTempKey, GroupUserQuestionsYesKeyService, GroupUsersKeyService }
+import base.entity.group.kv.{ GroupUserQuestionsYesKey, GroupUserQuestionsTempKey, GroupUsersKey }
 import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
 import base.entity.question.model.{ AnswerModel, QuestionModel }
@@ -75,7 +75,6 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val groupId = RandomService().uuid
     val key = mock[GroupUserQuestionsTempKey]
     key.del _ expects () returning Future.successful(false)
-    key.tokenToString _ expects () returning ""
 
     val method = new service.GetQuestionsMethod(groupId, authCtx.userId)
     intercept[RedisException] {
@@ -89,9 +88,9 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val userId = RandomService().uuid
     val questionResponse = true
 
-    val usersKey = GroupUsersKeyService().make(groupId)
+    val usersKey = make[GroupUsersKey](groupId)
     assert(usersKey.add(userId).await() == 1L)
-    val userYesKey = GroupUserQuestionsYesKeyService().make(groupId, userId)
+    val userYesKey = make[GroupUserQuestionsYesKey](groupId, userId)
     assert(userYesKey.add(QuestionIdComposite(questionId, SIDE_B)).await() == 1)
 
     val model = AnswerModel(questionId, groupId, SIDE_A, questionResponse)

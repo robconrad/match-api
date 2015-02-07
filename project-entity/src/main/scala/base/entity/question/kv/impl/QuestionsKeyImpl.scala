@@ -2,13 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:56 PM
+ * Last modified by rconrad, 2/7/15 3:34 PM
  */
 
 package base.entity.question.kv.impl
 
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.KeyLogger
 import base.entity.kv.impl.SetKeyImpl
 import base.entity.question.QuestionIdComposite
 import base.entity.question.kv.QuestionsKey
@@ -19,7 +17,6 @@ import base.entity.question.kv.QuestionsKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionsKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SetKeyImpl[QuestionIdComposite] with QuestionsKey {
-
-}
+class QuestionsKeyImpl(val keyValue: String)
+  extends SetKeyImpl[String, QuestionIdComposite]
+  with QuestionsKey

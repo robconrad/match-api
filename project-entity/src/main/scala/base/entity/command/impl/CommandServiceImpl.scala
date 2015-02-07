@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/5/15 8:03 PM
  */
 
 package base.entity.command.impl
@@ -12,6 +12,7 @@ import base.entity.auth.context.ChannelContext
 import base.entity.command.CommandService
 import base.entity.command.model.CommandModel
 import base.entity.error.model.ApiError
+import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
 import base.entity.service.CrudImplicits
 
@@ -25,6 +26,7 @@ private[entity] trait CommandServiceImpl[A, B]
     extends ServiceImpl
     with CommandService[A, B]
     with CrudImplicits[B]
+    with MakeKey
     with AuthLoggable {
 
   protected val responseManifest: Option[Manifest[B]] = None

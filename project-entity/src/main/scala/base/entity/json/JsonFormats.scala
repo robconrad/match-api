@@ -2,18 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:20 PM
+ * Last modified by rconrad, 2/7/15 3:24 PM
  */
 
 package base.entity.json
 
-import base.common.lib.{Currencies, Genders, Languages}
-import base.entity.api.{ApiErrorCodes, ApiVersions}
+import base.common.lib.{ Currencies, Genders, Languages }
+import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.command.CommandNames
 import base.entity.error.model.ApiError
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
-import base.entity.group.model.{GroupModel, InviteModel}
+import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.model._
 import base.entity.question.QuestionSides
 import base.entity.user.model.LoginResponseModel

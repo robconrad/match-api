@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 11:21 AM
+ * Last modified by rconrad, 2/7/15 3:34 PM
  */
 
 package base.entity.question.kv
 
-import base.entity.kv.SetKey
+import base.entity.kv.{ KeyPrefixes, SetKey }
 import base.entity.question.QuestionIdComposite
 
 /**
@@ -16,6 +16,8 @@ import base.entity.question.QuestionIdComposite
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait QuestionsKey extends SetKey[QuestionIdComposite] {
+trait QuestionsKey extends SetKey[String, QuestionIdComposite] {
+
+  final val keyPrefix = KeyPrefixes.questions
 
 }
