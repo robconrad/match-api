@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:33 PM
+ * Last modified by rconrad, 2/8/15 12:23 PM
  */
 
 package base.socket.api
@@ -23,10 +23,12 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
 
   def handlerService = new WebSocketApiHandlerServiceImpl
 
-  def connect() = {
+  def connect(connectProps: SocketProperties) = {
     val ch = WebSocketClientFactory.connect()
 
     new SocketConnection {
+
+      val props = connectProps
 
       def disconnect() {
         ch.close

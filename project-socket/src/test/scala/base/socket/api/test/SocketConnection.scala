@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:02 PM
+ * Last modified by rconrad, 2/8/15 12:41 PM
  */
 
 package base.socket.api.test
@@ -29,7 +29,7 @@ trait SocketConnection {
   lazy val message = new MessageCommandHandler
   lazy val answer = new AnswerCommandHandler
 
-  val props = new SocketProperties
+  val props: SocketProperties
 
   def disconnect()
 
