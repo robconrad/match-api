@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:41 PM
+ * Last modified by rconrad, 2/8/15 12:54 PM
  */
 
 package base.socket.api.test
@@ -25,8 +25,8 @@ class SocketProperties(
   private var _deviceId: Option[UUID] = Option(RandomService().uuid),
   private var _facebookToken: Option[String] = Option(RandomService().uuid.toString),
   private var _userId: Option[UUID] = None,
-  private var _name: Option[String] = Option("name" + RandomService().md5),
-  private var _phone: Option[String] = Option("phone" + RandomService().md5)) {
+  private var _name: Option[String] = Option("name-" + RandomService().md5),
+  private var _phone: Option[String] = Option("phone-" + RandomService().md5)) {
 
   implicit class PimpMyOptions[T](o: Option[T]) {
     def getOrThrow = o.getOrElse(throw new TestRuntimeException(s"$o not set"))

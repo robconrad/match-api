@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:50 PM
+ * Last modified by rconrad, 2/8/15 12:59 PM
  */
 
 package base.socket.api
@@ -10,7 +10,6 @@ package base.socket.api
 import java.util.UUID
 
 import base.common.logging.Loggable
-import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
 import base.common.service.{Services, ServicesBeforeAndAfterAll}
 import base.common.test.Tags
@@ -114,19 +113,13 @@ abstract class SocketApiIntegrationTest
   implicit def socket2Props(s: SocketConnection): SocketProperties = s.props
 
   test("integration test - runs all commands", Tags.SLOW) {
-
-    val socket1 = connect()
     val phone2 = "phone 2"
 
-    val deviceId1 = RandomService().uuid
-    val userId1 = randomMock.nextUuid()
+    val userId1 = randomMock.nextUuid(2)
+    val socket1 = connect(new SocketProperties(_userId = Option(userId1)))
 
-    socket1.deviceId = deviceId1
-    socket1.userId = userId1
     socket1.login(groups = List(), None, None)
-
     socket1.register()
-
     socket1.verify()
 
     val groupId = randomMock.nextUuid()
@@ -140,35 +133,33 @@ abstract class SocketApiIntegrationTest
     val users1 = List(socket1.userModel)
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    socket1.sendInvite(phone2, users1, groupId, events1, questionModels)
 
+    socket1.sendInvite(phone2, users1, groupId, events1, questionModels)
     socket1.questions(groupId, questionModels)
 
     val messageBody = "a message!"
     val messageEventId = randomMock.nextUuid()
     val messageEventModel: EventModel =
-      EventModelImpl(messageEventId, groupId, Option(userId1), EventTypes.MESSAGE, messageBody)
+      EventModelImpl(messageEventId, groupId, Option(socket1.userId), EventTypes.MESSAGE, messageBody)
+
     socket1.message(groupId, messageEventModel)
 
-    val socket2 = connect(new SocketProperties(_phone = Option(phone2)))
-    val deviceId2 = RandomService().uuid
-    val userId2 = randomMock.nextUuid()
-    socket2.deviceId = deviceId2
-    socket2.userId = userId2
-    socket2.login(List(), None, None)
+    val userId2 = randomMock.nextUuid(2)
+    val socket2 = connect(new SocketProperties(_userId = Option(userId2), _phone = Option(phone2)))
 
+    socket2.login(List(), None, None)
     socket2.register()
 
     val pendingGroups2 = List(GroupModelImpl(groupId, users1, List(socket2.inviteModel), None, None, 0))
-    socket2.verify(pendingGroups2)
 
-    // skip invite for user2
+    socket2.verify(pendingGroups2)
 
     val users2 = List(socket1.userModel, socket2.userModel)
     val eventId2 = randomMock.nextUuid()
     val events2 = events1 ++ List(messageEventModel,
       EventModelImpl(eventId2, groupId, Option(userId2), EventTypes.JOIN,
         "A user joined Scandal.ly chat! (hush, Michi)"))
+
     socket2.acceptInvite(users2, groupId, events2.reverse, questionModels)
 
     // socket1 answer is down here so that we have a valid match user id
@@ -176,34 +167,33 @@ abstract class SocketApiIntegrationTest
     executor.assertResponse(answerEvent)(manifest[EventModel], socket2)
 
     val questionModels2 = questionModels.filter(_.id != questionDefs(0).id)
+
     socket2.questions(groupId, questionModels2)
 
     val messageEventId2 = randomMock.nextUuid()
     val messageEventModel2: EventModel =
       EventModelImpl(messageEventId2, groupId, Option(userId2), EventTypes.MESSAGE, messageBody)
+
     socket2.message(groupId, messageEventModel2)
     executor.assertResponse(messageEventModel2)(manifest[EventModel], socket1)
 
-    val answerEvent2 = socket2.answer(groupId, userId1, questionDefs(1).id)
+    val answerEvent2 = socket2.answer(groupId, socket1.userId, questionDefs(1).id)
     executor.assertResponse(answerEvent2)(manifest[EventModel], socket1)
 
-    val socket3 = connect()
-    val deviceId3 = RandomService().uuid
-    val userId3 = randomMock.nextUuid()
-    socket3.deviceId = deviceId3
-    socket3.userId = userId3
+    val userId3 = randomMock.nextUuid(2)
+    val socket3 = connect(new SocketProperties(_userId = Option(userId3)))
     socket3.login(List(), None, None)
 
     val groupId2 = randomMock.nextUuid()
     val events3 = List(EventModelImpl(randomMock.nextUuid(1), groupId2, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
-    socket1.sendInvite(socket3.phone, users1, groupId2, events3, questionModels)
 
+    socket1.sendInvite(socket3.phone, users1, groupId2, events3, questionModels)
     socket3.register()
 
     val pendingGroups3 = List(GroupModelImpl(groupId2, users1, List(socket3.inviteModel), None, None, 0))
-    socket3.verify(pendingGroups3)
 
+    socket3.verify(pendingGroups3)
     socket3.declineInvite(groupId2)
 
     socket1.disconnect()
