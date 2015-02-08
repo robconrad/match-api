@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:16 PM
+ * Last modified by rconrad, 2/7/15 4:44 PM
  */
 
 package base.socket.api
@@ -24,6 +24,7 @@ import base.entity.error.ApiErrorService
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
+import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.model._
 import base.entity.group.model.impl.{ InviteModelImpl, GroupModelImpl }
@@ -48,6 +49,7 @@ import org.json4s.native.Serialization
 import spray.http.StatusCodes
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 /**
  * {{ Describe the high level purpose of SocketApiIntegrationTest here. }}
@@ -166,15 +168,18 @@ abstract class SocketApiIntegrationTest
               groups: List[GroupModel], groupId: Option[UUID], phone: Option[String],
               events: Option[List[EventModel]] = None, questions: Option[List[QuestionModel]] = None,
               lastLogin: Option[DateTime] = None)(implicit s: SocketConnection) {
+      def pictureUrl(id: String) = new FacebookServiceImpl(1.day).getPictureUrl(id)
       val deviceModel = DeviceModel(deviceId)
       val loginModel = LoginModel(fbToken, groupId, "", ApiVersions.V01, "", deviceModel)
-      val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(UserModel(userId, Option(name)), phone,
-        phone.isDefined, List(), sortGroups(groups), events, questions.map(sortQuestions), lastLogin)
+      val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(
+        UserModel(userId, Option(pictureUrl(fbToken)), Option(name)), phone, phone.isDefined,
+        List(), sortGroups(groups), events, questions.map(sortQuestions), lastLogin)
       val fbInfo = FacebookInfo(fbToken, name, "male", "EN_us")
       val facebookService = mock[FacebookService]
       val unregister = TestServices.register(facebookService)
       (facebookService.getInfo(_: String)(_: ChannelContext)) expects
         (*, *) returning Future.successful(Option(fbInfo))
+      facebookService.getPictureUrl _ expects * onCall pictureUrl _ anyNumberOfTimes ()
       execute(loginModel, Option(loginResponseModel))
       unregister()
     }
@@ -278,7 +283,7 @@ abstract class SocketApiIntegrationTest
         case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
       }
 
-    val users1 = List(UserModel(userId1, Option(name1)))
+    val users1 = List(UserModel(userId1, Option(FacebookService().getPictureUrl(fbToken1)), Option(name1)))
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
     sendInvite(phone2, users1, groupId, events1, questionModels)(socket1)
@@ -298,15 +303,15 @@ abstract class SocketApiIntegrationTest
 
     register(phone2)(socket2)
 
-    val invite2 = InviteModelImpl(phone2, None, Option(name2))
+    val invite2 = InviteModelImpl(phone2, Option(FacebookService().getPictureUrl(fbToken2)), Option(name2))
     val pendingGroups2 = List(GroupModelImpl(groupId, users1, List(invite2), None, None, 0))
     verify(phone2, pendingGroups2)(socket2)
 
     // skip invite for user2
 
     val users2 = List(
-      UserModel(userId1, Option(name1)),
-      UserModel(userId2, Option(name2)))
+      UserModel(userId1, Option(FacebookService().getPictureUrl(fbToken1)), Option(name1)),
+      UserModel(userId2, Option(FacebookService().getPictureUrl(fbToken2)), Option(name2)))
     val eventId2 = randomMock.nextUuid()
     val events2 = events1 ++ List(messageEventModel,
       EventModelImpl(eventId2, groupId, Option(userId2), EventTypes.JOIN,
@@ -341,7 +346,7 @@ abstract class SocketApiIntegrationTest
 
     register(phone3)(socket3)
 
-    val invite3 = InviteModelImpl(phone3, None, Option(name3))
+    val invite3 = InviteModelImpl(phone3, Option(FacebookService().getPictureUrl(fbToken3)), Option(name3))
     val pendingGroups3 = List(GroupModelImpl(groupId2, users1, List(invite3), None, None, 0))
     verify(phone3, pendingGroups3)(socket3)
 

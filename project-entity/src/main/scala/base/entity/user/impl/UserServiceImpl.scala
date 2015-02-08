@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/7/15 3:57 PM
  */
 
 package base.entity.user.impl
@@ -40,8 +40,8 @@ class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
   }
 
   private[impl] def getUser(userId: UUID, key: UserKey)(implicit p: Pipeline, channelCtx: ChannelContext) =
-    key.getName.map { name =>
-      Right(UserModel(userId, name))
+    key.getNameAttributes.map { name =>
+      Right(UserModel(userId, name.pictureUrl, name.name))
     }
 
   def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
@@ -51,8 +51,8 @@ class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
   private[impl] def getUsersFromKey(contextUserId: UUID, userIds: List[UUID],
                                     keyService: UserKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
-      keyService.make(userId).getName.map { name =>
-        UserModel(userId, name)
+      keyService.make(userId).getNameAttributes.map { name =>
+        UserModel(userId, name.pictureUrl, name.name)
       }
     }
     Future.sequence(futures).map(Right.apply)

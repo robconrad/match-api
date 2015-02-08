@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:16 PM
+ * Last modified by rconrad, 2/7/15 3:59 PM
  */
 
 package base.entity.user.impl
@@ -45,21 +45,21 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getUser") {
     val key = mock[UserKey]
-    key.getName _ expects () returning Future.successful(Option(name))
-    val model = UserModel(userId, Option(name))
+    key.getNameAttributes _ expects () returning Future.successful(UserNameAttributes(None, Option(name)))
+    val model = UserModel(userId, None, Option(name))
     assert(service.getUser(userId, key).await() == Right(model))
   }
 
   test("getUsers") {
     val userIds = List(userId1, userId2)
 
-    val model1 = UserModel(userId1, Option(name))
-    val model2 = UserModel(userId2, None)
+    val model1 = UserModel(userId1, None, Option(name))
+    val model2 = UserModel(userId2, None, None)
     val models = List(model1, model2)
 
     val (key1, key2) = (mock[UserKey], mock[UserKey])
-    key1.getName _ expects () returning Future.successful(Option(name))
-    key2.getName _ expects () returning Future.successful(None)
+    key1.getNameAttributes _ expects () returning Future.successful(UserNameAttributes(None, Option(name)))
+    key2.getNameAttributes _ expects () returning Future.successful(UserNameAttributes(None, None))
 
     val keyService = mock[UserKeyService]
     (keyService.make(_: UUID)(_: Pipeline)) expects (*, *) returning key1

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/7/15 3:50 PM
  */
 
 package base.entity.group.impl
@@ -88,9 +88,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
             users.map { user =>
               userIdOpts.find(_._2.contains(user.id)).map(_._1 -> user)
             }.collect {
-              case Some((phone, user)) =>
-                // todo pictureUrl
-                phone -> InviteModelImpl(phone, None, user.label)
+              case Some((phone, user)) => phone -> InviteModelImpl(phone, user.pictureUrl, user.name)
             }.toMap[String, InviteModel]
           case Left(apiError) =>
             error("received error but continuing anyway, %s", apiError)

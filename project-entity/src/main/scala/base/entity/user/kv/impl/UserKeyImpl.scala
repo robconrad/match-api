@@ -2,19 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/7/15 4:34 PM
  */
 
 package base.entity.user.kv.impl
 
 import base.common.time.TimeService
-import base.entity.facebook.FacebookInfo
+import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.kv.Key._
 import base.entity.kv.KeyProps.UpdatedProp
 import base.entity.kv.impl.HashKeyImpl
 import base.entity.kv.{ Key, KeyLogger }
 import base.entity.user.kv.UserKeyProps._
-import base.entity.user.kv.{ UserLoginAttributes, UserKey, UserPhoneAttributes }
+import base.entity.user.kv.{ UserKey, UserLoginAttributes, UserNameAttributes, UserPhoneAttributes }
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -29,7 +29,14 @@ class UserKeyImpl(val token: Array[Byte],
                   protected val logger: KeyLogger)(implicit protected val p: Pipeline)
     extends HashKeyImpl with UserKey {
 
-  def getName = getString(NameProp)
+  val nameProps = Array[Prop](NameProp, FacebookIdProp)
+  def getNameAttributes = {
+    get(nameProps) map { props =>
+      UserNameAttributes(
+        props(FacebookIdProp).map(FacebookService().getPictureUrl),
+        props(NameProp))
+    }
+  }
 
   val phoneVerifiedProps = Array[Prop](PhoneProp, PhoneCodeProp, PhoneVerifiedProp)
   def getPhoneAttributes = {
@@ -72,13 +79,15 @@ class UserKeyImpl(val token: Array[Byte],
   def getLastLogin = getDateTime(LastLoginProp)
   def setLastLogin(time: DateTime) = set(LastLoginProp, TimeService().asString(time))
 
-  val loginAttributeProps = Array[Prop](PhoneProp, PhoneVerifiedProp, NameProp, LastLoginProp)
+  val loginAttributeProps = Array[Prop](PhoneProp, PhoneVerifiedProp, FacebookIdProp, NameProp, LastLoginProp)
   def getLoginAttributes = {
     get(loginAttributeProps) map { props =>
       UserLoginAttributes(
         props(PhoneProp),
         props(PhoneVerifiedProp).map(Key.string2Boolean).contains(true),
-        props(NameProp),
+        UserNameAttributes(
+          props(FacebookIdProp).map(FacebookService().getPictureUrl),
+          props(NameProp)),
         props(LastLoginProp).map(TimeService().fromString))
     }
   }

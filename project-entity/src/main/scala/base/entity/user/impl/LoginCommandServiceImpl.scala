@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:24 PM
+ * Last modified by rconrad, 2/7/15 4:09 PM
  */
 
 package base.entity.user.impl
@@ -131,7 +131,7 @@ private[entity] class LoginCommandServiceImpl()
         userGetPendingGroups(UserService(), userId, builder.copy(
           phone = Option(attributes.phone),
           phoneVerified = Option(attributes.phoneVerified),
-          user = Option(UserModel(userId, attributes.name)),
+          user = Option(UserModel(userId, attributes.name.pictureUrl, attributes.name.name)),
           lastLoginTime = Option(attributes.lastLogin)))
       }
     }

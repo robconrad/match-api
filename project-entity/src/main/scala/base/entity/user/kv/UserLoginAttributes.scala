@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:16 PM
+ * Last modified by rconrad, 2/7/15 3:53 PM
  */
 
 package base.entity.user.kv
@@ -17,5 +17,5 @@ import org.joda.time.DateTime
  */
 case class UserLoginAttributes(phone: Option[String],
                                phoneVerified: Boolean,
-                               name: Option[String],
+                               name: UserNameAttributes,
                                lastLogin: Option[DateTime])

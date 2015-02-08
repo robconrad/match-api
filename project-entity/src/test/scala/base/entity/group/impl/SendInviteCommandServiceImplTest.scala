@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/7/15 3:59 PM
  */
 
 package base.entity.group.impl
@@ -63,7 +63,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
   private def testSuccess(userExists: Boolean) = {
     val eventCount = 0
     val userId = randomMock.nextUuid()
-    val users = List(UserModel(userId, Option(label)))
+    val users = List(UserModel(userId, None, Option(label)))
     val eventModel = mock[EventModel]
     val groupId = randomMock.nextUuid()
     val group = GroupModelImpl(groupId, users, List(), Option(time), Option(time), eventCount)

@@ -2,7 +2,7 @@
   ~ Copyright (c) 2015 Robert Conrad - All Rights Reserved.
   ~ Unauthorized copying of this file, via any medium is strictly prohibited.
   ~ This file is proprietary and confidential.
-  ~ Last modified by rconrad, 1/21/15 9:07 PM
+  ~ Last modified by rconrad, 2/7/15 4:23 PM
   -->
 
 <configuration>
@@ -71,5 +71,6 @@
     <logger name="com.wordnik.swagger" level="INFO" />
     <logger name="com.gettyimages" level="INFO" />
     <logger name="io.netty" level="INFO" />
+    <logger name="scredis" level="DEBUG" />
 
 </configuration>

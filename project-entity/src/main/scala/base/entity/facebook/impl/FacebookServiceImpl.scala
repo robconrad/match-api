@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 6:34 PM
+ * Last modified by rconrad, 2/7/15 4:44 PM
  */
 
 package base.entity.facebook.impl
 
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
-import base.entity.facebook.kv.{ FacebookInfoKeyService, FacebookInfoKey }
+import base.entity.facebook.kv.{ FacebookInfoKey, FacebookInfoKeyService }
 import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.KvFactoryService
@@ -33,6 +33,10 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
     extends ServiceImpl
     with FacebookService
     with AuthLoggable {
+
+  private val pictureUrlString = s"http://graph.facebook.com/%s/picture?type=large"
+
+  def getPictureUrl(facebookId: String) = pictureUrlString.format(facebookId)
 
   def getInfo(token: String)(implicit channelCtx: ChannelContext) = {
     implicit val p = KvFactoryService().pipeline

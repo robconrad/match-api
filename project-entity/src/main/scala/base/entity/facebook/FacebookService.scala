@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 6:40 PM
+ * Last modified by rconrad, 2/7/15 4:03 PM
  */
 
 package base.entity.facebook
@@ -19,6 +19,8 @@ import scala.concurrent.Future
 trait FacebookService extends Service {
 
   final val serviceManifest = manifest[FacebookService]
+
+  def getPictureUrl(facebookId: String): String
 
   def getInfo(token: String)(implicit channelCtx: ChannelContext): Future[Option[FacebookInfo]]
 

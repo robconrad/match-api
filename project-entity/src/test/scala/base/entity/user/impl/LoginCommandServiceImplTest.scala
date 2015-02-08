@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 4:25 PM
+ * Last modified by rconrad, 2/7/15 4:09 PM
  */
 
 package base.entity.user.impl
@@ -44,6 +44,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val name = "bob"
   private val fbToken = RandomService().uuid.toString
   private val fbId = RandomService().uuid.toString
+  private val pictureUrl = FacebookService().getPictureUrl(fbId)
   private val groupId = RandomService().uuid
   private val appVersion = "some app version"
   private val apiVersion = ApiVersions.V01
@@ -88,8 +89,15 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
       (*, *, *) returning Future.successful(Unit)
     (facebook.getInfo(_: String)(_: ChannelContext)) expects
       (*, *) returning Future.successful(Option(FacebookInfo(fbId, name, gender, locale)))
+    facebook.getPictureUrl _ expects * returning pictureUrl
 
-    assert(service.innerExecute(model).await() == Right(response))
+    val actual = service.innerExecute(model).await()
+    val expected = Right(response)
+
+    debug(actual.toString)
+    debug(expected.toString)
+
+    assert(actual == expected)
 
     assert(userKey.getLastLogin.await().exists(_.isEqual(TimeService().now)))
     assert(userKey.getFacebookId.await().contains(fbId))
@@ -114,7 +122,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("success - new user") {
     val userId = randomMock.nextUuid()
-    val userModel = UserModel(userId, Option(name))
+    val userModel = UserModel(userId, Option(pictureUrl), Option(name))
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
       List(), List(), None, None, None)
@@ -123,7 +131,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("success - existing user - without group id") {
     val userId = RandomService().uuid
-    val userModel = UserModel(userId, Option(name))
+    val userModel = UserModel(userId, Option(pictureUrl), Option(name))
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
@@ -134,7 +142,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   test("success - existing user - with group id") {
     registerQuestionMock()
     val userId = RandomService().uuid
-    val userModel = UserModel(userId, Option(name))
+    val userModel = UserModel(userId, Option(pictureUrl), Option(name))
     assert(FacebookUserKeyService().make(fbId).set(userId).await())
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
       List(), List(), Option(List()), Option(List()), None)

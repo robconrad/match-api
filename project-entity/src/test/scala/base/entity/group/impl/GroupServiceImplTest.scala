@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/7/15 3:59 PM
  */
 
 package base.entity.group.impl
@@ -108,7 +108,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val phone1 = "555-1234"
     val phone2 = "555-1235"
     val label = "bob"
-    val invitedUsers = List(UserModel(userId1, Option(label)), UserModel(userId2, None))
+    val invitedUsers = List(UserModel(userId1, None, Option(label)), UserModel(userId2, None, None))
     val userService = mock[UserService]
     (userService.getUsers(_: UUID, _: List[UUID])(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(users))
@@ -144,7 +144,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val phone1 = "555-1234"
     val phone2 = "555-1235"
     val label = "bob"
-    val invitedUsers = List(UserModel(userId1, Option(label)))
+    val invitedUsers = List(UserModel(userId1, None, Option(label)))
     val userService = mock[UserService]
     (userService.getUsers(_: UUID, _: List[UUID])(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(users))
