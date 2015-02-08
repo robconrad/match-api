@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/8/15 12:12 PM
  */
 
 package base.entity.group.impl
@@ -83,6 +83,7 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def phoneGetUserId(groupId: UUID, key: PhoneKey) =
       key.get.flatMap {
+        case Some(userId) if userId == authCtx.userId => Errors.selfInvited
         case Some(userId) => userGroupsInvitedAdd(groupId, make[UserGroupsInvitedKey](userId))
         case None         => phoneGroupsInvitedAdd(groupId, make[PhoneGroupsInvitedKey](input.phone))
       }
@@ -163,12 +164,9 @@ object SendInviteCommandServiceImpl {
 
     override protected val externalErrorText = "There was a problem during invite."
 
-    private val alreadyInvitedText = "The supplied phone number has already been invited."
-
-    lazy val alreadyInvited: Response = (alreadyInvitedText, ALREADY_INVITED)
-
+    lazy val alreadyInvited: Response = ("The supplied phone number has already been invited.", INVITED_ALREADY)
+    lazy val selfInvited: Response = ("The supplied phone number belongs to this user.", INVITED_SELF)
     lazy val userInvitedPhonesSetFailed: Response = "failed to add phone to user invited set"
-
     lazy val userGroupsInvitedAddFailed: Response = "failed to add group to user invites"
     lazy val phoneGroupsInvitedAddFailed: Response = "failed to add group to phone invites"
     lazy val userPhoneLabelSetFailed: Response = "failed to set userUserLabel"

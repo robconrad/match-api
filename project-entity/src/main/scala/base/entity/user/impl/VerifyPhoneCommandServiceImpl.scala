@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/8/15 12:13 PM
  */
 
 package base.entity.user.impl
@@ -118,8 +118,8 @@ object VerifyPhoneCommandServiceImpl {
     private val codeMissingText = "A verification code has not been sent for this phone number."
     private val codeValidationText = "The supplied verification code does not validate."
 
-    lazy val codeMissing: Response = (codeMissingText, NO_VERIFY_CODE)
-    lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_VALIDATION)
+    lazy val codeMissing: Response = (codeMissingText, VERIFY_CODE_MISSING)
+    lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_INVALID)
     lazy val userSetPhoneVerifiedFailed: Response = "failed to set user phone verified"
     lazy val phoneSetUserIdFailed: Response = "failed to set phone user id"
 

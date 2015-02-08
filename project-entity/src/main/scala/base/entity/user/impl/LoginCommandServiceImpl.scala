@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 4:09 PM
+ * Last modified by rconrad, 2/8/15 12:13 PM
  */
 
 package base.entity.user.impl
@@ -168,7 +168,7 @@ object LoginCommandServiceImpl {
 
     private val tokenInvalidText = "The supplied Facebook token is not valid."
 
-    lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_NOT_VALID)
+    lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_INVALID)
     lazy val deviceSetFailed: Response = "failed to set device attributes"
     lazy val facebookUserSetFailed: Response = "failed to set facebook user"
     lazy val userSetFailed: Response = "failed to set user attributes"

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:59 PM
+ * Last modified by rconrad, 2/8/15 12:11 PM
  */
 
 package base.entity.group.impl
@@ -167,10 +167,16 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     assert(command.groupCreate(groupId, key).await() == Errors.groupCreateFailed.await())
   }
 
-  test("phone groups invited add failed") {
-    val key = mock[PhoneGroupsInvitedKey]
+  test("user invited self") {
+    val key = mock[UserPhonesInvitedKey]
     key.add _ expects * returning Future.successful(0L)
-    assert(command.phoneGroupsInvitedAdd(groupId, key).await() == Errors.phoneGroupsInvitedAddFailed.await())
+    assert(command.userPhonesInvitedAdd(key).await() == Errors.alreadyInvited.await())
+  }
+
+  test("phone groups invited add failed") {
+    val key = mock[PhoneKey]
+    key.get _ expects () returning Future.successful(Option(authCtx.userId))
+    assert(command.phoneGetUserId(groupId, key).await() == Errors.selfInvited.await())
   }
 
   test("user groups invited add failed") {
