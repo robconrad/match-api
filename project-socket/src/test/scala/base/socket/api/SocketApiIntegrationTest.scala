@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 2:45 PM
+ * Last modified by rconrad, 2/8/15 3:39 PM
  */
 
 package base.socket.api
@@ -18,7 +18,7 @@ import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
-import base.entity.group.model.impl.{InviteModelImpl, GroupModelImpl}
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
@@ -26,10 +26,10 @@ import base.entity.question.impl.QuestionServiceImpl
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
 import base.socket.api.test.command.CommandExecutor
-import base.socket.api.test.model.EventModelFactory
+import base.socket.api.test.model.{EventModelFactory, InviteModelFactory}
 import base.socket.api.test.util.ListUtils._
 import base.socket.api.test.util.TestQuestions
-import base.socket.api.test.{TestGroup, IntegrationSuite, SocketConnection, SocketProperties}
+import base.socket.api.test.{IntegrationSuite, SocketConnection, SocketProperties, TestGroup}
 import base.socket.command.impl.CommandProcessingServiceImpl
 import spray.http.StatusCodes
 
@@ -115,7 +115,7 @@ abstract class SocketApiIntegrationTest
     socket1.register()
     socket1.verify()
 
-    val group1 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelImpl(phone2, None, Option("bob"))))
+    val group1 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelFactory(phone2)))
     val events1 = List(group1.welcome(randomMock.nextUuid(1)))
 
     socket1.sendInvite(phone2, group1, events1)
@@ -157,7 +157,7 @@ abstract class SocketApiIntegrationTest
     val socket3 = connect(new SocketProperties(_userId = Option(userId3)))
     socket3.login(List(), None, None)
 
-    val group2 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelImpl(socket3.phone, None, Option("bob"))))
+    val group2 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelFactory(socket3.phone)))
     val events3 = List(EventModelFactory.welcome(randomMock.nextUuid(1), group2.id))
 
     socket1.sendInvite(socket3.phone, group2, events3)

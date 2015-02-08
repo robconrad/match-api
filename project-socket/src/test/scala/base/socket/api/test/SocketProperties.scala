@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:54 PM
+ * Last modified by rconrad, 2/8/15 3:38 PM
  */
 
 package base.socket.api.test
@@ -11,9 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.test.TestExceptions.TestRuntimeException
-import base.entity.facebook.FacebookService
-import base.entity.group.model.impl.InviteModelImpl
-import base.entity.user.model.UserModel
+import base.socket.api.test.model.{InviteModelFactory, UserModelFactory}
 
 /**
  * {{ Describe the high level purpose of SocketProperties here. }}
@@ -48,7 +46,7 @@ class SocketProperties(
   def phone = _phone.getOrThrow
 
 
-  def userModel = UserModel(userId, Option(FacebookService().getPictureUrl(facebookToken)), Option(name))
-  def inviteModel = InviteModelImpl(phone, Option(FacebookService().getPictureUrl(facebookToken)), Option(name))
+  def userModel = UserModelFactory(userId, facebookToken, name)
+  def inviteModel = InviteModelFactory(phone, facebookToken, name)
 
 }
