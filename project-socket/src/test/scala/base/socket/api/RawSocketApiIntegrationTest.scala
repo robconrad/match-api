@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:23 PM
+ * Last modified by rconrad, 2/8/15 3:52 PM
  */
 
 package base.socket.api
@@ -21,19 +21,24 @@ class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
 
   def handlerService = new RawSocketApiHandlerServiceImpl
 
-  def connect(connectProps: SocketProperties) = {
-    val socket = new Socket(SocketApiService().host, SocketApiService().port)
-    socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
+  def makeSocket(props: SocketProperties) =
+    new SocketConnection(props) {
 
-    val out = new PrintWriter(socket.getOutputStream, true)
-    val in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+      private var socket: Socket = _
+      private var out: PrintWriter = _
+      private var in: BufferedReader = _
 
-    new SocketConnection {
+      def connect() = {
+        socket = new Socket(SocketApiService().host, SocketApiService().port)
+        socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
+        out = new PrintWriter(socket.getOutputStream, true)
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream))
+        this
+      }
 
-      val props = connectProps
-
-      def disconnect() {
+      def disconnect() = {
         socket.close()
+        this
       }
 
       def read = {
@@ -48,6 +53,5 @@ class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
       def isActive = socket.isConnected
 
     }
-  }
 
 }

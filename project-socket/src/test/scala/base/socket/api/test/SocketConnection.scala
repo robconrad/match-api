@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:41 PM
+ * Last modified by rconrad, 2/8/15 3:51 PM
  */
 
 package base.socket.api.test
@@ -15,7 +15,7 @@ import base.socket.api.test.command._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait SocketConnection {
+abstract class SocketConnection(var _props: SocketProperties) {
 
   implicit val self = this
 
@@ -29,9 +29,12 @@ trait SocketConnection {
   lazy val message = new MessageCommandHandler
   lazy val answer = new AnswerCommandHandler
 
-  val props: SocketProperties
+  def props_=(props: SocketProperties) { _props = props }
+  def props = _props
 
-  def disconnect()
+  def connect(): SocketConnection
+
+  def disconnect(): SocketConnection
 
   def read: String
 

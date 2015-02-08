@@ -2,13 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:23 PM
+ * Last modified by rconrad, 2/8/15 3:52 PM
  */
 
 package base.socket.api
 
 import base.socket.api.impl.WebSocketApiHandlerServiceImpl
 import base.socket.api.test._
+import io.netty.channel.Channel
 import io.netty.handler.codec.http.websocketx._
 import org.scalatest.concurrent.Eventually
 
@@ -23,15 +24,19 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
 
   def handlerService = new WebSocketApiHandlerServiceImpl
 
-  def connect(connectProps: SocketProperties) = {
-    val ch = WebSocketClientFactory.connect()
+  def makeSocket(props: SocketProperties) =
+    new SocketConnection(props) {
 
-    new SocketConnection {
+      private var ch: Channel = _
 
-      val props = connectProps
+      def connect() = {
+        ch = WebSocketClientFactory.connect()
+        this
+      }
 
-      def disconnect() {
+      def disconnect() = {
         ch.close
+        this
       }
 
       def read = {
@@ -52,6 +57,5 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
       def isActive = ch.isActive
 
     }
-  }
 
 }

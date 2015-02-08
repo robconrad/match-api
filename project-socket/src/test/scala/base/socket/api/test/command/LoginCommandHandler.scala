@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 2:16 PM
+ * Last modified by rconrad, 2/8/15 3:55 PM
  */
 
 package base.socket.api.test.command
@@ -33,19 +33,17 @@ import scala.concurrent.duration._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class LoginCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
-
-  import socket.props._
+class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
 
   def apply(groups: List[GroupModel], groupId: Option[UUID], phone: Option[String],
             events: Option[List[EventModel]] = None, filteredQuestions: Option[List[Int]] = None,
             lastLogin: Option[DateTime] = None)(implicit executor: CommandExecutor, questions: TestQuestions) {
-    val deviceModel = DeviceModel(deviceId)
-    val loginModel = LoginModel(facebookToken, groupId, "", ApiVersions.V01, "", deviceModel)
+    val deviceModel = DeviceModel(s.deviceId)
+    val loginModel = LoginModel(s.facebookToken, groupId, "", ApiVersions.V01, "", deviceModel)
     val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(
-      userModel, phone, phone.isDefined,
+      s.userModel, phone, phone.isDefined,
       List(), sortGroups(groups), events, filteredQuestions.map(questions.filteredModels), lastLogin)
-    val fbInfo = FacebookInfo(facebookToken, name, "male", "EN_us")
+    val fbInfo = FacebookInfo(s.facebookToken, s.name, "male", "EN_us")
     val unregister = registerFacebookService(Option(fbInfo))
     executor(loginModel, Option(loginResponseModel))
     unregister()

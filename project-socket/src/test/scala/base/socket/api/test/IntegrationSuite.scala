@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:25 PM
+ * Last modified by rconrad, 2/8/15 3:51 PM
  */
 
 package base.socket.api.test
@@ -20,7 +20,7 @@ private[api] trait IntegrationSuite extends SocketBaseSuite {
 
   def handlerService: SocketApiHandlerService
 
-  def connect(): SocketConnection = connect(new SocketProperties())
-  def connect(props: SocketProperties): SocketConnection
+  def makeSocket(): SocketConnection = makeSocket(new SocketProperties())
+  def makeSocket(props: SocketProperties): SocketConnection
 
 }
