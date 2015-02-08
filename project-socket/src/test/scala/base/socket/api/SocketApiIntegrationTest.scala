@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:59 PM
+ * Last modified by rconrad, 2/8/15 1:39 PM
  */
 
 package base.socket.api
@@ -24,13 +24,12 @@ import base.entity.group.model.impl.GroupModelImpl
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
-import base.entity.question._
 import base.entity.question.impl.QuestionServiceImpl
-import base.entity.question.model.QuestionModel
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
-import base.socket.api.test.ListUtils._
 import base.socket.api.test.command.CommandExecutor
+import base.socket.api.test.utils.ListUtils._
+import base.socket.api.test.utils.TestQuestions
 import base.socket.api.test.{IntegrationSuite, SocketConnection, SocketProperties}
 import base.socket.command.impl.CommandProcessingServiceImpl
 import spray.http.StatusCodes
@@ -52,12 +51,7 @@ abstract class SocketApiIntegrationTest
   val connectionsAllowed = 6
 
   private val totalSides = 6
-  private implicit val questionDefs = List(
-    ("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04", "Doin' it with the lights off", None),
-    ("2c75851f-1a87-40ab-9f66-14766fa12c6c", "Liberal use of chocolate sauce", None),
-    ("a8d08d2d-d914-4e7b-8ff4-6a9dde02002c", "Giving buttsex", Option("Receiving buttsex")),
-    ("543c57e3-54ba-4d9b-8ed3-c8f2e394b18d", "Dominating", Option("Being dominated"))
-  ).map(q => QuestionDef(UUID.fromString(q._1), q._2, q._3))
+  private implicit val questions = new TestQuestions
 
   private implicit val randomMock = new RandomServiceMock()
 
@@ -96,7 +90,7 @@ abstract class SocketApiIntegrationTest
     })
 
     // use real question service but control what questions are used and order they are returned
-    Services.register(new QuestionServiceImpl(questionDefs, totalSides) {
+    Services.register(new QuestionServiceImpl(questions.defs, totalSides) {
       override def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
         super.getQuestions(groupId, userId)(p, channelCtx).map {
           case Right(questions) => Right(sortQuestions(questions))
@@ -125,17 +119,12 @@ abstract class SocketApiIntegrationTest
     val groupId = randomMock.nextUuid()
     val eventId = randomMock.nextUuid(1)
 
-    val questionModels = questionDefs.map(QuestionModel(_, QuestionSides.SIDE_A)) ++
-      questionDefs.collect {
-        case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
-      }
-
     val users1 = List(socket1.userModel)
     val events1 = List(EventModelImpl(eventId, groupId, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
 
-    socket1.sendInvite(phone2, users1, groupId, events1, questionModels)
-    socket1.questions(groupId, questionModels)
+    socket1.sendInvite(phone2, users1, groupId, events1)
+    socket1.questions(groupId)
 
     val messageBody = "a message!"
     val messageEventId = randomMock.nextUuid()
@@ -160,15 +149,13 @@ abstract class SocketApiIntegrationTest
       EventModelImpl(eventId2, groupId, Option(userId2), EventTypes.JOIN,
         "A user joined Scandal.ly chat! (hush, Michi)"))
 
-    socket2.acceptInvite(users2, groupId, events2.reverse, questionModels)
+    socket2.acceptInvite(users2, groupId, events2.reverse)
 
     // socket1 answer is down here so that we have a valid match user id
-    val answerEvent = socket1.answer(groupId, userId2, questionDefs(0).id)
+    val answerEvent = socket1.answer(randomMock.nextUuid(), groupId, userId2, questionIndex = 0)
     executor.assertResponse(answerEvent)(manifest[EventModel], socket2)
 
-    val questionModels2 = questionModels.filter(_.id != questionDefs(0).id)
-
-    socket2.questions(groupId, questionModels2)
+    socket2.questions(groupId, List(0))
 
     val messageEventId2 = randomMock.nextUuid()
     val messageEventModel2: EventModel =
@@ -177,7 +164,7 @@ abstract class SocketApiIntegrationTest
     socket2.message(groupId, messageEventModel2)
     executor.assertResponse(messageEventModel2)(manifest[EventModel], socket1)
 
-    val answerEvent2 = socket2.answer(groupId, socket1.userId, questionDefs(1).id)
+    val answerEvent2 = socket2.answer(randomMock.nextUuid(1), groupId, socket1.userId, questionIndex = 1)
     executor.assertResponse(answerEvent2)(manifest[EventModel], socket1)
 
     val userId3 = randomMock.nextUuid(2)
@@ -188,7 +175,7 @@ abstract class SocketApiIntegrationTest
     val events3 = List(EventModelImpl(randomMock.nextUuid(1), groupId2, None, EventTypes.MESSAGE,
       "Welcome to Scandal.ly chat! (hush, Michi)"))
 
-    socket1.sendInvite(socket3.phone, users1, groupId2, events3, questionModels)
+    socket1.sendInvite(socket3.phone, users1, groupId2, events3)
     socket3.register()
 
     val pendingGroups3 = List(GroupModelImpl(groupId2, users1, List(socket3.inviteModel), None, None, 0))
@@ -206,7 +193,7 @@ abstract class SocketApiIntegrationTest
       GroupModelImpl(groupId, sortUsers(users2), List(), None, None, 0),
       GroupModelImpl(groupId2, sortUsers(users2.slice(0, 1)), List(socket3.inviteModel), None, None, 0))
     socket4.login(groups, Option(groupId), Option(socket1.phone),
-      Option((events2 ++ List(messageEventModel2)).reverse), Option(questionModels2.filter(_.id != questionDefs(1).id)),
+      Option((events2 ++ List(messageEventModel2)).reverse), Option(List(0)),
       Option(TimeServiceConstantMock.now))
   }
 

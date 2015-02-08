@@ -2,16 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 11:52 AM
+ * Last modified by rconrad, 2/8/15 1:20 PM
  */
 
 package base.socket.api.test.command
 
 import java.util.UUID
 
-import base.entity.question.model.{QuestionModel, QuestionsModel, QuestionsResponseModel}
-import base.socket.api.test.ListUtils._
+import base.entity.question.model.{QuestionsModel, QuestionsResponseModel}
 import base.socket.api.test.SocketConnection
+import base.socket.api.test.utils.TestQuestions
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -21,9 +21,10 @@ import base.socket.api.test.SocketConnection
  */
 class QuestionsCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(groupId: UUID, questionModels: List[QuestionModel])(implicit executor: CommandExecutor) {
+  def apply(groupId: UUID, filteredQuestions: List[Int] = List())
+           (implicit executor: CommandExecutor, questions: TestQuestions) {
     val questionsModel = QuestionsModel(groupId)
-    val questionsResponseModel = QuestionsResponseModel(groupId, sortQuestions(questionModels))
+    val questionsResponseModel = QuestionsResponseModel(groupId, questions.filteredModels(filteredQuestions))
     executor(questionsModel, Option(questionsResponseModel))
   }
 

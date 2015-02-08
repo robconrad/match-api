@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 11:03 AM
+ * Last modified by rconrad, 2/8/15 1:01 PM
  */
 
-package base.socket.api.test
+package base.socket.api.test.utils
 
 import base.entity.group.model.GroupModel
 import base.entity.question.model.QuestionModel
