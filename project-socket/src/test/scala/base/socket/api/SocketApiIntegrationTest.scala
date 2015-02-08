@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 1:39 PM
+ * Last modified by rconrad, 2/8/15 2:16 PM
  */
 
 package base.socket.api
@@ -28,8 +28,8 @@ import base.entity.question.impl.QuestionServiceImpl
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
 import base.socket.api.test.command.CommandExecutor
-import base.socket.api.test.utils.ListUtils._
-import base.socket.api.test.utils.TestQuestions
+import base.socket.api.test.util.ListUtils._
+import base.socket.api.test.util.TestQuestions
 import base.socket.api.test.{IntegrationSuite, SocketConnection, SocketProperties}
 import base.socket.command.impl.CommandProcessingServiceImpl
 import spray.http.StatusCodes

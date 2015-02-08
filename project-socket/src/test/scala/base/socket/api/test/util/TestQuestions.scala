@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 1:17 PM
+ * Last modified by rconrad, 2/8/15 2:16 PM
  */
 
-package base.socket.api.test.utils
+package base.socket.api.test.util
 
 import java.util.UUID
 

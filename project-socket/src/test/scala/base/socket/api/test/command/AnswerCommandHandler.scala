@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 1:36 PM
+ * Last modified by rconrad, 2/8/15 2:16 PM
  */
 
 package base.socket.api.test.command
@@ -19,7 +19,7 @@ import base.entity.question.model.AnswerModel
 import base.entity.question.{QuestionService, QuestionSides}
 import base.entity.user.User
 import base.socket.api.test.SocketConnection
-import base.socket.api.test.utils.TestQuestions
+import base.socket.api.test.util.TestQuestions
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
