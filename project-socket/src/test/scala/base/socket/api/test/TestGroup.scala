@@ -2,17 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 2:41 PM
+ * Last modified by rconrad, 2/8/15 4:07 PM
  */
 
 package base.socket.api.test
 
 import java.util.UUID
 
-import base.entity.group.model.{InviteModel, GroupModel}
+import base.common.random.mock.RandomServiceMock
+import base.entity.event.model.EventModel
 import base.entity.group.model.impl.GroupModelImpl
+import base.entity.group.model.{GroupModel, InviteModel}
 import base.entity.user.model.UserModel
-import base.socket.api.test.model.EventModelFactory
+import base.socket.api._
+import base.socket.api.test.model.{InviteModelFactory, EventModelFactory}
 import base.socket.api.test.util.ListUtils._
 
 /**
@@ -23,9 +26,14 @@ import base.socket.api.test.util.ListUtils._
  */
 class TestGroup(val id: UUID,
                 private var _users: List[UserModel] = List(),
-                private var _invites: List[InviteModel] = List()) {
+                private var _invites: List[InviteModel] = List(),
+                private var _events: List[EventModel] = List()) {
 
-  def welcome(eventId: UUID) = EventModelFactory.welcome(eventId, id)
+  def this(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) =
+    this(randomMock.nextUuid(),
+      List(socket1.userModel),
+      List(InviteModelFactory(socket2.phone)),
+      List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid())))
 
   def model: GroupModel = GroupModelImpl(id, users, invites, None, None, 0)
 
@@ -34,5 +42,8 @@ class TestGroup(val id: UUID,
 
   def invites_=(invites: List[InviteModel]) { _invites = invites }
   def invites = _invites
+
+  def events_=(events: List[EventModel]) { _events = events }
+  def events = _events
 
 }

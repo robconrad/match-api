@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:58 PM
+ * Last modified by rconrad, 2/8/15 4:16 PM
  */
 
 package base.socket.api
@@ -25,11 +25,11 @@ import base.entity.kv.KvTest
 import base.entity.question.impl.QuestionServiceImpl
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
+import base.socket.api.test.IntegrationSuite
 import base.socket.api.test.command.CommandExecutor
-import base.socket.api.test.model.{EventModelFactory, InviteModelFactory}
+import base.socket.api.test.model.EventModelFactory
 import base.socket.api.test.util.ListUtils._
 import base.socket.api.test.util.TestQuestions
-import base.socket.api.test.{IntegrationSuite, SocketConnection, SocketProperties, TestGroup}
 import base.socket.command.impl.CommandProcessingServiceImpl
 import spray.http.StatusCodes
 
@@ -103,8 +103,6 @@ abstract class SocketApiIntegrationTest
     assert(SocketApiService().stop().await())
   }
 
-  implicit def socket2Props(s: SocketConnection): SocketProperties = s.props
-
   test("integration test - runs all commands", Tags.SLOW) {
     val socket1 = makeSocket()
     val socket2 = makeSocket()
@@ -118,14 +116,10 @@ abstract class SocketApiIntegrationTest
     socket1.register()
     socket1.verify()
 
-    val group1 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelFactory(socket2.phone)))
-    val events1 = List(group1.welcome(randomMock.nextUuid(1)))
-
-    socket1.sendInvite(socket2.phone, group1, events1)
+    val group1 = socket1.sendInvite(socket2)
     socket1.questions(group1.id)
 
-    val message1 = EventModelFactory.message(randomMock.nextUuid(), group1.id, socket1)
-    socket1.message(group1.id, message1)
+    val message1 = socket1.message(group1.id)
 
     socket2.userId = randomMock.nextUuid()
     socket2.connect()
@@ -139,7 +133,7 @@ abstract class SocketApiIntegrationTest
 
     val users2 = List(socket1.userModel, socket2.userModel)
     val eventId2 = randomMock.nextUuid()
-    val events2 = events1 ++ List(message1, EventModelFactory.join(eventId2, group1.id, socket2))
+    val events2 = group1.events ++ List(message1, EventModelFactory.join(eventId2, group1.id, socket2))
 
     socket2.acceptInvite(users2, group1.id, events2.reverse)
 
@@ -149,8 +143,7 @@ abstract class SocketApiIntegrationTest
 
     socket2.questions(group1.id, List(0))
 
-    val message2 = EventModelFactory.message(randomMock.nextUuid(), group1.id, socket2)
-    socket2.message(group1.id, message2)
+    val message2 = socket2.message(group1.id)
     executor.assertResponse(message2)(manifest[EventModel], socket1)
 
     val answerEvent2 = socket2.answer(randomMock.nextUuid(1), group1.id, socket1.userId, questionIndex = 1)
@@ -161,10 +154,7 @@ abstract class SocketApiIntegrationTest
 
     socket3.login(List(), None, None)
 
-    val group2 = new TestGroup(randomMock.nextUuid(), List(socket1.userModel), List(InviteModelFactory(socket3.phone)))
-    val events3 = List(EventModelFactory.welcome(randomMock.nextUuid(1), group2.id))
-
-    socket1.sendInvite(socket3.phone, group2, events3)
+    val group2 = socket1.sendInvite(socket3)
     socket3.register()
 
     val pendingGroups3 = List(GroupModelImpl(group2.id, group1.users, List(socket3.inviteModel), None, None, 0))

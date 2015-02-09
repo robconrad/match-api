@@ -5,16 +5,18 @@
  * Last modified by rconrad, 2/8/15 4:04 PM
  */
 
-package base.socket.api.test.command
+package base.socket
 
-import base.common.test.PimpMyFutures
+import base.socket.api.test.{SocketProperties, SocketConnection}
 
 /**
- * {{ Describe the high level purpose of CommandHandler here. }}
+ * {{ Describe the high level purpose of package here. }}
  * {{ Include relevant details here. }}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait CommandHandler extends PimpMyFutures {
+package object api {
+
+  implicit def socket2Props(s: SocketConnection): SocketProperties = s.props
 
 }

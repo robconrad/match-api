@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:55 PM
+ * Last modified by rconrad, 2/8/15 4:15 PM
  */
 
 package base.socket.api.test.command
@@ -22,6 +22,7 @@ import base.entity.user.model.{LoginModel, LoginResponseModel}
 import base.socket.api.test.SocketConnection
 import base.socket.api.test.util.ListUtils._
 import base.socket.api.test.util.TestQuestions
+import base.socket.api._
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
