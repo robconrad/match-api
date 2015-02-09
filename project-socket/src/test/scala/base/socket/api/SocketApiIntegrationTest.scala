@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:42 PM
+ * Last modified by rconrad, 2/8/15 4:47 PM
  */
 
 package base.socket.api
@@ -17,7 +17,6 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiErrorCodes
 import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
-import base.entity.event.model.EventModel
 import base.entity.json.JsonFormats
 import base.entity.kv.Key._
 import base.entity.kv.KvTest
@@ -102,12 +101,12 @@ abstract class SocketApiIntegrationTest
   }
 
   test("integration test - runs all commands", Tags.SLOW) {
-    val (socket1, socket2, socket3, socket4) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
+    val (socket1, socket1a, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
 
     socket1.userId = randomMock.nextUuid()
     socket1.connect()
 
-    socket1.login(groups = List(), None, None)
+    socket1.login()
     socket1.register()
     socket1.verify()
 
@@ -119,7 +118,7 @@ abstract class SocketApiIntegrationTest
     socket2.userId = randomMock.nextUuid()
     socket2.connect()
 
-    socket2.login(List(), None, None)
+    socket2.login()
 
     group1.invites = List(socket2.inviteModel)
 
@@ -139,7 +138,7 @@ abstract class SocketApiIntegrationTest
     socket3.userId = randomMock.nextUuid()
     socket3.connect()
 
-    socket3.login(List(), None, None)
+    socket3.login()
 
     val group2 = socket1.sendInvite(socket3)
     socket3.register()
@@ -153,15 +152,19 @@ abstract class SocketApiIntegrationTest
     socket2.disconnect()
     socket3.disconnect()
 
-    socket4.props = socket1.props
-    socket4.connect()
+    socket1a.props = socket1.props
+    socket1a.connect()
 
     // original user login again
-    socket4.login(List(group1, group2), Option(group1.id), Option(socket1.phone),
-      Option(group1.events.reverse), Option(List(0)),
+    socket1a.login(
+      List(group1, group2),
+      Option(group1.id),
+      Option(socket1.phone),
+      Option(group1.events.reverse),
+      Option(List(0)),
       Option(TimeServiceConstantMock.now))
 
-    socket4.disconnect()
+    socket1a.disconnect()
   }
 
   test("error", Tags.SLOW) {

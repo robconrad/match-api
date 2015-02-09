@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:29 PM
+ * Last modified by rconrad, 2/8/15 4:47 PM
  */
 
 package base.socket.api.test.command
@@ -35,7 +35,7 @@ import scala.concurrent.duration._
  */
 class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
 
-  def apply(groups: List[TestGroup], groupId: Option[UUID], phone: Option[String],
+  def apply(groups: List[TestGroup] = List(), groupId: Option[UUID] = None, phone: Option[String] = None,
             events: Option[List[EventModel]] = None, filteredQuestions: Option[List[Int]] = None,
             lastLogin: Option[DateTime] = None)(implicit executor: CommandExecutor, questions: TestQuestions) {
     val deviceModel = DeviceModel(s.deviceId)
