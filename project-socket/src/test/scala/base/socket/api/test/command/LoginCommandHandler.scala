@@ -2,18 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:47 PM
+ * Last modified by rconrad, 2/8/15 5:51 PM
  */
 
 package base.socket.api.test.command
-
-import java.util.UUID
 
 import base.common.service.TestServices
 import base.entity.api.ApiVersions
 import base.entity.auth.context.ChannelContext
 import base.entity.device.model.DeviceModel
-import base.entity.event.model.EventModel
 import base.entity.facebook.FacebookInfo
 import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.user.model.impl.LoginResponseModelImpl
@@ -35,14 +32,19 @@ import scala.concurrent.duration._
  */
 class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
 
-  def apply(groups: List[TestGroup] = List(), groupId: Option[UUID] = None, phone: Option[String] = None,
-            events: Option[List[EventModel]] = None, filteredQuestions: Option[List[Int]] = None,
+  def apply(groups: List[TestGroup] = List(), group: Option[TestGroup] = None,
             lastLogin: Option[DateTime] = None)(implicit executor: CommandExecutor, questions: TestQuestions) {
     val deviceModel = DeviceModel(s.deviceId)
-    val loginModel = LoginModel(s.facebookToken, groupId, "", ApiVersions.V01, "", deviceModel)
+    val loginModel = LoginModel(s.facebookToken, group.map(_.id), "", ApiVersions.V01, "", deviceModel)
     val loginResponseModel: LoginResponseModel = LoginResponseModelImpl(
-      s.userModel, phone, phone.isDefined,
-      List(), sortGroups(groups.map(_.model)), events, filteredQuestions.map(questions.filteredModels), lastLogin)
+      s.userModel,
+      s.phoneOpt,
+      s.phoneOpt.isDefined,
+      List(),
+      sortGroups(groups.map(_.model)),
+      group.map(_.events.reverse),
+      group.map(g => questions.filteredModels(s.questionsAnswered)),
+      lastLogin)
     val fbInfo = FacebookInfo(s.facebookToken, s.name, "male", "EN_us")
     val unregister = registerFacebookService(Option(fbInfo))
     executor(loginModel, Option(loginResponseModel))

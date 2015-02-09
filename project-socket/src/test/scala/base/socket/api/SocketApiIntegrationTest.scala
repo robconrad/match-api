@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:53 PM
+ * Last modified by rconrad, 2/8/15 5:45 PM
  */
 
 package base.socket.api
@@ -119,10 +119,10 @@ abstract class SocketApiIntegrationTest
     socket2.register()
     socket2.verify(List(group1))
     socket2.acceptInvite(group1)
-    socket1.answer(randomMock.nextUuid(), group1, socket2.userId, questionIndex = 0)
+    socket1.answer(group1, socket2, questionIndex = 0)
     socket2.questions(group1.id, List(0))
     socket2.message(group1)
-    socket2.answer(randomMock.nextUuid(1), group1, socket1.userId, questionIndex = 1)
+    socket2.answer(group1, socket1, questionIndex = 1)
 
     socket3.connect()
 
@@ -143,10 +143,7 @@ abstract class SocketApiIntegrationTest
     // original user login again
     socket1a.login(
       List(group1, group2),
-      Option(group1.id),
-      Option(socket1.phone),
-      Option(group1.events.reverse),
-      Option(List(0)),
+      Option(group1),
       Option(TimeServiceConstantMock.now))
 
     socket1a.disconnect()

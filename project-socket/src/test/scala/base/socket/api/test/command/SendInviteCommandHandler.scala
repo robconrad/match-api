@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:12 PM
+ * Last modified by rconrad, 2/8/15 5:48 PM
  */
 
 package base.socket.api.test.command
@@ -25,7 +25,7 @@ class SendInviteCommandHandler(implicit socket: SocketConnection) extends Comman
   def apply(invitedSocket: SocketConnection)
            (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock) = {
     val group = new TestGroup(randomMock, socket, invitedSocket)
-    val inviteModel = SendInviteModel(invitedSocket.phone, InviteModelFactory.label)
+    val inviteModel = SendInviteModel(invitedSocket.phoneString, InviteModelFactory.label)
     val inviteResponseModel = SendInviteResponseModel(group.model, group.events, questions.models)
     executor(inviteModel, Option(inviteResponseModel))
     group

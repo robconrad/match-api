@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:51 PM
+ * Last modified by rconrad, 2/8/15 5:49 PM
  */
 
 package base.socket.api.test
@@ -24,7 +24,10 @@ class SocketProperties(
   private var _facebookToken: Option[String] = Option(RandomService().uuid.toString),
   private var _userId: Option[UUID] = None,
   private var _name: Option[String] = Option("name-" + RandomService().md5),
-  private var _phone: Option[String] = Option("phone-" + RandomService().md5)) {
+  private var _phone: Option[String] = None,
+  private var _questionsAnswered: List[Int] = List()) {
+
+  val phoneString = "phone-" + RandomService().md5
 
   implicit class PimpMyOptions[T](o: Option[T]) {
     def getOrThrow = o.getOrElse(throw new TestRuntimeException(s"$o not set"))
@@ -43,11 +46,14 @@ class SocketProperties(
   def name_=(name: String) { _name = Option(name) }
   def name = _name.getOrThrow
 
-  def phone_=(phone: String) { _phone = Option(phone) }
+  def setPhone() { _phone = Option(phoneString) }
   def phone = _phone.getOrThrow
+  def phoneOpt = _phone
 
+  def questionsAnswered_=(questionsAnswered: List[Int]) { _questionsAnswered = questionsAnswered }
+  def questionsAnswered = _questionsAnswered
 
   def userModel = UserModelFactory(userId, facebookToken, name)
-  def inviteModel = InviteModelFactory(phone, facebookToken, name)
+  def inviteModel = InviteModelFactory(phoneString, facebookToken, name)
 
 }

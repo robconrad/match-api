@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:42 PM
+ * Last modified by rconrad, 2/8/15 5:40 PM
  */
 
 package base.socket.api.test.command
 
-import java.util.UUID
-
+import base.common.random.mock.RandomServiceMock
 import base.entity.auth.context.StandardUserAuthContext
 import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.event.model.EventModel
@@ -16,6 +15,7 @@ import base.entity.kv.Key.Pipeline
 import base.entity.question.model.AnswerModel
 import base.entity.question.{QuestionService, QuestionSides}
 import base.entity.user.User
+import base.socket.api._
 import base.socket.api.test.model.EventModelFactory
 import base.socket.api.test.util.TestQuestions
 import base.socket.api.test.{SocketConnection, TestGroup}
@@ -28,16 +28,20 @@ import base.socket.api.test.{SocketConnection, TestGroup}
  */
 class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(answerEventId: UUID, group: TestGroup, otherUserId: UUID, questionIndex: Int)
-           (implicit executor: CommandExecutor, questions: TestQuestions, tp: Pipeline) {
-    val questionId = questions(0).id
+  def apply(group: TestGroup, otherSocket: SocketConnection, questionIndex: Int)
+           (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock, tp: Pipeline) {
+    val answerEventId = randomMock.nextUuid()
+    val questionId = questions(questionIndex).id
     val answer = true
     val side = QuestionSides.SIDE_A
     val answerBody = questions.defs.find(_.id == questionId).get + " is a match"
 
-    val inviteUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherUserId)), None)
-    val inviteUserAnswerModel = AnswerModel(questionId, group.id, side, answer)
-    QuestionService().answer(inviteUserAnswerModel)(tp, inviteUserAuthCtx).await()
+    val otherUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherSocket.userId)), None)
+    val otherUserAnswerModel = AnswerModel(questionId, group.id, side, answer)
+    QuestionService().answer(otherUserAnswerModel)(tp, otherUserAuthCtx).await()
+
+    socket.questionsAnswered ++= List(questionIndex)
+    otherSocket.questionsAnswered ++= List(questionIndex)
 
     val answerModel = AnswerModel(questionId, group.id, side, answer)
     val eventModel = EventModelFactory.`match`(answerEventId, group.id, answerBody)
