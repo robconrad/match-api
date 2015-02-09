@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:40 PM
+ * Last modified by rconrad, 2/8/15 6:06 PM
  */
 
 package base.socket.api.test.command
@@ -40,8 +40,8 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
     val otherUserAnswerModel = AnswerModel(questionId, group.id, side, answer)
     QuestionService().answer(otherUserAnswerModel)(tp, otherUserAuthCtx).await()
 
-    socket.questionsAnswered ++= List(questionIndex)
-    otherSocket.questionsAnswered ++= List(questionIndex)
+    socket.answerQuestion(group.id, questionIndex)
+    otherSocket.answerQuestion(group.id, questionIndex)
 
     val answerModel = AnswerModel(questionId, group.id, side, answer)
     val eventModel = EventModelFactory.`match`(answerEventId, group.id, answerBody)

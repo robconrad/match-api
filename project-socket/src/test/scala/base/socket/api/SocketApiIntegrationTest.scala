@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:58 PM
+ * Last modified by rconrad, 2/8/15 6:01 PM
  */
 
 package base.socket.api
@@ -109,7 +109,7 @@ abstract class SocketApiIntegrationTest
     socket1.register()
     socket1.verify()
     val group1 = socket1.sendInvite(socket2)
-    socket1.questions(group1.id)
+    socket1.questions(group1)
     socket1.message(group1)
 
     socket2.connect()
@@ -120,7 +120,7 @@ abstract class SocketApiIntegrationTest
     socket2.verify(List(group1))
     socket2.acceptInvite(group1)
     socket1.answer(group1, socket2, questionIndex = 0)
-    socket2.questions(group1.id, List(0))
+    socket2.questions(group1)
     socket2.message(group1)
     socket2.answer(group1, socket1, questionIndex = 1)
 

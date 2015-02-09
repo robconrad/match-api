@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:59 PM
+ * Last modified by rconrad, 2/8/15 6:02 PM
  */
 
 package base.socket.api.test.command
@@ -43,7 +43,7 @@ class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
       List(),
       sortGroups(s.groups.map(_.model)),
       group.map(_.events.reverse),
-      group.map(g => questions.filteredModels(s.questionsAnswered)),
+      group.map(group => questions.filteredModels(s.questionsAnswered(group.id))),
       s.lastLogin)
     val fbInfo = FacebookInfo(s.facebookToken, s.name, "male", "EN_us")
 

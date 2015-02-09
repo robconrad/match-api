@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:59 PM
+ * Last modified by rconrad, 2/8/15 6:06 PM
  */
 
 package base.socket.api.test
@@ -27,7 +27,7 @@ class SocketProperties(
   private var _name: Option[String] = Option("name-" + RandomService().md5),
   private var _phone: Option[String] = None,
   private var _lastLogin: Option[DateTime] = None,
-  private var _questionsAnswered: List[Int] = List(),
+  private var _questionsAnswered: Map[UUID, List[Int]] = Map(),
   private var _groups: List[TestGroup] = List()) {
 
   val phoneString = "phone-" + RandomService().md5
@@ -56,8 +56,10 @@ class SocketProperties(
   def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
   def lastLogin = _lastLogin
 
-  def questionsAnswered_=(questionsAnswered: List[Int]) { _questionsAnswered = questionsAnswered }
-  def questionsAnswered = _questionsAnswered
+  def answerQuestion(groupId: UUID, questionIndex: Int) {
+    _questionsAnswered += (groupId -> (_questionsAnswered.getOrElse(groupId, List()) ++ List(questionIndex)))
+  }
+  def questionsAnswered(groupId: UUID) = _questionsAnswered.getOrElse(groupId, List())
 
   def groups_=(groups: List[TestGroup]) { _groups = groups }
   def groups = _groups
