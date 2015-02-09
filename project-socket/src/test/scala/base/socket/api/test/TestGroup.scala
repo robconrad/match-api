@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:28 PM
+ * Last modified by rconrad, 2/8/15 6:52 PM
  */
 
 package base.socket.api.test
@@ -34,7 +34,10 @@ class TestGroup(private var _id: Option[UUID] = None,
     id = randomMock.nextUuid()
     sockets = List(socket1)
     users = List(socket1.userModel)
-    invites = List(InviteModelFactory(socket2.phoneString))
+    invites = socket2.phoneOpt match{
+      case Some(userId) => List(socket2.inviteModel)
+      case None => List(InviteModelFactory(socket2.phoneString))
+    }
     events = List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid()))
   }
 

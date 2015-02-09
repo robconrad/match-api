@@ -2,31 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:28 PM
+ * Last modified by rconrad, 2/8/15 6:56 PM
  */
 
 package base.socket.api
 
-import java.util.UUID
-
-import base.common.logging.Loggable
-import base.common.random.mock.RandomServiceMock
-import base.common.service.{Services, ServicesBeforeAndAfterAll}
 import base.common.test.Tags
-import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiErrorCodes
-import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
-import base.entity.json.JsonFormats
-import base.entity.kv.Key._
-import base.entity.kv.KvTest
-import base.entity.question.impl.QuestionServiceImpl
-import base.entity.sms.mock.SmsServiceMock
-import base.entity.user.impl.{UserServiceImpl, VerifyPhoneCommandServiceImpl}
 import base.socket.api.test.IntegrationSuite
-import base.socket.api.test.command.CommandExecutor
-import base.socket.api.test.util.ListUtils._
-import base.socket.api.test.util.TestQuestions
 import base.socket.command.impl.CommandProcessingServiceImpl
 import spray.http.StatusCodes
 
@@ -36,76 +20,14 @@ import spray.http.StatusCodes
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-abstract class SocketApiIntegrationTest
-    extends IntegrationSuite
-    with ServicesBeforeAndAfterAll
-    with Loggable
-    with KvTest {
-
-  private implicit val executor = new CommandExecutor()
-  private implicit val formats = JsonFormats.withModels
-  val connectionsAllowed = 6
-
-  private val totalSides = 6
-  private implicit val questions = new TestQuestions
-
-  private implicit val randomMock = new RandomServiceMock()
-
-  override def beforeAll() {
-    super.beforeAll()
-    Services.register(randomMock)
-    Services.register(TimeServiceConstantMock)
-    Services.register(handlerService)
-    assert(SocketApiService().start().await())
-  }
-
-  override def beforeEach() {
-    super.beforeEach()
-
-    // full integration except sms.. don't want to have external side effects
-    Services.register(new SmsServiceMock(result = true))
-
-    // use real verify service but swap code validation to be always true
-    val codeLength = 6
-    Services.register(new VerifyPhoneCommandServiceImpl(codeLength, "whatever") {
-      override def validateVerifyCodes(code1: String, code2: String) = true
-    })
-
-    // use real user service but ensure a constant ordering of users and groups
-    Services.register(new UserServiceImpl() {
-      override def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) =
-        super.getUsers(userId, userIds)(p, channelCtx).map {
-          case Right(users) => Right(sortUsers(users))
-          case x            => x
-        }
-      override def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
-        super.getGroups(userId)(p, channelCtx).map {
-          case Right(groups) => Right(sortGroups(groups))
-          case x             => x
-        }
-    })
-
-    // use real question service but control what questions are used and order they are returned
-    Services.register(new QuestionServiceImpl(questions.defs, totalSides) {
-      override def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-        super.getQuestions(groupId, userId)(p, channelCtx).map {
-          case Right(questions) => Right(sortQuestions(questions))
-        }
-      }
-    })
-  }
-
-  override def afterAll() {
-    super.afterAll()
-    assert(SocketApiService().stop().await())
-  }
+abstract class SocketApiIntegrationTest extends IntegrationSuite {
 
   test("integration test - runs all commands", Tags.SLOW) {
     val (socket1, socket1a, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
-    val (group1, group2) = (makeGroup(), makeGroup())
+    val (group1, group2, group3) = (makeGroup(), makeGroup(), makeGroup())
 
+    // first user logs in, does some stuff by himself including creating a group
     socket1.connect()
-
     socket1.login()
     socket1.register()
     socket1.verify()
@@ -113,40 +35,47 @@ abstract class SocketApiIntegrationTest
     socket1.questions(group1)
     socket1.message(group1)
 
+    // second user comes in response to invite from first, accepts invite, sends a message and answers a question
     socket2.connect()
-
     socket2.login()
     socket2.register()
     socket2.verify()
     socket2.acceptInvite(group1)
+    // first user answer down here because we couldn't match until second user exists
     socket1.answer(group1, socket2)
     socket2.questions(group1)
     socket2.message(group1)
     socket2.answer(group1, socket1)
 
+    // third user comes along and gets invited to a new group by first user *after* account is
+    //  created by login, and declines the invite
     socket3.connect()
-
     socket3.login()
     socket1.sendInvite(group2, socket3)
     socket3.register()
     socket3.verify()
     socket3.declineInvite(group2)
 
+    // third user goes on to invite second user who accepts but then leaves before the message is sent
+    socket3.sendInvite(group3, socket2)
+    socket2.acceptInvite(group3)
+    socket3.disconnect()
+    socket2.message(group3)
+
+    // everybody else leaves
     socket1.disconnect()
     socket2.disconnect()
-    socket3.disconnect()
 
+    // first user repeat login tests all his info is there (e.g. lastLogin, etc.) and specifies a default group
     socket1a.props = socket1.props
     socket1a.connect()
-
-    // original user login again
     socket1a.login(Option(group1))
-
     socket1a.disconnect()
   }
 
   test("error", Tags.SLOW) {
     implicit val socket = makeSocket().connect()
+
     assert(socket.isActive)
     socket.write("")
     executor.assertResponse(ApiErrorService().errorCodeSeed(

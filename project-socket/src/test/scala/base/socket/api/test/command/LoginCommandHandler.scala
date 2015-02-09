@@ -2,11 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:02 PM
+ * Last modified by rconrad, 2/8/15 6:52 PM
  */
 
 package base.socket.api.test.command
 
+import base.common.random.mock.RandomServiceMock
 import base.common.service.TestServices
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
@@ -32,7 +33,12 @@ import scala.concurrent.duration._
  */
 class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
 
-  def apply(group: Option[TestGroup] = None)(implicit executor: CommandExecutor, questions: TestQuestions) {
+  def apply(group: Option[TestGroup] = None)(implicit executor: CommandExecutor,
+                                             questions: TestQuestions, randomMock: RandomServiceMock) {
+
+    if (s.userIdOpt.isEmpty) {
+      s.userId = randomMock.nextUuid()
+    }
 
     val deviceModel = DeviceModel(s.deviceId)
     val loginModel = LoginModel(s.facebookToken, group.map(_.id), "", ApiVersions.V01, "", deviceModel)
