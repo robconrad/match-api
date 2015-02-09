@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/8/15 5:28 PM
  */
 
 package base.entity.question.impl
@@ -10,22 +10,25 @@ package base.entity.question.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{ CommonService, ServiceImpl }
+import base.common.service.{CommonService, ServiceImpl}
+import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.Key._
-import base.entity.kv.{ KvFactoryService, MakeKey }
+import base.entity.kv.{KvFactoryService, MakeKey}
+import base.entity.logging.AuthLoggable
 import base.entity.question.QuestionSides.QuestionSide
+import base.entity.question.impl.QuestionServiceImpl.Errors
 import base.entity.question.kv.QuestionsKey
-import base.entity.question.model.{ AnswerModel, QuestionModel }
-import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
-import base.entity.service.CrudImplicits
+import base.entity.question.model.{AnswerModel, QuestionModel}
+import base.entity.question.{QuestionDef, QuestionIdComposite, QuestionService, QuestionSides}
+import base.entity.service.{CrudErrorImplicits, CrudImplicits}
 import redis.client.RedisException
 
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 
 /**
  * {{ Describe the high level purpose of QuestionServiceImpl here. }}
@@ -34,7 +37,7 @@ import scala.concurrent.{ Await, Future }
  * @author rconrad
  */
 class QuestionServiceImpl(questions: Iterable[QuestionDef],
-                          questionCount: Int) extends ServiceImpl with QuestionService with MakeKey {
+                          questionCount: Int) extends ServiceImpl with QuestionService with MakeKey with AuthLoggable {
 
   private val questionMap = questions.map(q => q.id -> q).toMap
   private val questionKey = make[QuestionsKey]("standard")
@@ -116,10 +119,11 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       groupUserQuestionAdd(key)
     }
 
-    def groupUserQuestionAdd(key: GroupUserQuestionsKey) = {
+    def groupUserQuestionAdd(key: GroupUserQuestionsKey): Response = {
       val id = compositeId(input.questionId, input.side)
-      key.add(id).flatMap { added =>
-        questionResponse(id)
+      key.add(id).flatMap {
+        case 1L => questionResponse(id)
+        case _ => Errors.alreadyAnswered
       }
     }
 
@@ -164,12 +168,23 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def buildEvents(userIds: Iterable[UUID]) = {
       val matches = userIds.map { userId =>
+        debug("found match for %s", userId)
         val eventId = RandomService().uuid
         val body = questionMap(input.questionId) + " is a match"
         EventModelImpl(eventId, input.groupId, userId = None, EventTypes.MATCH, body)
       }
       Right(matches.toList)
     }
+
+  }
+
+}
+
+object QuestionServiceImpl {
+
+  object Errors extends CrudErrorImplicits[List[EventModel]] {
+
+    val alreadyAnswered: Response = ("This question has already been answered.", ANSWERED_ALREADY)
 
   }
 

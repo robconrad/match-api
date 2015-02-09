@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/8/15 5:32 PM
  */
 
 package base.entity.question.impl
@@ -16,9 +16,10 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.kv.{ GroupUserQuestionsYesKey, GroupUserQuestionsTempKey, GroupUsersKey }
+import base.entity.group.kv.{GroupUserQuestionsKey, GroupUserQuestionsYesKey, GroupUserQuestionsTempKey, GroupUsersKey}
 import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
+import base.entity.question.impl.QuestionServiceImpl.Errors
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite }
 import base.entity.service.EntityServiceTest
@@ -115,6 +116,13 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val method = new service.AnswerMethod(input)
     val id = QuestionIdComposite(questions(1), side)
     assert(method.questionResponse(id).await() == Right(List()))
+  }
+
+  test("answer - already answered") {
+    val key = mock[GroupUserQuestionsKey]
+    key.add _ expects * returning Future.successful(0L)
+    val method = new service.AnswerMethod(AnswerModel(questions(1).id, RandomService().uuid, SIDE_A, response = false))
+    assert(method.groupUserQuestionAdd(key).await() == Errors.alreadyAnswered.await())
   }
 
 }

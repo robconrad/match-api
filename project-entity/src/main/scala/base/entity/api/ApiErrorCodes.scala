@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:13 PM
+ * Last modified by rconrad, 2/8/15 5:22 PM
  */
 
 package base.entity.api
@@ -27,6 +27,7 @@ object ApiErrorCodes extends Enumeration {
   val TOKEN_INVALID = Value
   val INVITED_SELF = Value
   val INVITED_ALREADY = Value
+  val ANSWERED_ALREADY = Value
   val SERVER_NOT_RUNNING = Value
   val SERVER_BUSY = Value
 
