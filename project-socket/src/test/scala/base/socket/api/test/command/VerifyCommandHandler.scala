@@ -2,15 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:13 PM
+ * Last modified by rconrad, 2/8/15 4:20 PM
  */
 
 package base.socket.api.test.command
 
-import base.entity.group.model.GroupModel
 import base.entity.user.model._
-import base.socket.api.test.SocketConnection
 import base.socket.api._
+import base.socket.api.test.{SocketConnection, TestGroup}
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -20,10 +19,10 @@ import base.socket.api._
  */
 class VerifyCommandHandler(implicit s: SocketConnection) extends CommandHandler {
 
-  def apply(pendingGroups: List[GroupModel] = List())(implicit executor: CommandExecutor) {
+  def apply(pendingGroups: List[TestGroup] = List())(implicit executor: CommandExecutor) {
     val code = "code!"
     val verifyModel = VerifyPhoneModel(s.phone, code)
-    val verifyResponseModel = VerifyPhoneResponseModel(s.phone, pendingGroups)
+    val verifyResponseModel = VerifyPhoneResponseModel(s.phone, pendingGroups.map(_.model))
     executor(verifyModel, Option(verifyResponseModel))
   }
 

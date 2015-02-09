@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:16 PM
+ * Last modified by rconrad, 2/8/15 4:20 PM
  */
 
 package base.socket.api
@@ -125,11 +125,11 @@ abstract class SocketApiIntegrationTest
     socket2.connect()
 
     socket2.login(List(), None, None)
+
+    group1.invites = List(socket2.inviteModel)
+
     socket2.register()
-
-    val pendingGroups2 = List(GroupModelImpl(group1.id, group1.users, List(socket2.inviteModel), None, None, 0))
-
-    socket2.verify(pendingGroups2)
+    socket2.verify(List(group1))
 
     val users2 = List(socket1.userModel, socket2.userModel)
     val eventId2 = randomMock.nextUuid()
@@ -157,9 +157,9 @@ abstract class SocketApiIntegrationTest
     val group2 = socket1.sendInvite(socket3)
     socket3.register()
 
-    val pendingGroups3 = List(GroupModelImpl(group2.id, group1.users, List(socket3.inviteModel), None, None, 0))
+    group2.invites = List(socket3.inviteModel)
 
-    socket3.verify(pendingGroups3)
+    socket3.verify(List(group2))
     socket3.declineInvite(group2.id)
 
     socket1.disconnect()
