@@ -2,20 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 2:16 PM
+ * Last modified by rconrad, 2/8/15 4:40 PM
  */
 
 package base.socket.api.test.command
 
-import java.util.UUID
-
-import base.entity.event.model.EventModel
-import base.entity.group.model.impl.GroupModelImpl
+import base.common.random.mock.RandomServiceMock
 import base.entity.group.model.{AcceptInviteModel, AcceptInviteResponseModel}
-import base.entity.user.model._
-import base.socket.api.test.SocketConnection
-import base.socket.api.test.util.ListUtils._
+import base.socket.api._
+import base.socket.api.test.model.EventModelFactory
 import base.socket.api.test.util.TestQuestions
+import base.socket.api.test.{SocketConnection, TestGroup}
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -25,12 +22,16 @@ import base.socket.api.test.util.TestQuestions
  */
 class AcceptInviteCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(users: List[UserModel], groupId: UUID, events: List[EventModel])
-           (implicit executor: CommandExecutor, questions: TestQuestions) {
-    val groupModel = GroupModelImpl(groupId, sortUsers(users), List(), None, None, 0)
+  def apply(group: TestGroup)
+           (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock) {
 
-    val acceptInviteModel = AcceptInviteModel(groupId)
-    val inviteResponseModel = AcceptInviteResponseModel(groupModel, events, questions.models)
+    group.sockets ++= List(socket)
+    group.users ++= List(socket.userModel)
+    group.invites = List()
+    group.events ++= List(EventModelFactory.join(randomMock.nextUuid(), group.id, socket))
+
+    val acceptInviteModel = AcceptInviteModel(group.id)
+    val inviteResponseModel = AcceptInviteResponseModel(group.model, group.events.reverse, questions.models)
     executor(acceptInviteModel, Option(inviteResponseModel))
   }
 

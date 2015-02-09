@@ -2,17 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:16 PM
+ * Last modified by rconrad, 2/8/15 4:38 PM
  */
 
 package base.socket.api.test.command
 
-import java.util.UUID
-
 import base.common.random.mock.RandomServiceMock
+import base.entity.event.model.EventModel
 import base.entity.message.model.MessageModel
-import base.socket.api.test.SocketConnection
 import base.socket.api.test.model.EventModelFactory
+import base.socket.api.test.{SocketConnection, TestGroup}
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -22,11 +21,14 @@ import base.socket.api.test.model.EventModelFactory
  */
 class MessageCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(groupId: UUID)(implicit executor: CommandExecutor, randomMock: RandomServiceMock) = {
-    val event = EventModelFactory.message(randomMock.nextUuid(), groupId, socket)
-    val messageModel = MessageModel(groupId, event.body)
+  def apply(group: TestGroup)(implicit executor: CommandExecutor, randomMock: RandomServiceMock) = {
+    val event = EventModelFactory.message(randomMock.nextUuid(), group.id, socket)
+    group.events ++= List(event)
+    val messageModel = MessageModel(group.id, event.body)
     executor(messageModel, None)
-    executor.assertResponse(event)
+    group.sockets.foreach { socket =>
+      executor.assertResponse(event)(manifest[EventModel], socket)
+    }
     event
   }
 
