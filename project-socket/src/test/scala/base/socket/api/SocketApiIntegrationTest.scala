@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:47 PM
+ * Last modified by rconrad, 2/8/15 4:53 PM
  */
 
 package base.socket.api
@@ -103,48 +103,33 @@ abstract class SocketApiIntegrationTest
   test("integration test - runs all commands", Tags.SLOW) {
     val (socket1, socket1a, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
 
-    socket1.userId = randomMock.nextUuid()
     socket1.connect()
 
     socket1.login()
     socket1.register()
     socket1.verify()
-
     val group1 = socket1.sendInvite(socket2)
     socket1.questions(group1.id)
-
     socket1.message(group1)
 
-    socket2.userId = randomMock.nextUuid()
     socket2.connect()
 
     socket2.login()
-
     group1.invites = List(socket2.inviteModel)
-
     socket2.register()
     socket2.verify(List(group1))
-
     socket2.acceptInvite(group1)
-
     socket1.answer(randomMock.nextUuid(), group1, socket2.userId, questionIndex = 0)
-
     socket2.questions(group1.id, List(0))
-
     socket2.message(group1)
-
     socket2.answer(randomMock.nextUuid(1), group1, socket1.userId, questionIndex = 1)
 
-    socket3.userId = randomMock.nextUuid()
     socket3.connect()
 
     socket3.login()
-
     val group2 = socket1.sendInvite(socket3)
     socket3.register()
-
     group2.invites = List(socket3.inviteModel)
-
     socket3.verify(List(group2))
     socket3.declineInvite(group2.id)
 

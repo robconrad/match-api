@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:52 PM
+ * Last modified by rconrad, 2/8/15 4:52 PM
  */
 
 package base.socket.api
@@ -12,6 +12,8 @@ import base.socket.api.test._
 import io.netty.channel.Channel
 import io.netty.handler.codec.http.websocketx._
 import org.scalatest.concurrent.Eventually
+
+import scala.language.existentials
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
@@ -29,7 +31,7 @@ class WebSocketApiIntegrationTest extends SocketApiIntegrationTest with Eventual
 
       private var ch: Channel = _
 
-      def connect() = {
+      def _connect() = {
         ch = WebSocketClientFactory.connect()
         this
       }

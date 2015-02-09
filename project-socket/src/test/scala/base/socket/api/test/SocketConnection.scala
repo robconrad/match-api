@@ -2,11 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:51 PM
+ * Last modified by rconrad, 2/8/15 4:51 PM
  */
 
 package base.socket.api.test
 
+import base.common.random.mock.RandomServiceMock
 import base.socket.api.test.command._
 
 /**
@@ -32,7 +33,13 @@ abstract class SocketConnection(var _props: SocketProperties) {
   def props_=(props: SocketProperties) { _props = props }
   def props = _props
 
-  def connect(): SocketConnection
+  protected def _connect(): SocketConnection
+  final def connect()(implicit randomMock: RandomServiceMock) = {
+    if(props.userIdOpt.isEmpty) {
+      props.userId = randomMock.nextUuid()
+    }
+    _connect()
+  }
 
   def disconnect(): SocketConnection
 

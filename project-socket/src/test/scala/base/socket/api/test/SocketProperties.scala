@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:38 PM
+ * Last modified by rconrad, 2/8/15 4:51 PM
  */
 
 package base.socket.api.test
@@ -38,6 +38,7 @@ class SocketProperties(
 
   def userId_=(userId: UUID) { _userId = Option(userId) }
   def userId = _userId.getOrThrow
+  def userIdOpt = _userId
 
   def name_=(name: String) { _name = Option(name) }
   def name = _name.getOrThrow

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 3:52 PM
+ * Last modified by rconrad, 2/8/15 4:52 PM
  */
 
 package base.socket.api
@@ -12,6 +12,8 @@ import java.net.Socket
 
 import base.socket.api.impl.RawSocketApiHandlerServiceImpl
 import base.socket.api.test.{SocketProperties, SocketConnection}
+
+import scala.language.existentials
 
 /**
  * Responsible for testing Server startup - highest level integration test possible
@@ -28,7 +30,7 @@ class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
       private var out: PrintWriter = _
       private var in: BufferedReader = _
 
-      def connect() = {
+      def _connect() = {
         socket = new Socket(SocketApiService().host, SocketApiService().port)
         socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
         out = new PrintWriter(socket.getOutputStream, true)
