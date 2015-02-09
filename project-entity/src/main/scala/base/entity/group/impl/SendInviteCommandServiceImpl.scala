@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:12 PM
+ * Last modified by rconrad, 2/8/15 6:59 PM
  */
 
 package base.entity.group.impl
@@ -83,9 +83,12 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def phoneGetUserId(groupId: UUID, key: PhoneKey) =
       key.get.flatMap {
-        case Some(userId) if userId == authCtx.userId => Errors.selfInvited
-        case Some(userId) => userGroupsInvitedAdd(groupId, make[UserGroupsInvitedKey](userId))
-        case None         => phoneGroupsInvitedAdd(groupId, make[PhoneGroupsInvitedKey](input.phone))
+        case Some(userId) if userId == authCtx.userId =>
+          Errors.selfInvited
+        case Some(userId) =>
+          userGroupsInvitedAdd(groupId, make[UserGroupsInvitedKey](userId))
+        case None =>
+          phoneGroupsInvitedAdd(groupId, make[PhoneGroupsInvitedKey](input.phone))
       }
 
     def phoneGroupsInvitedAdd(groupId: UUID, key: PhoneGroupsInvitedKey) =

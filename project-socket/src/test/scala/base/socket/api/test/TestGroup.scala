@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:52 PM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.socket.api.test
@@ -12,10 +12,10 @@ import java.util.UUID
 import base.common.random.mock.RandomServiceMock
 import base.entity.event.model.EventModel
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.group.model.{GroupModel, InviteModel}
+import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.user.model.UserModel
 import base.socket.api._
-import base.socket.api.test.model.{InviteModelFactory, EventModelFactory}
+import base.socket.api.test.model.{ InviteModelFactory, EventModelFactory }
 import base.socket.api.test.util.ListUtils._
 
 /**
@@ -34,9 +34,9 @@ class TestGroup(private var _id: Option[UUID] = None,
     id = randomMock.nextUuid()
     sockets = List(socket1)
     users = List(socket1.userModel)
-    invites = socket2.phoneOpt match{
+    invites = socket2.phoneOpt match {
       case Some(userId) => List(socket2.inviteModel)
-      case None => List(InviteModelFactory(socket2.phoneString))
+      case None         => List(InviteModelFactory(socket2.phoneString))
     }
     events = List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid()))
   }

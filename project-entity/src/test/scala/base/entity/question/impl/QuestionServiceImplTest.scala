@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:32 PM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.entity.question.impl
@@ -16,7 +16,7 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes._
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.kv.{GroupUserQuestionsKey, GroupUserQuestionsYesKey, GroupUserQuestionsTempKey, GroupUsersKey}
+import base.entity.group.kv.{ GroupUserQuestionsKey, GroupUserQuestionsYesKey, GroupUserQuestionsTempKey, GroupUsersKey }
 import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
 import base.entity.question.impl.QuestionServiceImpl.Errors

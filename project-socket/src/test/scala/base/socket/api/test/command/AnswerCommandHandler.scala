@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:15 PM
+ * Last modified by rconrad, 2/8/15 6:59 PM
  */
 
 package base.socket.api.test.command
@@ -13,12 +13,12 @@ import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.event.model.EventModel
 import base.entity.kv.Key.Pipeline
 import base.entity.question.model.AnswerModel
-import base.entity.question.{QuestionService, QuestionSides}
+import base.entity.question.{ QuestionService, QuestionSides }
 import base.entity.user.User
 import base.socket.api._
 import base.socket.api.test.model.EventModelFactory
 import base.socket.api.test.util.TestQuestions
-import base.socket.api.test.{SocketConnection, TestGroup}
+import base.socket.api.test.{ SocketConnection, TestGroup }
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -28,8 +28,9 @@ import base.socket.api.test.{SocketConnection, TestGroup}
  */
 class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(group: TestGroup, otherSocket: SocketConnection)
-           (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock, tp: Pipeline) {
+  def apply(group: TestGroup,
+            otherSocket: SocketConnection)(implicit executor: CommandExecutor,
+                                           questions: TestQuestions, randomMock: RandomServiceMock, tp: Pipeline) {
     val answerEventId = randomMock.nextUuid()
 
     val questionIndex = socket.questionsAnswered(group.id).sorted.lastOption.getOrElse(-1) + 1

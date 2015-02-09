@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 11:00 AM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.socket.api.test.command
@@ -26,8 +26,8 @@ class CommandExecutor extends SocketBaseSuite with Loggable {
   private implicit val formats = JsonFormats.withModels
 
   def apply[A, B](model: A, responseModel: Option[B])(implicit mA: Manifest[A],
-                                                                mB: Manifest[B],
-                                                                socket: SocketConnection) {
+                                                      mB: Manifest[B],
+                                                      socket: SocketConnection) {
     val command = CommandModel(model)
     val json = Serialization.write(command)
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 4:38 PM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.socket.api.test.command
@@ -11,7 +11,7 @@ import base.common.random.mock.RandomServiceMock
 import base.entity.event.model.EventModel
 import base.entity.message.model.MessageModel
 import base.socket.api.test.model.EventModelFactory
-import base.socket.api.test.{SocketConnection, TestGroup}
+import base.socket.api.test.{ SocketConnection, TestGroup }
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}

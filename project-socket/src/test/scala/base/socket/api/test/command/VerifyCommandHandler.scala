@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:21 PM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.socket.api.test.command
@@ -24,7 +24,7 @@ class VerifyCommandHandler(implicit s: SocketConnection) extends CommandHandler 
     s.pendingGroups.foreach { group =>
       group.invites = group.invites.map {
         case i if i.phone == s.phoneString => s.inviteModel
-        case i => i
+        case i                             => i
       }
     }
     val code = "code!"

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:17 PM
+ * Last modified by rconrad, 2/8/15 6:57 PM
  */
 
 package base.socket.api.test
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.test.TestExceptions.TestRuntimeException
-import base.socket.api.test.model.{InviteModelFactory, UserModelFactory}
+import base.socket.api.test.model.{ InviteModelFactory, UserModelFactory }
 import org.joda.time.DateTime
 
 /**
@@ -21,15 +21,15 @@ import org.joda.time.DateTime
  * @author rconrad
  */
 class SocketProperties(
-  private var _deviceId: Option[UUID] = Option(RandomService().uuid),
-  private var _facebookToken: Option[String] = Option(RandomService().uuid.toString),
-  private var _userId: Option[UUID] = None,
-  private var _name: Option[String] = Option("name-" + RandomService().md5),
-  private var _phone: Option[String] = None,
-  private var _lastLogin: Option[DateTime] = None,
-  private var _questionsAnswered: Map[UUID, List[Int]] = Map(),
-  private var _groups: List[TestGroup] = List(),
-  private var _pendingGroups: List[TestGroup] = List()) {
+    private var _deviceId: Option[UUID] = Option(RandomService().uuid),
+    private var _facebookToken: Option[String] = Option(RandomService().uuid.toString),
+    private var _userId: Option[UUID] = None,
+    private var _name: Option[String] = Option("name-" + RandomService().md5),
+    private var _phone: Option[String] = None,
+    private var _lastLogin: Option[DateTime] = None,
+    private var _questionsAnswered: Map[UUID, List[Int]] = Map(),
+    private var _groups: List[TestGroup] = List(),
+    private var _pendingGroups: List[TestGroup] = List()) {
 
   val phoneString = "phone-" + RandomService().md5
 
@@ -52,7 +52,7 @@ class SocketProperties(
 
   def setPhone() { _phone = Option(phoneString) }
   def phone = _phone.getOrThrow
-  def phoneOpt = _phone              
+  def phoneOpt = _phone
 
   def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
   def lastLogin = _lastLogin
