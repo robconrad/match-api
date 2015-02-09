@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 2:25 PM
+ * Last modified by rconrad, 2/8/15 7:59 PM
  */
 
 package base.entity.perm
@@ -35,6 +35,7 @@ private[perm] object PermSets {
 
   val questions = PermSet(
     Perms.QUESTIONS,
+    Perms.CREATE_QUESTION,
     Perms.ANSWER
   )
 

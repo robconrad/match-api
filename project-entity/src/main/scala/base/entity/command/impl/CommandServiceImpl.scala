@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/5/15 8:03 PM
+ * Last modified by rconrad, 2/8/15 9:24 PM
  */
 
 package base.entity.command.impl
@@ -39,8 +39,9 @@ private[entity] trait CommandServiceImpl[A, B]
     innerExecute(input).map {
       case Right(response) =>
         responseManifest match {
-          case Some(responseManifest) => Option(CommandModel(response)(responseManifest))
-          case None                   => None
+          case Some(responseManifest)              => Option(CommandModel(response)(responseManifest))
+          case None if response.isInstanceOf[Unit] => None
+          case None                                => throw new RuntimeException("you forgot to add a manifest")
         }
       case Left(error) => Option(CommandModel(error)(errorManifest))
     }

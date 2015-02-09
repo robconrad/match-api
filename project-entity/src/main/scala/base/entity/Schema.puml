@@ -91,6 +91,11 @@ package user {
         GroupId
     }
 
+    set(UserQuestions) {
+        key(userId)
+        QuestionIdComposite
+    }
+
 }
 
 package facebook {
@@ -135,6 +140,11 @@ package group {
         - time
     }
 
+    set(GroupQuestions) {
+        key(groupId)
+        QuestionIdComposite
+    }
+
     package GroupUserQuestion #White/Plum {
 
         set(GroupUserQuestions) {
@@ -170,8 +180,17 @@ package question {
 
     id(QuestionIdComposite)
 
+    id(QuestionId)
+
+    hash(Question) {
+        key(questionId)
+        + creatorId
+        + a
+        + b
+    }
+
     set(Questions) {
-        key("standard")
+        key(category)
         QuestionIdComposite
     }
 
@@ -240,12 +259,14 @@ package legend <<Rect>> #White/Gainsboro {
 
 FacebookAccount -* FacebookInfo
 FacebookInfo --* FacebookUser
-GroupId -* Group
+GroupId --* Group
+GroupId ---* GroupQuestions
 GroupId --* GroupEvents
 GroupId --* GroupUser
 GroupId --* GroupUserQuestion
 GroupId --* GroupUsers
 GroupId ---* GroupPhonesInvited
+QuestionId --* Question
 Phone --* PhoneGroupsInvited
 Phone --* UserPhoneLabel
 PhysicalDevice --* Device
@@ -253,10 +274,11 @@ PhysicalDevice --* Phone
 PhysicalDevice --* PhoneCooldown
 UserId --* GroupUser
 UserId --* GroupUserQuestion
-UserId --* User
+UserId ---* User
 UserId --* UserGroups
 UserId --* UserGroupsInvited
 UserId --* UserPhonesInvited
-UserId --* UserPhoneLabel
+UserId ---* UserPhoneLabel
+UserId ---* UserQuestions
 
 @enduml

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:33 PM
+ * Last modified by rconrad, 2/8/15 9:24 PM
  */
 
 package base.entity.service
@@ -17,7 +17,8 @@ import base.entity.group.kv.impl._
 import base.entity.kv.impl.{ ScredisKeyFactoryServiceImpl, ScredisFactoryServiceImpl, KvFactoryServiceImpl }
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.question.QuestionDef
-import base.entity.question.impl.{ AnswerCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl }
+import base.entity.question.impl.{ CreateQuestionCommandServiceImpl, AnswerCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl }
+import base.entity.question.kv.impl.QuestionKeyServiceImpl
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 import base.entity.user.kv.impl._
@@ -72,18 +73,17 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new ScredisKeyFactoryServiceImpl())
 
+    Services.register(new DeviceKeyServiceImpl())
     Services.register(new FacebookInfoKeyServiceImpl())
     Services.register(new FacebookUserKeyServiceImpl())
-
-    Services.register(new UserKeyServiceImpl())
-    Services.register(new DeviceKeyServiceImpl())
-    Services.register(new PhoneKeyServiceImpl())
-    Services.register(new PhoneCooldownKeyServiceImpl())
-    Services.register(new UserPhoneLabelKeyServiceImpl())
-
+    Services.register(new GroupEventsKeyServiceImpl())
     Services.register(new GroupKeyServiceImpl())
     Services.register(new GroupUserKeyServiceImpl())
-    Services.register(new GroupEventsKeyServiceImpl())
+    Services.register(new PhoneCooldownKeyServiceImpl())
+    Services.register(new PhoneKeyServiceImpl())
+    Services.register(new QuestionKeyServiceImpl())
+    Services.register(new UserKeyServiceImpl())
+    Services.register(new UserPhoneLabelKeyServiceImpl())
 
     Services.register(new ApiErrorServiceImpl(
       Keys(MATCH, "debug")))
@@ -138,6 +138,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new QuestionsCommandServiceImpl())
 
     Services.register(new AnswerCommandServiceImpl())
+
+    Services.register(new CreateQuestionCommandServiceImpl())
 
     true
   }

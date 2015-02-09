@@ -9,18 +9,18 @@ package base.entity.question
 
 import base.entity.command.{ CommandService, CommandServiceCompanion }
 import base.entity.perm.Perms
-import base.entity.question.model.AnswerModel
+import base.entity.question.model.{ CreateQuestionResponseModel, CreateQuestionModel }
 
 /**
  * CRUD, etc.
  * @author rconrad
  */
-trait AnswerCommandService extends CommandService[AnswerModel, Unit] {
+trait CreateQuestionCommandService extends CommandService[CreateQuestionModel, CreateQuestionResponseModel] {
 
-  final val serviceManifest = manifest[AnswerCommandService]
+  final val serviceManifest = manifest[CreateQuestionCommandService]
 
-  final val perms = Set(Perms.ANSWER)
+  final val perms = Set(Perms.CREATE_QUESTION)
 
 }
 
-object AnswerCommandService extends CommandServiceCompanion[AnswerCommandService]
+object CreateQuestionCommandService extends CommandServiceCompanion[CreateQuestionCommandService]

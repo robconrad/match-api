@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:40 PM
+ * Last modified by rconrad, 2/8/15 8:59 PM
  */
 
 package base.entity.kv.bytea.scredisImpl
@@ -35,7 +35,7 @@ object QuestionIdCompositeScredisSerializer extends ScredisSerializer[QuestionId
       case null =>
         throw new RedisException("toType received null")
       case data if data.length != compositeIdLength =>
-        throw new RedisException(s"toType received invalid QuestionIdComposite $data")
+        throw new RedisException(s"toType received invalid QuestionIdComposite length ${data.length} $data")
       case data =>
         val uuid = UUIDReader.read(data.slice(0, uuidLength))
         val side = QuestionSides.withName(new String(data.slice(uuidLength, compositeIdLength)))

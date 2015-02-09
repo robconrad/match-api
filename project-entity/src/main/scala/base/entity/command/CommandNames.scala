@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 1:00 PM
+ * Last modified by rconrad, 2/8/15 8:45 PM
  */
 
 package base.entity.command
@@ -11,7 +11,7 @@ import base.entity.error.model.ApiError
 import base.entity.event.model.EventModel
 import base.entity.group.model._
 import base.entity.message.model.MessageModel
-import base.entity.question.model.{ AnswerModel, QuestionsModel, QuestionsResponseModel }
+import base.entity.question.model._
 import base.entity.user.model._
 
 /**
@@ -48,6 +48,9 @@ object CommandNames extends Enumeration {
   val questions = Value
   val questionsResponse = Value
 
+  val createQuestion = Value
+  val createQuestionResponse = Value
+
   val message = Value
   val answer = Value
   val event = Value
@@ -73,6 +76,8 @@ object CommandNames extends Enumeration {
     manifest[DeclineInviteResponseModel] -> declineInviteResponse,
     manifest[QuestionsModel] -> questions,
     manifest[QuestionsResponseModel] -> questionsResponse,
+    manifest[CreateQuestionModel] -> createQuestion,
+    manifest[CreateQuestionResponseModel] -> createQuestionResponse,
     manifest[MessageModel] -> message,
     manifest[AnswerModel] -> answer,
     manifest[EventModel] -> event)

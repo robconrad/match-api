@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/5/15 7:34 PM
+ * Last modified by rconrad, 2/8/15 8:06 PM
  */
 
 package base.entity.kv
@@ -39,6 +39,7 @@ object KeyPrefixes extends Enumeration {
   val group                     = Value(13000)
   val groupEvents               = Value(14000)
   val groupPhonesInvited        = Value(15000)
+  val groupQuestions            = Value(15500)
   val groupUser                 = Value(16000)
   val groupUserQuestions        = Value(17000)
   val groupUserQuestionsTemp    = Value(18000)
@@ -47,6 +48,7 @@ object KeyPrefixes extends Enumeration {
   val phone                     = Value(21000)
   val phoneCooldown             = Value(22000)
   val phoneGroupsInvited        = Value(23000)
+  val question                  = Value(23500)
   val questions                 = Value(24000)
   val test                      = Value(25000)
   val user                      = Value(26000)
@@ -54,6 +56,7 @@ object KeyPrefixes extends Enumeration {
   val userGroupsInvited         = Value(28000)
   val userPhonesInvited         = Value(29000)
   val userPhoneLabel            = Value(30000)
+  val userQuestions             = Value(31000)
   // format: ON
 
 }

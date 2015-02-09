@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:56 PM
+ * Last modified by rconrad, 2/8/15 9:15 PM
  */
 
 package base.socket.api
@@ -61,6 +61,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket2.acceptInvite(group3)
     socket3.disconnect()
     socket2.message(group3)
+    socket2.createQuestion(group3)
 
     // everybody else leaves
     socket1.disconnect()
