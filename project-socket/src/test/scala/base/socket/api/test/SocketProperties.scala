@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:06 PM
+ * Last modified by rconrad, 2/8/15 6:17 PM
  */
 
 package base.socket.api.test
@@ -28,7 +28,8 @@ class SocketProperties(
   private var _phone: Option[String] = None,
   private var _lastLogin: Option[DateTime] = None,
   private var _questionsAnswered: Map[UUID, List[Int]] = Map(),
-  private var _groups: List[TestGroup] = List()) {
+  private var _groups: List[TestGroup] = List(),
+  private var _pendingGroups: List[TestGroup] = List()) {
 
   val phoneString = "phone-" + RandomService().md5
 
@@ -63,6 +64,9 @@ class SocketProperties(
 
   def groups_=(groups: List[TestGroup]) { _groups = groups }
   def groups = _groups
+
+  def pendingGroups_=(pendingGroups: List[TestGroup]) { _pendingGroups = pendingGroups }
+  def pendingGroups = _pendingGroups
 
   def userModel = UserModelFactory(userId, facebookToken, name)
   def inviteModel = InviteModelFactory(phoneString, facebookToken, name)

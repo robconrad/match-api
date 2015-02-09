@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:14 PM
+ * Last modified by rconrad, 2/8/15 6:28 PM
  */
 
 package base.socket.api
@@ -102,13 +102,14 @@ abstract class SocketApiIntegrationTest
 
   test("integration test - runs all commands", Tags.SLOW) {
     val (socket1, socket1a, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
+    val (group1, group2) = (makeGroup(), makeGroup())
 
     socket1.connect()
 
     socket1.login()
     socket1.register()
     socket1.verify()
-    val group1 = socket1.sendInvite(socket2)
+    socket1.sendInvite(group1, socket2)
     socket1.questions(group1)
     socket1.message(group1)
 
@@ -116,7 +117,7 @@ abstract class SocketApiIntegrationTest
 
     socket2.login()
     socket2.register()
-    socket2.verify(List(group1))
+    socket2.verify()
     socket2.acceptInvite(group1)
     socket1.answer(group1, socket2)
     socket2.questions(group1)
@@ -126,10 +127,10 @@ abstract class SocketApiIntegrationTest
     socket3.connect()
 
     socket3.login()
-    val group2 = socket1.sendInvite(socket3)
+    socket1.sendInvite(group2, socket3)
     socket3.register()
-    socket3.verify(List(group2))
-    socket3.declineInvite(group2.id)
+    socket3.verify()
+    socket3.declineInvite(group2)
 
     socket1.disconnect()
     socket2.disconnect()

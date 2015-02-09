@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:55 PM
+ * Last modified by rconrad, 2/8/15 6:27 PM
  */
 
 package base.socket.api.test.command
@@ -22,10 +22,14 @@ import base.socket.api.test.{SocketConnection, TestGroup}
  */
 class SendInviteCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(invitedSocket: SocketConnection)
+  def apply(group: TestGroup, invitedSocket: SocketConnection)
            (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock) = {
-    val group = new TestGroup(randomMock, socket, invitedSocket)
+
+    group.set(randomMock, socket, invitedSocket)
+
     socket.groups ++= List(group)
+    invitedSocket.pendingGroups ++= List(group)
+
     val inviteModel = SendInviteModel(invitedSocket.phoneString, InviteModelFactory.label)
     val inviteResponseModel = SendInviteResponseModel(group.model, group.events, questions.models)
     executor(inviteModel, Option(inviteResponseModel))

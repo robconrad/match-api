@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:55 PM
+ * Last modified by rconrad, 2/8/15 6:19 PM
  */
 
 package base.socket.api.test.command
@@ -26,6 +26,7 @@ class AcceptInviteCommandHandler(implicit socket: SocketConnection) extends Comm
            (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock) {
 
     socket.groups ++= List(group)
+    socket.pendingGroups = socket.pendingGroups.filter(_ != group)
 
     group.sockets ++= List(socket)
     group.users ++= List(socket.userModel)

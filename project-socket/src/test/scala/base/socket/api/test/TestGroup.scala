@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:48 PM
+ * Last modified by rconrad, 2/8/15 6:28 PM
  */
 
 package base.socket.api.test
@@ -24,20 +24,24 @@ import base.socket.api.test.util.ListUtils._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class TestGroup(val id: UUID,
+class TestGroup(private var _id: Option[UUID] = None,
                 private var _sockets: List[SocketConnection] = List(),
                 private var _users: List[UserModel] = List(),
                 private var _invites: List[InviteModel] = List(),
                 private var _events: List[EventModel] = List()) {
 
-  def this(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) =
-    this(randomMock.nextUuid(),
-      List(socket1),
-      List(socket1.userModel),
-      List(InviteModelFactory(socket2.phoneString)),
-      List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid())))
+  def set(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) {
+    id = randomMock.nextUuid()
+    sockets = List(socket1)
+    users = List(socket1.userModel)
+    invites = List(InviteModelFactory(socket2.phoneString))
+    events = List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid()))
+  }
 
   def model: GroupModel = GroupModelImpl(id, users, invites, None, None, 0)
+
+  def id_=(id: UUID) { _id = Option(id) }
+  def id = _id.get
 
   def sockets_=(sockets: List[SocketConnection]) { _sockets = sockets }
   def sockets = _sockets
