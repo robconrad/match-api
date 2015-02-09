@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:06 PM
+ * Last modified by rconrad, 2/8/15 6:15 PM
  */
 
 package base.socket.api.test.command
@@ -28,9 +28,13 @@ import base.socket.api.test.{SocketConnection, TestGroup}
  */
 class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
-  def apply(group: TestGroup, otherSocket: SocketConnection, questionIndex: Int)
+  def apply(group: TestGroup, otherSocket: SocketConnection)
            (implicit executor: CommandExecutor, questions: TestQuestions, randomMock: RandomServiceMock, tp: Pipeline) {
     val answerEventId = randomMock.nextUuid()
+
+    val questionIndex = socket.questionsAnswered(group.id).sorted.lastOption.getOrElse(-1) + 1
+    assert(!otherSocket.questionsAnswered(group.id).contains(questionIndex))
+
     val questionId = questions(questionIndex).id
     val answer = true
     val side = QuestionSides.SIDE_A

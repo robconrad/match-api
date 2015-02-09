@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:12 PM
+ * Last modified by rconrad, 2/8/15 6:14 PM
  */
 
 package base.socket.api
@@ -118,10 +118,10 @@ abstract class SocketApiIntegrationTest
     socket2.register()
     socket2.verify(List(group1))
     socket2.acceptInvite(group1)
-    socket1.answer(group1, socket2, questionIndex = 0)
+    socket1.answer(group1, socket2)
     socket2.questions(group1)
     socket2.message(group1)
-    socket2.answer(group1, socket1, questionIndex = 1)
+    socket2.answer(group1, socket1)
 
     socket3.connect()
 
