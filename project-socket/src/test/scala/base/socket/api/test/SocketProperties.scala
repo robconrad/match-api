@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:49 PM
+ * Last modified by rconrad, 2/8/15 5:59 PM
  */
 
 package base.socket.api.test
@@ -12,6 +12,7 @@ import java.util.UUID
 import base.common.random.RandomService
 import base.common.test.TestExceptions.TestRuntimeException
 import base.socket.api.test.model.{InviteModelFactory, UserModelFactory}
+import org.joda.time.DateTime
 
 /**
  * {{ Describe the high level purpose of SocketProperties here. }}
@@ -25,7 +26,9 @@ class SocketProperties(
   private var _userId: Option[UUID] = None,
   private var _name: Option[String] = Option("name-" + RandomService().md5),
   private var _phone: Option[String] = None,
-  private var _questionsAnswered: List[Int] = List()) {
+  private var _lastLogin: Option[DateTime] = None,
+  private var _questionsAnswered: List[Int] = List(),
+  private var _groups: List[TestGroup] = List()) {
 
   val phoneString = "phone-" + RandomService().md5
 
@@ -48,10 +51,16 @@ class SocketProperties(
 
   def setPhone() { _phone = Option(phoneString) }
   def phone = _phone.getOrThrow
-  def phoneOpt = _phone
+  def phoneOpt = _phone              
+
+  def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
+  def lastLogin = _lastLogin
 
   def questionsAnswered_=(questionsAnswered: List[Int]) { _questionsAnswered = questionsAnswered }
   def questionsAnswered = _questionsAnswered
+
+  def groups_=(groups: List[TestGroup]) { _groups = groups }
+  def groups = _groups
 
   def userModel = UserModelFactory(userId, facebookToken, name)
   def inviteModel = InviteModelFactory(phoneString, facebookToken, name)

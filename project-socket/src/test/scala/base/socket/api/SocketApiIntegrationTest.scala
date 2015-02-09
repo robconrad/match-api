@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:45 PM
+ * Last modified by rconrad, 2/8/15 5:58 PM
  */
 
 package base.socket.api
@@ -141,10 +141,7 @@ abstract class SocketApiIntegrationTest
     socket1a.connect()
 
     // original user login again
-    socket1a.login(
-      List(group1, group2),
-      Option(group1),
-      Option(TimeServiceConstantMock.now))
+    socket1a.login(Option(group1))
 
     socket1a.disconnect()
   }
