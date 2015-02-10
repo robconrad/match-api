@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/5/15 6:29 PM
+ * Last modified by rconrad, 2/10/15 12:33 PM
  */
 
 import sbt._
@@ -61,7 +61,7 @@ object Dependencies {
 
   lazy val redis = Seq(
     "com.github.spullara.redis" % "client" % "0.7",
-    "com.livestream" %% "scredis" % "2.0.7-SNAPSHOT" changing())
+    "com.github.robconrad" %% "scredis" % "2.1.0-SNAPSHOT" changing())
 
   private val sprayVersion = "1.3.1"
   lazy val sprayClient = Seq(
