@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/10/15 5:03 PM
  */
 
 package base.socket.api.test.command
@@ -23,7 +23,7 @@ class QuestionsCommandHandler(implicit socket: SocketConnection) extends Command
   def apply(group: TestGroup)(implicit executor: CommandExecutor, questions: TestQuestions) {
     val questionsModel = QuestionsModel(group.id)
     val questionsResponseModel = QuestionsResponseModel(group.id,
-      questions.filteredModels(socket.questionsAnswered(group.id)))
+      questions.filteredModels(group.id, socket.questionsAnswered(group.id)))
     executor(questionsModel, Option(questionsResponseModel))
   }
 

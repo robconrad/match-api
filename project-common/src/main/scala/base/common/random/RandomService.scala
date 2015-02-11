@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:39 AM
+ * Last modified by rconrad, 2/10/15 4:29 PM
  */
 
 package base.common.random
@@ -11,6 +11,8 @@ import java.util.UUID
 
 import base.common.service.{ Service, ServiceCompanion }
 import com.google.common.hash.HashCode
+
+import scala.util.Random
 
 /**
  * Provides randomly generated unique identifiers (used to better support mocking)
@@ -39,6 +41,11 @@ trait RandomService extends Service {
    * Generate a random uuid
    */
   def uuid: UUID
+
+  /**
+   * Get a scala Random impl
+   */
+  def random: Random
 
 }
 

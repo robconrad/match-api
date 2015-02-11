@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:15 PM
+ * Last modified by rconrad, 2/10/15 5:04 PM
  */
 
 package base.socket.api
@@ -32,6 +32,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket1.register()
     socket1.verify()
     socket1.sendInvite(group1, socket2)
+    socket1.createQuestion(group1)
     socket1.questions(group1)
     socket1.message(group1)
 
@@ -43,6 +44,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket2.acceptInvite(group1)
     // first user answer down here because we couldn't match until second user exists
     socket1.answer(group1, socket2)
+    socket2.createQuestion(group1)
     socket2.questions(group1)
     socket2.message(group1)
     socket2.answer(group1, socket1)
@@ -61,7 +63,6 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket2.acceptInvite(group3)
     socket3.disconnect()
     socket2.message(group3)
-    socket2.createQuestion(group3)
 
     // everybody else leaves
     socket1.disconnect()

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:24 PM
+ * Last modified by rconrad, 2/8/15 9:46 PM
  */
 
 package base.entity.service
@@ -112,7 +112,8 @@ object EntityServicesBootstrap extends ServicesBootstrap {
           Keys("a"),
           Keys("b"))
       },
-      Keys(MATCH_QUESTION, "count")))
+      Keys(MATCH_QUESTION, "count"),
+      Keys(MATCH_QUESTION, "groupCount")))
 
     Services.register(new UserServiceImpl())
 

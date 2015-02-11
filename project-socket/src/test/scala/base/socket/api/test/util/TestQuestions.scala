@@ -2,14 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/10/15 5:03 PM
  */
 
 package base.socket.api.test.util
 
 import java.util.UUID
 
-import base.entity.question.{ QuestionSides, QuestionDef }
+import base.entity.question.QuestionDef
+import base.entity.question.QuestionSides._
 import base.entity.question.model.QuestionModel
 
 /**
@@ -20,23 +21,31 @@ import base.entity.question.model.QuestionModel
  */
 class TestQuestions {
 
-  val defs = List(
+  val standardDefs = List(
     ("65b76c8e-a9b3-4eda-b6dc-ebee6ef78a04", "Doin' it with the lights off", None),
     ("2c75851f-1a87-40ab-9f66-14766fa12c6c", "Liberal use of chocolate sauce", None),
     ("a8d08d2d-d914-4e7b-8ff4-6a9dde02002c", "Giving buttsex", Option("Receiving buttsex")),
     ("543c57e3-54ba-4d9b-8ed3-c8f2e394b18d", "Dominating", Option("Being dominated"))
   ).map(q => QuestionDef(UUID.fromString(q._1), q._2, q._3))
 
-  val models = ListUtils.sortQuestions(defs.map(QuestionModel(_, QuestionSides.SIDE_A)) ++
-    defs.collect {
-      case q if q.b.isDefined => QuestionModel(q, QuestionSides.SIDE_B)
+  private var groupDefs = Map[UUID, Set[QuestionDef]]()
+
+  def defs(groupId: UUID) = standardDefs ++ groupDefs.getOrElse(groupId, Set())
+
+  def models(groupId: UUID) = ListUtils.sortQuestions(defs(groupId).map(QuestionModel(_, SIDE_A)) ++
+    defs(groupId).collect {
+      case q if q.b.isDefined => QuestionModel(q, SIDE_B)
     })
 
-  def apply(index: Int) = defs(index)
+  def apply(groupId: UUID, index: Int) = defs(groupId)(index)
 
-  def filteredModels(index: Int) = models.filter(_.id != defs(index).id)
-  def filteredModels(indices: List[Int]) = models.filter { model =>
-    !indices.map(defs(_).id).contains(model.id)
+  def filteredModels(groupId: UUID, index: Int) = models(groupId).filter(_.id != defs(groupId)(index).id)
+  def filteredModels(groupId: UUID, indices: List[Int]) = models(groupId).filter { model =>
+    !indices.map(defs(groupId)(_).id).contains(model.id)
+  }
+
+  def addGroupDef(groupId: UUID, `def`: QuestionDef): Unit = {
+    groupDefs += groupId -> (groupDefs.getOrElse(groupId, Set()) ++ Set(`def`))
   }
 
 }

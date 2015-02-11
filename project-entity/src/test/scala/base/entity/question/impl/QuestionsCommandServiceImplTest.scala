@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/8/15 9:59 PM
  */
 
 package base.entity.question.impl
@@ -14,6 +14,7 @@ import base.common.service.TestServices
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
+import base.entity.group.kv.GroupUsersKey
 import base.entity.kv.Key.Pipeline
 import base.entity.question.QuestionService
 import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
@@ -45,6 +46,8 @@ class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("success") {
+    val groupUsersKey = make[GroupUsersKey](groupId)
+    assert(groupUsersKey.add(authCtx.userId).await() == 1L)
     val questionService = mock[QuestionService]
     (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *, *) returning Future.successful(Right(List()))

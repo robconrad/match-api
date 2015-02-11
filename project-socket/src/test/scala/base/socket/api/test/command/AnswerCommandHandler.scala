@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:59 PM
+ * Last modified by rconrad, 2/10/15 5:03 PM
  */
 
 package base.socket.api.test.command
@@ -36,10 +36,10 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
     val questionIndex = socket.questionsAnswered(group.id).sorted.lastOption.getOrElse(-1) + 1
     assert(!otherSocket.questionsAnswered(group.id).contains(questionIndex))
 
-    val questionId = questions(questionIndex).id
+    val questionId = questions(group.id, questionIndex).id
     val answer = true
     val side = QuestionSides.SIDE_A
-    val answerBody = questions.defs.find(_.id == questionId).get + " is a match"
+    val answerBody = questions.defs(group.id).find(_.id == questionId).get + " is a match"
 
     val otherUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherSocket.userId)), None)
     val otherUserAnswerModel = AnswerModel(questionId, group.id, side, answer)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 8:37 PM
+ * Last modified by rconrad, 2/10/15 4:31 PM
  */
 
 package base.entity.question.impl
@@ -18,11 +18,11 @@ import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.Key._
-import base.entity.kv.{ KvFactoryService, MakeKey }
+import base.entity.kv.{ KvFactoryService, MakeKey, SetKey }
 import base.entity.logging.AuthLoggable
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.impl.QuestionServiceImpl.Errors
-import base.entity.question.kv.QuestionsKey
+import base.entity.question.kv.{ QuestionKey, QuestionKeyService, QuestionsKey }
 import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
 import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
@@ -37,10 +37,15 @@ import scala.concurrent.{ Await, Future }
  * @author rconrad
  */
 class QuestionServiceImpl(questions: Iterable[QuestionDef],
-                          questionCount: Int) extends ServiceImpl with QuestionService with MakeKey with AuthLoggable {
+                          questionCount: Int,
+                          groupQuestionCount: Int)
+    extends ServiceImpl
+    with QuestionService
+    with MakeKey
+    with AuthLoggable {
 
-  private val questionMap = questions.map(q => q.id -> q).toMap
-  private val questionKey = make[QuestionsKey]("standard")
+  private val questionsMap = questions.map(q => q.id -> q).toMap
+  private val questionsKey = make[QuestionsKey]("standard")
 
   Await.ready(init(), CommonService().defaultDuration)
 
@@ -49,12 +54,12 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     val compositeIds_a = questions.map(q => compositeId(q.id, QuestionSides.SIDE_A))
     val compositeIds_b = questions.collect { case q if q.b.isDefined => compositeId(q.id, QuestionSides.SIDE_B) }
     val compositeIds = compositeIds_a.toSet ++ compositeIds_b
-    questionKey.add(compositeIds.toSeq: _*)
+    questionsKey.add(compositeIds.toSeq: _*)
   }
 
   private[impl] def compositeId(questionId: UUID, side: QuestionSide, inverse: Boolean = false) = {
-    assert(questionMap.contains(questionId))
-    QuestionIdComposite(questionMap(questionId), side, inverse)
+    assert(questionsMap.contains(questionId))
+    QuestionIdComposite(questionsMap(questionId), side, inverse)
   }
 
   def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
@@ -64,40 +69,83 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     new AnswerMethod(input).execute()
 
   /**
+   * - diffstore group user questions with answered questions
+   *   - get $n random questions from stored set
+   *   - delete stored set
    * - diffstore standard questions with answered questions
-   * - get $n random questions from stored set
-   * - delete stored set
-   * - return questions
+   *   - get $n random questions from stored set
+   *   - delete stored set
+   * - return combined questions
    */
   private[impl] class GetQuestionsMethod(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
       extends CrudImplicits[List[QuestionModel]] {
 
     def execute() = {
-      val temp = make[GroupUserQuestionsTempKey](groupId, userId)
-      val answered = make[GroupUserQuestionsKey](groupId, userId)
-      groupUserQuestionsTempDiffStore(temp, answered)
+      diffStoreGroupQuestions()
     }
 
-    def groupUserQuestionsTempDiffStore(temp: GroupUserQuestionsTempKey, answered: GroupUserQuestionsKey) =
-      temp.diffStore(questionKey, answered).flatMap {
+    def diffStoreGroupQuestions() = {
+      diffStoreQuestions(make[GroupQuestionsKey](groupId), groupQuestionCount, makeGroupQuestionModel) flatMap {
+        case Right(groupQuestions) => diffStoreStandardQuestions(groupQuestions)
+        case Left(error)           => error
+      }
+    }
+
+    def diffStoreStandardQuestions(groupQuestions: Iterable[QuestionModel]) = {
+      val count = Math.max(0, questionCount - groupQuestions.size)
+      diffStoreQuestions(questionsKey, count, makeStandardQuestionModel) map {
+        case Right(standardQuestions) => Right(combineQuestions(standardQuestions, groupQuestions).toList)
+        case error                    => error
+      }
+    }
+
+    def combineQuestions(questionSets: Iterable[QuestionModel]*) = {
+      RandomService().random.shuffle(questionSets.reduce(_ ++ _))
+    }
+
+    def diffStoreQuestions(questionsKey: SetKey[_, QuestionIdComposite],
+                           questionCount: Int,
+                           getModel: (QuestionIdComposite) => Future[QuestionModel]): Response = {
+      val temp = make[GroupUserQuestionsTempKey](groupId, userId)
+      val answered = make[GroupUserQuestionsKey](groupId, userId)
+      groupUserQuestionsTempDiffStore(questionsKey, temp, answered, getModel)
+    }
+
+    def groupUserQuestionsTempDiffStore(questionsKey: SetKey[_, QuestionIdComposite],
+                                        temp: GroupUserQuestionsTempKey,
+                                        answered: GroupUserQuestionsKey,
+                                        getModel: (QuestionIdComposite) => Future[QuestionModel]) =
+      temp.diffStore(questionsKey, answered) flatMap {
         case n if n <= 0 => Future.successful(Right(List()))
-        case n           => groupUserQuestionTempRand(temp)
+        case n           => groupUserQuestionTempRand(temp, getModel)
       }
 
-    def groupUserQuestionTempRand(temp: GroupUserQuestionsTempKey) =
-      temp.randMembers(questionCount).flatMap { compositeIds =>
-        groupUserQuestionTempDel(temp, compositeIds)
+    def groupUserQuestionTempRand(temp: GroupUserQuestionsTempKey,
+                                  getModel: (QuestionIdComposite) => Future[QuestionModel]) =
+      temp.randMembers(questionCount) flatMap { compositeIds =>
+        groupUserQuestionTempDel(temp, compositeIds, getModel)
       }
 
-    def groupUserQuestionTempDel(temp: GroupUserQuestionsTempKey, compositeIds: Iterable[QuestionIdComposite]) =
-      temp.del().map {
-        case true  => Right(compositeIds.map(makeQuestionModelFromCompositeId).toList)
+    def groupUserQuestionTempDel(temp: GroupUserQuestionsTempKey,
+                                 compositeIds: Iterable[QuestionIdComposite],
+                                 getModel: (QuestionIdComposite) => Future[QuestionModel]) =
+      temp.del() flatMap {
+        case true  => Future.sequence(compositeIds.map(getModel).toList).map(Right.apply)
         case false => throw new RedisException(s"failed to delete $temp")
       }
 
-    def makeQuestionModelFromCompositeId(compositeId: QuestionIdComposite) = {
-      QuestionModel(questionMap(compositeId.questionId), compositeId.side)
+    def makeStandardQuestionModel(compositeId: QuestionIdComposite) = {
+      Future.successful(QuestionModel(questionsMap(compositeId.questionId), compositeId.side))
     }
+
+    def makeGroupQuestionModel(compositeId: QuestionIdComposite) = {
+      questionGet(QuestionKeyService().make(compositeId.questionId), compositeId)
+    }
+
+    def questionGet(key: QuestionKey, compositeId: QuestionIdComposite) =
+      key.getQuestionDef(compositeId.questionId) map { questionDef =>
+        QuestionModel(questionDef, compositeId.side)
+      }
 
   }
 
@@ -170,7 +218,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       val matches = userIds.map { userId =>
         debug("found match for %s", userId)
         val eventId = RandomService().uuid
-        val body = questionMap(input.questionId) + " is a match"
+        val body = questionsMap(input.questionId) + " is a match"
         EventModelImpl(eventId, input.groupId, userId = None, EventTypes.MATCH, body)
       }
       Right(matches.toList)

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:59 PM
+ * Last modified by rconrad, 2/10/15 5:03 PM
  */
 
 package base.socket.api.test.command
@@ -34,7 +34,7 @@ class AcceptInviteCommandHandler(implicit socket: SocketConnection) extends Comm
     group.events ++= List(EventModelFactory.join(randomMock.nextUuid(), group.id, socket))
 
     val acceptInviteModel = AcceptInviteModel(group.id)
-    val inviteResponseModel = AcceptInviteResponseModel(group.model, group.events.reverse, questions.models)
+    val inviteResponseModel = AcceptInviteResponseModel(group.model, group.events.reverse, questions.models(group.id))
     executor(acceptInviteModel, Option(inviteResponseModel))
   }
 

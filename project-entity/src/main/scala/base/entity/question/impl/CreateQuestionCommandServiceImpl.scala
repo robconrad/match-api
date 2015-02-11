@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:26 PM
+ * Last modified by rconrad, 2/8/15 9:43 PM
  */
 
 package base.entity.question.impl
@@ -98,7 +98,7 @@ object CreateQuestionCommandServiceImpl {
 
   object Errors extends CrudErrorImplicits[CreateQuestionResponseModel] {
 
-    override protected def externalErrorText = "Create question failed."
+    override protected val externalErrorText = "Create question failed."
 
     lazy val userNotGroupMember: Response = "user is not a member of the group"
     lazy val createQuestionFailed: Response = "failed to create question"

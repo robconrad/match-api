@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/10/15 5:03 PM
  */
 
 package base.socket.api.test
@@ -73,7 +73,7 @@ private[api] trait IntegrationSuite extends SocketBaseSuite with ServicesBeforeA
 
     // use real question service but control what questions are used and order they are returned
     val questionCount = 25
-    Services.register(new QuestionServiceImpl(questions.defs, questionCount) {
+    Services.register(new QuestionServiceImpl(questions.standardDefs, questionCount, questionCount / 10) {
       override def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
         super.getQuestions(groupId, userId)(p, channelCtx).map {
           case Right(questions) => Right(sortQuestions(questions))
