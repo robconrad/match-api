@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/5/15 9:21 AM
+ * Last modified by rconrad, 2/10/15 8:27 PM
  */
 
 import com.typesafe.sbt.SbtScalariform
@@ -171,7 +171,6 @@ object BaseBuild extends Build {
     Defaults.coreDefaultSettings ++
     SbtScalariform.scalariformSettings ++
     sbtassembly.Plugin.assemblySettings ++
-    ScoverageSbtPlugin.instrumentSettings ++
     ScalastylePlugin.projectSettings ++
     net.virtualvoid.sbt.graph.Plugin.graphSettings ++ Seq(
       scalaVersion := "2.11.5",
@@ -183,12 +182,11 @@ object BaseBuild extends Build {
       (compile in Compile) <<= (compile in Compile) dependsOn (ScalastylePlugin.scalastyle in Compile).toTask(""),
       (test in Test) <<= (test in Test) dependsOn (ScalastylePlugin.scalastyle in Test).toTask(""),
       (products in Test) <<= (products in Test) dependsOn (ScalastylePlugin.scalastyle in Test).toTask(""),
-      ScoverageKeys.minimumCoverage := 80,
-      ScoverageKeys.highlighting := true,
+      ScoverageKeys.coverageMinimum := 80,
+      ScoverageKeys.coverageHighlighting := true,
       resolvers ++= Dependencies.Resolvers.standard,
       testOptions in Test += standardTestOptions,
       parallelExecution in Test := false,
-      parallelExecution in ScoverageSbtPlugin.ScoverageTest := false,
       parallelExecution := false
     )
 
