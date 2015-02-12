@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:02 PM
+ * Last modified by rconrad, 2/11/15 8:50 PM
  */
 
 package base.entity.group.impl
@@ -62,7 +62,7 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def userPhonesInvitedAdd(key: UserPhonesInvitedKey) =
       key.add(input.phone) flatMap {
-        case 1L => userPhoneLabelSet(UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, input.phone)))
+        case 1L => userPhoneLabelSet(make[UserPhoneLabelKey](UserPhone(authCtx.userId, input.phone)))
         case 0L => Errors.alreadyInvited
         case _  => Errors.userInvitedPhonesSetFailed
       }
@@ -77,7 +77,7 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def groupCreate(groupId: UUID, key: GroupKey) =
       key.create() flatMap { result =>
-        phoneGetUserId(groupId, PhoneKeyService().make(input.phone))
+        phoneGetUserId(groupId, make[PhoneKey](input.phone))
       }
 
     def phoneGetUserId(groupId: UUID, key: PhoneKey) =

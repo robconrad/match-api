@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:06 PM
+ * Last modified by rconrad, 2/11/15 8:50 PM
  */
 
 package base.entity.group.impl
@@ -85,7 +85,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
       InviteModelImpl(phone1, None, Option(label))))
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
-    assert(UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone1)).set(label).await())
+    assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone1)).set(label).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
     assert(make[GroupKey](groupId).setLastEvent(time).await())
@@ -121,8 +121,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
       InviteModelImpl(phone2, None, None)))
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
-    assert(PhoneKeyService().make(phone1).set(userId1).await())
-    assert(PhoneKeyService().make(phone2).set(userId2).await())
+    assert(make[PhoneKey](phone1).set(userId1).await())
+    assert(make[PhoneKey](phone2).set(userId2).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
     assert(make[GroupKey](groupId).setLastEvent(time).await())
@@ -157,8 +157,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
       InviteModelImpl(phone1, None, Option(label))))
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
-    assert(PhoneKeyService().make(phone1).set(userId1).await())
-    assert(UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone2)).set(label).await())
+    assert(make[PhoneKey](phone1).set(userId1).await())
+    assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone2)).set(label).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
     assert(make[GroupKey](groupId).setLastEvent(time).await())

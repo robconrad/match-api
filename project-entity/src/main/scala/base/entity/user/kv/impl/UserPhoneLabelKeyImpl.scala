@@ -2,15 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 10:57 AM
+ * Last modified by rconrad, 2/11/15 8:49 PM
  */
 
 package base.entity.user.kv.impl
 
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.KeyLogger
 import base.entity.kv.impl.SimpleKeyImpl
-import base.entity.user.kv.UserPhoneLabelKey
+import base.entity.user.kv.{UserPhone, UserPhoneLabelKey}
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -18,7 +16,6 @@ import base.entity.user.kv.UserPhoneLabelKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserPhoneLabelKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SimpleKeyImpl[String] with UserPhoneLabelKey {
-
-}
+class UserPhoneLabelKeyImpl(val keyValue: UserPhone)
+    extends SimpleKeyImpl[UserPhone, String]
+    with UserPhoneLabelKey

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:26 PM
+ * Last modified by rconrad, 2/11/15 8:54 PM
  */
 
 package base.entity.user.impl
@@ -63,7 +63,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val groupId1 = RandomService().uuid
     val groupId2 = RandomService().uuid
     val userKey = make[UserKey](authCtx.userId)
-    val phoneKey = PhoneKeyService().make(phone)
+    val phoneKey = make[PhoneKey](phone)
     val phoneGroupsInvitedKey = make[PhoneGroupsInvitedKey](phone)
     val userGroupsInvitedKey = make[UserGroupsInvitedKey](authCtx.userId)
     val userService = mock[UserService]
@@ -108,7 +108,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to set phone user id") {
     val key = mock[PhoneKey]
-    key.set _ expects * returning Future.successful(false)
+    key.set _ expects (*,*,*) returning Future.successful(false)
     assert(command.phoneSetUserId(key).await() == Errors.phoneSetUserIdFailed.await())
   }
 

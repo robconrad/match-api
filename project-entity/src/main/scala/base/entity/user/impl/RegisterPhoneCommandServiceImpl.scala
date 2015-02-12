@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:24 PM
+ * Last modified by rconrad, 2/11/15 8:51 PM
  */
 
 package base.entity.user.impl
@@ -46,11 +46,11 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
       extends Command[RegisterPhoneModel, RegisterPhoneResponseModel] {
 
     def execute() = {
-      phoneCooldownExists(PhoneCooldownKeyService().make(input.phone))
+      phoneCooldownExists(make[PhoneCooldownKey](input.phone))
     }
 
     def phoneCooldownExists(key: PhoneCooldownKey): Response =
-      key.exists().flatMap {
+      key.exists.flatMap {
         case false => phoneCooldownSet(key)
         case true  => Errors.phoneCooldown
       }
@@ -62,7 +62,7 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
       }
 
     def phoneCooldownExpire(key: PhoneCooldownKey): Response =
-      key.expire(phoneCooldown.toSeconds).flatMap {
+      key.expire(phoneCooldown.toSeconds.toInt).flatMap {
         case true  => userSetPhoneAttributes(make[UserKey](authCtx.userId))
         case false => Errors.phoneCooldownExpireFailed
       }

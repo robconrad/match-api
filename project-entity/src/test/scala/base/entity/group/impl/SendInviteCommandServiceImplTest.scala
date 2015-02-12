@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:06 PM
+ * Last modified by rconrad, 2/11/15 8:54 PM
  */
 
 package base.entity.group.impl
@@ -87,7 +87,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     val response = SendInviteResponseModel(group, List(), List())
 
     if (userExists) {
-      val phoneKey = PhoneKeyService().make(phone)
+      val phoneKey = make[PhoneKey](phone)
       phoneKey.set(userId)
     }
 
@@ -102,7 +102,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     val userPhonesInvitedKey = make[UserPhonesInvitedKey](authCtx.userId)
     assert(userPhonesInvitedKey.isMember(phone).await())
 
-    val userPhoneLabelKey = UserPhoneLabelKeyService().make(UserPhone(authCtx.userId, phone))
+    val userPhoneLabelKey = make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone))
     assert(userPhoneLabelKey.get.await().contains(label))
 
     val groupKey = make[GroupKey](groupId)
@@ -157,7 +157,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   test("user phone label set failed") {
     val key = mock[UserPhoneLabelKey]
-    key.set _ expects * returning Future.successful(false)
+    key.set _ expects (*,*,*) returning Future.successful(false)
     assert(command.userPhoneLabelSet(key).await() == Errors.userPhoneLabelSetFailed.await())
   }
 

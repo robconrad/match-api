@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:02 PM
+ * Last modified by rconrad, 2/11/15 8:50 PM
  */
 
 package base.entity.group.impl
@@ -13,13 +13,13 @@ import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
 import base.entity.group.GroupService
 import base.entity.group.kv._
-import base.entity.group.model.impl.{ GroupModelBuilder, InviteModelImpl }
-import base.entity.group.model.{ GroupModel, InviteModel }
+import base.entity.group.model.impl.{GroupModelBuilder, InviteModelImpl}
+import base.entity.group.model.{GroupModel, InviteModel}
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.MakeKey
 import base.entity.service.CrudImplicits
 import base.entity.user.UserService
-import base.entity.user.kv.{ PhoneKeyService, UserPhone, UserPhoneLabelKeyService }
+import base.entity.user.kv.{PhoneKey, UserPhoneLabelKey, UserPhone}
 
 import scala.concurrent.Future
 
@@ -72,7 +72,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
     def groupPhonesInvitedGet(key: GroupPhonesInvitedKey, builder: GroupModelBuilder): Response = {
       key.members flatMap { phones =>
         val userIds = phones.map { phone =>
-          PhoneKeyService().make(phone).get.map(userId => phone -> userId)
+          make[PhoneKey](phone).get.map(userId => phone -> userId)
         }
         phoneUsersGet(Future.sequence(userIds), builder)
       }
@@ -101,7 +101,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
 
     def phoneLabelsGet(phones: Set[String], users: Map[String, InviteModel], builder: GroupModelBuilder): Response = {
       val phoneLabels = phones.filter(!users.isDefinedAt(_)).map { phone =>
-        val key = UserPhoneLabelKeyService().make(UserPhone(userId, phone))
+        val key = make[UserPhoneLabelKey](UserPhone(userId, phone))
         key.get.map(label => phone -> InviteModelImpl(phone, None, label))
       }
       Future.sequence(phoneLabels) map { phoneLabels =>

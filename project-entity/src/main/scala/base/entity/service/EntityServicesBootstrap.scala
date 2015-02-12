@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:35 PM
+ * Last modified by rconrad, 2/11/15 8:50 PM
  */
 
 package base.entity.service
@@ -11,7 +11,6 @@ import base.common.lib.BaseConfig
 import base.common.service.{Services, ServicesBootstrap}
 import base.entity.error.impl.ApiErrorServiceImpl
 import base.entity.facebook.impl.FacebookServiceImpl
-import base.entity.facebook.kv.impl.FacebookInfoKeyServiceImpl
 import base.entity.group.impl._
 import base.entity.group.kv.impl._
 import base.entity.kv.impl.{KvFactoryServiceImpl, ScredisFactoryServiceImpl, ScredisKeyFactoryServiceImpl}
@@ -20,7 +19,6 @@ import base.entity.question.QuestionDef
 import base.entity.question.impl.{AnswerCommandServiceImpl, CreateQuestionCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl}
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
-import base.entity.user.kv.impl._
 
 /**
  * Injects configuration into Services and boots them up. If it's configurable, it belongs here.
@@ -72,12 +70,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
 
     Services.register(new ScredisKeyFactoryServiceImpl())
 
-    Services.register(new FacebookInfoKeyServiceImpl())
-    Services.register(new FacebookUserKeyServiceImpl())
     Services.register(new GroupEventsKeyServiceImpl())
-    Services.register(new PhoneCooldownKeyServiceImpl())
-    Services.register(new PhoneKeyServiceImpl())
-    Services.register(new UserPhoneLabelKeyServiceImpl())
 
     Services.register(new ApiErrorServiceImpl(
       Keys(MATCH, "debug")))

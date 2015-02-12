@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 11:29 AM
+ * Last modified by rconrad, 2/11/15 8:49 PM
  */
 
 package base.entity.user.kv
 
 import java.util.UUID
 
-import base.entity.kv.SimpleKey
+import base.entity.kv.{KeyPrefixes, SimpleKey}
 
 /**
  * {{ Describe the high level purpose of UserKey here. }}
@@ -17,6 +17,8 @@ import base.entity.kv.SimpleKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait PhoneKey extends SimpleKey[UUID] {
+trait PhoneKey extends SimpleKey[String, UUID] {
+
+  final val keyPrefix = KeyPrefixes.phone
 
 }

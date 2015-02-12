@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:25 PM
+ * Last modified by rconrad, 2/11/15 8:54 PM
  */
 
 package base.entity.user.impl
@@ -48,9 +48,12 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
   private def command(implicit input: RegisterPhoneModel) = new service.RegisterCommand(input)
 
   private def assertSuccessConditions() {
-    val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
-    assert(phoneCooldownKey.get().await() == Option(phoneCooldownValue))
-    assert(phoneCooldownKey.ttl().await().getOrElse(-1L) > 0L)
+    val phoneCooldownKey = make[PhoneCooldownKey](phone)
+    assert(phoneCooldownKey.get.await() == Option(phoneCooldownValue))
+    phoneCooldownKey.ttl.await() match {
+      case Left(b) => fail()
+      case Right(ttl) => assert(ttl > 0)
+    }
 
     val userKey = make[UserKey](authCtx.userId)
     val phoneAttributes = userKey.getPhoneAttributes.await()
@@ -87,7 +90,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
     assert(service.innerExecute(model).await() == Right(RegisterPhoneResponseModel(phone)))
     assertSuccessConditions()
 
-    val phoneCooldownKey = PhoneCooldownKeyService().make(phone)
+    val phoneCooldownKey = make[PhoneCooldownKey](phone)
     assert(phoneCooldownKey.del().await())
 
     assert(service.innerExecute(model).await() == Right(RegisterPhoneResponseModel(phone)))
@@ -96,14 +99,14 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   test("phone cooldown in effect") {
-    val key = PhoneCooldownKeyService().make(model.phone)
+    val key = make[PhoneCooldownKey](model.phone)
     assert(key.set(1).await())
     assert(command.phoneCooldownExists(key).await() == Errors.phoneCooldown.await())
   }
 
   test("failed to set phone cooldown") {
     val key = mock[PhoneCooldownKey]
-    key.set _ expects * returning Future.successful(false)
+    key.set _ expects (*,*,*) returning Future.successful(false)
     assert(command.phoneCooldownSet(key).await() == Errors.phoneCooldownSetFailed.await())
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:05 PM
+ * Last modified by rconrad, 2/11/15 8:30 PM
  */
 
 package base.entity.user.impl
@@ -58,7 +58,7 @@ private[entity] class LoginCommandServiceImpl()
 
     def facebookInfoGet(): Response = {
       FacebookService().getInfo(input.fbToken) flatMap {
-        case Some(fbInfo) => facebookUserGet(FacebookUserKeyService() make fbInfo.id, fbInfo)
+        case Some(fbInfo) => facebookUserGet(make[FacebookUserKey](fbInfo.id), fbInfo)
         case None         => Errors.tokenInvalid
       }
     }
@@ -71,9 +71,8 @@ private[entity] class LoginCommandServiceImpl()
     }
 
     def facebookUserSet(key: FacebookUserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
-      key.set(userId) flatMap {
-        case true  => userSet(make[UserKey](userId), userId, fbInfo)
-        case false => Errors.facebookUserSetFailed
+      key.set(userId) flatMap { result =>
+        userSet(make[UserKey](userId), userId, fbInfo)
       }
     }
 
@@ -166,7 +165,6 @@ object LoginCommandServiceImpl {
     private val tokenInvalidText = "The supplied Facebook token is not valid."
 
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_INVALID)
-    lazy val facebookUserSetFailed: Response = "failed to set facebook user"
 
   }
 

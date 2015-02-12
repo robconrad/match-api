@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:00 PM
+ * Last modified by rconrad, 2/11/15 8:55 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.random.RandomService
-import base.entity.kv.mock.KeyLoggerMock
-import base.entity.question.{ QuestionSides, QuestionIdComposite }
+import base.entity.kv.{KvTest, KeyPrefixes}
+import base.entity.question.{QuestionIdComposite, QuestionSides}
 
 /**
  * {{ Describe the high level purpose of IdKeyImplTest here. }}
@@ -17,14 +17,13 @@ import base.entity.question.{ QuestionSides, QuestionIdComposite }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionIdCompositeTypedKeyImplTest extends KeyImplTest {
+class QuestionIdCompositeTypedKeyImplTest extends /* KeyImplTest */ KvTest {
 
   private val id = QuestionIdComposite(RandomService().uuid, QuestionSides.SIDE_A)
 
-  val model = new SimpleKeyImpl[QuestionIdComposite] {
-    val token = this.getClass.getSimpleName.getBytes
-    val logger = KeyLoggerMock
-    protected implicit val p = tp
+  val model = new SimpleKeyImpl[String, QuestionIdComposite] {
+    def keyPrefix = KeyPrefixes.test
+    def keyValue = "test"
   }
 
   def create = model.set(id).await()

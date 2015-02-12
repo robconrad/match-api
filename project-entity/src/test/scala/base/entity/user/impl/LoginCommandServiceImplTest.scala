@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:18 PM
+ * Last modified by rconrad, 2/11/15 8:33 PM
  */
 
 package base.entity.user.impl
@@ -132,7 +132,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   test("success - existing user - without group id") {
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
-    assert(FacebookUserKeyService().make(fbId).set(userId).await())
+    assert(make[FacebookUserKey](fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
       List(), List(), None, None, None)
@@ -143,7 +143,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     registerQuestionMock()
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
-    assert(FacebookUserKeyService().make(fbId).set(userId).await())
+    assert(make[FacebookUserKey](fbId).set(userId).await())
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
       List(), List(), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
@@ -155,14 +155,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val unregister = TestServices.register(facebook)
     assert(command.facebookInfoGet().await() == Errors.tokenInvalid.await())
     unregister()
-  }
-
-  test("failed to set user to facebook id") {
-    val userId = RandomService().uuid
-    val fbInfo = FacebookInfo("", "", "", "")
-    val key = mock[FacebookUserKey]
-    key.set _ expects * returning Future.successful(false)
-    assert(command.facebookUserSet(key, userId, fbInfo).await() == Errors.facebookUserSetFailed.await())
   }
 
   test("failed to get groups") {

@@ -2,15 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 11:29 AM
+ * Last modified by rconrad, 2/11/15 8:49 PM
  */
 
 package base.entity.user.kv.impl
 
 import java.util.UUID
 
-import base.entity.kv.Key._
-import base.entity.kv.KeyLogger
 import base.entity.kv.impl.SimpleKeyImpl
 import base.entity.user.kv.PhoneKey
 
@@ -20,8 +18,6 @@ import base.entity.user.kv.PhoneKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class PhoneKeyImpl(val token: Array[Byte],
-                   protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends SimpleKeyImpl[UUID] with PhoneKey {
-
-}
+class PhoneKeyImpl(val keyValue: String)
+    extends SimpleKeyImpl[String, UUID]
+    with PhoneKey

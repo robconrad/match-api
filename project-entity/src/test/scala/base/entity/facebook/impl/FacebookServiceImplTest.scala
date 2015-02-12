@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:53 PM
+ * Last modified by rconrad, 2/11/15 8:43 PM
  */
 
 package base.entity.facebook.impl
 
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.facebook.FacebookInfo
-import base.entity.facebook.kv.{FacebookInfoKey, FacebookInfoKeyService}
+import base.entity.facebook.kv.FacebookInfoKey
 import base.entity.kv.KvTest
 import base.entity.test.EntityBaseSuite
 import com.restfb.exception.{FacebookException, FacebookOAuthException}
@@ -56,9 +56,12 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
     assert(service.getInfo(token).await() == Option(fbInfo))
 
     // has set the cache
-    val key = FacebookInfoKeyService().make(token)
+    val key = make[FacebookInfoKey](token)
     assert(key.get.await() == Option(fbInfo))
-    assert(key.ttl().await().exists(ttl => ttl > expireTime.toSeconds - 2 && ttl <= expireTime.toSeconds))
+    key.ttl.await() match {
+      case Left(b) => fail()
+      case Right(ttl) => assert(ttl > expireTime.toSeconds - 2 && ttl <= expireTime.toSeconds)
+    }
 
     // is now a cached call (fb client mock was only called once)
     assert(service.getInfo(token).await() == Option(fbInfo))
@@ -95,7 +98,7 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
   test("setInfo failed") {
     val key = mock[FacebookInfoKey]
 
-    key.set _ expects fbInfo returning Future.successful(false)
+    key.set _ expects (fbInfo, *, *) returning Future.successful(false)
 
     intercept[RedisException] {
       method.setInfo(key, fbInfo).await()
@@ -105,7 +108,7 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
   test("expireInfo failed") {
     val key = mock[FacebookInfoKey]
 
-    key.expire _ expects expireTime.toSeconds returning Future.successful(false)
+    key.expire _ expects expireTime.toSeconds.toInt returning Future.successful(false)
 
     intercept[RedisException] {
       method.expireInfo(key, fbInfo).await()

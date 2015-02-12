@@ -2,14 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:05 PM
+ * Last modified by rconrad, 2/11/15 8:49 PM
  */
 
 package base.entity.user.kv.impl
 
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.KeyLogger
-import base.entity.kv.impl.IntKeyImpl
+import base.entity.kv.impl.SimpleKeyImpl
 import base.entity.user.kv.PhoneCooldownKey
 
 /**
@@ -18,7 +16,6 @@ import base.entity.user.kv.PhoneCooldownKey
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class PhoneCooldownKeyImpl(val token: Array[Byte], protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends IntKeyImpl with PhoneCooldownKey {
-
-}
+class PhoneCooldownKeyImpl(val keyValue: String)
+    extends SimpleKeyImpl[String, Int]
+    with PhoneCooldownKey

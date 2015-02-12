@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:52 PM
+ * Last modified by rconrad, 2/11/15 8:38 PM
  */
 
 package base.entity.facebook.impl
 
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
-import base.entity.facebook.kv.{FacebookInfoKeyService, FacebookInfoKey}
+import base.entity.facebook.kv.FacebookInfoKey
 import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.kv.Key.Pipeline
 import base.entity.kv.{KvFactoryService, MakeKey}
@@ -54,7 +54,7 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
     val fieldParameters = Parameter.`with`("fields", s"$fieldId,$fieldFirstName,$fieldGender,$fieldLocale")
 
     def execute() = {
-      getCachedInfo(FacebookInfoKeyService().make(token))
+      getCachedInfo(make[FacebookInfoKey](token))
     }
 
     def getCachedInfo(key: FacebookInfoKey) = {
@@ -101,7 +101,7 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
     }
 
     def expireInfo(key: FacebookInfoKey, info: FacebookInfo) = {
-      key.expire(infoExpireTime.toSeconds).map {
+      key.expire(infoExpireTime.toSeconds.toInt).map {
         case true  => info
         case false => throw new RedisException("failed to expire facebook info")
       }
