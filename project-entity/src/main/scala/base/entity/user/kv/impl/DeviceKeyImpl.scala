@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:30 PM
+ * Last modified by rconrad, 2/11/15 10:24 PM
  */
 
 package base.entity.user.kv.impl
@@ -40,6 +40,7 @@ class DeviceKeyImpl(val keyValue: UUID)
     mSet(props)
   }
 
+  // scalastyle:off null
   def set(appVersion: String,
           locale: String,
           model: Option[String],

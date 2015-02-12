@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:40 PM
+ * Last modified by rconrad, 2/11/15 9:55 PM
  */
 
-package base.entity.kv.bytea.scredisImpl
+package base.entity.kv.bytea.impl
 
-import base.entity.kv.bytea.ScredisSerializer
+import base.entity.kv.bytea.Serializer
 import base.entity.kv.{ IdPair, OrderedIdPair }
 import scredis.serialization.{ UUIDReader, UUIDWriter }
 
@@ -17,7 +17,7 @@ import scredis.serialization.{ UUIDReader, UUIDWriter }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object IdPairScredisSerializer extends ScredisSerializer[IdPair] {
+object IdPairSerializer extends Serializer[IdPair] {
 
   private val uuidLength = 16
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:27 PM
+ * Last modified by rconrad, 2/11/15 10:20 PM
  */
 
 package base.entity.kv
@@ -17,7 +17,7 @@ import scala.concurrent.Future
  * @define true '''true'''
  * @define false '''false'''
  */
-trait ListKey[K, V] extends ScredisKey[K] {
+trait ListKey[K, V] extends Key[K] {
 
   /**
    * Returns an element from a list by its index.
@@ -32,7 +32,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lIndex(index: Long): Future[Option[V]]
-  
+
   /**
    * Inserts an element before or after another element in a list.
    *
@@ -52,7 +52,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lLen: Future[Long]
-  
+
   /**
    * Removes and returns the first element of a list.
    *
@@ -61,7 +61,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lPop: Future[Option[V]]
-  
+
   /**
    * Prepends one or multiple values to a list.
    *
@@ -74,7 +74,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lPush(values: V*): Future[Long]
-  
+
   /**
    * Prepends a value to a list, only if the list exists.
    *
@@ -84,7 +84,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 2.2.0
    */
   def lPushX(value: V): Future[Long]
-  
+
   /**
    * Returns a range of elements from a list.
    *
@@ -102,7 +102,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lRange(start: Long = 0, stop: Long = -1): Future[List[V]]
-  
+
   /**
    * Removes the first count occurrences of elements equal to value from the list stored at key.
    *
@@ -120,7 +120,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lRem(value: V, count: Int = 0): Future[Long]
-  
+
   /**
    * Sets the value of an element in a list by its index.
    *
@@ -130,7 +130,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lSet(index: Long, value: V): Future[Unit]
-  
+
   /**
    * Trims a list to the specified range.
    *
@@ -144,7 +144,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def lTrim(start: Long, stop: Long): Future[Unit]
-  
+
   /**
    * Removes and returns the last element of a list.
    *
@@ -153,7 +153,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def rPop: Future[Option[V]]
-  
+
   /**
    * Removes the last element in a list, appends it to another list and returns it.
    *
@@ -163,7 +163,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.2.0
    */
   def rPopLPush(destKey: ListKey[_, V]): Future[Option[V]]
-  
+
   /**
    * Appends one or multiple values to a list.
    *
@@ -176,7 +176,7 @@ trait ListKey[K, V] extends ScredisKey[K] {
    * @since 1.0.0
    */
   def rPush(values: V*): Future[Long]
-  
+
   /**
    * Appends a value to a list, only if the list exists.
    *

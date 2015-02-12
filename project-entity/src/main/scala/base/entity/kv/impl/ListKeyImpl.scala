@@ -2,18 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:44 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.{ListKey, ScredisFactoryService}
+import base.entity.kv.{ KeyCommandsService, ListKey }
 
 abstract class ListKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[V])
-    extends ScredisKeyValueImpl[K, V]
+    extends KeyValueImpl[K, V]
     with ListKey[K, V] {
 
-  private lazy val commands = ScredisFactoryService().listCommands
+  private lazy val commands = KeyCommandsService().listCommands
 
   protected def keyCommands = commands
 
@@ -30,7 +30,7 @@ abstract class ListKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[
     commands.lPop(key)
 
   def lPush(values: V*) =
-    commands.lPush(key, values:_*)
+    commands.lPush(key, values: _*)
 
   def lPushX(value: V) =
     commands.lPushX(key, value)
@@ -54,7 +54,7 @@ abstract class ListKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[
     commands.rPopLPush(key, destKey.key)
 
   def rPush(values: V*) =
-    commands.rPush(key, values:_*)
+    commands.rPush(key, values: _*)
 
   def rPushX(value: V) =
     commands.rPushX(key, value)

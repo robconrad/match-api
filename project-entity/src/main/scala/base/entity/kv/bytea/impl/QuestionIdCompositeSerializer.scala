@@ -2,14 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:18 PM
+ * Last modified by rconrad, 2/11/15 10:29 PM
  */
 
 package base.entity.kv.bytea.impl
 
-import base.entity.kv.bytea.ByteaSerializer
+import base.entity.kv.bytea.Serializer
 import base.entity.question.{ QuestionIdComposite, QuestionSides }
-import redis.client.RedisException
+import scredis.exceptions.RedisException
+import scredis.serialization.{ UUIDReader, UUIDWriter }
 
 /**
  * {{ Describe the high level purpose of QuestionIdCompositeByteaSerializer here. }}
@@ -18,27 +19,25 @@ import redis.client.RedisException
  * @author rconrad
  */
 // scalastyle:off null
-object QuestionIdCompositeByteaSerializer extends ByteaSerializer[QuestionIdComposite] {
+object QuestionIdCompositeSerializer extends Serializer[QuestionIdComposite] {
 
   val compositeIdLength = 17
   val uuidLength = 16
 
-  def serialize(data: QuestionIdComposite) = {
+  def writeImpl(data: QuestionIdComposite) = {
     val side = data.side.toString.getBytes
     assert(side.length == 1)
-    UuidUtil.fromUuid(data.questionId) ++ side
+    UUIDWriter.write(data.questionId) ++ side
   }
 
-  def deserialize(data: Array[Byte]) = {
+  def readImpl(data: Array[Byte]) = {
     data match {
       case null =>
-        throw new RedisException("toType received null")
+        throw new RedisException("toType received null") {}
       case data if data.length != compositeIdLength =>
-        throw new RedisException(s"toType received invalid QuestionIdComposite $data")
+        throw new RedisException(s"toType received invalid QuestionIdComposite length ${data.length} $data") {}
       case data =>
-        val uuid = UuidUtil.toUuid(data.slice(0, uuidLength)).getOrElse {
-          throw new RedisException(s"toType received invalid uuid $data")
-        }
+        val uuid = UUIDReader.read(data.slice(0, uuidLength))
         val side = QuestionSides.withName(new String(data.slice(uuidLength, compositeIdLength)))
         QuestionIdComposite(uuid, side)
     }

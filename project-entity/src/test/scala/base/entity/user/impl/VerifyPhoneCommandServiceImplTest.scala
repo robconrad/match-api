@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:54 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.user.impl
@@ -16,7 +16,6 @@ import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.model.ApiError
-import base.entity.kv.Key.Pipeline
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.UserService
 import base.entity.user.impl.VerifyPhoneCommandServiceImpl.Errors
@@ -69,8 +68,8 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val userService = mock[UserService]
     val unregister = TestServices.register(userService)
 
-    (userService.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List()))
+    (userService.getPendingGroups(_: UUID)(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Right(List()))
 
     assert(phoneKey.get.await() == None)
 
@@ -108,15 +107,15 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to set phone user id") {
     val key = mock[PhoneKey]
-    key.set _ expects (*,*,*) returning Future.successful(false)
+    key.set _ expects (*, *, *) returning Future.successful(false)
     assert(command.phoneSetUserId(key).await() == Errors.phoneSetUserIdFailed.await())
   }
 
   test("get invitesIn returned error") {
     val apiError = mock[ApiError]
     val service = mock[UserService]
-    (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(apiError))
+    (service.getPendingGroups(_: UUID)(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Left(apiError))
     assert(command.userGetInvitesIn(service).await() == Left(apiError))
   }
 

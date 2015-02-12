@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:54 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.user.impl
@@ -51,7 +51,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val phoneCooldownKey = make[PhoneCooldownKey](phone)
     assert(phoneCooldownKey.get.await() == Option(phoneCooldownValue))
     phoneCooldownKey.ttl.await() match {
-      case Left(b) => fail()
+      case Left(b)    => fail()
       case Right(ttl) => assert(ttl > 0)
     }
 
@@ -106,7 +106,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to set phone cooldown") {
     val key = mock[PhoneCooldownKey]
-    key.set _ expects (*,*,*) returning Future.successful(false)
+    key.set _ expects (*, *, *) returning Future.successful(false)
     assert(command.phoneCooldownSet(key).await() == Errors.phoneCooldownSetFailed.await())
   }
 

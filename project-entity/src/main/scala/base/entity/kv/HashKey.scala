@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:30 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv
@@ -19,8 +19,8 @@ import scala.concurrent.Future
  * @define true '''true'''
  * @define false '''false'''
  */
-trait HashKey[K] extends ScredisKey[K] {
-  
+trait HashKey[K] extends Key[K] {
+
   /**
    * Deletes one or more hash fields.
    *
@@ -35,7 +35,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def del(fields: Prop*): Future[Long]
-  
+
   /**
    * Determines if a hash field exists.
    *
@@ -46,7 +46,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def exists(field: Prop): Future[Boolean]
-  
+
   /**
    * Returns the value of a hash field.
    *
@@ -57,7 +57,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def get(field: Prop): Future[Option[Array[Byte]]]
-  
+
   /**
    * Returns all the fields and values in a hash.
    *
@@ -67,7 +67,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def getAll: Future[Option[Map[Prop, Array[Byte]]]]
-  
+
   /**
    * Increments the integer value of a hash field by the given number.
    *
@@ -81,7 +81,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def incrBy(field: Prop, count: Long): Future[Long]
-  
+
   /**
    * Increments the float value of a hash field by the given amount.
    *
@@ -95,7 +95,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.6.0
    */
   protected def incrByFloat(field: Prop, count: Double): Future[Double]
-  
+
   /**
    * Returns all the fields in a hash.
    *
@@ -104,7 +104,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def keys: Future[Set[Prop]]
-  
+
   /**
    * Returns the number of fields contained in the hash stored at key.
    *
@@ -113,7 +113,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def len: Future[Long]
-  
+
   /**
    * Returns the values associated to the specified hash fields.
    *
@@ -125,7 +125,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def mGet(fields: Prop*): Future[List[Option[Array[Byte]]]]
-  
+
   /**
    * Returns a `Map` containing field-value pairs associated to the specified hash fields.
    *
@@ -137,7 +137,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def mGetAsMap(fields: Prop*): Future[Map[String, Array[Byte]]]
-  
+
   /**
    * Sets multiple hash fields to multiple values.
    *
@@ -149,7 +149,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def mSet(fieldValuePairs: Map[Prop, Array[Byte]]): Future[Unit]
-  
+
   /**
    * Incrementally iterates through the fields of a hash.
    *
@@ -164,9 +164,8 @@ trait HashKey[K] extends ScredisKey[K] {
   protected def scan(
     cursor: Long,
     matchOpt: Option[String] = None,
-    countOpt: Option[Int] = None
-  ): Future[(Long, List[(Prop, Array[Byte])])]
-  
+    countOpt: Option[Int] = None): Future[(Long, List[(Prop, Array[Byte])])]
+
   /**
    * Sets the string value of a hash field.
    *
@@ -180,7 +179,7 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def set(field: Prop, value: Array[Byte]): Future[Boolean]
-  
+
   /**
    * Sets the value of a hash field, only if the field does not exist.
    *
@@ -201,5 +200,5 @@ trait HashKey[K] extends ScredisKey[K] {
    * @since 2.0.0
    */
   protected def vals: Future[List[Array[Byte]]]
-  
+
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:30 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.group.kv.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.time.TimeService
 import base.entity.group.kv.GroupKey
-import base.entity.group.kv.GroupKeyProps.{EventCountProp, LastEventTimeProp}
+import base.entity.group.kv.GroupKeyProps.{ EventCountProp, LastEventTimeProp }
 import base.entity.kv.KeyProps.CreatedProp
 import base.entity.kv.impl.HashKeyImpl
 import org.joda.time.DateTime
@@ -25,8 +25,8 @@ import scala.concurrent.Future
  * @author rconrad
  */
 class GroupKeyImpl(val keyValue: UUID)
-  extends HashKeyImpl[UUID]
-  with GroupKey {
+    extends HashKeyImpl[UUID]
+    with GroupKey {
 
   def create() = setNX(CreatedProp, write(TimeService().now))
 

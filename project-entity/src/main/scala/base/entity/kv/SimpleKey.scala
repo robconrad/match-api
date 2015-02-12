@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:49 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv
@@ -18,7 +18,7 @@ import scala.concurrent.duration.FiniteDuration
  * @define true '''true'''
  * @define false '''false'''
  */
-trait SimpleKey[K, V] extends ScredisKey[K] {
+trait SimpleKey[K, V] extends Key[K] {
 
   /**
    * Appends a value to a key.
@@ -214,8 +214,7 @@ trait SimpleKey[K, V] extends ScredisKey[K] {
   def set(
     value: V,
     ttlOpt: Option[FiniteDuration] = None,
-    conditionOpt: Option[scredis.Condition] = None
-  ): Future[Boolean]
+    conditionOpt: Option[scredis.Condition] = None): Future[Boolean]
 
   /**
    * Sets or clears the bit at offset in the string value stored at key.

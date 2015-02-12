@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:40 PM
+ * Last modified by rconrad, 2/11/15 9:56 PM
  */
 
-package base.entity.kv.bytea.scredisImpl
+package base.entity.kv.bytea.impl
 
 import java.util.UUID
 
-import base.entity.kv.bytea.ScredisSerializer
+import base.entity.kv.bytea.Serializer
 import scredis.serialization.{ UUIDWriter, UUIDReader }
 
 /**
@@ -18,7 +18,7 @@ import scredis.serialization.{ UUIDWriter, UUIDReader }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object UUIDScredisSerializer extends ScredisSerializer[UUID] {
+object UUIDSerializer extends Serializer[UUID] {
 
   def writeImpl(value: UUID) = UUIDWriter.write(value)
 

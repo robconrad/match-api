@@ -2,32 +2,33 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:30 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key._
-import base.entity.kv.bytea.ScredisSerializers
-import base.entity.kv.{HashKey, KeyProp, ScredisFactoryService}
-import scredis.serialization.{BytesReader, Reader}
+import base.entity.kv.bytea.Serializers
+import base.entity.kv.{ HashKey, KeyCommandsService, KeyProp }
+import scredis.serialization.{ BytesReader, Reader }
 
 abstract class HashKeyImpl[K](implicit val mk: Manifest[K])
-    extends ScredisKeyImpl[K]
+    extends KeyImpl[K]
     with HashKey[K] {
 
-  private lazy val commands = ScredisFactoryService().hashCommands
+  private lazy val commands = KeyCommandsService().hashCommands
 
   protected implicit def valueReader: Reader[Array[Byte]] = BytesReader
 
   protected implicit def prop2String(p: Prop): String = p.toString
   protected implicit def props2String(p: Seq[Prop]): Seq[String] = p.map(_.toString)
-  protected implicit def propMap2StringMap[T](p: Map[Prop, T]): Map[String, T] = p.map { case (k,v) =>
-    k.toString -> v
+  protected implicit def propMap2StringMap[T](p: Map[Prop, T]): Map[String, T] = p.map {
+    case (k, v) =>
+      k.toString -> v
   }
 
-  protected def read[T](v: Array[Byte])(implicit m: Manifest[T]) = ScredisSerializers.read(v)(m)
-  protected def write[T](v: T)(implicit m: Manifest[T]) = ScredisSerializers.write(v)(m)
+  protected def read[T](v: Array[Byte])(implicit m: Manifest[T]) = Serializers.read(v)(m)
+  protected def write[T](v: T)(implicit m: Manifest[T]) = Serializers.write(v)(m)
 
   protected def keyCommands = commands
 
@@ -61,7 +62,7 @@ abstract class HashKeyImpl[K](implicit val mk: Manifest[K])
     commands.hmGet(key, fields: _*)
 
   protected def mGetAsMap(fields: Prop*) =
-    commands.hmGetAsMap(key, fields:_*)
+    commands.hmGetAsMap(key, fields: _*)
 
   protected def mSet(fieldValuePairs: Map[Prop, Array[Byte]]) =
     commands.hmSet(key, fieldValuePairs)

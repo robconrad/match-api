@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:40 PM
+ * Last modified by rconrad, 2/11/15 10:02 PM
  */
 
 package base.entity.kv.impl
@@ -20,9 +20,9 @@ import scala.util.Random
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class ScredisFactoryServiceImpl(clientCount: Int, host: String, port: Int)
+class KeyCommandsServiceImpl(clientCount: Int, host: String, port: Int)
     extends ServiceImpl
-    with ScredisFactoryService {
+    with KeyCommandsService {
 
   private val PING_RESPONSE = "PONG"
   private val random = new Random()
@@ -34,6 +34,7 @@ class ScredisFactoryServiceImpl(clientCount: Int, host: String, port: Int)
   def hashCommands = client
   def keyCommands = client
   def listCommands = client
+  def serverCommands = client
   def setCommands = client
   def sortedSetCommands = client
   def stringCommands = client

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:25 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.group.impl
@@ -21,7 +21,6 @@ import base.entity.group.impl.AcceptInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.{ AcceptInviteModel, AcceptInviteResponseModel, GroupModel }
 import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
-import base.entity.kv.Key._
 import base.entity.question.QuestionService
 import base.entity.user.kv._
 
@@ -70,16 +69,14 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupService = mock[GroupService]
     val questionService = mock[QuestionService]
 
-    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
-      (*, *, *) returning Future.successful(Right(eventModel))
+    groupEventsService.setEvent _ expects (*, *) returning Future.successful(Right(eventModel))
     (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Unit)
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(Option(groupModel)))
-    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(List()))
-    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects
-      (*, *) returning Future.successful(Right(List()))
+    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(Option(groupModel)))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
+    groupEventsService.getEvents _ expects * returning Future.successful(Right(List()))
 
     val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
     val response = AcceptInviteResponseModel(groupModel, List(), List())
@@ -141,8 +138,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   test("group events prepend returned error") {
     val groupEventsService = mock[GroupEventsService]
-    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
-      (*, *, *) returning Future.successful(Left(error))
+    groupEventsService.setEvent _ expects (*, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupEventsService)
     assert(command.groupEventsPrepend().await() == Left(error))
     unregister()
@@ -150,8 +146,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   test("group get returned error") {
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Left(error))
+    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupService)
     assert(command.groupGet().await() == Left(error))
     unregister()
@@ -159,8 +155,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   test("group get failed") {
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(None))
+    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(None))
     val unregister = TestServices.register(groupService)
     assert(command.groupGet().await() == Errors.groupGetFailed.await())
     unregister()
@@ -169,8 +165,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
   test("questions get returned error") {
     val groupModel = mock[GroupModel]
     val questionService = mock[QuestionService]
-    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Left(error))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(questionService)
     assert(command.questionsGet(groupModel).await() == Left(error))
     unregister()
@@ -179,8 +175,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
   test("events get returned error") {
     val groupModel = mock[GroupModel]
     val groupEventsService = mock[GroupEventsService]
-    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects
-      (*, *) returning Future.successful(Left(error))
+    groupEventsService.getEvents _ expects * returning Future.successful(Left(error))
     val unregister = TestServices.register(groupEventsService)
     assert(command.eventsGet(groupModel, List()).await() == Left(error))
     unregister()

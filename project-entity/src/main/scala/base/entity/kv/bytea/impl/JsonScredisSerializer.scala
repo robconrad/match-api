@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:40 PM
+ * Last modified by rconrad, 2/11/15 9:54 PM
  */
 
-package base.entity.kv.bytea.scredisImpl
+package base.entity.kv.bytea.impl
 
 import base.entity.json.JsonFormats
-import base.entity.kv.bytea.ScredisSerializer
+import base.entity.kv.bytea.Serializer
 import org.json4s.native.{ JsonMethods, Serialization }
 
 /**
@@ -17,7 +17,7 @@ import org.json4s.native.{ JsonMethods, Serialization }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait JsonScredisSerializer[T <: AnyRef] extends ScredisSerializer[T] {
+trait JsonScredisSerializer[T <: AnyRef] extends Serializer[T] {
 
   implicit val formats = JsonFormats.withModels
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:43 PM
+ * Last modified by rconrad, 2/11/15 10:35 PM
  */
 
 package base.entity.facebook.impl
@@ -15,9 +15,7 @@ import base.entity.test.EntityBaseSuite
 import com.restfb.exception.{FacebookException, FacebookOAuthException}
 import com.restfb.json.JsonObject
 import com.restfb.{DefaultFacebookClient, Parameter}
-import redis.client.RedisException
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 /**
@@ -35,7 +33,7 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
 
   private implicit def service: FacebookServiceImpl = new FacebookServiceImpl(expireTime)
   private def method(implicit service: FacebookServiceImpl) =
-    new service.GetInfoMethod(token)(tp, ChannelContextDataFactory.userAuth)
+    new service.GetInfoMethod(token)(ChannelContextDataFactory.userAuth)
 
   test("success") {
     implicit val ctx = ChannelContextDataFactory.userAuth
@@ -59,7 +57,7 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
     val key = make[FacebookInfoKey](token)
     assert(key.get.await() == Option(fbInfo))
     key.ttl.await() match {
-      case Left(b) => fail()
+      case Left(b)    => fail()
       case Right(ttl) => assert(ttl > expireTime.toSeconds - 2 && ttl <= expireTime.toSeconds)
     }
 
@@ -83,36 +81,6 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
     }
     val key = mock[FacebookInfoKey]
     assert(method.wrapFetchInfo(key).await() == None)
-  }
-
-  test("wrapFetchInfo received RedisException") {
-    implicit val service = new FacebookServiceImpl(expireTime) {
-      override def makeClient(token: String) = throw new RedisException()
-    }
-    val key = mock[FacebookInfoKey]
-    intercept[RedisException] {
-      method.wrapFetchInfo(key).await()
-    }
-  }
-
-  test("setInfo failed") {
-    val key = mock[FacebookInfoKey]
-
-    key.set _ expects (fbInfo, *, *) returning Future.successful(false)
-
-    intercept[RedisException] {
-      method.setInfo(key, fbInfo).await()
-    }
-  }
-
-  test("expireInfo failed") {
-    val key = mock[FacebookInfoKey]
-
-    key.expire _ expects expireTime.toSeconds.toInt returning Future.successful(false)
-
-    intercept[RedisException] {
-      method.expireInfo(key, fbInfo).await()
-    }
   }
 
   test("makeClient") {

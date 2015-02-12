@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 1:20 PM
+ * Last modified by rconrad, 2/11/15 9:55 PM
  */
 
 package base.entity.kv.bytea.impl
 
-import base.entity.facebook.FacebookInfo
+import base.entity.event.model.EventModel
 
 /**
  * {{ Describe the high level purpose of JsonByteaSerializer here. }}
@@ -15,8 +15,8 @@ import base.entity.facebook.FacebookInfo
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object FacebookInfoByteaSerializer extends JsonByteaSerializer[FacebookInfo] {
+object EventModelSerializer extends JsonScredisSerializer[EventModel] {
 
-  val m = manifest[FacebookInfo]
+  val m = manifest[EventModel]
 
 }

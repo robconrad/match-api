@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:02 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.user.impl
@@ -14,7 +14,6 @@ import base.entity.auth.context.ChannelContext
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.GroupModel
-import base.entity.kv.Key._
 import base.entity.kv.MakeKey
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.UserService
@@ -34,22 +33,22 @@ import scala.concurrent.Future
  */
 class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
 
-  def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  def getUser(userId: UUID)(implicit channelCtx: ChannelContext) = {
     val key = make[UserKey](userId)
     getUser(userId, key)
   }
 
-  private[impl] def getUser(userId: UUID, key: UserKey)(implicit p: Pipeline, channelCtx: ChannelContext) =
+  private[impl] def getUser(userId: UUID, key: UserKey)(implicit channelCtx: ChannelContext) =
     key.getNameAttributes.map { name =>
       Right(UserModel(userId, name.pictureUrl, name.name))
     }
 
-  def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  def getUsers(userId: UUID, userIds: List[UUID])(implicit channelCtx: ChannelContext) = {
     getUsersFromKey(userId, userIds)
   }
 
   private[impl] def getUsersFromKey(contextUserId: UUID,
-                                    userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
+                                    userIds: List[UUID])(implicit channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
       make[UserKey](userId).getNameAttributes.map { name =>
         UserModel(userId, name.pictureUrl, name.name)
@@ -58,32 +57,30 @@ class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
     Future.sequence(futures).map(Right.apply)
   }
 
-  def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  def getGroups(userId: UUID)(implicit channelCtx: ChannelContext) = {
     getGroupsFromKey(userId, make[UserGroupsKey](userId))
   }
 
-  private[impl] def getGroupsFromKey(userId: UUID, key: UserGroupsKey)(implicit p: Pipeline,
-                                                                       channelCtx: ChannelContext): GetGroups = {
+  private[impl] def getGroupsFromKey(userId: UUID,
+                                     key: UserGroupsKey)(implicit channelCtx: ChannelContext): GetGroups = {
     key.members flatMap { groupIds =>
       getGroupsFromIds(userId, groupIds)
     }
   }
 
-  def getPendingGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  def getPendingGroups(userId: UUID)(implicit channelCtx: ChannelContext) = {
     getPendingGroupsFromKey(userId, make[UserGroupsInvitedKey](userId))
   }
 
   private[impl] def getPendingGroupsFromKey(userId: UUID,
-                                            key: UserGroupsInvitedKey)(implicit p: Pipeline,
-                                                                       channelCtx: ChannelContext): GetGroups = {
+                                            key: UserGroupsInvitedKey)(implicit channelCtx: ChannelContext) = {
     key.members flatMap { groupIds =>
       getGroupsFromIds(userId, groupIds)
     }
   }
 
   private[impl] def getGroupsFromIds(userId: UUID,
-                                     groupIds: Set[UUID])(implicit p: Pipeline,
-                                                          channelCtx: ChannelContext): GetGroups = {
+                                     groupIds: Set[UUID])(implicit channelCtx: ChannelContext): GetGroups = {
     val futures = groupIds.map { groupId =>
       GroupService().getGroup(userId, groupId)
     }

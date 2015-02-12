@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:38 PM
+ * Last modified by rconrad, 2/11/15 10:18 PM
  */
 
 package base.entity.kv.impl
@@ -17,7 +17,7 @@ import base.entity.kv.KvTest
  */
 abstract class KeyImplTest extends KvTest {
 
-  val model: ScredisKeyImpl[_]
+  val model: KeyImpl[_]
 
   def create: Boolean
 
@@ -31,12 +31,13 @@ abstract class KeyImplTest extends KvTest {
   }
 
   test("expire / ttl") {
+    val missingTtl = Left(false)
     assert(!model.expire(Int.MaxValue).await())
-    assert(model.ttl.await() == Left(false))
+    assert(model.ttl.await() == missingTtl)
     assert(create)
     assert(model.expire(Int.MaxValue).await())
     model.ttl.await() match {
-      case Left(b) => fail()
+      case Left(b)    => fail()
       case Right(ttl) => assert(ttl > 0)
     }
   }

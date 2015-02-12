@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:38 PM
+ * Last modified by rconrad, 2/11/15 10:29 PM
  */
 
 package base.entity.facebook.impl
@@ -10,14 +10,12 @@ package base.entity.facebook.impl
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
 import base.entity.facebook.kv.FacebookInfoKey
-import base.entity.facebook.{FacebookInfo, FacebookService}
-import base.entity.kv.Key.Pipeline
-import base.entity.kv.{KvFactoryService, MakeKey}
+import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
-import com.restfb.exception.{FacebookException, FacebookOAuthException}
+import com.restfb.exception.{ FacebookException, FacebookOAuthException }
 import com.restfb.json.JsonObject
-import com.restfb.{DefaultFacebookClient, Parameter, Version}
-import redis.client.RedisException
+import com.restfb.{ DefaultFacebookClient, Parameter, Version }
 
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -40,11 +38,10 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
   def getPictureUrl(facebookId: String) = pictureUrlString.format(facebookId)
 
   def getInfo(token: String)(implicit channelCtx: ChannelContext) = {
-    implicit val p = KvFactoryService().pipeline
     new GetInfoMethod(token).execute()
   }
 
-  private[impl] class GetInfoMethod(token: String)(implicit p: Pipeline, ctx: ChannelContext) {
+  private[impl] class GetInfoMethod(token: String)(implicit ctx: ChannelContext) {
 
     val fieldId = "id"
     val fieldFirstName = "first_name"
@@ -94,16 +91,14 @@ class FacebookServiceImpl(infoExpireTime: FiniteDuration)
     }
 
     def setInfo(key: FacebookInfoKey, info: FacebookInfo) = {
-      key.set(info).flatMap {
-        case true  => expireInfo(key, info)
-        case false => throw new RedisException("failed to set facebook info")
+      key.set(info).flatMap { result =>
+        expireInfo(key, info)
       }
     }
 
     def expireInfo(key: FacebookInfoKey, info: FacebookInfo) = {
-      key.expire(infoExpireTime.toSeconds.toInt).map {
-        case true  => info
-        case false => throw new RedisException("failed to expire facebook info")
+      key.expire(infoExpireTime.toSeconds.toInt).map { result =>
+        info
       }
     }
 

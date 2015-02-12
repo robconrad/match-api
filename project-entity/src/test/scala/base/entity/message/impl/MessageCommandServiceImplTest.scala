@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/11/15 10:11 PM
  */
 
 package base.entity.message.impl
@@ -59,8 +59,7 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
     val event = mock[EventModel]
     val groupEventsService = mock[GroupEventsService]
     val groupListenerService = mock[GroupListenerService]
-    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
-      (*, *, *) returning Future.successful(Right(event))
+    groupEventsService.setEvent _ expects (*, *) returning Future.successful(Right(event))
     (groupListenerService.publish(_: CommandModel[EventModel])(_: ChannelContext)) expects
       (*, *) returning Future.successful(Unit)
     val unregister = TestServices.register(groupEventsService, groupListenerService)
@@ -70,8 +69,7 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
 
   test("group event set failed") {
     val groupEventsService = mock[GroupEventsService]
-    (groupEventsService.setEvent(_: EventModel, _: Boolean)(_: Pipeline)) expects
-      (*, *, *) returning Future.successful(Left(error))
+    groupEventsService.setEvent _ expects (*, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupEventsService)
     assert(command.groupEventSet().await() == Left(error))
     unregister()

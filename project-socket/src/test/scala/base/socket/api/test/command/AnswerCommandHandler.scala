@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 5:03 PM
+ * Last modified by rconrad, 2/11/15 10:33 PM
  */
 
 package base.socket.api.test.command
@@ -11,7 +11,6 @@ import base.common.random.mock.RandomServiceMock
 import base.entity.auth.context.StandardUserAuthContext
 import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.event.model.EventModel
-import base.entity.kv.Key.Pipeline
 import base.entity.question.model.AnswerModel
 import base.entity.question.{ QuestionService, QuestionSides }
 import base.entity.user.User
@@ -30,7 +29,7 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
 
   def apply(group: TestGroup,
             otherSocket: SocketConnection)(implicit executor: CommandExecutor,
-                                           questions: TestQuestions, randomMock: RandomServiceMock, tp: Pipeline) {
+                                           questions: TestQuestions, randomMock: RandomServiceMock) {
     val answerEventId = randomMock.nextUuid()
 
     val questionIndex = socket.questionsAnswered(group.id).sorted.lastOption.getOrElse(-1) + 1
@@ -43,7 +42,7 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
 
     val otherUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherSocket.userId)), None)
     val otherUserAnswerModel = AnswerModel(questionId, group.id, side, answer)
-    QuestionService().answer(otherUserAnswerModel)(tp, otherUserAuthCtx).await()
+    QuestionService().answer(otherUserAnswerModel)(otherUserAuthCtx).await()
 
     socket.answerQuestion(group.id, questionIndex)
     otherSocket.answerQuestion(group.id, questionIndex)

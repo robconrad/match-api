@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:49 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.user.kv.impl
@@ -17,5 +17,5 @@ import base.entity.user.kv.PhoneCooldownKey
  * @author rconrad
  */
 class PhoneCooldownKeyImpl(val keyValue: String)
-    extends SimpleKeyImpl[String, Int]
-    with PhoneCooldownKey
+  extends SimpleKeyImpl[String, Int]
+  with PhoneCooldownKey

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:33 PM
+ * Last modified by rconrad, 2/11/15 9:54 PM
  */
 
 package base.entity.kv
@@ -15,12 +15,12 @@ import base.common.service.{ Service, ServiceCompanion }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait ScredisKeyFactoryService extends Service {
+trait KeyFactoryService extends Service {
 
-  final val serviceManifest = manifest[ScredisKeyFactoryService]
+  final val serviceManifest = manifest[KeyFactoryService]
 
   def make[T](id: Any)(implicit m: Manifest[T]): T
 
 }
 
-object ScredisKeyFactoryService extends ServiceCompanion[ScredisKeyFactoryService]
+object KeyFactoryService extends ServiceCompanion[KeyFactoryService]

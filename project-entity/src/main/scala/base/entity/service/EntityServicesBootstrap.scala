@@ -2,20 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:30 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.service
 
 import base.common.lib.BaseConfig
-import base.common.service.{Services, ServicesBootstrap}
+import base.common.service.{ Services, ServicesBootstrap }
 import base.entity.error.impl.ApiErrorServiceImpl
 import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.group.impl._
-import base.entity.kv.impl.{KvFactoryServiceImpl, ScredisFactoryServiceImpl, ScredisKeyFactoryServiceImpl}
+import base.entity.kv.impl.{ KeyCommandsServiceImpl, KeyFactoryServiceImpl }
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.question.QuestionDef
-import base.entity.question.impl.{AnswerCommandServiceImpl, CreateQuestionCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl}
+import base.entity.question.impl.{ AnswerCommandServiceImpl, CreateQuestionCommandServiceImpl, QuestionServiceImpl, QuestionsCommandServiceImpl }
 import base.entity.sms.impl.TwilioSmsServiceImpl
 import base.entity.user.impl._
 
@@ -49,12 +49,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val kvRegistered = {
 
-    Services.register(new KvFactoryServiceImpl(
-      Keys(KV, "clientCount"),
-      Keys(KV, "host"),
-      Keys(KV, "port")))
-
-    Services.register(new ScredisFactoryServiceImpl(
+    Services.register(new KeyCommandsServiceImpl(
       Keys(KV, "clientCount"),
       Keys(KV, "host"),
       Keys(KV, "port")))
@@ -67,7 +62,7 @@ object EntityServicesBootstrap extends ServicesBootstrap {
    */
   lazy val otherRegistered = {
 
-    Services.register(new ScredisKeyFactoryServiceImpl())
+    Services.register(new KeyFactoryServiceImpl())
 
     Services.register(new ApiErrorServiceImpl(
       Keys(MATCH, "debug")))

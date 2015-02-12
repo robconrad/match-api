@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:32 PM
+ * Last modified by rconrad, 2/11/15 9:59 PM
  */
 
 package base.entity.group.impl
@@ -34,14 +34,14 @@ class GroupEventsServiceImpl(count: Int)
 
   private implicit val formats = JsonFormats.withModels
 
-  def getEvents(groupId: UUID)(implicit p: Pipeline) = {
+  def getEvents(groupId: UUID) = {
     val key = make[GroupEventsKey](groupId)
     key.lRange(0, count - 1).map { events =>
       Right(events)
     }
   }
 
-  def setEvent(event: EventModel, createIfNotExists: Boolean)(implicit p: Pipeline) = {
+  def setEvent(event: EventModel, createIfNotExists: Boolean) = {
     val key = make[GroupEventsKey](event.groupId)
     val fun: EventModel => Future[Long] = createIfNotExists match {
       case true => any => key.lPush(any)

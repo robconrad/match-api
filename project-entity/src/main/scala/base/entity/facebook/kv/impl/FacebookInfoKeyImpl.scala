@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:49 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.facebook.kv.impl
@@ -18,5 +18,5 @@ import base.entity.kv.impl.SimpleKeyImpl
  * @author rconrad
  */
 class FacebookInfoKeyImpl(val keyValue: String)
-    extends SimpleKeyImpl[String, FacebookInfo]
-    with FacebookInfoKey
+  extends SimpleKeyImpl[String, FacebookInfo]
+  with FacebookInfoKey

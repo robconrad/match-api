@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:40 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key.Prop
-import base.entity.kv.{KeyPrefixes, KeyProp}
+import base.entity.kv.{ KeyPrefixes, KeyProp }
 
 import scala.language.reflectiveCalls
 
@@ -70,8 +70,8 @@ class HashKeyImplTest extends KeyImplTest {
     test("getAll") {
       assert(getAll.await() == None)
       mSet(map).await()
-      assert(getAll.await().get.map { case (k,v) => key -> read[String](v) } ==
-        map.map { case (k, v) => key -> read[String](v)})
+      assert(getAll.await().get.map { case (k, v) => key -> read[String](v) } ==
+        map.map { case (k, v) => key -> read[String](v) })
     }
 
     test("incrby") {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:59 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.question.impl
@@ -15,7 +15,6 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
 import base.entity.group.kv.GroupUsersKey
-import base.entity.kv.Key.Pipeline
 import base.entity.question.QuestionService
 import base.entity.question.model.{ QuestionsModel, QuestionsResponseModel }
 
@@ -49,8 +48,8 @@ class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
     val groupUsersKey = make[GroupUsersKey](groupId)
     assert(groupUsersKey.add(authCtx.userId).await() == 1L)
     val questionService = mock[QuestionService]
-    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(List()))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
     val unregister = TestServices.register(questionService)
     val response = QuestionsResponseModel(groupId, List())
     assert(service.innerExecute(model).await() == Right(response))
@@ -59,8 +58,8 @@ class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
 
   test("questions get failed") {
     val questionService = mock[QuestionService]
-    (questionService.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Left(error))
+    (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(questionService)
     assert(command.questionsGet().await() == Left(error))
     unregister()

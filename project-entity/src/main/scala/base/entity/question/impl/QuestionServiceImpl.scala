@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 9:19 PM
+ * Last modified by rconrad, 2/11/15 10:29 PM
  */
 
 package base.entity.question.impl
@@ -10,25 +10,24 @@ package base.entity.question.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{CommonService, ServiceImpl}
+import base.common.service.{ CommonService, ServiceImpl }
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
-import base.entity.kv.Key._
-import base.entity.kv.{KvFactoryService, MakeKey, SetKey}
+import base.entity.kv.{ MakeKey, SetKey }
 import base.entity.logging.AuthLoggable
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.impl.QuestionServiceImpl.Errors
-import base.entity.question.kv.{QuestionKey, QuestionsKey}
-import base.entity.question.model.{AnswerModel, QuestionModel}
-import base.entity.question.{QuestionDef, QuestionIdComposite, QuestionService, QuestionSides}
-import base.entity.service.{CrudErrorImplicits, CrudImplicits}
-import redis.client.RedisException
+import base.entity.question.kv.{ QuestionKey, QuestionsKey }
+import base.entity.question.model.{ AnswerModel, QuestionModel }
+import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
+import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
+import scredis.exceptions.RedisException
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 /**
  * {{ Describe the high level purpose of QuestionServiceImpl here. }}
@@ -50,7 +49,6 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
   Await.ready(init(), CommonService().defaultDuration)
 
   private[impl] def init() = {
-    implicit val p = KvFactoryService().pipeline
     val compositeIds_a = questions.map(q => compositeId(q.id, QuestionSides.SIDE_A))
     val compositeIds_b = questions.collect { case q if q.b.isDefined => compositeId(q.id, QuestionSides.SIDE_B) }
     val compositeIds = compositeIds_a.toSet ++ compositeIds_b
@@ -62,10 +60,10 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     QuestionIdComposite(questionsMap(questionId), side, inverse)
   }
 
-  def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
+  def getQuestions(groupId: UUID, userId: UUID)(implicit channelCtx: ChannelContext) =
     new GetQuestionsMethod(groupId, userId: UUID).execute()
 
-  def answer(input: AnswerModel)(implicit p: Pipeline, channelCtx: ChannelContext) =
+  def answer(input: AnswerModel)(implicit channelCtx: ChannelContext) =
     new AnswerMethod(input).execute()
 
   /**
@@ -77,7 +75,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
    *   - delete stored set
    * - return combined questions
    */
-  private[impl] class GetQuestionsMethod(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext)
+  private[impl] class GetQuestionsMethod(groupId: UUID, userId: UUID)(implicit channelCtx: ChannelContext)
       extends CrudImplicits[List[QuestionModel]] {
 
     def execute() = {
@@ -131,7 +129,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
                                  getModel: (QuestionIdComposite) => Future[QuestionModel]) =
       temp.del() flatMap {
         case true  => Future.sequence(compositeIds.map(getModel).toList).map(Right.apply)
-        case false => throw new RedisException(s"failed to delete $temp")
+        case false => throw new RedisException(s"failed to delete $temp") {}
       }
 
     def makeStandardQuestionModel(compositeId: QuestionIdComposite) = {
@@ -159,7 +157,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
    *    - notify other group members of match events (???)
    *    - return match events for all matches
    */
-  private[impl] class AnswerMethod(input: AnswerModel)(implicit p: Pipeline, channelCtx: ChannelContext)
+  private[impl] class AnswerMethod(input: AnswerModel)(implicit channelCtx: ChannelContext)
       extends CrudImplicits[List[EventModel]] {
 
     def execute() = {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:24 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.user
@@ -13,7 +13,6 @@ import base.common.service.{ Service, ServiceCompanion }
 import base.entity.auth.context.ChannelContext
 import base.entity.error.model.ApiError
 import base.entity.group.model.{ GroupModel, InviteModel }
-import base.entity.kv.Key.Pipeline
 import base.entity.user.UserService.{ GetGroups, GetUser, GetUsers }
 import base.entity.user.model.UserModel
 
@@ -27,13 +26,13 @@ trait UserService extends Service {
 
   final val serviceManifest = manifest[UserService]
 
-  def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetUser
+  def getUser(userId: UUID)(implicit channelCtx: ChannelContext): GetUser
 
-  def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext): GetUsers
+  def getUsers(userId: UUID, userIds: List[UUID])(implicit channelCtx: ChannelContext): GetUsers
 
-  def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups
+  def getGroups(userId: UUID)(implicit channelCtx: ChannelContext): GetGroups
 
-  def getPendingGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext): GetGroups
+  def getPendingGroups(userId: UUID)(implicit channelCtx: ChannelContext): GetGroups
 
 }
 

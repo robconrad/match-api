@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:40 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv.impl
@@ -14,9 +14,9 @@ import base.entity.facebook.kv.FacebookInfoKey
 import base.entity.facebook.kv.impl.FacebookInfoKeyImpl
 import base.entity.group.kv._
 import base.entity.group.kv.impl._
-import base.entity.kv.ScredisKeyFactoryService
-import base.entity.question.kv.impl.{QuestionKeyImpl, QuestionsKeyImpl}
-import base.entity.question.kv.{QuestionKey, QuestionsKey}
+import base.entity.kv.{ KeyFactoryService, KeyFactoryService$ }
+import base.entity.question.kv.impl.{ QuestionKeyImpl, QuestionsKeyImpl }
+import base.entity.question.kv.{ QuestionKey, QuestionsKey }
 import base.entity.user.kv._
 import base.entity.user.kv.impl._
 
@@ -26,7 +26,7 @@ import base.entity.user.kv.impl._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class ScredisKeyFactoryServiceImpl extends ServiceImpl with ScredisKeyFactoryService {
+class KeyFactoryServiceImpl extends ServiceImpl with KeyFactoryService {
 
   // format: OFF
   // scalastyle:off line.size.limit

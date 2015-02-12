@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:33 PM
+ * Last modified by rconrad, 2/11/15 10:16 PM
  */
 
 package base.entity.user.impl
@@ -22,14 +22,13 @@ import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
 import base.entity.facebook.{ FacebookInfo, FacebookService }
 import base.entity.group.{ GroupEventsService, GroupListenerService }
-import base.entity.kv.Key._
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
 import base.entity.user.UserService
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv._
 import base.entity.user.model.impl.{ LoginResponseModelBuilder, LoginResponseModelImpl }
-import base.entity.user.model.{ UserModel, LoginModel, LoginResponseModel }
+import base.entity.user.model.{ LoginModel, LoginResponseModel, UserModel }
 
 import scala.concurrent.Future
 
@@ -68,10 +67,10 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   private def registerQuestionMock() {
     val questionMock = mock[QuestionService]
-    (questionMock.answer(_: AnswerModel)(_: Pipeline, _: ChannelContext)) expects
+    (questionMock.answer(_: AnswerModel)(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
+    (questionMock.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
-    (questionMock.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Right(List())) anyNumberOfTimes ()
     Services.register(questionMock)
   }
 
@@ -159,8 +158,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
   test("failed to get groups") {
     val userService = mock[UserService]
-    (userService.getGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(apiError))
+    (userService.getGroups(_: UUID)(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(userService)
     assert(command.groupsGet(RandomService().uuid).await() == Left(apiError))
     unregister()
@@ -171,7 +170,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[UserKey]
     val result = Future.successful(Left(apiError))
     val groupEventsService = mock[GroupEventsService]
-    (groupEventsService.getEvents(_: UUID)(_: Pipeline)) expects (*, *) returning result
+    groupEventsService.getEvents _ expects * returning result
     val unregister = TestServices.register(groupEventsService)
     assert(command.eventsGet(key, uuid, uuid, LoginResponseModelBuilder()).await() == Left(apiError))
     unregister()
@@ -181,8 +180,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val uuid = RandomService().uuid
     val key = mock[UserKey]
     val questionMock = mock[QuestionService]
-    (questionMock.getQuestions(_: UUID, _: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *, *) returning Future.successful(Left(apiError))
+    (questionMock.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(apiError))
     val unregister = TestServices.register(questionMock)
     assert(command.eventsGet(key, uuid, uuid, LoginResponseModelBuilder()).await() == Left(apiError))
     unregister()
@@ -200,8 +199,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   test("failed to get pending groups") {
     val userId = RandomService().uuid
     val service = mock[UserService]
-    (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(apiError))
+    (service.getPendingGroups(_: UUID)(_: ChannelContext)) expects
+      (*, *) returning Future.successful(Left(apiError))
     assert(command.userGetPendingGroups(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
   }
 

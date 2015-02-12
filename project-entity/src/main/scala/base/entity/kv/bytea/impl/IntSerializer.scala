@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:52 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
-package base.entity.kv.bytea.scredisImpl
+package base.entity.kv.bytea.impl
 
-import base.entity.kv.bytea.ScredisSerializer
-import scredis.serialization.{LongReader, LongWriter}
+import base.entity.kv.bytea.Serializer
+import scredis.serialization.{ IntReader, IntWriter }
 
 /**
  * {{ Describe the high level purpose of StringScredisSerializer here. }}
@@ -16,10 +16,10 @@ import scredis.serialization.{LongReader, LongWriter}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object LongScredisSerializer extends ScredisSerializer[Long] {
+object IntSerializer extends Serializer[Int] {
 
-  def writeImpl(value: Long) = LongWriter.write(value)
+  def writeImpl(value: Int) = IntWriter.write(value)
 
-  def readImpl(bytes: Array[Byte]) = LongReader.read(bytes)
+  def readImpl(bytes: Array[Byte]) = IntReader.read(bytes)
 
 }

@@ -2,24 +2,24 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 8:43 PM
+ * Last modified by rconrad, 2/11/15 9:54 PM
  */
 
 package base.entity.kv.impl
 
 import base.common.lib.Dispatchable
-import base.entity.kv.ScredisKey
-import base.entity.kv.bytea.ScredisSerializers
+import base.entity.kv.Key
+import base.entity.kv.bytea.Serializers
 import scredis.commands.KeyCommands
 import scredis.serialization.Writer
 
-trait ScredisKeyImpl[K] extends ScredisKey[K] with Dispatchable {
+trait KeyImpl[K] extends Key[K] with Dispatchable {
 
   protected def keyCommands: KeyCommands
 
   implicit protected def mk: Manifest[K]
 
-  implicit protected def keyWriter: Writer[K] = ScredisSerializers.writer[K]
+  implicit protected def keyWriter: Writer[K] = Serializers.writer[K]
 
   final lazy val key = keyPrefix.toBytes ++ keyWriter.write(keyValue)
 

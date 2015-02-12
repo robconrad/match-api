@@ -2,18 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 8:44 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.{ ScredisFactoryService, SetKey }
+import base.entity.kv.{ KeyCommandsService, SetKey }
 
 abstract class SetKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[V])
-    extends ScredisKeyValueImpl[K, V]
+    extends KeyValueImpl[K, V]
     with SetKey[K, V] {
 
-  private lazy val commands = ScredisFactoryService().setCommands
+  private lazy val commands = KeyCommandsService().setCommands
 
   protected def keyCommands = commands
 

@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 5:29 PM
+ * Last modified by rconrad, 2/11/15 10:19 PM
  */
 
-package base.entity.kv.bytea.scredisImpl
+package base.entity.kv.bytea.impl
 
 import java.nio.ByteBuffer
 
-import base.entity.kv.bytea.ScredisSerializer
+import base.entity.kv.bytea.Serializer
 import org.joda.time.DateTime
 
 /**
@@ -18,10 +18,12 @@ import org.joda.time.DateTime
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object DateTimeScredisSerializer extends ScredisSerializer[DateTime] {
+object DateTimeSerializer extends Serializer[DateTime] {
+
+  val longLength = 8
 
   def writeImpl(value: DateTime) = {
-    val bb = ByteBuffer.wrap(new Array[Byte](8))
+    val bb = ByteBuffer.wrap(new Array[Byte](longLength))
     bb.putLong(value.getMillis)
     bb.array()
   }

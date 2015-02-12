@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:27 PM
+ * Last modified by rconrad, 2/11/15 10:25 PM
  */
 
 package base.entity.group.kv.impl
@@ -20,5 +20,5 @@ import base.entity.kv.impl.ListKeyImpl
  * @author rconrad
  */
 class GroupEventsKeyImpl(val keyValue: UUID)
-    extends ListKeyImpl[UUID, EventModel]
-    with GroupEventsKey
+  extends ListKeyImpl[UUID, EventModel]
+  with GroupEventsKey

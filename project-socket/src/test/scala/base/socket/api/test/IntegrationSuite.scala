@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 5:03 PM
+ * Last modified by rconrad, 2/11/15 10:34 PM
  */
 
 package base.socket.api.test
@@ -10,18 +10,17 @@ package base.socket.api.test
 import java.util.UUID
 
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ ServicesBeforeAndAfterAll, Services }
+import base.common.service.{ Services, ServicesBeforeAndAfterAll }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContext
-import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.question.impl.QuestionServiceImpl
 import base.entity.sms.mock.SmsServiceMock
 import base.entity.user.impl.{ UserServiceImpl, VerifyPhoneCommandServiceImpl }
-import base.socket.api.{ SocketApiService, SocketApiHandlerService }
 import base.socket.api.test.command.CommandExecutor
 import base.socket.api.test.util.ListUtils._
 import base.socket.api.test.util.TestQuestions
+import base.socket.api.{ SocketApiHandlerService, SocketApiService }
 import base.socket.test.SocketBaseSuite
 
 /**
@@ -58,14 +57,14 @@ private[api] trait IntegrationSuite extends SocketBaseSuite with ServicesBeforeA
 
     // use real user service but ensure a constant ordering of users and groups
     Services.register(new UserServiceImpl() {
-      override def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) =
-        super.getUsers(userId, userIds)(p, channelCtx).map {
+      override def getUsers(userId: UUID, userIds: List[UUID])(implicit channelCtx: ChannelContext) =
+        super.getUsers(userId, userIds)(channelCtx).map {
           case Right(users) => Right(sortUsers(users))
           case x            => x
         }
 
-      override def getGroups(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) =
-        super.getGroups(userId)(p, channelCtx).map {
+      override def getGroups(userId: UUID)(implicit channelCtx: ChannelContext) =
+        super.getGroups(userId)(channelCtx).map {
           case Right(groups) => Right(sortGroups(groups))
           case x             => x
         }
@@ -74,9 +73,10 @@ private[api] trait IntegrationSuite extends SocketBaseSuite with ServicesBeforeA
     // use real question service but control what questions are used and order they are returned
     val questionCount = 25
     Services.register(new QuestionServiceImpl(questions.standardDefs, questionCount, questionCount / 10) {
-      override def getQuestions(groupId: UUID, userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-        super.getQuestions(groupId, userId)(p, channelCtx).map {
+      override def getQuestions(groupId: UUID, userId: UUID)(implicit channelCtx: ChannelContext) = {
+        super.getQuestions(groupId, userId)(channelCtx).map {
           case Right(questions) => Right(sortQuestions(questions))
+          case Left(e) => Left(e)
         }
       }
     })
