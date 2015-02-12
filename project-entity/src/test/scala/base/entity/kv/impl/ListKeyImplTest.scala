@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 5:00 PM
+ * Last modified by rconrad, 2/11/15 9:38 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.mock.KeyLoggerMock
+import base.entity.kv.KeyPrefixes
 
 /**
  * {{ Describe the high level purpose of IntModelTest here. }}
@@ -20,23 +20,22 @@ class ListKeyImplTest extends KeyImplTest {
   private val val1 = "value1"
   private val val2 = "value2"
 
-  val model = new ListKeyImpl[String] {
-    val token = this.getClass.getSimpleName.getBytes
-    val logger = KeyLoggerMock
-    protected implicit val p = tp
+  val model = new ListKeyImpl[String, String] {
+    def keyPrefix = KeyPrefixes.test
+    def keyValue = "test"
   }
 
-  def create = model.prepend(val1).await()
+  def create = model.lPush(val1).await() == 1L
 
   test("prepend") {
-    assert(model.prepend(val1).await())
-    assert(model.prepend(val1, val2).await())
+    assert(model.lPush(val1).await() == 1L)
+    assert(model.lPush(val1, val2).await() == 3L)
   }
 
   test("prependIfExists") {
-    assert(!model.prependIfExists(val1).await())
-    assert(model.prepend(val1).await())
-    assert(model.prependIfExists(val1).await())
+    assert(model.lPushX(val1).await() == 0L)
+    assert(model.lPush(val1).await() == 1L)
+    assert(model.lPushX(val1).await() == 2L)
   }
 
 }

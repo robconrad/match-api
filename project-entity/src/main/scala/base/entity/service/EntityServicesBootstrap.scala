@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:50 PM
+ * Last modified by rconrad, 2/11/15 9:30 PM
  */
 
 package base.entity.service
@@ -12,7 +12,6 @@ import base.common.service.{Services, ServicesBootstrap}
 import base.entity.error.impl.ApiErrorServiceImpl
 import base.entity.facebook.impl.FacebookServiceImpl
 import base.entity.group.impl._
-import base.entity.group.kv.impl._
 import base.entity.kv.impl.{KvFactoryServiceImpl, ScredisFactoryServiceImpl, ScredisKeyFactoryServiceImpl}
 import base.entity.message.impl.MessageCommandServiceImpl
 import base.entity.question.QuestionDef
@@ -69,8 +68,6 @@ object EntityServicesBootstrap extends ServicesBootstrap {
   lazy val otherRegistered = {
 
     Services.register(new ScredisKeyFactoryServiceImpl())
-
-    Services.register(new GroupEventsKeyServiceImpl())
 
     Services.register(new ApiErrorServiceImpl(
       Keys(MATCH, "debug")))

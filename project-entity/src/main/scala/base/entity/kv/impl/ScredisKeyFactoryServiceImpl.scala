@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:56 PM
+ * Last modified by rconrad, 2/11/15 9:40 PM
  */
 
 package base.entity.kv.impl
@@ -35,6 +35,7 @@ class ScredisKeyFactoryServiceImpl extends ServiceImpl with ScredisKeyFactorySer
     manifest[FacebookInfoKey]               -> ((id: Any) => new FacebookInfoKeyImpl(id.asInstanceOf[String])),
     manifest[FacebookUserKey]               -> ((id: Any) => new FacebookUserKeyImpl(id.asInstanceOf[String])),
     manifest[GroupKey]                      -> ((id: Any) => new GroupKeyImpl(id.asInstanceOf[UUID])),
+    manifest[GroupEventsKey]                -> ((id: Any) => new GroupEventsKeyImpl(id.asInstanceOf[UUID])),
     manifest[GroupUserKey]                  -> ((id: Any) => new GroupUserKeyImpl(id.asInstanceOf[(UUID, UUID)])),
     manifest[QuestionKey]                   -> ((id: Any) => new QuestionKeyImpl(id.asInstanceOf[UUID])),
     manifest[UserKey]                       -> ((id: Any) => new UserKeyImpl(id.asInstanceOf[UUID])),

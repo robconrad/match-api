@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:21 AM
+ * Last modified by rconrad, 2/11/15 9:44 PM
  */
 
 package base.entity.group.impl
@@ -12,7 +12,6 @@ import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.impl.GroupEventsServiceImpl.Errors
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 
@@ -45,7 +44,7 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
 
   test("setEvent / getEvents") {
 
-    assert(service.setEvent(event, createIfNotExists = false).await() == Errors.setEventFailed)
+    assert(service.setEvent(event, createIfNotExists = false).await() == Right(event))
 
     assert(service.setEvent(event, createIfNotExists = true).await() == Right(event))
 

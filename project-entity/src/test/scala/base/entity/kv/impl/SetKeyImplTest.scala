@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:34 PM
+ * Last modified by rconrad, 2/11/15 9:39 PM
  */
 
 package base.entity.kv.impl
@@ -18,7 +18,7 @@ import base.entity.kv.{ KvTest, KeyPrefixes }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class SetKeyImplTest extends /* KeyImplTest */ KvTest {
+class SetKeyImplTest extends KeyImplTest {
 
   private val val1 = RandomService().uuid
   private val val2 = RandomService().uuid

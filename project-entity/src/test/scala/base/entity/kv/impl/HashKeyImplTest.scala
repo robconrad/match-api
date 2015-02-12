@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:03 PM
+ * Last modified by rconrad, 2/11/15 9:40 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key.Prop
-import base.entity.kv.{KvTest, KeyPrefixes, KeyProp}
+import base.entity.kv.{KeyPrefixes, KeyProp}
 
 import scala.language.reflectiveCalls
 
@@ -19,11 +19,11 @@ import scala.language.reflectiveCalls
  * @author rconrad
  */
 // scalastyle:off null
-class HashKeyImplTest extends /* KeyImplTest */ KvTest {
+class HashKeyImplTest extends KeyImplTest {
 
-  def create = key.create
+  def create = model.create
 
-  val key = new HashKeyImpl[String] {
+  val model = new HashKeyImpl[String] {
 
     private val prop = new KeyProp("prop") {}
     private val prop2 = new KeyProp("prop2") {}

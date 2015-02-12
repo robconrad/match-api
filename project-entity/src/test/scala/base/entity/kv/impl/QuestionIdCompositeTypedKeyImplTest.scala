@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:55 PM
+ * Last modified by rconrad, 2/11/15 9:39 PM
  */
 
 package base.entity.kv.impl
@@ -17,7 +17,7 @@ import base.entity.question.{QuestionIdComposite, QuestionSides}
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionIdCompositeTypedKeyImplTest extends /* KeyImplTest */ KvTest {
+class QuestionIdCompositeTypedKeyImplTest extends KeyImplTest {
 
   private val id = QuestionIdComposite(RandomService().uuid, QuestionSides.SIDE_A)
 

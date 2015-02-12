@@ -2,54 +2,61 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 4:58 PM
+ * Last modified by rconrad, 2/11/15 9:44 PM
  */
 
 package base.entity.kv.impl
 
-import base.entity.kv.ListKey
-import base.entity.kv.bytea.ByteaSerializers._
-import redis.client.RedisException
-import redis.reply.BulkReply
+import base.entity.kv.{ListKey, ScredisFactoryService}
 
-/**
- * Base model for set keys
- */
-// scalastyle:off null
-abstract class ListKeyImpl[T](implicit m: Manifest[T]) extends KeyImpl with ListKey[T] {
+abstract class ListKeyImpl[K, V](implicit val mk: Manifest[K], val mv: Manifest[V])
+    extends ScredisKeyValueImpl[K, V]
+    with ListKey[K, V] {
 
-  def prepend(value: T*) = {
-    val args = token +: value.map(v => serialize(v))
-    p.lpush_(args: _*).map { v =>
-      val res = v.data() > 0L
-      if (isDebugEnabled) log("LPUSH", s" value: $value, result: $res")
-      res
-    }
-  }
+  private lazy val commands = ScredisFactoryService().listCommands
 
-  def prependIfExists(value: T) = {
-    p.lpushx(token, serialize(value)).map { v =>
-      val res = v.data() > 0L
-      if (isDebugEnabled) log("LPUSHX", s" value: $value, result: $res")
-      res
-    }
-  }
+  protected def keyCommands = commands
 
-  def range(start: Int, stop: Int) = {
-    p.lrange(token, start, stop).map { v =>
-      //val res = v.asStringList(Charset.defaultCharset()).toList
-      val res = v match {
-        case null                => List()
-        case v if v.data == null => List()
-        case v => v.data().map {
-          case v: BulkReply => deserialize(v.data())
-          case v            => throw new RedisException(s"LRANGE received unexpected type: $v")
-        }.toList
-      }
-      if (isDebugEnabled) log("LRANGE", s" start: $start, stop: $stop, resukt: $res")
-      res
-    }
-  }
+  def lIndex(index: Long) =
+    commands.lIndex(key, index)
+
+  def lInsert(position: scredis.Position, pivot: V, value: V) =
+    commands.lInsert(key, position, pivot, value)
+
+  def lLen =
+    commands.lLen(key)
+
+  def lPop =
+    commands.lPop(key)
+
+  def lPush(values: V*) =
+    commands.lPush(key, values:_*)
+
+  def lPushX(value: V) =
+    commands.lPushX(key, value)
+
+  def lRange(start: Long, stop: Long) =
+    commands.lRange(key, start, stop)
+
+  def lRem(value: V, count: Int) =
+    commands.lRem(key, value, count)
+
+  def lSet(index: Long, value: V) =
+    commands.lSet(key, index, value)
+
+  def lTrim(start: Long, stop: Long) =
+    commands.lTrim(key, start, stop)
+
+  def rPop =
+    commands.rPop(key)
+
+  def rPopLPush(destKey: ListKey[_, V]) =
+    commands.rPopLPush(key, destKey.key)
+
+  def rPush(values: V*) =
+    commands.rPush(key, values:_*)
+
+  def rPushX(value: V) =
+    commands.rPushX(key, value)
 
 }
-
