@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/11/15 7:25 PM
  */
 
 package base.entity.user.impl
@@ -52,7 +52,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneCooldownKey.get().await() == Option(phoneCooldownValue))
     assert(phoneCooldownKey.ttl().await().getOrElse(-1L) > 0L)
 
-    val userKey = UserKeyService().make(authCtx.userId)
+    val userKey = make[UserKey](authCtx.userId)
     val phoneAttributes = userKey.getPhoneAttributes.await()
     assert(userKey.getCreated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(phoneAttributes.exists(_.phone == phone))
@@ -111,12 +111,6 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[PhoneCooldownKey]
     key.expire _ expects * returning Future.successful(false)
     assert(command.phoneCooldownExpire(key).await() == Errors.phoneCooldownExpireFailed.await())
-  }
-
-  test("failed to set user phone attributes") {
-    val userKey = mock[UserKey]
-    userKey.setPhoneAttributes _ expects * returning Future.successful(false)
-    assert(command.userSetPhoneAttributes(userKey).await() == Errors.userSetFailed.await())
   }
 
   test("failed to send sms") {

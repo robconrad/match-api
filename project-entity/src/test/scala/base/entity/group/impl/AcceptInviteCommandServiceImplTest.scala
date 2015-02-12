@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/11/15 7:25 PM
  */
 
 package base.entity.group.impl
@@ -90,8 +90,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupPhonesInvitedKey = make[GroupPhonesInvitedKey](groupId)
     assert(groupPhonesInvitedKey.add(phone).await() == 1L)
 
-    val userKey = UserKeyService().make(authCtx.userId)
-    assert(userKey.setPhoneAttributes(UserPhoneAttributes(phone, "", verified = true)).await())
+    val userKey = make[UserKey](authCtx.userId)
+    userKey.setPhoneAttributes(UserPhoneAttributes(phone, "", verified = true)).await()
 
     val actual = service.innerExecute(AcceptInviteModel(groupId)).await()
     val expected = Right(response)

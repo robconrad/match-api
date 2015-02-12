@@ -2,21 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 4:44 PM
+ * Last modified by rconrad, 2/11/15 7:52 PM
  */
 
 package base.entity.facebook.impl
 
 import base.common.service.ServiceImpl
 import base.entity.auth.context.ChannelContext
-import base.entity.facebook.kv.{ FacebookInfoKey, FacebookInfoKeyService }
-import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.facebook.kv.{FacebookInfoKeyService, FacebookInfoKey}
+import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.kv.Key.Pipeline
-import base.entity.kv.KvFactoryService
+import base.entity.kv.{KvFactoryService, MakeKey}
 import base.entity.logging.AuthLoggable
-import com.restfb.exception.{ FacebookException, FacebookOAuthException }
+import com.restfb.exception.{FacebookException, FacebookOAuthException}
 import com.restfb.json.JsonObject
-import com.restfb.{ DefaultFacebookClient, Parameter, Version }
+import com.restfb.{DefaultFacebookClient, Parameter, Version}
 import redis.client.RedisException
 
 import scala.concurrent.Future
@@ -32,6 +32,7 @@ import scala.concurrent.duration.FiniteDuration
 class FacebookServiceImpl(infoExpireTime: FiniteDuration)
     extends ServiceImpl
     with FacebookService
+    with MakeKey
     with AuthLoggable {
 
   private val pictureUrlString = s"http://graph.facebook.com/%s/picture?type=large"

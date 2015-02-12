@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:13 PM
+ * Last modified by rconrad, 2/11/15 7:24 PM
  */
 
 package base.entity.user.impl
@@ -61,7 +61,7 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
       extends Command[VerifyPhoneModel, VerifyPhoneResponseModel] {
 
     def execute() = {
-      userGetPhoneAttributes(UserKeyService().make(authCtx.userId))
+      userGetPhoneAttributes(make[UserKey](authCtx.userId))
     }
 
     def userGetPhoneAttributes(key: UserKey): Response =
@@ -77,9 +77,8 @@ class VerifyPhoneCommandServiceImpl(codeLength: Int, smsBody: String)
       }
 
     def userSetPhoneVerified(key: UserKey): Response =
-      key.setPhoneVerified(verified = true) flatMap {
-        case true  => phoneSetUserId(PhoneKeyService().make(input.phone))
-        case false => Errors.userSetPhoneVerifiedFailed
+      key.setPhoneVerified(verified = true) flatMap { result =>
+        phoneSetUserId(PhoneKeyService().make(input.phone))
       }
 
     def phoneSetUserId(key: PhoneKey): Response =
@@ -120,7 +119,6 @@ object VerifyPhoneCommandServiceImpl {
 
     lazy val codeMissing: Response = (codeMissingText, VERIFY_CODE_MISSING)
     lazy val codeValidation: Response = (codeValidationText, VERIFY_CODE_INVALID)
-    lazy val userSetPhoneVerifiedFailed: Response = "failed to set user phone verified"
     lazy val phoneSetUserIdFailed: Response = "failed to set phone user id"
 
   }

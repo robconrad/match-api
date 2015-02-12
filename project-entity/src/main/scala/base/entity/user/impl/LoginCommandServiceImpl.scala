@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 12:13 PM
+ * Last modified by rconrad, 2/11/15 7:05 PM
  */
 
 package base.entity.user.impl
@@ -65,22 +65,21 @@ private[entity] class LoginCommandServiceImpl()
 
     def facebookUserGet(key: FacebookUserKey, fbInfo: FacebookInfo): Response = {
       key.get flatMap {
-        case Some(userId) => userSet(UserKeyService().make(userId), userId, fbInfo)
+        case Some(userId) => userSet(make[UserKey](userId), userId, fbInfo)
         case None         => facebookUserSet(key, RandomService().uuid, fbInfo)
       }
     }
 
     def facebookUserSet(key: FacebookUserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
       key.set(userId) flatMap {
-        case true  => userSet(UserKeyService().make(userId), userId, fbInfo)
+        case true  => userSet(make[UserKey](userId), userId, fbInfo)
         case false => Errors.facebookUserSetFailed
       }
     }
 
     def userSet(key: UserKey, userId: UUID, fbInfo: FacebookInfo): Response = {
-      key.setFacebookInfo(fbInfo) flatMap {
-        case true  => deviceSet(DeviceKeyService() make input.device.uuid, userId)
-        case false => Errors.userSetFailed
+      key.setFacebookInfo(fbInfo) flatMap { result =>
+        deviceSet(make[DeviceKey](input.device.uuid), userId)
       }
     }
 
@@ -92,14 +91,13 @@ private[entity] class LoginCommandServiceImpl()
         input.device.cordova,
         input.device.platform,
         input.device.version
-      ).flatMap {
-          case true  => groupsGet(userId)
-          case false => Errors.deviceSetFailed
-        }
+      ).flatMap { result =>
+        groupsGet(userId)
+      }
     }
 
     def groupsGet(userId: UUID): Response = {
-      val key = UserKeyService().make(userId)
+      val key = make[UserKey](userId)
       UserService().getGroups(userId).flatMap {
         case Left(error) => error
         case Right(groups) =>
@@ -138,15 +136,14 @@ private[entity] class LoginCommandServiceImpl()
 
     def userGetPendingGroups(service: UserService, userId: UUID, builder: LoginResponseModelBuilder): Response = {
       service.getPendingGroups(userId) flatMap {
-        case Right(groups) => setLastLogin(UserKeyService().make(userId), builder.copy(pendingGroups = Option(groups)))
+        case Right(groups) => setLastLogin(make[UserKey](userId), builder.copy(pendingGroups = Option(groups)))
         case Left(error)   => error
       }
     }
 
     def setLastLogin(key: UserKey, builder: LoginResponseModelBuilder): Response = {
-      key.setLastLogin() flatMap {
-        case true  => registerGroupListeners(builder.build)
-        case false => Errors.userSetFailed
+      key.setLastLogin() flatMap { result =>
+        registerGroupListeners(builder.build)
       }
     }
 
@@ -169,9 +166,7 @@ object LoginCommandServiceImpl {
     private val tokenInvalidText = "The supplied Facebook token is not valid."
 
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_INVALID)
-    lazy val deviceSetFailed: Response = "failed to set device attributes"
     lazy val facebookUserSetFailed: Response = "failed to set facebook user"
-    lazy val userSetFailed: Response = "failed to set user attributes"
 
   }
 

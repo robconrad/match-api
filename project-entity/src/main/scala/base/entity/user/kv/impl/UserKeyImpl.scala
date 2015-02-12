@@ -2,19 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 4:34 PM
+ * Last modified by rconrad, 2/11/15 7:30 PM
  */
 
 package base.entity.user.kv.impl
 
+import java.util.UUID
+
 import base.common.time.TimeService
-import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.kv.Key._
-import base.entity.kv.KeyProps.UpdatedProp
+import base.entity.kv.KeyProps.{CreatedProp, UpdatedProp}
 import base.entity.kv.impl.HashKeyImpl
-import base.entity.kv.{ Key, KeyLogger }
 import base.entity.user.kv.UserKeyProps._
-import base.entity.user.kv.{ UserKey, UserLoginAttributes, UserNameAttributes, UserPhoneAttributes }
+import base.entity.user.kv.{UserKey, UserLoginAttributes, UserNameAttributes, UserPhoneAttributes}
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -25,25 +26,23 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class UserKeyImpl(val token: Array[Byte],
-                  protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends HashKeyImpl with UserKey {
+class UserKeyImpl(val keyValue: UUID)
+    extends HashKeyImpl[UUID]
+    with UserKey {
 
-  val nameProps = Array[Prop](NameProp, FacebookIdProp)
   def getNameAttributes = {
-    get(nameProps) map { props =>
+    mGetAsMap(NameProp, FacebookIdProp) map { props =>
       UserNameAttributes(
-        props(FacebookIdProp).map(FacebookService().getPictureUrl),
-        props(NameProp))
+        props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(read[String](bytea))),
+        props.get(NameProp).map(read[String]))
     }
   }
 
-  val phoneVerifiedProps = Array[Prop](PhoneProp, PhoneCodeProp, PhoneVerifiedProp)
   def getPhoneAttributes = {
-    get(phoneVerifiedProps).map { props =>
-      (props.get(PhoneProp).flatten,
-        props.get(PhoneCodeProp).flatten,
-        props.get(PhoneVerifiedProp).flatten.map(Key.string2Boolean)) match {
+    mGetAsMap(PhoneProp, PhoneCodeProp, PhoneVerifiedProp).map { props =>
+      (props.get(PhoneProp).map(read[String]),
+        props.get(PhoneCodeProp).map(read[String]),
+        props.get(PhoneVerifiedProp).map(read[Boolean])) match {
           case (Some(phone), Some(code), Some(verified)) => Option(UserPhoneAttributes(phone, code, verified))
           case _                                         => None
         }
@@ -51,45 +50,47 @@ class UserKeyImpl(val token: Array[Byte],
   }
 
   def setPhoneAttributes(attributes: UserPhoneAttributes) = {
-    val setCreated = create().map(result => true)
-    val setPhone = set(PhoneProp, attributes.phone)
+    val setCreated = setNX(CreatedProp, write(TimeService().now))
+    val setPhone = set(PhoneProp, write(attributes.phone))
     val setVerified = setPhoneVerified(attributes.verified)
-    val setCode = set(PhoneCodeProp, attributes.code)
-    Future.sequence(Set(setCreated, setPhone, setVerified, setCode)).map(_.reduce(_ && _))
+    val setCode = set(PhoneCodeProp, write(attributes.code))
+    Future.sequence(Set(setCreated, setPhone, setVerified, setCode)).map(x => Unit)
   }
 
   def setPhoneVerified(verified: Boolean) = {
-    setFlag(PhoneVerifiedProp, verified)
+    set(PhoneVerifiedProp, write(verified)).map(x => Unit)
   }
 
   def setFacebookInfo(fbInfo: FacebookInfo) = {
-    val props = Map[Prop, Any](
-      NameProp -> fbInfo.firstName,
-      GenderProp -> fbInfo.gender,
-      FacebookIdProp -> fbInfo.id,
-      LocaleProp -> fbInfo.locale,
-      UpdatedProp -> TimeService().asString())
-    set(props)
+    val props = Map[Prop, Array[Byte]](
+      NameProp -> write(fbInfo.firstName),
+      GenderProp -> write(fbInfo.gender),
+      FacebookIdProp -> write(fbInfo.id),
+      LocaleProp -> write(fbInfo.locale),
+      UpdatedProp -> write(TimeService().now))
+    mSet(props)
   }
 
-  def getFacebookId = getString(FacebookIdProp)
+  def getFacebookId = get(FacebookIdProp).map(_.map(read[String]))
 
-  def getLocale = getString(LocaleProp)
+  def getLocale = get(LocaleProp).map(_.map(read[String]))
 
-  def getLastLogin = getDateTime(LastLoginProp)
-  def setLastLogin(time: DateTime) = set(LastLoginProp, TimeService().asString(time))
+  def getLastLogin = get(LastLoginProp).map(_.map(read[DateTime]))
+  def setLastLogin(time: DateTime) = set(LastLoginProp, write(time)).map(x => Unit)
 
-  val loginAttributeProps = Array[Prop](PhoneProp, PhoneVerifiedProp, FacebookIdProp, NameProp, LastLoginProp)
   def getLoginAttributes = {
-    get(loginAttributeProps) map { props =>
+    mGetAsMap(PhoneProp, PhoneVerifiedProp, FacebookIdProp, NameProp, LastLoginProp) map { props =>
       UserLoginAttributes(
-        props(PhoneProp),
-        props(PhoneVerifiedProp).map(Key.string2Boolean).contains(true),
+        props.get(PhoneProp).map(read[String]),
+        props.get(PhoneVerifiedProp).map(read[Boolean]).contains(true),
         UserNameAttributes(
-          props(FacebookIdProp).map(FacebookService().getPictureUrl),
-          props(NameProp)),
-        props(LastLoginProp).map(TimeService().fromString))
+          props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(read[String](bytea))),
+          props.get(NameProp).map(read[String])),
+        props.get(LastLoginProp).map(read[DateTime]))
     }
   }
+
+  def getCreated = get(CreatedProp).map(_.map(read[DateTime]))
+  def getUpdated = get(UpdatedProp).map(_.map(read[DateTime]))
 
 }

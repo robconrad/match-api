@@ -2,135 +2,84 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 2:42 PM
+ * Last modified by rconrad, 2/11/15 7:30 PM
  */
 
 package base.entity.kv.impl
 
-import java.nio.charset.Charset
-import java.util.UUID
-
-import base.common.lib.{ Ifo, Tryo }
-import base.common.time.TimeService
 import base.entity.kv.Key._
-import base.entity.kv.KeyProps.{ CreatedProp, UpdatedProp }
-import base.entity.kv.{ HashKey, Key, KeyProp }
+import base.entity.kv.bytea.ScredisSerializers
+import base.entity.kv.{HashKey, KeyProp, ScredisFactoryService}
+import scredis.serialization.{BytesReader, Reader}
 
-import scala.collection.JavaConversions._
-import scala.collection.{ breakOut, _ }
-import scala.concurrent.Future
+abstract class HashKeyImpl[K](implicit val mk: Manifest[K])
+    extends ScredisKeyImpl[K]
+    with HashKey[K] {
 
-/**
- * {{ Describe the high level purpose of ConcreteKeyImpl here. }}
- * {{ Include relevant details here. }}
- * {{ Do not skip writing good doc! }}
- * @author rconrad
- */
-// scalastyle:off null
-abstract class HashKeyImpl extends KeyImpl with HashKey {
+  private lazy val commands = ScredisFactoryService().hashCommands
 
-  def create() = setNx(CreatedProp, TimeService().asString())
+  protected implicit def valueReader: Reader[Array[Byte]] = BytesReader
 
-  def getCreated = getDateTime(CreatedProp)
-  def getUpdated = getDateTime(UpdatedProp)
-
-  protected[impl] def getString(prop: Prop) =
-    get_(prop).map(v => Ifo(v, v != null && v.length > 0))
-
-  protected[impl] def getDateTime(prop: Prop) =
-    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(TimeService().fromString(v))))
-
-  protected[impl] def getId(prop: Prop) =
-    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(UUID.fromString(v))))
-
-  protected[impl] def getInt(prop: Prop) =
-    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(v.toInt)))
-
-  protected[impl] def getLong(prop: Prop) =
-    get_(prop).map(v => Ifo(v, v != null).flatMap(v => Tryo(Math.round(v.toDouble))))
-
-  protected[impl] def getFlag(prop: Prop) =
-    get_(prop).map(Key.string2Boolean)
-
-  private def get_(prop: Prop) = p.hget(token, prop).map { v =>
-    val res = v.asUTF8String()
-    if (isDebugEnabled) log("HGET", s"prop: $prop, value: $res")
-    res
+  protected implicit def prop2String(p: Prop): String = p.toString
+  protected implicit def props2String(p: Seq[Prop]): Seq[String] = p.map(_.toString)
+  protected implicit def propMap2StringMap[T](p: Map[Prop, T]): Map[String, T] = p.map { case (k,v) =>
+    k.toString -> v
   }
 
-  protected[impl] def get = p.hgetall(token).map { v =>
-    val res = v.asStringMap(Charset.defaultCharset()).toMap
-    if (isDebugEnabled) log("HGETALL", s"props: $res")
-    res.collect {
-      case (k, v) if KeyProp(k).isDefined => (KeyProp(k).get, v)
-    }.toMap
-  }
+  protected def read[T](v: Array[Byte])(implicit m: Manifest[T]) = ScredisSerializers.read(v)(m)
+  protected def write[T](v: T)(implicit m: Manifest[T]) = ScredisSerializers.write(v)(m)
 
-  // note that an empty result is null for this
-  protected[impl] def get(props: Array[Prop]) = {
-    val args = token +: props.map(_.asInstanceOf[AnyRef])
-    p.hmget_(args: _*).map { v =>
-      val res = v.asStringList(Charset.defaultCharset()).toList
-      val bag = props.zip(res)(breakOut).map {
-        case (key, value) => key -> Option(value)
-      }.toMap[Prop, Option[String]]
-      if (isDebugEnabled) log("HMGET", s"$bag")
-      bag
-    }
-  }
+  protected def keyCommands = commands
 
-  protected[impl] def getProps = p.hkeys(token).map { v =>
-    val res = v.asStringSet(Charset.defaultCharset()).toList
-    if (isDebugEnabled) log("HKEYS", s"value: $res")
-    res.collect {
-      case f if KeyProp(f).isDefined => KeyProp(f).get
-    }
-  }
+  protected def del(fields: Prop*) =
+    commands.hDel(key, fields: _*)
 
-  protected[impl] def setFlag(prop: Prop, value: Boolean) =
-    set(prop, Key.boolean2Int(value))
+  protected def exists(field: Prop) =
+    commands.hExists(key, field)
 
-  protected[impl] def set(prop: Prop, value: Any): Future[Boolean] =
-    p.hset(token, prop, value).map { v =>
-      val res = v.data().intValue()
-      if (isDebugEnabled) log("HSET", s"prop: $prop, value: $value, result: $res")
-      res >= 0
+  protected def get(field: Prop) =
+    commands.hGet(key, field)
+
+  protected def getAll =
+    commands.hGetAll(key).map(_.map(_.map {
+      case (prop, value) => KeyProp(prop).orNull -> value
+    }.toMap))
+
+  protected def incrBy(field: Prop, count: Long) =
+    commands.hIncrBy(key, field, count)
+
+  protected def incrByFloat(field: Prop, count: Double) =
+    commands.hIncrByFloat(key, field, count)
+
+  protected def keys =
+    commands.hKeys(key).map(_.map(KeyProp(_).orNull))
+
+  protected def len =
+    commands.hLen(key)
+
+  protected def mGet(fields: Prop*) =
+    commands.hmGet(key, fields: _*)
+
+  protected def mGetAsMap(fields: Prop*) =
+    commands.hmGetAsMap(key, fields:_*)
+
+  protected def mSet(fieldValuePairs: Map[Prop, Array[Byte]]) =
+    commands.hmSet(key, fieldValuePairs)
+
+  protected def scan(cursor: Long, matchOpt: Option[String], countOpt: Option[Int]) =
+    commands.hScan(key, cursor, matchOpt, countOpt).map {
+      case (cursor, fields) => cursor -> fields.map {
+        case (field, reader) => (KeyProp(field).orNull, reader)
+      }
     }
 
-  protected[impl] def set[T <: Map[Prop, Any]](props: T): Future[Boolean] =
-    set_(props.map(_.productIterator.toList).flatten.toArray)
+  protected def set(field: Prop, value: Array[Byte]) =
+    commands.hSet(key, field, value)
 
-  private def set_(propValues: Array[Any]): Future[Boolean] = {
-    assert(propValues.size > 1 && propValues.size % 2 == 0)
-    val args = token +: propValues.map(_.asInstanceOf[AnyRef])
-    p.hmset_(args: _*).map { v =>
-      val res = v.data()
-      if (isDebugEnabled) log("HMSET", "props: " + propValues.map(_.toString).toList + ", result: " + res)
-      res == Key.STATUS_OK
-    }
-  }
+  protected def setNX(field: Prop, value: Array[Byte]) =
+    commands.hSetNX(key, field, value)
 
-  protected[impl] def setNx(prop: Prop, value: Any) = p.hsetnx(token, prop, value).map { v =>
-    val res = v.data().intValue()
-    if (isDebugEnabled) log("HSETNX", s"prop: $prop, value: $value, result: $res")
-    res == 1
-  }
-
-  protected[impl] def increment(prop: Prop, value: Long) = p.hincrby(token, prop, value).map { v =>
-    val res = Math.round(v.data().toDouble)
-    if (isDebugEnabled) log("HINCRBY", s"prop: $prop, value: $value, result: $res")
-    res
-  }
-
-  protected[impl] def del(prop: Prop) = {
-    if (isDebugEnabled) log("HDEL", "prop: " + prop)
-    p.hdel_(token, prop).map(_.data().intValue() == 1)
-  }
-
-  protected[impl] def del(props: List[Prop]) = {
-    if (isDebugEnabled) log("HDEL", "props: " + props)
-    val args = token +: props
-    p.hdel_(args: _*).map(_.data().intValue() == props.size)
-  }
+  protected def vals =
+    commands.hVals(key)
 
 }

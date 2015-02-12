@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/11/15 7:02 PM
  */
 
 package base.entity.group.impl
@@ -55,7 +55,7 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
 
     def userGroupsInvitedRemove(key: UserGroupsInvitedKey): Response =
       key.rem(input.groupId) flatMap {
-        case 1L => userGetPhone(UserKeyService().make(authCtx.userId))
+        case 1L => userGetPhone(make[UserKey](authCtx.userId))
         case _  => Errors.userGroupsInvitedRemoveFailed
       }
 

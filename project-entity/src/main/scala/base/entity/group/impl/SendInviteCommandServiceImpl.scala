@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:59 PM
+ * Last modified by rconrad, 2/11/15 7:02 PM
  */
 
 package base.entity.group.impl
@@ -71,14 +71,13 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
       key.set(input.label) flatMap {
         case true =>
           val groupId = RandomService().uuid
-          groupCreate(groupId, GroupKeyService().make(groupId))
+          groupCreate(groupId, make[GroupKey](groupId))
         case false => Errors.userPhoneLabelSetFailed
       }
 
     def groupCreate(groupId: UUID, key: GroupKey) =
-      key.create() flatMap {
-        case true  => phoneGetUserId(groupId, PhoneKeyService().make(input.phone))
-        case false => Errors.groupCreateFailed
+      key.create() flatMap { result =>
+        phoneGetUserId(groupId, PhoneKeyService().make(input.phone))
       }
 
     def phoneGetUserId(groupId: UUID, key: PhoneKey) =

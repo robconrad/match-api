@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/11/15 7:24 PM
  */
 
 package base.entity.user.impl
@@ -63,16 +63,15 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
 
     def phoneCooldownExpire(key: PhoneCooldownKey): Response =
       key.expire(phoneCooldown.toSeconds).flatMap {
-        case true  => userSetPhoneAttributes(UserKeyService().make(authCtx.userId))
+        case true  => userSetPhoneAttributes(make[UserKey](authCtx.userId))
         case false => Errors.phoneCooldownExpireFailed
       }
 
     def userSetPhoneAttributes(key: UserKey): Response = {
       val code = VerifyPhoneCommandService().makeVerifyCode()
       info("phone verification code for %s is %s", input.phone, code)
-      key.setPhoneAttributes(UserPhoneAttributes(input.phone, code, verified = false)) flatMap {
-        case true  => smsSend(code)
-        case false => Errors.userSetFailed
+      key.setPhoneAttributes(UserPhoneAttributes(input.phone, code, verified = false)) flatMap { result =>
+        smsSend(code)
       }
     }
 
@@ -99,7 +98,6 @@ object RegisterPhoneCommandServiceImpl {
     lazy val phoneCooldown: Response = (phoneCooldownText, StatusCodes.EnhanceYourCalm, PHONE_RATE_LIMIT)
     lazy val phoneCooldownSetFailed: Response = "failed to set phoneCooldown"
     lazy val phoneCooldownExpireFailed: Response = "failed to expire phoneCooldown"
-    lazy val userSetFailed: Response = "failed to set phone attributes on user"
     lazy val smsSendFailed: ApiError = "failed to send sms"
 
   }

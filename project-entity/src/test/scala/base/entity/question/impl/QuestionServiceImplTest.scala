@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 4:29 PM
+ * Last modified by rconrad, 2/11/15 5:51 PM
  */
 
 package base.entity.question.impl
@@ -20,9 +20,9 @@ import base.entity.group.kv._
 import base.entity.kv.KvTest
 import base.entity.question.QuestionSides._
 import base.entity.question.impl.QuestionServiceImpl.Errors
-import base.entity.question.kv.QuestionKeyService
-import base.entity.question.model.{ AnswerModel, QuestionModel }
-import base.entity.question.{ QuestionDef, QuestionIdComposite }
+import base.entity.question.kv.QuestionKey
+import base.entity.question.model.{AnswerModel, QuestionModel}
+import base.entity.question.{QuestionDef, QuestionIdComposite}
 import base.entity.service.EntityServiceTest
 import redis.client.RedisException
 
@@ -81,8 +81,8 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val groupQuestionsKey = make[GroupQuestionsKey](groupId)
     assert(groupQuestionsKey.add(QuestionIdComposite(groupQuestion, SIDE_A)).await() == 1L)
 
-    val questionKey = QuestionKeyService().make(groupQuestion.id)
-    assert(questionKey.createDef(groupQuestion.a, groupQuestion.b, authCtx.userId).await())
+    val questionKey = make[QuestionKey](groupQuestion.id)
+    questionKey.createDef(groupQuestion.a, groupQuestion.b, authCtx.userId).await()
 
     val questionModels = List(QuestionModel(groupQuestion, SIDE_A)) ++
       questions.map(QuestionModel(_, SIDE_A)) ++
@@ -91,7 +91,10 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
       }
 
     service.getQuestions(groupId, authCtx.userId).await() match {
-      case Right(models) => assert(models.toSet == questionModels.toSet)
+      case Right(models) =>
+        debug(models.sortBy(_.id).toString())
+        debug(questionModels.sortBy(_.id).toString())
+        assert(models.toSet == questionModels.toSet)
     }
   }
 

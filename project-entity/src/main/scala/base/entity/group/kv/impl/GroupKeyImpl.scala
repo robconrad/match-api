@@ -2,16 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:07 PM
+ * Last modified by rconrad, 2/11/15 7:30 PM
  */
 
 package base.entity.group.kv.impl
 
+import java.util.UUID
+
 import base.common.time.TimeService
 import base.entity.group.kv.GroupKey
-import base.entity.group.kv.GroupKeyProps.{ EventCountProp, LastEventTimeProp }
-import base.entity.kv.Key._
-import base.entity.kv.KeyLogger
+import base.entity.group.kv.GroupKeyProps.{EventCountProp, LastEventTimeProp}
+import base.entity.kv.KeyProps.CreatedProp
 import base.entity.kv.impl.HashKeyImpl
 import org.joda.time.DateTime
 
@@ -23,23 +24,26 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupKeyImpl(val token: Array[Byte],
-                   protected val logger: KeyLogger)(implicit protected val p: Pipeline)
-    extends HashKeyImpl with GroupKey {
+class GroupKeyImpl(val keyValue: UUID)
+  extends HashKeyImpl[UUID]
+  with GroupKey {
 
-  private val props = Array[Prop](LastEventTimeProp, EventCountProp)
+  def create() = setNX(CreatedProp, write(TimeService().now))
+
+  def getCreated = get(CreatedProp).map(_.map(read[DateTime]))
+
   def getLastEventAndCount: Future[(Option[DateTime], Option[Int])] = {
-    get(props).map { props =>
-      val time = props(LastEventTimeProp).map(TimeService().fromString)
-      val count = props(EventCountProp).map(_.toInt)
+    mGetAsMap(LastEventTimeProp, EventCountProp).map { props =>
+      val time = props.get(LastEventTimeProp).map(read[DateTime])
+      val count = props.get(EventCountProp).map(read[Int])
       (time, count)
     }
   }
 
   def setLastEvent(time: DateTime) =
-    set(LastEventTimeProp, TimeService().asString(time))
+    set(LastEventTimeProp, write(TimeService().now))
 
   def setEventCount(count: Int) =
-    set(EventCountProp, count)
+    set(EventCountProp, write(count))
 
 }

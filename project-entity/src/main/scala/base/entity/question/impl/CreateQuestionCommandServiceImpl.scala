@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:43 PM
+ * Last modified by rconrad, 2/10/15 9:19 PM
  */
 
 package base.entity.question.impl
@@ -13,12 +13,12 @@ import base.common.random.RandomService
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.group.kv.{ GroupQuestionsKey, GroupUsersKey }
+import base.entity.group.kv.{GroupQuestionsKey, GroupUsersKey}
 import base.entity.question.QuestionSides._
 import base.entity.question.impl.CreateQuestionCommandServiceImpl.Errors
-import base.entity.question.kv.{ QuestionKey, QuestionKeyService, QuestionsKey }
-import base.entity.question.model.{ CreateQuestionModel, CreateQuestionResponseModel }
-import base.entity.question.{ CreateQuestionCommandService, QuestionIdComposite }
+import base.entity.question.kv.{QuestionKey, QuestionsKey}
+import base.entity.question.model.{CreateQuestionModel, CreateQuestionResponseModel}
+import base.entity.question.{CreateQuestionCommandService, QuestionIdComposite}
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv.UserQuestionsKey
 
@@ -55,13 +55,12 @@ private[entity] class CreateQuestionCommandServiceImpl()
         case false => Errors.userNotGroupMember
         case true =>
           val id = RandomService().uuid
-          createQuestion(id, QuestionKeyService().make(id))
+          createQuestion(id, make[QuestionKey](id))
       }
 
     def createQuestion(questionId: UUID, key: QuestionKey) =
-      key.createDef(input.a, input.b, authCtx.userId) flatMap {
-        case true  => groupQuestionsAdd(questionIdComposites(questionId), make[GroupQuestionsKey](input.groupId))
-        case false => Errors.createQuestionFailed
+      key.createDef(input.a, input.b, authCtx.userId) flatMap { result =>
+        groupQuestionsAdd(questionIdComposites(questionId), make[GroupQuestionsKey](input.groupId))
       }
 
     def questionIdComposites(id: UUID) = List(QuestionIdComposite(id, SIDE_A)) ++ (input.b match {
@@ -101,7 +100,6 @@ object CreateQuestionCommandServiceImpl {
     override protected val externalErrorText = "Create question failed."
 
     lazy val userNotGroupMember: Response = "user is not a member of the group"
-    lazy val createQuestionFailed: Response = "failed to create question"
     lazy val groupQuestionsAddFailed: Response = "failed to add question to group"
     lazy val userQuestionsAddFailed: Response = "failed to add question to user"
     lazy val allQuestionsAddFailed: Response = "failed to add question to all"

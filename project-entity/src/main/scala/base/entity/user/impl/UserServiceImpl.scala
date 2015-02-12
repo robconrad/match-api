@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:57 PM
+ * Last modified by rconrad, 2/11/15 7:02 PM
  */
 
 package base.entity.user.impl
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
 
   def getUser(userId: UUID)(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    val key = UserKeyService().make(userId)
+    val key = make[UserKey](userId)
     getUser(userId, key)
   }
 
@@ -45,13 +45,13 @@ class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
     }
 
   def getUsers(userId: UUID, userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
-    getUsersFromKey(userId, userIds, UserKeyService())
+    getUsersFromKey(userId, userIds)
   }
 
-  private[impl] def getUsersFromKey(contextUserId: UUID, userIds: List[UUID],
-                                    keyService: UserKeyService)(implicit p: Pipeline, channelCtx: ChannelContext) = {
+  private[impl] def getUsersFromKey(contextUserId: UUID,
+                                    userIds: List[UUID])(implicit p: Pipeline, channelCtx: ChannelContext) = {
     val futures = userIds.map { userId =>
-      keyService.make(userId).getNameAttributes.map { name =>
+      make[UserKey](userId).getNameAttributes.map { name =>
         UserModel(userId, name.pictureUrl, name.name)
       }
     }

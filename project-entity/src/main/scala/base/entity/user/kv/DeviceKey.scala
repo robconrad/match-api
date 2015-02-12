@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 7:01 PM
+ * Last modified by rconrad, 2/11/15 7:30 PM
  */
 
 package base.entity.user.kv
 
 import java.util.UUID
 
-import base.entity.kv.HashKey
+import base.entity.kv.{HashKey, KeyPrefixes}
 
 import scala.concurrent.Future
 
@@ -19,7 +19,9 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait DeviceKey extends HashKey {
+trait DeviceKey extends HashKey[UUID] {
+
+  final val keyPrefix = KeyPrefixes.device
 
   def getToken: Future[Option[UUID]]
   def setToken(token: UUID): Future[Boolean]
@@ -27,14 +29,14 @@ trait DeviceKey extends HashKey {
   def getUserId: Future[Option[UUID]]
   def setUserId(userId: UUID): Future[Boolean]
 
-  def setTokenAndUserId(token: UUID, userId: UUID): Future[Boolean]
+  def setTokenAndUserId(token: UUID, userId: UUID): Future[Unit]
 
   def set(appVersion: String,
           locale: String,
           model: Option[String],
           cordova: Option[String],
           platform: Option[String],
-          version: Option[String]): Future[Boolean]
+          version: Option[String]): Future[Unit]
 
   def getAppVersion: Future[Option[String]]
   def getLocale: Future[Option[String]]

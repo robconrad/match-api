@@ -2,19 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/27/15 6:55 PM
+ * Last modified by rconrad, 2/11/15 7:53 PM
  */
 
 package base.entity.facebook.impl
 
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.facebook.FacebookInfo
-import base.entity.facebook.kv.{ FacebookInfoKey, FacebookInfoKeyService }
+import base.entity.facebook.kv.{FacebookInfoKey, FacebookInfoKeyService}
 import base.entity.kv.KvTest
 import base.entity.test.EntityBaseSuite
-import com.restfb.exception.{ FacebookException, FacebookOAuthException }
+import com.restfb.exception.{FacebookException, FacebookOAuthException}
 import com.restfb.json.JsonObject
-import com.restfb.{ DefaultFacebookClient, Parameter }
+import com.restfb.{DefaultFacebookClient, Parameter}
 import redis.client.RedisException
 
 import scala.concurrent.Future
@@ -33,7 +33,7 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
   private val fbInfo = FacebookInfo("", "", "", "")
   private val expireTime = 1.day
 
-  private implicit def service = new FacebookServiceImpl(expireTime)
+  private implicit def service: FacebookServiceImpl = new FacebookServiceImpl(expireTime)
   private def method(implicit service: FacebookServiceImpl) =
     new service.GetInfoMethod(token)(tp, ChannelContextDataFactory.userAuth)
 

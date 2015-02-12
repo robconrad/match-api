@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 3:16 PM
+ * Last modified by rconrad, 2/11/15 8:03 PM
  */
 
 package base.entity.kv.impl
 
 import base.entity.kv.Key.Prop
-import base.entity.kv.mock.KeyLoggerMock
-import base.entity.kv.{ KeyProp, KvFactoryService }
+import base.entity.kv.{KvTest, KeyPrefixes, KeyProp}
 
 import scala.language.reflectiveCalls
 
@@ -20,96 +19,101 @@ import scala.language.reflectiveCalls
  * @author rconrad
  */
 // scalastyle:off null
-class HashKeyImplTest extends KeyImplTest {
+class HashKeyImplTest extends /* KeyImplTest */ KvTest {
 
-  private val prop = new KeyProp("prop") {}
-  private val prop2 = new KeyProp("prop2") {}
-  private val string = "value"
-  private val string2 = "value2"
-  private val int = 1
-  private val long = 1L
-  private val flagOn = true
-  private val flagOff = false
-  private val map = Map[Prop, String](prop -> string, prop2 -> string)
+  def create = key.create
 
-  val model = new HashKeyImpl {
-    val logger = KeyLoggerMock
-    val token = getClass.getSimpleName.getBytes
-    val p = KvFactoryService().pipeline
-  }
+  val key = new HashKeyImpl[String] {
 
-  def create = model.set(prop, string).await()
+    private val prop = new KeyProp("prop") {}
+    private val prop2 = new KeyProp("prop2") {}
+    private val string = "value"
+    private val string2 = "value2"
+    private val int = 1
+    private val long = 1L
+    private val flagOn = true
+    private val flagOff = false
+    private val map = Map[Prop, Array[Byte]](prop -> write(string), prop2 -> write(string))
 
-  test("getString") {
-    assert(model.getString(prop).await() == None)
-    assert(model.set(prop, string).await())
-    assert(model.getString(prop).await() == Option(string))
-  }
+    def keyPrefix = KeyPrefixes.test
 
-  test("getInt") {
-    assert(model.getInt(prop).await() == None)
-    assert(model.set(prop, int).await())
-    assert(model.getInt(prop).await() == Option(int))
-  }
+    def keyValue = "test"
 
-  test("getLong") {
-    assert(model.getLong(prop).await() == None)
-    assert(model.set(prop, long).await())
-    assert(model.getLong(prop).await() == Option(long))
-  }
+    def create = set(prop, write(string)).await()
 
-  test("getFlag") {
-    assert(model.getFlag(prop).await() == flagOff)
-    assert(model.setFlag(prop, flagOn).await())
-    assert(model.getFlag(prop).await() == flagOn)
-    assert(model.setFlag(prop, flagOff).await())
-    assert(model.getFlag(prop).await() == flagOff)
-  }
+    test("getString") {
+      assert(get(prop).await() == None)
+      assert(set(prop, write(string)).await())
+      assert(get(prop).await().map(read[String]) == Option(string))
+    }
 
-  test("getAll") {
-    assert(model.get.await() == Map())
-    assert(model.set(map).await())
-    assert(model.get.await() == map)
-  }
+    test("getInt") {
+      assert(get(prop).await() == None)
+      assert(set(prop, write(int)).await())
+      assert(get(prop).await().map(read[Int]) == Option(int))
+    }
 
-  test("incrby") {
-    assert(model.getInt(prop).await() == None)
-    assert(model.increment(prop, 0L).await() == 0L)
-    assert(model.increment(prop, long).await() == long)
-    assert(model.increment(prop, long).await() == long + long)
-  }
+    test("getLong") {
+      assert(get(prop).await() == None)
+      assert(set(prop, write(long)).await())
+      assert(get(prop).await().map(read[Long]) == Option(long))
+    }
 
-  test("mGet") {
-    assert(model.get(map.keys.toArray).await() == Map(prop -> None, prop2 -> None))
-    assert(model.set(map).await())
-    assert(model.get(map.keys.toArray).await() == Map(prop -> Option(string), prop2 -> Option(string)))
-  }
+    test("getFlag") {
+      assert(get(prop).await() == None)
+      assert(set(prop, write(flagOn)).await())
+      assert(get(prop).await().map(read[Boolean]).contains(flagOn))
+      assert(!set(prop, write(flagOff)).await())
+      assert(get(prop).await().map(read[Boolean]).contains(flagOff))
+    }
 
-  test("getKeys") {
-    assert(model.getProps.await() == List())
-    assert(model.set(map).await())
-    assert(model.getProps.await().map(_.toString).sorted == map.keys.toList.map(_.toString).sorted)
-  }
+    test("getAll") {
+      assert(getAll.await() == None)
+      mSet(map).await()
+      assert(getAll.await().get.map { case (k,v) => key -> read[String](v) } ==
+        map.map { case (k, v) => key -> read[String](v)})
+    }
 
-  test("setNx") {
-    assert(model.getString(prop).await() == None)
-    assert(model.setNx(prop, string).await())
-    assert(model.getString(prop).await() == Option(string))
-    assert(!model.setNx(prop, string2).await())
-    assert(model.getString(prop).await() == Option(string))
-  }
+    test("incrby") {
+      assert(get(prop).await() == None)
+      assert(incrBy(prop, 0L).await() == 0L)
+      assert(incrBy(prop, long).await() == long)
+      assert(incrBy(prop, long).await() == long + long)
+    }
 
-  test("del") {
-    assert(model.set(prop, string).await())
-    assert(model.del(prop).await())
-    assert(model.getString(prop).await() == None)
-  }
+    test("mGet") {
+      assert(mGet(map.keys.toSeq: _*).await() == List(None, None))
+      mSet(map).await()
+      assert(mGet(map.keys.toSeq: _*).await().map(_.map(read[String])) == List(Option(string), Option(string)))
+    }
 
-  test("del-multi") {
-    assert(model.set(map).await())
-    assert(model.del(List(prop, prop2)).await())
-    assert(model.getString(prop).await() == None)
-    assert(model.getString(prop2).await() == None)
+    test("getKeys") {
+      assert(keys.await() == Set())
+      mSet(map).await()
+      assert(keys.await() == map.keys.toSet)
+    }
+
+    test("setNx") {
+      assert(get(prop).await() == None)
+      assert(setNX(prop, write(string)).await())
+      assert(get(prop).await().map(read[String]) == Option(string))
+      assert(!setNX(prop, write(string2)).await())
+      assert(get(prop).await().map(read[String]) == Option(string))
+    }
+
+    test("del") {
+      assert(set(prop, write(string)).await())
+      assert(del(prop).await() == 1L)
+      assert(get(prop).await() == None)
+    }
+
+    test("del-multi") {
+      mSet(map).await()
+      assert(del(prop, prop2).await() == 2L)
+      assert(get(prop).await() == None)
+      assert(get(prop2).await() == None)
+    }
+
   }
 
 }

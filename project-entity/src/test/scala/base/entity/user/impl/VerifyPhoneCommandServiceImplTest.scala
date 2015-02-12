@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/11/15 7:26 PM
  */
 
 package base.entity.user.impl
@@ -62,7 +62,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
   test("success") {
     val groupId1 = RandomService().uuid
     val groupId2 = RandomService().uuid
-    val userKey = UserKeyService().make(authCtx.userId)
+    val userKey = make[UserKey](authCtx.userId)
     val phoneKey = PhoneKeyService().make(phone)
     val phoneGroupsInvitedKey = make[PhoneGroupsInvitedKey](phone)
     val userGroupsInvitedKey = make[UserGroupsInvitedKey](authCtx.userId)
@@ -74,7 +74,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
     assert(phoneKey.get.await() == None)
 
-    assert(userKey.setPhoneAttributes(UserPhoneAttributes(phone, code, verified = false)).await())
+    userKey.setPhoneAttributes(UserPhoneAttributes(phone, code, verified = false)).await()
 
     assert(phoneGroupsInvitedKey.add(groupId1).await() == 1)
     assert(userGroupsInvitedKey.add(groupId2).await() == 1)
@@ -104,12 +104,6 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[UserKey]
     val code = model.code + "munge"
     assert(command.userVerifyPhoneCode(key, code).await() == Errors.codeValidation.await())
-  }
-
-  test("failed to set user phone verified") {
-    val key = mock[UserKey]
-    key.setPhoneVerified _ expects * returning Future.successful(false)
-    assert(command.userSetPhoneVerified(key).await() == Errors.userSetPhoneVerifiedFailed.await())
   }
 
   test("failed to set phone user id") {

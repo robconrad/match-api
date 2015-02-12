@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:50 PM
+ * Last modified by rconrad, 2/11/15 7:02 PM
  */
 
 package base.entity.group.impl
@@ -39,13 +39,13 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
       extends CrudImplicits[Option[GroupModel]] {
 
     def execute(): Response = {
-      val key = GroupUserKeyService().make(groupId, userId)
+      val key = make[GroupUserKey](groupId, userId)
       groupUserGetSetLastRead(key, GroupModelBuilder(id = Option(groupId)))
     }
 
     def groupUserGetSetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
       key.getLastRead.flatMap { lastRead =>
-        val key = GroupKeyService().make(groupId)
+        val key = make[GroupKey](groupId)
         groupGet(key, builder.copy(lastReadTime = Option(lastRead)))
       }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 4:09 PM
+ * Last modified by rconrad, 2/11/15 7:18 PM
  */
 
 package base.entity.user.impl
@@ -78,8 +78,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private def command(implicit input: LoginModel) = new service.LoginCommand(input)
 
   private def testSuccess(userId: UUID, model: LoginModel, response: LoginResponseModel) {
-    val userKey = UserKeyService().make(userId)
-    val deviceKey = DeviceKeyService().make(deviceUuid)
+    val userKey = make[UserKey](userId)
+    val deviceKey = make[DeviceKey](deviceUuid)
     val gender = "male"
 
     val facebook = mock[FacebookService]
@@ -165,21 +165,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(command.facebookUserSet(key, userId, fbInfo).await() == Errors.facebookUserSetFailed.await())
   }
 
-  test("failed to set facebook info to user") {
-    val userId = RandomService().uuid
-    val fbInfo = FacebookInfo("", "", "", "")
-    val key = mock[UserKey]
-    key.setFacebookInfo _ expects * returning Future.successful(false)
-    assert(command.userSet(key, userId, fbInfo).await() == Errors.userSetFailed.await())
-  }
-
-  test("failed to set device attributes") {
-    val userId = RandomService().uuid
-    val key = mock[DeviceKey]
-    key.set _ expects (*, *, *, *, *, *) returning Future.successful(false)
-    assert(command.deviceSet(key, userId).await() == Errors.deviceSetFailed.await())
-  }
-
   test("failed to get groups") {
     val userService = mock[UserService]
     (userService.getGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
@@ -226,12 +211,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     (service.getPendingGroups(_: UUID)(_: Pipeline, _: ChannelContext)) expects
       (*, *, *) returning Future.successful(Left(apiError))
     assert(command.userGetPendingGroups(service, userId, LoginResponseModelBuilder()).await() == Left(apiError))
-  }
-
-  test("failed to set last login") {
-    val key = mock[UserKey]
-    key.setLastLogin _ expects * returning Future.successful(false)
-    assert(command.setLastLogin(key, LoginResponseModelBuilder()).await() == Errors.userSetFailed.await())
   }
 
 }

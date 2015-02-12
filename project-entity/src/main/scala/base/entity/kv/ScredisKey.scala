@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:32 PM
+ * Last modified by rconrad, 2/10/15 8:43 PM
  */
 
 package base.entity.kv
@@ -19,7 +19,7 @@ import scala.concurrent.Future
  * @define true '''true'''
  * @define false '''false'''
  */
-trait ScredisKey[K, V] {
+trait ScredisKey[K] {
 
   /**
    * @return the key of this key

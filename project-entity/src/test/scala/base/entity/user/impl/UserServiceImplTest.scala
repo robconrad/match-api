@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:59 PM
+ * Last modified by rconrad, 2/11/15 7:28 PM
  */
 
 package base.entity.user.impl
@@ -16,7 +16,7 @@ import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.impl.GroupModelImpl
 import base.entity.kv.Key._
-import base.entity.kv.KvTest
+import base.entity.kv.{ScredisKeyFactoryService, KvTest}
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
 import base.entity.user.kv._
@@ -61,11 +61,13 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     key1.getNameAttributes _ expects () returning Future.successful(UserNameAttributes(None, Option(name)))
     key2.getNameAttributes _ expects () returning Future.successful(UserNameAttributes(None, None))
 
-    val keyService = mock[UserKeyService]
-    (keyService.make(_: UUID)(_: Pipeline)) expects (*, *) returning key1
-    (keyService.make(_: UUID)(_: Pipeline)) expects (*, *) returning key2
+    val makeService = mock[ScredisKeyFactoryService]
+    (makeService.make[UserKey](_: Any)(_: Manifest[UserKey])) expects (*, *) returning key1
+    (makeService.make[UserKey](_: Any)(_: Manifest[UserKey])) expects (*, *) returning key2
 
-    assert(service.getUsersFromKey(authCtx.userId, userIds, keyService).await() == Right(models))
+    val unregister = TestServices.register(makeService)
+    assert(service.getUsersFromKey(authCtx.userId, userIds).await() == Right(models))
+    unregister()
   }
 
   test("getGroups - success") {

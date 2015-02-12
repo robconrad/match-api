@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:34 PM
+ * Last modified by rconrad, 2/10/15 8:43 PM
  */
 
 package base.entity.kv
@@ -17,7 +17,7 @@ import scala.concurrent.Future
  * @define true '''true'''
  * @define false '''false'''
  */
-trait SetKey[K, V] extends ScredisKey[K, V] {
+trait SetKey[K, V] extends ScredisKey[K] {
 
   /**
    * Adds one or more members to a set.

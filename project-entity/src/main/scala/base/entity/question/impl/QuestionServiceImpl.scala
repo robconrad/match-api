@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 4:31 PM
+ * Last modified by rconrad, 2/10/15 9:19 PM
  */
 
 package base.entity.question.impl
@@ -10,7 +10,7 @@ package base.entity.question.impl
 import java.util.UUID
 
 import base.common.random.RandomService
-import base.common.service.{ CommonService, ServiceImpl }
+import base.common.service.{CommonService, ServiceImpl}
 import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.event.EventTypes
@@ -18,17 +18,17 @@ import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.Key._
-import base.entity.kv.{ KvFactoryService, MakeKey, SetKey }
+import base.entity.kv.{KvFactoryService, MakeKey, SetKey}
 import base.entity.logging.AuthLoggable
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.impl.QuestionServiceImpl.Errors
-import base.entity.question.kv.{ QuestionKey, QuestionKeyService, QuestionsKey }
-import base.entity.question.model.{ AnswerModel, QuestionModel }
-import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
-import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
+import base.entity.question.kv.{QuestionKey, QuestionsKey}
+import base.entity.question.model.{AnswerModel, QuestionModel}
+import base.entity.question.{QuestionDef, QuestionIdComposite, QuestionService, QuestionSides}
+import base.entity.service.{CrudErrorImplicits, CrudImplicits}
 import redis.client.RedisException
 
-import scala.concurrent.{ Await, Future }
+import scala.concurrent.{Await, Future}
 
 /**
  * {{ Describe the high level purpose of QuestionServiceImpl here. }}
@@ -139,7 +139,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
     }
 
     def makeGroupQuestionModel(compositeId: QuestionIdComposite) = {
-      questionGet(QuestionKeyService().make(compositeId.questionId), compositeId)
+      questionGet(make[QuestionKey](compositeId.questionId), compositeId)
     }
 
     def questionGet(key: QuestionKey, compositeId: QuestionIdComposite) =
