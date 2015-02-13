@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:29 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
 package base.entity.question.impl
@@ -17,7 +17,7 @@ import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
-import base.entity.kv.{ MakeKey, SetKey }
+import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
 import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.impl.QuestionServiceImpl.Errors
@@ -26,6 +26,7 @@ import base.entity.question.model.{ AnswerModel, QuestionModel }
 import base.entity.question.{ QuestionDef, QuestionIdComposite, QuestionService, QuestionSides }
 import base.entity.service.{ CrudErrorImplicits, CrudImplicits }
 import scredis.exceptions.RedisException
+import scredis.keys.SetKey
 
 import scala.concurrent.{ Await, Future }
 
@@ -101,7 +102,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       RandomService().random.shuffle(questionSets.reduce(_ ++ _))
     }
 
-    def diffStoreQuestions(questionsKey: SetKey[_, QuestionIdComposite],
+    def diffStoreQuestions(questionsKey: SetKey[_, _, QuestionIdComposite],
                            questionCount: Int,
                            getModel: (QuestionIdComposite) => Future[QuestionModel]): Response = {
       val temp = make[GroupUserQuestionsTempKey](groupId, userId)
@@ -109,7 +110,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
       groupUserQuestionsTempDiffStore(questionsKey, temp, answered, getModel)
     }
 
-    def groupUserQuestionsTempDiffStore(questionsKey: SetKey[_, QuestionIdComposite],
+    def groupUserQuestionsTempDiffStore(questionsKey: SetKey[_, _, QuestionIdComposite],
                                         temp: GroupUserQuestionsTempKey,
                                         answered: GroupUserQuestionsKey,
                                         getModel: (QuestionIdComposite) => Future[QuestionModel]) =

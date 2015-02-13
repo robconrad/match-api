@@ -2,18 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:30 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
 package base.entity.group.kv.impl
 
-import java.util.UUID
-
-import base.entity.group.kv.GroupKeyProps.LastReadTimeProp
+import base.common.lib.Dispatchable
 import base.entity.group.kv.GroupUserKey
+import base.entity.group.kv.impl.GroupUserKeyImpl._
 import base.entity.kv.OrderedIdPair
-import base.entity.kv.impl.HashKeyImpl
+import base.entity.kv.serializer.SerializerImplicits._
 import org.joda.time.DateTime
+import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -21,14 +21,21 @@ import org.joda.time.DateTime
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupUserKeyImpl(val keyValue: OrderedIdPair)
-    extends HashKeyImpl[OrderedIdPair]
-    with GroupUserKey {
+class GroupUserKeyImpl(keyFactory: HashKeyProps => HashKey[Short, OrderedIdPair])
+    extends GroupUserKey
+    with Dispatchable {
 
-  def this(keyValue: (UUID, UUID)) =
-    this(OrderedIdPair(keyValue._1, keyValue._2))
+  private lazy val key = keyFactory(props)
 
-  def getLastRead = get(LastReadTimeProp).map(_.map(read[DateTime]))
-  def setLastRead(time: DateTime) = set(LastReadTimeProp, write(time))
+  def getLastRead = key.get[DateTime](LastReadTimeProp)
+  def setLastRead(time: DateTime) = key.set(LastReadTimeProp, time)
+
+}
+
+private[impl] object GroupUserKeyImpl {
+
+  val LastReadTimeProp = HashKeyProp("lastRead")
+
+  val props = HashKeyProps(Set(LastReadTimeProp))
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/12/15 8:49 PM
  */
 
 package base.entity.group.impl
@@ -14,9 +14,8 @@ import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiErrorService
-import base.entity.group.kv.{ GroupKey, GroupUserKey, GroupPhonesInvitedKey }
+import base.entity.group.kv.{ GroupKey, GroupPhonesInvitedKey, GroupUserKey }
 import base.entity.group.model.impl.{ GroupModelBuilder, GroupModelImpl, InviteModelImpl }
-import base.entity.kv.Key._
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 import base.entity.user.UserService

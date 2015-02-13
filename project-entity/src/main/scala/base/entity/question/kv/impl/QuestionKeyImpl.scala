@@ -2,20 +2,21 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:25 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
 package base.entity.question.kv.impl
 
 import java.util.UUID
 
+import base.common.lib.Dispatchable
 import base.common.time.TimeService
-import base.entity.kv.Key.Prop
-import base.entity.kv.KeyProps.CreatedProp
-import base.entity.kv.impl.HashKeyImpl
+import base.entity.kv.serializer.SerializerImplicits._
 import base.entity.question.QuestionDef
 import base.entity.question.kv.QuestionKey
-import base.entity.question.kv.QuestionKeyProps.{ CreatorIdProp, SideAProp, SideBProp }
+import base.entity.question.kv.impl.QuestionKeyImpl._
+import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
+import scredis.serialization.Implicits._
 
 /**
  * {{ Describe the high level purpose of QuestionKeyImpl here. }}
@@ -23,24 +24,41 @@ import base.entity.question.kv.QuestionKeyProps.{ CreatorIdProp, SideAProp, Side
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class QuestionKeyImpl(val keyValue: UUID)
-    extends HashKeyImpl[UUID]
-    with QuestionKey {
+class QuestionKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
+    extends QuestionKey
+    with Dispatchable {
+
+  private lazy val key = keyFactory(props)
 
   // scalastyle:off null
   def createDef(a: String, b: Option[String], userId: UUID) = {
-    mSet(Map[Prop, Array[Byte]](
-      SideAProp -> write(a),
-      SideBProp -> b.map(write[String]).orNull,
-      CreatorIdProp -> write(userId),
-      CreatedProp -> write(TimeService().now)
+    key.mSet(Map[HashKeyProp, Array[Byte]](
+      SideAProp -> stringWriter.write(a),
+      SideBProp -> b.map(stringWriter.write).orNull,
+      CreatorIdProp -> uuidWriter.write(userId),
+      CreatedProp -> dateTimeSerializer.write(TimeService().now)
     ).filter(_._2 != null))
   }
 
-  def getQuestionDef(id: UUID) = mGetAsMap(SideAProp, SideBProp).map { props =>
-    QuestionDef(id, read[String](props(SideAProp)), props.get(SideBProp).map(read[String]))
+  def getQuestionDef(id: UUID) = key.mGetAsMap[Array[Byte]](SideAProp, SideBProp).map { props =>
+    QuestionDef(id, stringReader.read(props(SideAProp)), props.get(SideBProp).map(stringReader.read))
   }
 
-  def getCreatorId = get(CreatorIdProp).map(_.map(read[UUID]))
+  def getCreatorId = key.get[UUID](CreatorIdProp)
+
+}
+
+object QuestionKeyImpl {
+
+  val CreatedProp = HashKeyProp("created")
+  val SideAProp = HashKeyProp("a")
+  val SideBProp = HashKeyProp("b")
+  val CreatorIdProp = HashKeyProp("creator")
+
+  val props = HashKeyProps(Set(
+    CreatedProp,
+    SideAProp,
+    SideBProp,
+    CreatorIdProp))
 
 }

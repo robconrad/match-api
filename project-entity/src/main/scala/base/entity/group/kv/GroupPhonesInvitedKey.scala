@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:34 PM
+ * Last modified by rconrad, 2/12/15 6:53 PM
  */
 
 package base.entity.group.kv
 
 import java.util.UUID
 
-import base.entity.kv.{ KeyPrefixes, SetKey }
+import scredis.keys.SetKey
 
 /**
  * {{ Describe the high level purpose of UserKey here. }}
@@ -17,8 +17,4 @@ import base.entity.kv.{ KeyPrefixes, SetKey }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-trait GroupPhonesInvitedKey extends SetKey[UUID, String] {
-
-  final val keyPrefix = KeyPrefixes.groupPhonesInvited
-
-}
+trait GroupPhonesInvitedKey extends SetKey[Short, UUID, String]

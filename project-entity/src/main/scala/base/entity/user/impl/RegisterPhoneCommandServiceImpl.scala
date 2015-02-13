@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:51 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
 package base.entity.user.impl
@@ -56,7 +56,7 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
       }
 
     def phoneCooldownSet(key: PhoneCooldownKey): Response =
-      key.set(RegisterPhoneCommandServiceImpl.phoneCooldownValue).flatMap {
+      key.set(value = true).flatMap {
         case true  => phoneCooldownExpire(key)
         case false => Errors.phoneCooldownSetFailed
       }
@@ -86,8 +86,6 @@ private[entity] class RegisterPhoneCommandServiceImpl(phoneCooldown: FiniteDurat
 }
 
 object RegisterPhoneCommandServiceImpl {
-
-  val phoneCooldownValue = 1
 
   object Errors extends CrudErrorImplicits[RegisterPhoneResponseModel] {
 

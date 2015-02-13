@@ -2,10 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:55 PM
+ * Last modified by rconrad, 2/12/15 8:46 PM
  */
 
-package base.entity.kv.bytea.impl
+package base.entity.kv.serializer.impl
 
 import base.entity.facebook.FacebookInfo
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:35 PM
+ * Last modified by rconrad, 2/12/15 8:49 PM
  */
 
 package base.entity.facebook.impl
@@ -12,9 +12,9 @@ import base.entity.facebook.FacebookInfo
 import base.entity.facebook.kv.FacebookInfoKey
 import base.entity.kv.KvTest
 import base.entity.test.EntityBaseSuite
-import com.restfb.exception.{FacebookException, FacebookOAuthException}
+import com.restfb.exception.{ FacebookException, FacebookOAuthException }
 import com.restfb.json.JsonObject
-import com.restfb.{DefaultFacebookClient, Parameter}
+import com.restfb.{ DefaultFacebookClient, Parameter }
 
 import scala.concurrent.duration._
 

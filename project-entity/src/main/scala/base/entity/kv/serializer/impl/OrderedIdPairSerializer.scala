@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:56 PM
+ * Last modified by rconrad, 2/12/15 8:46 PM
  */
 
-package base.entity.kv.bytea.impl
+package base.entity.kv.serializer.impl
 
-import base.entity.kv.bytea.Serializer
-import base.entity.user.kv.UserPhone
+import base.entity.kv.serializer.Serializer
+import base.entity.kv.{ IdPair, OrderedIdPair }
 import scredis.serialization.{ UUIDReader, UUIDWriter }
 
 /**
@@ -17,16 +17,16 @@ import scredis.serialization.{ UUIDReader, UUIDWriter }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object UserPhoneSerializer extends Serializer[UserPhone] {
+object OrderedIdPairSerializer extends Serializer[OrderedIdPair] {
 
   private val uuidLength = 16
 
-  def writeImpl(v: UserPhone) = {
-    UUIDWriter.write(v.userId) ++ v.phone.getBytes
+  def writeImpl(v: OrderedIdPair) = {
+    UUIDWriter.write(v.a) ++ UUIDWriter.write(v.b)
   }
 
-  def readImpl(v: Array[Byte]) = UserPhone(
+  def readImpl(v: Array[Byte]) = OrderedIdPair(
     UUIDReader.read(v.slice(0, uuidLength)),
-    new String(v.slice(uuidLength, v.length)))
+    UUIDReader.read(v.slice(uuidLength, 2 * uuidLength)))
 
 }

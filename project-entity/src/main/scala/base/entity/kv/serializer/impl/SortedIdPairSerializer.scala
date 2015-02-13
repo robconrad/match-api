@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:55 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
-package base.entity.kv.bytea.impl
+package base.entity.kv.serializer.impl
 
-import base.entity.kv.bytea.Serializer
-import base.entity.kv.{ IdPair, OrderedIdPair }
+import base.entity.kv.SortedIdPair
+import base.entity.kv.serializer.Serializer
 import scredis.serialization.{ UUIDReader, UUIDWriter }
 
 /**
@@ -17,15 +17,15 @@ import scredis.serialization.{ UUIDReader, UUIDWriter }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-object IdPairSerializer extends Serializer[IdPair] {
+object SortedIdPairSerializer extends Serializer[SortedIdPair] {
 
   private val uuidLength = 16
 
-  def writeImpl(v: IdPair) = {
+  def writeImpl(v: SortedIdPair) = {
     UUIDWriter.write(v.a) ++ UUIDWriter.write(v.b)
   }
 
-  def readImpl(v: Array[Byte]) = OrderedIdPair(
+  def readImpl(v: Array[Byte]) = SortedIdPair(
     UUIDReader.read(v.slice(0, uuidLength)),
     UUIDReader.read(v.slice(uuidLength, 2 * uuidLength)))
 

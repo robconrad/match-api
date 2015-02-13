@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/12/15 8:53 PM
  */
 
 package base.entity.user.impl
@@ -49,7 +49,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   private def assertSuccessConditions() {
     val phoneCooldownKey = make[PhoneCooldownKey](phone)
-    assert(phoneCooldownKey.get.await() == Option(phoneCooldownValue))
+    assert(phoneCooldownKey.get.await().contains(true))
     phoneCooldownKey.ttl.await() match {
       case Left(b)    => fail()
       case Right(ttl) => assert(ttl > 0)
@@ -100,7 +100,7 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   test("phone cooldown in effect") {
     val key = make[PhoneCooldownKey](model.phone)
-    assert(key.set(1).await())
+    assert(key.set(value = true).await())
     assert(command.phoneCooldownExists(key).await() == Errors.phoneCooldown.await())
   }
 

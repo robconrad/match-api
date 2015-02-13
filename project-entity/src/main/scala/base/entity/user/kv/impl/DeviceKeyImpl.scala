@@ -2,19 +2,20 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:24 PM
+ * Last modified by rconrad, 2/12/15 8:52 PM
  */
 
 package base.entity.user.kv.impl
 
 import java.util.UUID
 
+import base.common.lib.Dispatchable
 import base.common.time.TimeService
-import base.entity.kv.Key._
-import base.entity.kv.KeyProps.UpdatedProp
-import base.entity.kv.impl.HashKeyImpl
+import base.entity.kv.serializer.SerializerImplicits._
 import base.entity.user.kv.DeviceKey
-import base.entity.user.kv.UserKeyProps._
+import base.entity.user.kv.impl.DeviceKeyImpl._
+import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
+import scredis.serialization.Implicits._
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -22,22 +23,24 @@ import base.entity.user.kv.UserKeyProps._
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class DeviceKeyImpl(val keyValue: UUID)
-    extends HashKeyImpl[UUID]
-    with DeviceKey {
+class DeviceKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
+    extends DeviceKey
+    with Dispatchable {
 
-  def getToken = get(TokenProp).map(_.map(read[UUID]))
-  def setToken(token: UUID) = set(TokenProp, write(token))
+  private lazy val key = keyFactory(props)
 
-  def getUserId = get(UserIdProp).map(_.map(read[UUID]))
-  def setUserId(userId: UUID) = set(UserIdProp, write(userId))
+  def getToken = key.get[UUID](TokenProp)
+  def setToken(token: UUID) = key.set(TokenProp, token)
+
+  def getUserId = key.get[UUID](UserIdProp)
+  def setUserId(userId: UUID) = key.set(UserIdProp, userId)
 
   def setTokenAndUserId(token: UUID, userId: UUID) = {
-    val props = Map[Prop, Array[Byte]](
-      UpdatedProp -> write(TimeService()),
-      TokenProp -> write(token),
-      UserIdProp -> write(userId))
-    mSet(props)
+    val props = Map[HashKeyProp, Array[Byte]](
+      UpdatedProp -> dateTimeSerializer.write(TimeService().now),
+      TokenProp -> uuidWriter.write(token),
+      UserIdProp -> uuidWriter.write(userId))
+    key.mSet(props)
   }
 
   // scalastyle:off null
@@ -47,21 +50,48 @@ class DeviceKeyImpl(val keyValue: UUID)
           cordova: Option[String],
           platform: Option[String],
           version: Option[String]) = {
-    val props = Map[Prop, Array[Byte]](
-      AppVersionProp -> write(appVersion),
-      LocaleProp -> write(locale),
-      ModelProp -> model.map(write[String]).orNull,
-      CordovaProp -> cordova.map(write[String]).orNull,
-      PlatformProp -> platform.map(write[String]).orNull,
-      VersionProp -> version.map(write[String]).orNull)
-    mSet(props.filter(_._2 != null))
+    val props = Map[HashKeyProp, Array[Byte]](
+      AppVersionProp -> stringWriter.write(appVersion),
+      LocaleProp -> stringWriter.write(locale),
+      ModelProp -> model.map(stringWriter.write).orNull,
+      CordovaProp -> cordova.map(stringWriter.write).orNull,
+      PlatformProp -> platform.map(stringWriter.write).orNull,
+      VersionProp -> version.map(stringWriter.write).orNull)
+    key.mSet(props.filter(_._2 != null))
   }
 
-  def getAppVersion = get(AppVersionProp).map(_.map(read[String]))
-  def getLocale = get(LocaleProp).map(_.map(read[String]))
-  def getModel = get(ModelProp).map(_.map(read[String]))
-  def getCordova = get(CordovaProp).map(_.map(read[String]))
-  def getPlatform = get(PlatformProp).map(_.map(read[String]))
-  def getVersion = get(VersionProp).map(_.map(read[String]))
+  def getAppVersion = key.get[String](AppVersionProp)
+  def getLocale = key.get[String](LocaleProp)
+  def getModel = key.get[String](ModelProp)
+  def getCordova = key.get[String](CordovaProp)
+  def getPlatform = key.get[String](PlatformProp)
+  def getVersion = key.get[String](VersionProp)
+
+}
+
+private[impl] object DeviceKeyImpl {
+
+  val CreatedProp = HashKeyProp("created")
+  val UpdatedProp = HashKeyProp("updated")
+  val TokenProp = HashKeyProp("token")
+  val UserIdProp = HashKeyProp("userId")
+  val AppVersionProp = HashKeyProp("appVersion")
+  val LocaleProp = HashKeyProp("locale")
+  val ModelProp = HashKeyProp("model")
+  val CordovaProp = HashKeyProp("cordova")
+  val PlatformProp = HashKeyProp("platform")
+  val VersionProp = HashKeyProp("version")
+
+  val props = HashKeyProps(Set(
+    CreatedProp,
+    UpdatedProp,
+    TokenProp,
+    UserIdProp,
+    AppVersionProp,
+    LocaleProp,
+    ModelProp,
+    CordovaProp,
+    PlatformProp,
+    VersionProp))
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 8:06 PM
+ * Last modified by rconrad, 2/12/15 8:29 PM
  */
 
 package base.entity.kv
@@ -19,13 +19,7 @@ import java.nio.ByteBuffer
 object KeyPrefixes extends Enumeration {
   type KeyPrefix = Value
 
-  implicit class Props(v: Value) {
-    def toBytes = bytes(v)
-  }
-
-  private lazy val bytes = values.toList.map { v =>
-    v -> ByteBuffer.allocate(2).putShort(v.id.toShort).array()
-  }.toMap
+  implicit def toShort(v: Value): Short = v.id.toShort
 
   /**
    * WARNING: DANGER: VERY IMPORTANT: these can never change value or the kv store is hosed!
@@ -54,8 +48,8 @@ object KeyPrefixes extends Enumeration {
   val user                      = Value(26000)
   val userGroups                = Value(27000)
   val userGroupsInvited         = Value(28000)
-  val userPhonesInvited         = Value(29000)
-  val userPhoneLabel            = Value(30000)
+  val userPhoneLabel            = Value(29000)
+  val userPhonesInvited         = Value(30000)
   val userQuestions             = Value(31000)
   // format: ON
 

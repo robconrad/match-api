@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:11 PM
+ * Last modified by rconrad, 2/12/15 8:49 PM
  */
 
 package base.entity.message.impl
@@ -17,7 +17,6 @@ import base.entity.command.model.CommandModel
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.{ GroupEventsService, GroupListenerService }
-import base.entity.kv.Key._
 import base.entity.message.model.MessageModel
 
 import scala.concurrent.Future

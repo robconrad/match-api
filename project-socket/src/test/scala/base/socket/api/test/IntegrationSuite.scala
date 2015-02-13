@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:34 PM
+ * Last modified by rconrad, 2/12/15 8:49 PM
  */
 
 package base.socket.api.test
@@ -76,7 +76,7 @@ private[api] trait IntegrationSuite extends SocketBaseSuite with ServicesBeforeA
       override def getQuestions(groupId: UUID, userId: UUID)(implicit channelCtx: ChannelContext) = {
         super.getQuestions(groupId, userId)(channelCtx).map {
           case Right(questions) => Right(sortQuestions(questions))
-          case Left(e) => Left(e)
+          case Left(e)          => Left(e)
         }
       }
     })

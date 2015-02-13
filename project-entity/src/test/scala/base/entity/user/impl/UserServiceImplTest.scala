@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/12/15 8:49 PM
  */
 
 package base.entity.user.impl
@@ -15,8 +15,7 @@ import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.error.ApiErrorService
 import base.entity.group.GroupService
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.kv.Key._
-import base.entity.kv.{ KeyFactoryService, KeyFactoryService$, KvTest }
+import base.entity.kv.{ KeyFactoryService, KvTest }
 import base.entity.service.EntityServiceTest
 import base.entity.user.impl.UserServiceImpl.Errors
 import base.entity.user.kv._

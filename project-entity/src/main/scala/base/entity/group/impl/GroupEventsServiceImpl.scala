@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:59 PM
+ * Last modified by rconrad, 2/12/15 8:53 PM
  */
 
 package base.entity.group.impl
@@ -14,7 +14,6 @@ import base.entity.event.model.EventModel
 import base.entity.group.GroupEventsService
 import base.entity.group.kv.GroupEventsKey
 import base.entity.json.JsonFormats
-import base.entity.kv.Key._
 import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
 
