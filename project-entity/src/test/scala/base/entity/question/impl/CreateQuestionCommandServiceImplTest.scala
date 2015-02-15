@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/15/15 1:16 PM
  */
 
 package base.entity.question.impl
@@ -29,7 +29,9 @@ import scala.concurrent.Future
  */
 class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
 
-  val service = new CreateQuestionCommandServiceImpl()
+  private val maxQuestions = 1000
+
+  val service = new CreateQuestionCommandServiceImpl(maxQuestions)
 
   private val randomMock = new RandomServiceMock()
 
@@ -86,6 +88,12 @@ class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[GroupUsersKey]
     key.isMember _ expects * returning Future.successful(false)
     assert(command.groupUsersIsMember(key).await() == Errors.userNotGroupMember.await())
+  }
+
+  test("fail - user has created too many questions") {
+    val key = mock[UserQuestionsKey]
+    key.card _ expects () returning Future.successful(maxQuestions + 1)
+    assert(command.userQuestionCount(key).await() == Errors.userCreatedTooManyQuestions.await())
   }
 
   test("fail - group questions add failed") {

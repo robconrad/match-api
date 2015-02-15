@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:25 PM
+ * Last modified by rconrad, 2/15/15 1:15 PM
  */
 
 package base.entity.question.impl
@@ -26,7 +26,7 @@ import base.entity.user.kv.UserQuestionsKey
  * User processing (CRUD - i.e. external / customer-facing)
  * @author rconrad
  */
-private[entity] class CreateQuestionCommandServiceImpl()
+private[entity] class CreateQuestionCommandServiceImpl(maxUserQuestions: Int)
     extends CommandServiceImpl[CreateQuestionModel, CreateQuestionResponseModel]
     with CreateQuestionCommandService {
 
@@ -52,8 +52,14 @@ private[entity] class CreateQuestionCommandServiceImpl()
 
     def groupUsersIsMember(key: GroupUsersKey) =
       key.isMember(authCtx.userId) flatMap {
+        case true => userQuestionCount(make[UserQuestionsKey](authCtx.userId))
         case false => Errors.userNotGroupMember
-        case true =>
+      }
+
+    def userQuestionCount(key: UserQuestionsKey) =
+      key.card flatMap {
+        case count if count > maxUserQuestions => Errors.userCreatedTooManyQuestions
+        case _ =>
           val id = RandomService().uuid
           createQuestion(id, make[QuestionKey](id))
       }
@@ -100,6 +106,7 @@ object CreateQuestionCommandServiceImpl {
     override protected val externalErrorText = "Create question failed."
 
     lazy val userNotGroupMember: Response = "user is not a member of the group"
+    lazy val userCreatedTooManyQuestions: Response = "user has created too many questions"
     lazy val groupQuestionsAddFailed: Response = "failed to add question to group"
     lazy val userQuestionsAddFailed: Response = "failed to add question to user"
     lazy val allQuestionsAddFailed: Response = "failed to add question to all"
