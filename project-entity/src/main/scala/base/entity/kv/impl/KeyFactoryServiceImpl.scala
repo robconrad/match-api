@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 2/15/15 12:10 PM
  */
 
 package base.entity.kv.impl
@@ -26,7 +26,6 @@ import base.entity.user.kv.impl._
 import scredis.Client
 import scredis.keys.HashKeyProps
 import scredis.keys.impl.{ SetKeyImpl, ListKeyImpl, SimpleKeyImpl }
-import scredis.serialization.Implicits._
 import scredis.serialization.Writer
 
 /**
