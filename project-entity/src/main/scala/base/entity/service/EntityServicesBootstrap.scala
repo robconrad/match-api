@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 1:15 PM
+ * Last modified by rconrad, 2/15/15 1:22 PM
  */
 
 package base.entity.service
@@ -78,7 +78,9 @@ object EntityServicesBootstrap extends ServicesBootstrap {
     Services.register(new GroupServiceImpl())
 
     Services.register(new GroupEventsServiceImpl(
-      Keys(MATCH_GROUP_EVENT, "count")))
+      Keys(MATCH_GROUP_EVENT, "count"),
+      Keys(MATCH_GROUP_EVENT, "store"),
+      Keys(MATCH_GROUP_EVENT, "delta")))
 
     Services.register(new GroupListenerServiceImpl(
       GroupListenerServiceImpl.makeActor))

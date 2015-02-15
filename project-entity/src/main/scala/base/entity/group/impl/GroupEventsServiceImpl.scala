@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:53 PM
+ * Last modified by rconrad, 2/15/15 1:27 PM
  */
 
 package base.entity.group.impl
@@ -25,13 +25,15 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupEventsServiceImpl(count: Int)
+class GroupEventsServiceImpl(count: Int, store: Int, delta: Int)
     extends ServiceImpl
     with GroupEventsService
     with MakeKey
     with AuthLoggable {
 
   private implicit val formats = JsonFormats.withModels
+
+  private val storeDelta = store + delta
 
   def getEvents(groupId: UUID) = {
     val key = make[GroupEventsKey](groupId)
@@ -46,8 +48,12 @@ class GroupEventsServiceImpl(count: Int)
       case true => any => key.lPush(any)
       case false => key.lPushX
     }
-    fun(event).map { result =>
-      Right(event)
+    fun(event) flatMap {
+      case n if n > storeDelta =>
+        key.lTrim(0, store - 1) map { result =>
+          Right(event)
+        }
+      case n => Future.successful(Right(event))
     }
   }
 

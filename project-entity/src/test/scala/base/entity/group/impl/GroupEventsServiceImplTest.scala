@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 9:44 PM
+ * Last modified by rconrad, 2/15/15 1:33 PM
  */
 
 package base.entity.group.impl
@@ -12,6 +12,7 @@ import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
+import base.entity.group.kv.GroupEventsKey
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 
@@ -24,8 +25,10 @@ import base.entity.service.EntityServiceTest
 class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
 
   private val count = 2
+  private val store = 3
+  private val delta = 2
 
-  val service = new GroupEventsServiceImpl(count)
+  val service = new GroupEventsServiceImpl(count, store, delta)
 
   private val groupId = RandomService().uuid
   private val body = "some event body"
@@ -37,23 +40,30 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
     `type` = EventTypes.JOIN,
     body = body)
 
+  private val groupKey = make[GroupEventsKey](groupId)
+
   override def beforeAll() {
     super.beforeAll()
     Services.register(TimeServiceConstantMock)
   }
 
+  private def set(length: Int, createIfNotExists: Boolean = false): Unit = {
+    assert(service.setEvent(event, createIfNotExists).await() == Right(event))
+    assert(groupKey.lLen.await() == length)
+  }
+
+  private def mSet(length: Int*) = length.foreach(set(_))
+
   test("setEvent / getEvents") {
-
-    assert(service.setEvent(event, createIfNotExists = false).await() == Right(event))
-
-    assert(service.setEvent(event, createIfNotExists = true).await() == Right(event))
-
-    assert(service.setEvent(event, createIfNotExists = false).await() == Right(event))
-    // extra event puts us over count limit
-    assert(service.setEvent(event, createIfNotExists = false).await() == Right(event))
-
+    set(0)
+    set(1, createIfNotExists = true)
+    mSet(2,3,4)
     assert(service.getEvents(groupId).await() == Right(List(event, event)))
+  }
 
+  test("trim events") {
+    set(1, createIfNotExists = true)
+    mSet(2, 3, 4, 5, 3, 4, 5, 3, 4, 5, 3, 4, 5)
   }
 
 }
