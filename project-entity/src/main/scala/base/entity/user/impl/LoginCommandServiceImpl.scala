@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:25 PM
+ * Last modified by rconrad, 2/15/15 12:02 PM
  */
 
 package base.entity.user.impl
@@ -15,6 +15,7 @@ import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.group.kv.GroupUsersKey
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
 import base.entity.service.CrudErrorImplicits
@@ -102,12 +103,18 @@ private[entity] class LoginCommandServiceImpl()
         case Right(groups) =>
           val builder = LoginResponseModelBuilder(groups = Option(groups))
           input.groupId match {
-            case Some(groupId) => eventsGet(key, userId, groupId, builder)
+            case Some(groupId) => groupIsMember(make[GroupUsersKey](groupId), key, userId, groupId, builder)
             case None =>
               userGetLoginAttributes(key, userId, builder.copy(events = Option(None), questions = Option(None)))
           }
       }
     }
+
+    def groupIsMember(key: GroupUsersKey, userKey: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder) =
+      key.isMember(userId) flatMap {
+        case true => eventsGet(userKey, userId, groupId, builder)
+        case false => Errors.notGroupMember
+      }
 
     def eventsGet(key: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder): Response = {
       GroupEventsService().getEvents(groupId).flatMap {
@@ -165,6 +172,7 @@ object LoginCommandServiceImpl {
     private val tokenInvalidText = "The supplied Facebook token is not valid."
 
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_INVALID)
+    lazy val notGroupMember: Response  = "not a member of this group"
 
   }
 

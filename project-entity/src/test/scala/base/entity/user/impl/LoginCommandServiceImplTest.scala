@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/15/15 12:24 PM
  */
 
 package base.entity.user.impl
@@ -21,6 +21,7 @@ import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
 import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.group.kv.GroupUsersKey
 import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
@@ -143,6 +144,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
     assert(make[FacebookUserKey](fbId).set(userId).await())
+    assert(make[GroupUsersKey](groupId).add(userId).await() == 1L)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
       List(), List(), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
