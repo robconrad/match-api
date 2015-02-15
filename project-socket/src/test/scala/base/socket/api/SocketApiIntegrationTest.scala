@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 5:04 PM
+ * Last modified by rconrad, 2/15/15 1:06 PM
  */
 
 package base.socket.api
@@ -23,7 +23,7 @@ import spray.http.StatusCodes
 abstract class SocketApiIntegrationTest extends IntegrationSuite {
 
   test("integration test - runs all commands", Tags.SLOW) {
-    val (socket1, socket1a, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket(), makeSocket())
+    val (socket1, socket2, socket3) = (makeSocket(), makeSocket(), makeSocket())
     val (group1, group2, group3) = (makeGroup(), makeGroup(), makeGroup())
 
     // first user logs in, does some stuff by himself including creating a group
@@ -42,6 +42,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket2.register()
     socket2.verify()
     socket2.acceptInvite(group1)
+
     // first user answer down here because we couldn't match until second user exists
     socket1.answer(group1, socket2)
     socket2.createQuestion(group1)
@@ -68,11 +69,27 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket1.disconnect()
     socket2.disconnect()
 
-    // first user repeat login tests all his info is there (e.g. lastLogin, etc.) and specifies a default group
-    socket1a.props = socket1.props
-    socket1a.connect()
-    socket1a.login(Option(group1))
-    socket1a.disconnect()
+    // do it all again (minus the registrations and invites)
+    socket1.connect()
+    socket2.connect()
+    socket3.connect()
+    socket1.login(Option(group2))
+    socket2.login(Option(group3))
+    socket3.login(Option(group3))
+    socket1.createQuestion(group1)
+    socket1.questions(group1)
+    socket1.message(group1)
+    socket1.answer(group1, socket2)
+    socket2.createQuestion(group1)
+    socket2.questions(group1)
+    socket2.message(group1)
+    socket2.answer(group1, socket1)
+    socket2.message(group3)
+
+    // everybody leaves
+    socket1.disconnect()
+    socket2.disconnect()
+    socket3.disconnect()
   }
 
   test("error", Tags.SLOW) {

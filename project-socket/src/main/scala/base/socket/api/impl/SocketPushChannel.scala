@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:08 PM
+ * Last modified by rconrad, 2/15/15 12:52 PM
  */
 
 package base.socket.api.impl
@@ -45,5 +45,7 @@ class SocketPushChannel(implicit ctx: ChannelHandlerContext) extends PushChannel
   def serialize[T <: CommandModel[_]](command: T)(implicit m: Manifest[T]) = {
     Serialization.write(command)
   }
+
+  override lazy val toString = getClass.getSimpleName + s"($ctx)"
 
 }

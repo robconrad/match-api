@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/15/15 12:38 PM
  */
 
 package base.socket.api.test
@@ -25,14 +25,14 @@ import base.socket.api.test.util.ListUtils._
  * @author rconrad
  */
 class TestGroup(private var _id: Option[UUID] = None,
-                private var _sockets: List[SocketConnection] = List(),
+                private var _sockets: Set[SocketConnection] = Set(),
                 private var _users: List[UserModel] = List(),
                 private var _invites: List[InviteModel] = List(),
                 private var _events: List[EventModel] = List()) {
 
   def set(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) {
     id = randomMock.nextUuid()
-    sockets = List(socket1)
+    sockets = Set(socket1)
     users = List(socket1.userModel)
     invites = socket2.phoneOpt match {
       case Some(userId) => List(socket2.inviteModel)
@@ -46,7 +46,7 @@ class TestGroup(private var _id: Option[UUID] = None,
   def id_=(id: UUID) { _id = Option(id) }
   def id = _id.get
 
-  def sockets_=(sockets: List[SocketConnection]) { _sockets = sockets }
+  def sockets_=(sockets: Set[SocketConnection]) { _sockets = sockets }
   def sockets = _sockets
 
   def users_=(users: List[UserModel]) { _users = sortUsers(users) }

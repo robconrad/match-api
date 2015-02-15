@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:12 AM
+ * Last modified by rconrad, 2/15/15 12:55 PM
  */
 
 package base.entity.group.impl
@@ -38,6 +38,7 @@ class GroupListenerActor extends BaseActor {
   }
 
   def register(msg: Register) {
+    debug("register %s", msg)
     import msg._
     groupIds foreach { groupId =>
       groupUsers get groupId match {
@@ -54,6 +55,7 @@ class GroupListenerActor extends BaseActor {
   }
 
   def unregister(msg: Unregister) {
+    debug("unregister %s", msg)
     import msg._
     userGroups remove userId foreach { groupIds =>
       groupIds foreach { groupId =>
@@ -67,8 +69,9 @@ class GroupListenerActor extends BaseActor {
     sender ! Unit
   }
 
-  def publish(publish: Publish) {
-    groupUsers get publish.command.body.groupId match {
+  def publish(msg: Publish) {
+    debug("publish %s", msg)
+    groupUsers get msg.command.body.groupId match {
       case Some(userIds) =>
         val futures = userIds.map { userId =>
           userChannels get userId map { channel =>
@@ -76,7 +79,7 @@ class GroupListenerActor extends BaseActor {
             //  since it's a choke point for the whole app. Who knows what's happening inside publish!
             //  (json serialization for one)
             Future {
-              channel push publish.command
+              channel push msg.command
             } flatMap identity
           }
         }.collect {

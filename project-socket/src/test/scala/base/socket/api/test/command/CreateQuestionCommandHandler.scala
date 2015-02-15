@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 4:59 PM
+ * Last modified by rconrad, 2/15/15 11:39 AM
  */
 
 package base.socket.api.test.command
@@ -24,8 +24,11 @@ class CreateQuestionCommandHandler(implicit socket: SocketConnection) extends Co
 
   def apply(group: TestGroup)(implicit executor: CommandExecutor,
                               randomMock: RandomServiceMock, testQuestions: TestQuestions) {
-    testQuestions.addGroupDef(group.id, QuestionDef(randomMock.nextUuid(), sideA, Option(sideB)))
-    val createQuestionModel = CreateQuestionModel(group.id, sideA, Option(sideB))
+    val sideAText = s"($counter) " + sideA
+    val sideBText = s"($counter) " + sideB
+    counter += 1
+    testQuestions.addGroupDef(group.id, QuestionDef(randomMock.nextUuid(), sideAText, Option(sideBText)))
+    val createQuestionModel = CreateQuestionModel(group.id, sideAText, Option(sideBText))
     val responseModel = CreateQuestionResponseModel(group.id, randomMock.nextUuid())
     executor(createQuestionModel, Option(responseModel))
   }
@@ -33,6 +36,8 @@ class CreateQuestionCommandHandler(implicit socket: SocketConnection) extends Co
 }
 
 object CreateQuestionCommandHandler {
+
+  var counter = 0
 
   val sideA = "user question side a"
   val sideB = "user question side b"

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/15/15 12:41 PM
  */
 
 package base.socket.api
@@ -30,7 +30,7 @@ class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
       private var out: PrintWriter = _
       private var in: BufferedReader = _
 
-      def connect() = {
+      protected def _connect() = {
         socket = new Socket(SocketApiService().host, SocketApiService().port)
         socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
         out = new PrintWriter(socket.getOutputStream, true)

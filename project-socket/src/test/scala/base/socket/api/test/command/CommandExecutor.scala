@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/15/15 12:34 PM
  */
 
 package base.socket.api.test.command
@@ -42,15 +42,17 @@ class CommandExecutor extends SocketBaseSuite with Loggable {
     val rawResponse = socket.read
 
     val expectedResponse = CommandModel(responseModel)
-    val actualResponse = JsonMethods.parse(rawResponse).extract[CommandModel[B]]
-
-    debug(socket.hashCode() + "   actual: " + actualResponse.toString)
-    debug(socket.hashCode() + " expected: " + expectedResponse.toString)
+    val actualResponse = JsonMethods.parse(rawResponse)
 
     debug(socket.hashCode() + "   pretty actual:\n" + Serialization.writePretty(JsonMethods.parse(rawResponse)))
     debug(socket.hashCode() + " pretty expected:\n" + Serialization.writePretty(expectedResponse))
 
-    assert(actualResponse == expectedResponse)
+    val extractedResponse = actualResponse.extract[CommandModel[B]]
+
+    debug(socket.hashCode() + "   actual: " + extractedResponse.toString)
+    debug(socket.hashCode() + " expected: " + expectedResponse.toString)
+
+    assert(extractedResponse == expectedResponse)
   }
 
 }

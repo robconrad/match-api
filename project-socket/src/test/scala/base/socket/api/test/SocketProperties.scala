@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 2/15/15 11:49 AM
  */
 
 package base.socket.api.test
@@ -11,6 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.test.TestExceptions.TestRuntimeException
+import base.entity.question.QuestionSides.QuestionSide
 import base.socket.api.test.model.{ InviteModelFactory, UserModelFactory }
 import org.joda.time.DateTime
 
@@ -27,7 +28,7 @@ class SocketProperties(
     private var _name: Option[String] = Option("name-" + RandomService().md5),
     private var _phone: Option[String] = None,
     private var _lastLogin: Option[DateTime] = None,
-    private var _questionsAnswered: Map[UUID, List[Int]] = Map(),
+    private var _questionsAnswered: Map[UUID, List[(Int, QuestionSide)]] = Map(),
     private var _groups: List[TestGroup] = List(),
     private var _pendingGroups: List[TestGroup] = List()) {
 
@@ -57,8 +58,9 @@ class SocketProperties(
   def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
   def lastLogin = _lastLogin
 
-  def answerQuestion(groupId: UUID, questionIndex: Int) {
-    _questionsAnswered += (groupId -> (_questionsAnswered.getOrElse(groupId, List()) ++ List(questionIndex)))
+  def answerQuestion(groupId: UUID, questionIndex: Int, questionSide: QuestionSide) {
+    val qa = _questionsAnswered.getOrElse(groupId, List()) ++ List((questionIndex, questionSide))
+    _questionsAnswered += (groupId -> qa)
   }
   def questionsAnswered(groupId: UUID) = _questionsAnswered.getOrElse(groupId, List())
 

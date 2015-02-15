@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 5:03 PM
+ * Last modified by rconrad, 2/15/15 11:47 AM
  */
 
 package base.socket.api.test.util
@@ -39,10 +39,15 @@ class TestQuestions {
 
   def apply(groupId: UUID, index: Int) = defs(groupId)(index)
 
-  def filteredModels(groupId: UUID, index: Int) = models(groupId).filter(_.id != defs(groupId)(index).id)
-  def filteredModels(groupId: UUID, indices: List[Int]) = models(groupId).filter { model =>
-    !indices.map(defs(groupId)(_).id).contains(model.id)
-  }
+  def filteredModels(groupId: UUID, index: Int, side: QuestionSide = SIDE_A): List[QuestionModel] =
+    filteredModels(groupId, List((index, side)))
+
+  def filteredModels(groupId: UUID, indices: List[(Int, QuestionSide)]): List[QuestionModel] =
+    models(groupId).filter { model =>
+      !indices.map { case (index, side) =>
+        (defs(groupId)(index).id, side)
+      }.contains((model.id, model.side))
+    }
 
   def addGroupDef(groupId: UUID, `def`: QuestionDef): Unit = {
     groupDefs += groupId -> (groupDefs.getOrElse(groupId, Set()) ++ Set(`def`))
