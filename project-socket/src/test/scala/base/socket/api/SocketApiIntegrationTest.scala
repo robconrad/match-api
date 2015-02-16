@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:08 PM
+ * Last modified by rconrad, 2/15/15 8:26 PM
  */
 
 package base.socket.api
@@ -50,7 +50,10 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket2.createQuestion(group1)
     socket2.questions(group1)
     socket2.message(group1)
-    socket2.answer(group1, socket1)
+
+    // exhaust the available standard questions so we start answering user generated questions
+    for (i <- 0 until questions.standardModels.size - socket2.questionsAnswered(group1.id).size)
+      socket2.answer(group1, socket1)
 
     // third user comes along and gets invited to a new group by first user *after* account is
     //  created by login, and declines the invite

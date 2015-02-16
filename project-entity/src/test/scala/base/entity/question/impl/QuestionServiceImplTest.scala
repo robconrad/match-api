@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:19 PM
+ * Last modified by rconrad, 2/15/15 8:47 PM
  */
 
 package base.entity.question.impl
@@ -111,20 +111,57 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     }
   }
 
-  test("answer - success") {
-    val questionId = questions(3).id
+  test("answer - standard question - success") {
+    val questionDef = questions(3)
     val groupId = RandomService().uuid
-    val userId = RandomService().uuid
+    val otherUserId = RandomService().uuid
     val questionResponse = true
+    val side = SIDE_A
+    val composite = QuestionIdComposite(questionDef, side)
 
-    val usersKey = make[GroupUsersKey](groupId)
-    assert(usersKey.add(userId).await() == 1L)
-    val userYesKey = make[GroupUserQuestionsYesKey](groupId, userId)
-    assert(userYesKey.add(QuestionIdComposite(questionId, SIDE_B)).await() == 1)
+    val groupUsersKey = make[GroupUsersKey](groupId)
+    assert(groupUsersKey.add(otherUserId).await() == 1L)
+    val otherUserYesKey = make[GroupUserQuestionsYesKey](groupId, otherUserId)
+    assert(otherUserYesKey.add(QuestionIdComposite(questionDef, SIDE_B)).await() == 1)
 
-    val model = AnswerModel(questionId, groupId, SIDE_A, questionResponse)
+    val model = AnswerModel(questionDef.id, groupId, side, questionResponse)
     val eventId = randomMock.nextUuid()
     val response = EventModelImpl(eventId, groupId, None, MATCH, questions(3) + " is a match")
+
+    val actual = service.answer(model).await()
+    val expected = Right(List(response))
+
+    // todo generic assert for debug actual/expected?
+    debug(actual.toString)
+    debug(expected.toString)
+
+    assert(actual == expected)
+
+    val userQuestionsKey = make[GroupUserQuestionsKey](groupId, authCtx.userId)
+    assert(userQuestionsKey.isMember(composite).await())
+    val userQuestionsYesKey = make[GroupUserQuestionsYesKey](groupId, authCtx.userId)
+    assert(userQuestionsYesKey.isMember(composite).await())
+  }
+
+  test("answer - user question - success") {
+    val questionId = RandomService().uuid
+    val questionDef = QuestionDef(questionId, "side a", Option("side b"))
+    val groupId = RandomService().uuid
+    val otherUserId = RandomService().uuid
+    val questionResponse = true
+    val side = SIDE_A
+    val composite = QuestionIdComposite(questionDef, side)
+
+    val groupUsersKey = make[GroupUsersKey](groupId)
+    assert(groupUsersKey.add(otherUserId).await() == 1L)
+    val otherUserYesKey = make[GroupUserQuestionsYesKey](groupId, otherUserId)
+    assert(otherUserYesKey.add(QuestionIdComposite(questionId, SIDE_B)).await() == 1)
+    val questionKey = make[QuestionKey](questionId)
+    questionKey.createDef(questionDef.a, questionDef.b, otherUserId).await()
+
+    val model = AnswerModel(questionId, groupId, side, questionResponse)
+    val eventId = randomMock.nextUuid()
+    val response = EventModelImpl(eventId, groupId, None, MATCH, questionDef + " is a match")
 
     val actual = service.answer(model).await()
     val expected = Right(List(response))
@@ -133,6 +170,11 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     debug(expected.toString)
 
     assert(actual == expected)
+
+    val userQuestionsKey = make[GroupUserQuestionsKey](groupId, authCtx.userId)
+    assert(userQuestionsKey.isMember(composite).await())
+    val userQuestionsYesKey = make[GroupUserQuestionsYesKey](groupId, authCtx.userId)
+    assert(userQuestionsYesKey.isMember(composite).await())
   }
 
   test("answer - question response false") {
@@ -151,6 +193,14 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     key.add _ expects * returning Future.successful(0L)
     val method = new service.AnswerMethod(AnswerModel(questions(1).id, RandomService().uuid, SIDE_A, response = false))
     assert(method.groupUserQuestionAdd(key).await() == Errors.alreadyAnswered.await())
+  }
+
+  test("answer - question doesn't exist") {
+    val key = make[QuestionKey](RandomService().uuid)
+    val method = new service.AnswerMethod(AnswerModel(questions(1).id, RandomService().uuid, SIDE_A, response = false))
+    intercept[RedisException] {
+      method.questionGet(key, Set()).await()
+    }
   }
 
 }

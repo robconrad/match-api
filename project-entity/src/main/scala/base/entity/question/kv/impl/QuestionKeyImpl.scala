@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:39 PM
+ * Last modified by rconrad, 2/15/15 8:47 PM
  */
 
 package base.entity.question.kv.impl
@@ -15,6 +15,7 @@ import base.entity.kv.serializer.SerializerImplicits._
 import base.entity.question.QuestionDef
 import base.entity.question.kv.QuestionKey
 import base.entity.question.kv.impl.QuestionKeyImpl._
+import scredis.exceptions.{RedisException, RedisReaderException}
 import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
 import scredis.serialization.{UTF8StringReader, UTF8StringWriter}
 
@@ -41,6 +42,9 @@ class QuestionKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
   }
 
   def getQuestionDef(id: UUID) = key.mGetAsMap[Array[Byte]](SideAProp, SideBProp).map { props =>
+    if (!props.isDefinedAt(SideAProp)) {
+      throw new RedisException() {}
+    }
     QuestionDef(id, UTF8StringReader.read(props(SideAProp)), props.get(SideBProp).map(UTF8StringReader.read))
   }
 

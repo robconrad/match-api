@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 11:47 AM
+ * Last modified by rconrad, 2/15/15 8:25 PM
  */
 
 package base.socket.api.test.util
@@ -32,10 +32,15 @@ class TestQuestions {
 
   def defs(groupId: UUID) = standardDefs ++ groupDefs.getOrElse(groupId, Set())
 
-  def models(groupId: UUID) = ListUtils.sortQuestions(defs(groupId).map(QuestionModel(_, SIDE_A)) ++
-    defs(groupId).collect {
-      case q if q.b.isDefined => QuestionModel(q, SIDE_B)
-    })
+  private implicit def defs2Models(defs: List[QuestionDef]): List[QuestionModel] =
+    ListUtils.sortQuestions(defs.map(QuestionModel(_, SIDE_A)) ++
+      defs.collect {
+        case q if q.b.isDefined => QuestionModel(q, SIDE_B)
+      })
+
+  def standardModels: List[QuestionModel] = standardDefs
+
+  def models(groupId: UUID): List[QuestionModel] = defs(groupId)
 
   def apply(groupId: UUID, index: Int) = defs(groupId)(index)
 
