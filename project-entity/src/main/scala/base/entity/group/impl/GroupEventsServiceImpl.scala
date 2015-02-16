@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:23 PM
+ * Last modified by rconrad, 2/15/15 5:49 PM
  */
 
 package base.entity.group.impl
@@ -36,19 +36,11 @@ class GroupEventsServiceImpl(count: Int, store: Int, delta: Int)
 
   private val storeDelta = store + delta
 
-  def getEvents(groupId: UUID, setLastReadTime: Boolean)(implicit channelCtx: ChannelContext) = {
-    val key = make[GroupUserKey]((groupId, authCtx.userId))
-    groupUserSetLastRead(key, setLastReadTime) flatMap { result =>
-      val key = make[GroupEventsKey](groupId)
-      key.lRange(0, count - 1).map { events =>
-        Right(events)
-      }
+  def getEvents(groupId: UUID)(implicit channelCtx: ChannelContext) = {
+    val key = make[GroupEventsKey](groupId)
+    key.lRange(0, count - 1).map { events =>
+      Right(events)
     }
-  }
-
-  private def groupUserSetLastRead(key: GroupUserKey, setLastReadTime: Boolean) = setLastReadTime match {
-    case false => Future.successful(true)
-    case true => key.setLastRead()
   }
 
   def setEvent(event: EventModel, createIfNotExists: Boolean) = {

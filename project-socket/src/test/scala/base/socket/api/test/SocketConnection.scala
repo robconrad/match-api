@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:41 PM
+ * Last modified by rconrad, 2/15/15 6:07 PM
  */
 
 package base.socket.api.test
@@ -29,6 +29,7 @@ abstract class SocketConnection(var _props: SocketProperties) {
   lazy val message = new MessageCommandHandler
   lazy val answer = new AnswerCommandHandler
   lazy val createQuestion = new CreateQuestionCommandHandler
+  lazy val ackEvents = new AckEventsCommandHandler
 
   def props_=(props: SocketProperties) { _props = props }
   def props = _props

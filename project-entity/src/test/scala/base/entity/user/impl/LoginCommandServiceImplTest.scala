@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:27 PM
+ * Last modified by rconrad, 2/15/15 5:52 PM
  */
 
 package base.entity.user.impl
@@ -172,8 +172,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val key = mock[UserKey]
     val result = Future.successful(Left(apiError))
     val groupEventsService = mock[GroupEventsService]
-    (groupEventsService.getEvents(_: UUID, _: Boolean)(_: ChannelContext)) expects
-      (*, *, *) returning result
+    groupEventsService.getEvents _ expects * returning result
     val unregister = TestServices.register(groupEventsService)
     assert(command.eventsGet(key, uuid, uuid, LoginResponseModelBuilder()).await() == Left(apiError))
     unregister()

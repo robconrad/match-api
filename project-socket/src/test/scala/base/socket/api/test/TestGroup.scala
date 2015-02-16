@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:38 PM
+ * Last modified by rconrad, 2/15/15 6:06 PM
  */
 
 package base.socket.api.test
@@ -10,6 +10,7 @@ package base.socket.api.test
 import java.util.UUID
 
 import base.common.random.mock.RandomServiceMock
+import base.common.time.mock.TimeServiceConstantMock
 import base.entity.event.model.EventModel
 import base.entity.group.model.impl.GroupModelImpl
 import base.entity.group.model.{ GroupModel, InviteModel }
@@ -17,6 +18,7 @@ import base.entity.user.model.UserModel
 import base.socket.api._
 import base.socket.api.test.model.{ InviteModelFactory, EventModelFactory }
 import base.socket.api.test.util.ListUtils._
+import org.joda.time.DateTime
 
 /**
  * {{ Describe the high level purpose of TestGroup here. }}
@@ -28,7 +30,8 @@ class TestGroup(private var _id: Option[UUID] = None,
                 private var _sockets: Set[SocketConnection] = Set(),
                 private var _users: List[UserModel] = List(),
                 private var _invites: List[InviteModel] = List(),
-                private var _events: List[EventModel] = List()) {
+                private var _events: List[EventModel] = List(),
+                private var _reads: Map[UUID, DateTime] = Map()) {
 
   def set(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) {
     id = randomMock.nextUuid()
@@ -41,7 +44,13 @@ class TestGroup(private var _id: Option[UUID] = None,
     events = List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid()))
   }
 
-  def model: GroupModel = GroupModelImpl(id, users, invites, None, None, 0)
+  def model(implicit s: SocketConnection): GroupModel = {
+    val eventTime = events.size > 0 match {
+      case true => Option(TimeServiceConstantMock.now)
+      case false => None
+    }
+    GroupModelImpl(id, users, invites, eventTime, reads.get(s.userId), events.size)
+  }
 
   def id_=(id: UUID) { _id = Option(id) }
   def id = _id.get
@@ -57,5 +66,8 @@ class TestGroup(private var _id: Option[UUID] = None,
 
   def events_=(events: List[EventModel]) { _events = events }
   def events = _events
+
+  def reads_=(reads: Map[UUID, DateTime]) { _reads = reads }
+  def reads = _reads
 
 }

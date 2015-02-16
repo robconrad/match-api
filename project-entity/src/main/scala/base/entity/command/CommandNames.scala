@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:14 PM
+ * Last modified by rconrad, 2/15/15 6:10 PM
  */
 
 package base.entity.command
 
 import base.entity.error.model.ApiError
-import base.entity.event.model.EventModel
+import base.entity.event.model.{AckEventsModel, EventModel}
 import base.entity.group.model._
 import base.entity.message.model.MessageModel
 import base.entity.question.model._
@@ -51,6 +51,8 @@ object CommandNames extends Enumeration {
   val createQuestion = Value
   val createQuestionResponse = Value
 
+  val ackEvents = Value
+
   val message = Value
   val answer = Value
   val event = Value
@@ -78,6 +80,7 @@ object CommandNames extends Enumeration {
     manifest[QuestionsResponseModel] -> questionsResponse,
     manifest[CreateQuestionModel] -> createQuestion,
     manifest[CreateQuestionResponseModel] -> createQuestionResponse,
+    manifest[AckEventsModel] -> ackEvents,
     manifest[MessageModel] -> message,
     manifest[AnswerModel] -> answer,
     manifest[EventModel] -> event)

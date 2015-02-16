@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:34 PM
+ * Last modified by rconrad, 2/15/15 5:50 PM
  */
 
 package base.entity.group.impl
@@ -44,15 +44,12 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
     body = body)
 
   private val groupEventsKey = make[GroupEventsKey](groupId)
-  private val groupUserKey = make[GroupUserKey]((groupId, authCtx.userId))
   private val groupKey = make[GroupKey](groupId)
   private var eventCount = 0
 
-  private val timeMock = TimeServiceMonotonicMock
-
   override def beforeAll() {
     super.beforeAll()
-    Services.register(timeMock)
+    Services.register(TimeServiceConstantMock)
   }
 
   override def beforeEach() {
@@ -70,7 +67,7 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
       case 0 => assert(groupKey.getLastEventAndCount.await()._2 == None)
       case n =>
         assert(groupKey.getLastEventAndCount.await()._2 == Option(eventCount))
-        assert(groupKey.getLastEventAndCount.await()._1 == Option(timeMock.nowNoUpdate))
+        assert(groupKey.getLastEventAndCount.await()._1 == Option(TimeServiceConstantMock.now))
     }
   }
 
@@ -80,16 +77,7 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
     set(0)
     set(1, createIfNotExists = true)
     mSet(2,3,4)
-
-    assert(groupUserKey.getLastRead.await() == None)
-
     assert(service.getEvents(groupId).await() == Right(List(event, event)))
-    assert(groupUserKey.getLastRead.await() == Option(timeMock.nowNoUpdate))
-
-    val now = timeMock.nowNoUpdate
-    assert(service.getEvents(groupId).await() == Right(List(event, event)))
-    assert(groupUserKey.getLastRead.await() == Option(timeMock.nowNoUpdate))
-    assert(now != timeMock.nowNoUpdate)
   }
 
   test("trim events") {
