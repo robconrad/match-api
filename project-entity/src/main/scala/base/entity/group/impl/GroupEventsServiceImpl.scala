@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:49 PM
+ * Last modified by rconrad, 2/15/15 7:22 PM
  */
 
 package base.entity.group.impl
@@ -36,7 +36,7 @@ class GroupEventsServiceImpl(count: Int, store: Int, delta: Int)
 
   private val storeDelta = store + delta
 
-  def getEvents(groupId: UUID)(implicit channelCtx: ChannelContext) = {
+  def getEvents(groupId: UUID) = {
     val key = make[GroupEventsKey](groupId)
     key.lRange(0, count - 1).map { events =>
       Right(events)

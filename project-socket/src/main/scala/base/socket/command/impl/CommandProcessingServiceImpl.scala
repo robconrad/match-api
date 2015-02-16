@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:10 PM
+ * Last modified by rconrad, 2/15/15 6:42 PM
  */
 
 package base.socket.command.impl
@@ -108,7 +108,7 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
     def addAuthContext(cmd: CommandName, response: Future[Option[_]]): FutureResponse = {
       val newAuthCtx: Future[Option[AuthContext]] = response.map {
         case Some(CommandModel(CommandNames.loginResponse, model: LoginResponseModel)) =>
-          Option(new StandardUserAuthContext(new User(model.user.id)))
+          Option(new StandardUserAuthContext(new User(model.user.id), model.groups.map(_.id).toSet))
         case _ => None
       }
       combineResponseAndAuthCtx(response, newAuthCtx)

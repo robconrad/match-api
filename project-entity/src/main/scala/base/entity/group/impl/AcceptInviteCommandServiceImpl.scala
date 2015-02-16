@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 7:02 PM
+ * Last modified by rconrad, 2/15/15 7:01 PM
  */
 
 package base.entity.group.impl
 
 import base.common.random.RandomService
-import base.entity.auth.context.ChannelContext
+import base.entity.auth.context.{StandardUserAuthContext, ChannelContext}
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
@@ -117,8 +117,10 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
 
     def eventsGet(group: GroupModel, questions: List[QuestionModel]): Response =
       GroupEventsService().getEvents(input.groupId).flatMap {
-        case Right(events) => AcceptInviteResponseModel(group, events, questions)
         case Left(error)   => error
+        case Right(events) =>
+          channelCtx.authCtx = StandardUserAuthContext(authCtx.userThrows, authCtx.groups + group.id)
+          AcceptInviteResponseModel(group, events, questions)
       }
 
   }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 1:15 PM
+ * Last modified by rconrad, 2/15/15 7:13 PM
  */
 
 package base.entity.question.impl
@@ -13,12 +13,12 @@ import base.common.random.RandomService
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.group.kv.{ GroupQuestionsKey, GroupUsersKey }
+import base.entity.group.kv.GroupQuestionsKey
 import base.entity.question.QuestionSides._
 import base.entity.question.impl.CreateQuestionCommandServiceImpl.Errors
-import base.entity.question.kv.{ QuestionKey, QuestionsKey }
-import base.entity.question.model.{ CreateQuestionModel, CreateQuestionResponseModel }
-import base.entity.question.{ CreateQuestionCommandService, QuestionIdComposite }
+import base.entity.question.kv.{QuestionKey, QuestionsKey}
+import base.entity.question.model.{CreateQuestionModel, CreateQuestionResponseModel}
+import base.entity.question.{CreateQuestionCommandService, QuestionIdComposite}
 import base.entity.service.CrudErrorImplicits
 import base.entity.user.kv.UserQuestionsKey
 
@@ -47,14 +47,8 @@ private[entity] class CreateQuestionCommandServiceImpl(maxUserQuestions: Int)
       extends Command[CreateQuestionModel, CreateQuestionResponseModel] {
 
     def execute(): Response = {
-      groupUsersIsMember(make[GroupUsersKey](input.groupId))
+      userQuestionCount(make[UserQuestionsKey](authCtx.userId))
     }
-
-    def groupUsersIsMember(key: GroupUsersKey) =
-      key.isMember(authCtx.userId) flatMap {
-        case true => userQuestionCount(make[UserQuestionsKey](authCtx.userId))
-        case false => Errors.userNotGroupMember
-      }
 
     def userQuestionCount(key: UserQuestionsKey) =
       key.card flatMap {
@@ -105,7 +99,6 @@ object CreateQuestionCommandServiceImpl {
 
     override protected val externalErrorText = "Create question failed."
 
-    lazy val userNotGroupMember: Response = "user is not a member of the group"
     lazy val userCreatedTooManyQuestions: Response = "user has created too many questions"
     lazy val groupQuestionsAddFailed: Response = "failed to add question to group"
     lazy val userQuestionsAddFailed: Response = "failed to add question to user"

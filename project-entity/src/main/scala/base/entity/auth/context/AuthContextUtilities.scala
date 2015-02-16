@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:51 PM
+ * Last modified by rconrad, 2/15/15 6:22 PM
  */
 
 package base.entity.auth.context
+
+import java.util.UUID
 
 import base.entity.auth.context.AuthContext.ExceptionStrings
 import base.entity.perm.PermException
@@ -36,6 +38,11 @@ case class AuthContextUtilities(authCtx: AuthContext) {
   final def hasUser = user.isDefined
 
   /**
+   * Whether this user is a member of a particular group
+   */
+  final def hasGroup(groupId: UUID) = groups.contains(groupId)
+
+  /**
    * Throw if not has perm
    */
   final def assertHas(perm: Perm) {
@@ -58,6 +65,13 @@ case class AuthContextUtilities(authCtx: AuthContext) {
   }
   final def assertHasNoUser() =
     if (hasUser) throw new PermException(ExceptionStrings.assertHasNoUser)
+
+  /**
+   * Throw if user does not have membership in the group id
+   */
+  final def assertHasGroup(groupId: UUID) = if (!hasGroup(groupId)) {
+    throw new PermException(ExceptionStrings.assertHasGroup.format(groupId))
+  }
 
   /**
    * user id accessors that throw perm exception on object not found.

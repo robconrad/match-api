@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 1:16 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.question.impl
@@ -27,7 +27,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
+class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest[CreateQuestionModel] {
 
   private val maxQuestions = 1000
 
@@ -40,8 +40,8 @@ class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
   private val sideA = "question side a"
   private val sideB = "question side b"
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = CreateQuestionModel(groupId, sideA, Option(sideB))
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
+  implicit val model = CreateQuestionModel(groupId, sideA, Option(sideB))
 
   private def command(implicit input: CreateQuestionModel) = new service.CreateQuestionCommand(input)
 
@@ -49,12 +49,6 @@ class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
     super.beforeAll()
     Services.register(randomMock)
     Services.register(TimeServiceConstantMock)
-  }
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
   }
 
   test("success") {
@@ -82,12 +76,6 @@ class CreateQuestionCommandServiceImplTest extends CommandServiceImplTest {
 
     val allQuestionsKey = make[QuestionsKey](QuestionServiceImpl.userQuestionsKey)
     assert(allQuestionsKey.members.await() == composites)
-  }
-
-  test("fail - user is not member") {
-    val key = mock[GroupUsersKey]
-    key.isMember _ expects * returning Future.successful(false)
-    assert(command.groupUsersIsMember(key).await() == Errors.userNotGroupMember.await())
   }
 
   test("fail - user has created too many questions") {

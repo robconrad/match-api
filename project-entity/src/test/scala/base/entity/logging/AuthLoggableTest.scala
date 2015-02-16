@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:54 PM
+ * Last modified by rconrad, 2/15/15 7:18 PM
  */
 
 package base.entity.logging
@@ -18,7 +18,7 @@ import base.entity.test.EntityBaseSuite
  */
 class AuthLoggableTest extends EntityBaseSuite with AuthLoggable {
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
   private val t = new RuntimeException("error!")
 
   private def logAndAssert(logger: (String, String) => Unit)(implicit channelCtx: ChannelContext) {

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:56 PM
+ * Last modified by rconrad, 2/15/15 6:24 PM
  */
 
 package base.entity.event.impl
@@ -34,7 +34,6 @@ private[entity] class AckEventsCommandServiceImpl()
   private[impl] class AckEventsCommand(val input: AckEventsModel)(implicit val channelCtx: ChannelContext)
       extends Command[AckEventsModel, Unit] {
 
-    // TODO check that user is a member of the groupId
     def execute() = {
       val key = make[GroupUserKey]((input.groupId, authCtx.userId))
       key.setLastRead() map { result =>

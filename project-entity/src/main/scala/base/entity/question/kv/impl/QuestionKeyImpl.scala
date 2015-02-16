@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 2/15/15 6:39 PM
  */
 
 package base.entity.question.kv.impl
@@ -16,7 +16,7 @@ import base.entity.question.QuestionDef
 import base.entity.question.kv.QuestionKey
 import base.entity.question.kv.impl.QuestionKeyImpl._
 import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
-import scredis.serialization.Implicits._
+import scredis.serialization.{UTF8StringReader, UTF8StringWriter}
 
 /**
  * {{ Describe the high level purpose of QuestionKeyImpl here. }}
@@ -33,15 +33,15 @@ class QuestionKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
   // scalastyle:off null
   def createDef(a: String, b: Option[String], userId: UUID) = {
     key.mSet(Map[HashKeyProp, Array[Byte]](
-      SideAProp -> stringWriter.write(a),
-      SideBProp -> b.map(stringWriter.write).orNull,
+      SideAProp -> UTF8StringWriter.write(a),
+      SideBProp -> b.map(UTF8StringWriter.write).orNull,
       CreatorIdProp -> uuidWriter.write(userId),
       CreatedProp -> dateTimeSerializer.write(TimeService().now)
     ).filter(_._2 != null))
   }
 
   def getQuestionDef(id: UUID) = key.mGetAsMap[Array[Byte]](SideAProp, SideBProp).map { props =>
-    QuestionDef(id, stringReader.read(props(SideAProp)), props.get(SideBProp).map(stringReader.read))
+    QuestionDef(id, UTF8StringReader.read(props(SideAProp)), props.get(SideBProp).map(UTF8StringReader.read))
   }
 
   def getCreatorId = key.get[UUID](CreatorIdProp)

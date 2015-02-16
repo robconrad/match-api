@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/22/15 9:53 PM
+ * Last modified by rconrad, 2/15/15 7:21 PM
  */
 
 package base.entity.auth.context
@@ -79,9 +79,10 @@ class AuthContextTest extends EntityBaseSuite {
   private implicit def authId2Option(authId: Long) = Option(authId)
 
   test("UserAuthContext") {
+    val channelCtx = ChannelContextDataFactory.userAuth()
     assertContext(
-      ChannelContextDataFactory.userAuth.authCtx,
-      ChannelContextDataFactory.userAuth.authCtx.user.map(_.id),
+      channelCtx.authCtx,
+      channelCtx.authCtx.user.map(_.id),
       PermSetGroups.user)
   }
 

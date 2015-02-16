@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.question.impl
@@ -25,7 +25,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
+class QuestionsCommandServiceImplTest extends CommandServiceImplTest[QuestionsModel] {
 
   val service = new QuestionsCommandServiceImpl()
 
@@ -33,16 +33,10 @@ class QuestionsCommandServiceImplTest extends CommandServiceImplTest {
 
   private val error = ApiErrorService().badRequest("test")
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = QuestionsModel(groupId)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
+  implicit val model = QuestionsModel(groupId)
 
   private def command(implicit input: QuestionsModel) = new service.QuestionsCommand(input)
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
-  }
 
   test("success") {
     val groupUsersKey = make[GroupUsersKey](groupId)

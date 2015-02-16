@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 1:05 PM
+ * Last modified by rconrad, 2/15/15 6:43 PM
  */
 
 package base.socket.api.test.command
@@ -12,14 +12,14 @@ import base.common.random.mock.RandomServiceMock
 import base.entity.auth.context.StandardUserAuthContext
 import base.entity.auth.context.impl.ChannelContextImpl
 import base.entity.event.model.EventModel
-import base.entity.question.model.AnswerModel
+import base.entity.question.QuestionService
 import base.entity.question.QuestionSides._
-import base.entity.question.{ QuestionService, QuestionSides }
+import base.entity.question.model.AnswerModel
 import base.entity.user.User
 import base.socket.api._
 import base.socket.api.test.model.EventModelFactory
 import base.socket.api.test.util.TestQuestions
-import base.socket.api.test.{ SocketConnection, TestGroup }
+import base.socket.api.test.{SocketConnection, TestGroup}
 
 /**
  * {{ Describe the high level purpose of LoginCommandHandler here. }}
@@ -48,7 +48,8 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
       case false => side
     }
 
-    val otherUserAuthCtx = ChannelContextImpl(new StandardUserAuthContext(new User(otherSocket.userId)), None)
+    val otherUserAuthCtx =
+      ChannelContextImpl(new StandardUserAuthContext(new User(otherSocket.userId), Set(group.id)), None)
     val otherUserAnswerModel = AnswerModel(question.id, group.id, otherSide, answer)
     QuestionService().answer(otherUserAnswerModel)(otherUserAuthCtx).await()
 

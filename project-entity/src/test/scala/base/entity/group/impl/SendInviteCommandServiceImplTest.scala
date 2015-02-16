@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:52 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.group.impl
@@ -11,17 +11,17 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, TestServices }
+import base.common.service.{Services, TestServices}
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.impl.SendInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.group.model.{ GroupModel, SendInviteModel, SendInviteResponseModel }
-import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
+import base.entity.group.model.{GroupModel, SendInviteModel, SendInviteResponseModel}
+import base.entity.group.{GroupEventsService, GroupListenerService, GroupService}
 import base.entity.question.QuestionService
 import base.entity.user.kv._
 import base.entity.user.model.UserModel
@@ -34,7 +34,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
+class SendInviteCommandServiceImplTest extends CommandServiceImplTest[SendInviteModel] {
 
   val service = new SendInviteCommandServiceImpl("welcome!")
 
@@ -48,8 +48,8 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = SendInviteModel(phone, label)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth(groupId)
+  implicit val model = SendInviteModel(phone, label)
 
   override def beforeAll() {
     super.beforeAll()
@@ -125,12 +125,6 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
     assert(groupPhonesInvitedKey.isMember(phone).await())
 
     unregister()
-  }
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
   }
 
   test("success - new user") {

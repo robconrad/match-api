@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:49 PM
+ * Last modified by rconrad, 2/15/15 7:19 PM
  */
 
 package base.entity.facebook.impl
@@ -33,10 +33,10 @@ class FacebookServiceImplTest extends EntityBaseSuite with KvTest {
 
   private implicit def service: FacebookServiceImpl = new FacebookServiceImpl(expireTime)
   private def method(implicit service: FacebookServiceImpl) =
-    new service.GetInfoMethod(token)(ChannelContextDataFactory.userAuth)
+    new service.GetInfoMethod(token)(ChannelContextDataFactory.userAuth())
 
   test("success") {
-    implicit val ctx = ChannelContextDataFactory.userAuth
+    implicit val ctx = ChannelContextDataFactory.userAuth()
     val client = mock[DefaultFacebookClient]
     val jsonObject = mock[JsonObject]
     implicit val service = new FacebookServiceImpl(expireTime) {

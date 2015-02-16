@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 9:24 PM
+ * Last modified by rconrad, 2/15/15 7:12 PM
  */
 
 package base.entity.question.model
@@ -10,6 +10,7 @@ package base.entity.question.model
 import java.util.UUID
 
 import base.entity.api.ApiStrings.User._
+import base.entity.command.model.CommandInputModel
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
@@ -25,7 +26,9 @@ import scala.annotation.meta.field
 case class CreateQuestionModel(
   @(ApiModelProperty @field)(required = true, value = emailDesc)     groupId: UUID,
   @(ApiModelProperty @field)(required = true, value = emailDesc)     a: String,
-  @(ApiModelProperty @field)(required = true, value = emailDesc)     b: Option[String]) {
+  @(ApiModelProperty @field)(required = true, value = emailDesc)     b: Option[String]) extends CommandInputModel {
   // format: ON
+
+  lazy val assertGroupId = Option(groupId)
 
 }

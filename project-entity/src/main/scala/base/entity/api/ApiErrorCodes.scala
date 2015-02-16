@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 5:22 PM
+ * Last modified by rconrad, 2/15/15 6:51 PM
  */
 
 package base.entity.api
@@ -20,6 +20,8 @@ object ApiErrorCodes extends Enumeration {
   val JSON_COMMAND_NOT_FOUND = Value
   val JSON_BODY_NOT_FOUND = Value
   val COMMAND_NOT_HANDLED = Value
+
+  val NOT_GROUP_MEMBER = Value
 
   val PHONE_RATE_LIMIT = Value
   val VERIFY_CODE_MISSING = Value

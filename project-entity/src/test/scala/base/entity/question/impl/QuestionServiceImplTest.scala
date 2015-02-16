@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:33 PM
+ * Last modified by rconrad, 2/15/15 7:19 PM
  */
 
 package base.entity.question.impl
@@ -50,7 +50,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
 
   override def beforeAll() {
     super.beforeAll()

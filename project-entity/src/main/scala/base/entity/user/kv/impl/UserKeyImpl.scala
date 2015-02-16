@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 2/15/15 6:45 PM
  */
 
 package base.entity.user.kv.impl
@@ -17,7 +17,7 @@ import base.entity.user.kv.impl.UserKeyImpl._
 import base.entity.user.kv.{ UserKey, UserLoginAttributes, UserNameAttributes, UserPhoneAttributes }
 import org.joda.time.DateTime
 import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
-import scredis.serialization.Implicits._
+import scredis.serialization.{UTF8StringWriter, UTF8StringReader}
 
 import scala.concurrent.Future
 
@@ -36,16 +36,16 @@ class UserKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
   def getNameAttributes = {
     key.mGetAsMap[Array[Byte]](NameProp, FacebookIdProp) map { props =>
       UserNameAttributes(
-        props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(stringReader.read(bytea))),
-        props.get(NameProp).map(stringReader.read))
+        props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(UTF8StringReader.read(bytea))),
+        props.get(NameProp).map(UTF8StringReader.read))
     }
   }
 
   def getPhoneAttributes = {
     key.mGetAsMap[Array[Byte]](PhoneProp, PhoneCodeProp, PhoneVerifiedProp).map { props =>
-      (props.get(PhoneProp).map(stringReader.read),
-        props.get(PhoneCodeProp).map(stringReader.read),
-        props.get(PhoneVerifiedProp).map(booleanReader.read)) match {
+      (props.get(PhoneProp).map(UTF8StringReader.read),
+        props.get(PhoneCodeProp).map(UTF8StringReader.read),
+        props.get(PhoneVerifiedProp).map(booleanSerializer.read)) match {
           case (Some(phone), Some(code), Some(verified)) => Option(UserPhoneAttributes(phone, code, verified))
           case _                                         => None
         }
@@ -64,10 +64,10 @@ class UserKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
 
   def setFacebookInfo(fbInfo: FacebookInfo) = {
     val props = Map[HashKeyProp, Array[Byte]](
-      NameProp -> stringWriter.write(fbInfo.firstName),
-      GenderProp -> stringWriter.write(fbInfo.gender),
-      FacebookIdProp -> stringWriter.write(fbInfo.id),
-      LocaleProp -> stringWriter.write(fbInfo.locale),
+      NameProp -> UTF8StringWriter.write(fbInfo.firstName),
+      GenderProp -> UTF8StringWriter.write(fbInfo.gender),
+      FacebookIdProp -> UTF8StringWriter.write(fbInfo.id),
+      LocaleProp -> UTF8StringWriter.write(fbInfo.locale),
       UpdatedProp -> dateTimeSerializer.write(TimeService().now))
     key.mSet(props)
   }
@@ -82,11 +82,11 @@ class UserKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
   def getLoginAttributes = {
     key.mGetAsMap[Array[Byte]](PhoneProp, PhoneVerifiedProp, FacebookIdProp, NameProp, LastLoginProp) map { props =>
       UserLoginAttributes(
-        props.get(PhoneProp).map(stringReader.read),
-        props.get(PhoneVerifiedProp).map(booleanReader.read).contains(true),
+        props.get(PhoneProp).map(UTF8StringReader.read),
+        props.get(PhoneVerifiedProp).map(booleanSerializer.read).contains(true),
         UserNameAttributes(
-          props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(stringReader.read(bytea))),
-          props.get(NameProp).map(stringReader.read)),
+          props.get(FacebookIdProp).map(bytea => FacebookService().getPictureUrl(UTF8StringReader.read(bytea))),
+          props.get(NameProp).map(UTF8StringReader.read)),
         props.get(LastLoginProp).map(dateTimeSerializer.read))
     }
   }

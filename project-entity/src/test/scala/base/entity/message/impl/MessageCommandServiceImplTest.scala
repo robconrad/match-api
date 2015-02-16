@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:49 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.message.impl
@@ -26,7 +26,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class MessageCommandServiceImplTest extends CommandServiceImplTest {
+class MessageCommandServiceImplTest extends CommandServiceImplTest[MessageModel] {
 
   val service = new MessageCommandServiceImpl()
 
@@ -37,8 +37,8 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = MessageModel(groupId, body)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
+  implicit val model = MessageModel(groupId, body)
 
   override def beforeAll() {
     super.beforeAll()
@@ -47,12 +47,6 @@ class MessageCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   private def command(implicit input: MessageModel) = new service.MessageCommand(input)
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
-  }
 
   test("success") {
     val event = mock[EventModel]

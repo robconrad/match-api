@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.user.impl
@@ -29,7 +29,7 @@ import scala.concurrent.Future
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
+class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest[VerifyPhoneModel] {
 
   val codeLength = 6
 
@@ -40,8 +40,8 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = VerifyPhoneModel(phone, code)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
+  implicit val model = VerifyPhoneModel(phone, code)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,13 +52,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest {
 
   private def command(implicit input: VerifyPhoneModel) = new service.VerifyCommand(input)
 
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
-  }
-
-  test("success") {
+    test("success") {
     val groupId1 = RandomService().uuid
     val groupId2 = RandomService().uuid
     val userKey = make[UserKey](authCtx.userId)

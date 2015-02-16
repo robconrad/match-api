@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 2/15/15 6:39 PM
  */
 
 package base.entity.user.kv.impl
@@ -15,7 +15,7 @@ import base.entity.kv.serializer.SerializerImplicits._
 import base.entity.user.kv.DeviceKey
 import base.entity.user.kv.impl.DeviceKeyImpl._
 import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
-import scredis.serialization.Implicits._
+import scredis.serialization.{UTF8StringWriter, UTF8StringReader}
 
 /**
  * {{ Describe the high level purpose of UserKeyImpl here. }}
@@ -51,12 +51,12 @@ class DeviceKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
           platform: Option[String],
           version: Option[String]) = {
     val props = Map[HashKeyProp, Array[Byte]](
-      AppVersionProp -> stringWriter.write(appVersion),
-      LocaleProp -> stringWriter.write(locale),
-      ModelProp -> model.map(stringWriter.write).orNull,
-      CordovaProp -> cordova.map(stringWriter.write).orNull,
-      PlatformProp -> platform.map(stringWriter.write).orNull,
-      VersionProp -> version.map(stringWriter.write).orNull)
+      AppVersionProp -> UTF8StringWriter.write(appVersion),
+      LocaleProp -> UTF8StringWriter.write(locale),
+      ModelProp -> model.map(UTF8StringWriter.write).orNull,
+      CordovaProp -> cordova.map(UTF8StringWriter.write).orNull,
+      PlatformProp -> platform.map(UTF8StringWriter.write).orNull,
+      VersionProp -> version.map(UTF8StringWriter.write).orNull)
     key.mSet(props.filter(_._2 != null))
   }
 

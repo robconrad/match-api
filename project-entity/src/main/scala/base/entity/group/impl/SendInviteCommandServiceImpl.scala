@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 8:50 PM
+ * Last modified by rconrad, 2/15/15 7:01 PM
  */
 
 package base.entity.group.impl
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.entity.api.ApiErrorCodes._
-import base.entity.auth.context.ChannelContext
+import base.entity.auth.context.{StandardUserAuthContext, ChannelContext}
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
 import base.entity.event.EventTypes
@@ -152,8 +152,10 @@ private[entity] class SendInviteCommandServiceImpl(welcomeMessage: String)
 
     def eventsGet(groupId: UUID, group: GroupModel, questions: List[QuestionModel]) =
       GroupEventsService().getEvents(groupId).flatMap {
-        case Right(events) => SendInviteResponseModel(group, events, questions)
         case Left(error)   => error
+        case Right(events) =>
+          channelCtx.authCtx = StandardUserAuthContext(authCtx.userThrows, authCtx.groups + group.id)
+          SendInviteResponseModel(group, events, questions)
       }
 
   }

@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:59 PM
+ * Last modified by rconrad, 2/15/15 6:32 PM
  */
 
 package base.entity.auth.context
+
+import java.util.UUID
 
 import base.entity.perm.PermSetGroups
 
@@ -21,5 +23,7 @@ case object NoAuthContext extends AuthContext {
   val user = None
 
   val authTypeId = None
+
+  val groups = Set[UUID]()
 
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:53 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.user.impl
@@ -25,7 +25,7 @@ import scala.concurrent.duration._
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
+class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest[RegisterPhoneModel] {
 
   val service = new RegisterPhoneCommandServiceImpl(10.minutes)
 
@@ -36,8 +36,8 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
   private val intMax = 1000000
   private val randomMock = new RandomServiceMock(intMin = intMin, intMax = intMax)
 
-  private implicit val model = RegisterPhoneModel(phone)
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
+  implicit val model = RegisterPhoneModel(phone)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
 
   override def beforeAll() {
     super.beforeAll()
@@ -61,12 +61,6 @@ class RegisterPhoneCommandServiceImplTest extends CommandServiceImplTest {
     assert(phoneAttributes.exists(_.phone == phone))
     assert(phoneAttributes.exists(_.code == verifyCode))
     assert(phoneAttributes.exists(!_.verified))
-  }
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
   }
 
   test("success - no existing phone or user") {

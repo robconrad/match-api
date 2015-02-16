@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:52 PM
+ * Last modified by rconrad, 2/15/15 7:47 PM
  */
 
 package base.entity.group.impl
@@ -32,7 +32,7 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
+class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest[AcceptInviteModel] {
 
   val service = new AcceptInviteCommandServiceImpl("joined!")
 
@@ -42,8 +42,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
 
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = AcceptInviteModel(groupId)
+  implicit val channelCtx = ChannelContextDataFactory.userAuth(groupId)
+  implicit val model = AcceptInviteModel(groupId)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,12 +52,6 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   private def command(implicit input: AcceptInviteModel) = new service.AcceptInviteCommand(input)
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
-  }
 
   test("success") {
     val phone = "555-1234"
@@ -69,6 +63,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest {
     val groupService = mock[GroupService]
     val questionService = mock[QuestionService]
 
+    groupModel.id _ expects () returning groupId
     groupEventsService.setEvent _ expects (*, *) returning Future.successful(Right(eventModel))
     (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Unit)

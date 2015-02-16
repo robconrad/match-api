@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:20 PM
+ * Last modified by rconrad, 2/15/15 6:45 PM
  */
 
 package base.entity.kv.serializer
 
 import base.entity.kv.serializer.impl._
-import scredis.serialization.{UUIDWriter, UUIDReader}
+import scredis.serialization.{BytesWriter, BytesReader, UUIDWriter, UUIDReader}
 
 /**
  * {{ Describe the high level purpose of SerializerImplicits here. }}
@@ -18,7 +18,7 @@ import scredis.serialization.{UUIDWriter, UUIDReader}
  */
 object SerializerImplicits {
 
-  implicit val booleanPhoneSerializer = BooleanSerializer
+  implicit val booleanSerializer = BooleanSerializer
   implicit val dateTimeSerializer = DateTimeSerializer
   implicit val eventModelSerializer = EventModelSerializer
   implicit val facebookInfoSerializer = FacebookInfoSerializer
@@ -29,6 +29,9 @@ object SerializerImplicits {
   implicit val shortPhoneSerializer = ShortSerializer
   implicit val sortedIdPairSerializer = SortedIdPairSerializer
   implicit val userPhoneSerializer = UserPhoneSerializer
+
+  implicit val byteaReader = BytesReader
+  implicit val byteaWriter = BytesWriter
 
   implicit val uuidReader = UUIDReader
   implicit val uuidWriter = UUIDWriter

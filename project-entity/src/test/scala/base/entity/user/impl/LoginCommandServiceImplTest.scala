@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:52 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.user.impl
@@ -11,25 +11,26 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{ Services, TestServices }
+import base.common.service.{Services, TestServices}
 import base.common.test.TestExceptions.TestRuntimeException
 import base.common.time.TimeService
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.api.ApiVersions
-import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
+import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
-import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.facebook.{FacebookInfo, FacebookService}
 import base.entity.group.kv.GroupUsersKey
-import base.entity.group.{ GroupEventsService, GroupListenerService }
+import base.entity.group.model.impl.GroupModelImpl
+import base.entity.group.{GroupEventsService, GroupListenerService}
 import base.entity.question.QuestionService
 import base.entity.question.model.AnswerModel
 import base.entity.user.UserService
 import base.entity.user.impl.LoginCommandServiceImpl._
 import base.entity.user.kv._
-import base.entity.user.model.impl.{ LoginResponseModelBuilder, LoginResponseModelImpl }
-import base.entity.user.model.{ LoginModel, LoginResponseModel, UserModel }
+import base.entity.user.model.impl.{LoginResponseModelBuilder, LoginResponseModelImpl}
+import base.entity.user.model.{LoginModel, LoginResponseModel, UserModel}
 
 import scala.concurrent.Future
 
@@ -38,7 +39,7 @@ import scala.concurrent.Future
  *  (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class LoginCommandServiceImplTest extends CommandServiceImplTest {
+class LoginCommandServiceImplTest extends CommandServiceImplTest[LoginModel] {
 
   val service = new LoginCommandServiceImpl
   private val name = "bob"
@@ -56,8 +57,8 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
   private val apiError = ApiErrorService().badRequest("test error")
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = LoginModel(fbToken, Option(groupId), appVersion, apiVersion, locale, deviceModel)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth(groupId)
+  implicit val model = LoginModel(fbToken, Option(groupId), appVersion, apiVersion, locale, deviceModel)
 
   override def beforeAll() {
     super.beforeAll()
@@ -85,11 +86,11 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     val facebook = mock[FacebookService]
     val groupListener = mock[GroupListenerService]
     val unregister = TestServices.register(groupListener, facebook)
+    (facebook.getInfo(_: String)(_: ChannelContext)) expects
+    (*, *) returning Future.successful(Option(FacebookInfo(fbId, name, gender, locale)))
+    facebook.getPictureUrl _ expects * returning pictureUrl anyNumberOfTimes()
     (groupListener.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Unit)
-    (facebook.getInfo(_: String)(_: ChannelContext)) expects
-      (*, *) returning Future.successful(Option(FacebookInfo(fbId, name, gender, locale)))
-    facebook.getPictureUrl _ expects * returning pictureUrl
 
     val actual = service.innerExecute(model).await()
     val expected = Right(response)
@@ -101,7 +102,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
 
     assert(userKey.getLastLogin.await().exists(_.isEqual(TimeService().now)))
     assert(userKey.getFacebookId.await().contains(fbId))
-    // todo assert(userKey.getNameAndGender.await() == (Option(name), Option(Genders.withName(gender))))
     assert(userKey.getLocale.await().contains(locale))
     assert(userKey.getUpdated.await().exists(_.isEqual(TimeServiceConstantMock.now)))
     assert(deviceKey.getAppVersion.await().contains(appVersion))
@@ -112,12 +112,6 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     assert(deviceKey.getVersion.await() == deviceModel.version)
 
     unregister()
-  }
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
   }
 
   test("success - new user") {
@@ -143,10 +137,12 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest {
     registerQuestionMock()
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
+    val groupModel = GroupModelImpl(groupId, List(userModel), List(), None, None, 0)
     assert(make[FacebookUserKey](fbId).set(userId).await())
     assert(make[GroupUsersKey](groupId).add(userId).await() == 1L)
+    assert(make[UserGroupsKey](userId).add(groupId).await() == 1L)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), Option(List()), Option(List()), None)
+      List(), List(groupModel), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
   }
 

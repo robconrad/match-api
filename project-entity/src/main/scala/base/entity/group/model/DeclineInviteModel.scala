@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 1:17 PM
+ * Last modified by rconrad, 2/15/15 7:12 PM
  */
 
 package base.entity.group.model
@@ -10,6 +10,7 @@ package base.entity.group.model
 import java.util.UUID
 
 import base.entity.api.ApiStrings.User._
+import base.entity.command.model.CommandInputModel
 import com.wordnik.swagger.annotations.{ ApiModelProperty, ApiModel }
 
 import scala.annotation.meta.field
@@ -23,7 +24,10 @@ import scala.annotation.meta.field
 @ApiModel(description = createRequestDesc)
 // todo convert to interface for mocking
 case class DeclineInviteModel(
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  groupId: UUID) {
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  groupId: UUID) extends CommandInputModel {
   // format: ON
+
+  // yes it has a group id but you are not actually a member
+  def assertGroupId = None
 
 }

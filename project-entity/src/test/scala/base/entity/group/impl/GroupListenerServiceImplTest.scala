@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:38 AM
+ * Last modified by rconrad, 2/15/15 7:18 PM
  */
 
 package base.entity.group.impl
@@ -29,7 +29,7 @@ class GroupListenerServiceImplTest extends EntityServiceTest {
 
   val service = new GroupListenerServiceImpl(probe.ref)
 
-  implicit val channelCtx = ChannelContextDataFactory.userAuth
+  implicit val channelCtx = ChannelContextDataFactory.userAuth()
 
   test("register") {
     val groupIds = List.fill(3)(RandomService().uuid).toSet

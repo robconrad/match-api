@@ -5,18 +5,20 @@
  * Last modified by rconrad, 2/15/15 7:12 PM
  */
 
-package base.entity.event.model.impl
+package base.entity.command.model
 
 import java.util.UUID
 
-import base.entity.event.model.AckEventsModel
+import base.entity.model.Model
 
 /**
- * API describable model
+ * {{ Describe the high level purpose of GroupCommand here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-case class AckEventsModelImpl(groupId: UUID) extends AckEventsModel {
+trait CommandInputModel extends Model {
 
-  lazy val assertGroupId = Option(groupId)
+  def assertGroupId: Option[UUID]
 
 }

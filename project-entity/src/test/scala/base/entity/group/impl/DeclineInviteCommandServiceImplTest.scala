@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:26 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.group.impl
@@ -26,18 +26,16 @@ import scala.concurrent.Future
  * @author rconrad
  */
 // scalastyle:off null
-class DeclineInviteCommandServiceImplTest extends CommandServiceImplTest {
+class DeclineInviteCommandServiceImplTest extends CommandServiceImplTest[DeclineInviteModel] {
 
   val service = new DeclineInviteCommandServiceImpl()
 
   private val groupId = RandomService().uuid
 
-  private val error = ApiErrorService().badRequest("test")
-
   private val randomMock = new RandomServiceMock()
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = DeclineInviteModel(groupId)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
+  implicit val model = DeclineInviteModel(groupId)
 
   override def beforeAll() {
     super.beforeAll()
@@ -46,12 +44,6 @@ class DeclineInviteCommandServiceImplTest extends CommandServiceImplTest {
   }
 
   private def command(implicit input: DeclineInviteModel) = new service.DeclineInviteCommand(input)
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
-  }
 
   test("success") {
     val groupId = RandomService().uuid

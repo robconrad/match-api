@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/26/15 9:18 PM
+ * Last modified by rconrad, 2/15/15 7:12 PM
  */
 
 package base.entity.user.model
@@ -12,6 +12,7 @@ import java.util.UUID
 import base.entity.api.ApiStrings
 import ApiStrings.User._
 import base.entity.api.ApiVersions.ApiVersion
+import base.entity.command.model.CommandInputModel
 import base.entity.device.model.DeviceModel
 import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
@@ -31,7 +32,10 @@ case class LoginModel(
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  appVersion: String,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  apiVersion: ApiVersion,
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  locale: String,
-  @(ApiModelProperty @field)(required = true, value = passwordDesc)  device: DeviceModel) {
+  @(ApiModelProperty @field)(required = true, value = passwordDesc)  device: DeviceModel) extends CommandInputModel {
   // format: ON
+
+  // suspicious right? It's because Login is the command that establishes groups on the auth context in the first place
+  def assertGroupId = None
 
 }

@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 1:51 PM
+ * Last modified by rconrad, 2/15/15 6:36 PM
  */
 
 package base.entity.auth.context
+
+import java.util.UUID
 
 import base.common.logging.LoggerToken
 import base.entity.perm.PermSetGroup
@@ -38,6 +40,11 @@ trait AuthContext {
   def authTypeId: Option[_]
 
   /**
+   * Groups that this user is a member of
+   */
+  def groups: Set[UUID]
+
+  /**
    * Provides suite of useful methods for auth contexts
    */
   final lazy val utilities = AuthContextUtilities(this)
@@ -56,13 +63,14 @@ trait AuthContext {
 
 object AuthContext {
 
-  implicit def authContext2AuthContextUtilities(authCtx: AuthContext) = authCtx.utilities
+  implicit def authContext2AuthContextUtilities(authCtx: AuthContext): AuthContextUtilities = authCtx.utilities
 
   object ExceptionStrings {
 
     val assertIsUser = "assert isUser failed"
     val assertHasNoUser = "assert !hasUser failed"
     val assertHasPerm = "assert has(%s) failed"
+    val assertHasGroup = "assert has group %s failed"
     val userThrows = "user missing"
 
   }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:58 PM
+ * Last modified by rconrad, 2/15/15 7:49 PM
  */
 
 package base.entity.event.impl
@@ -12,6 +12,7 @@ import base.common.service.Services
 import base.common.time.mock.{TimeServiceMonotonicMock, TimeServiceConstantMock}
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
+import base.entity.event.model.AckEventsModel
 import base.entity.event.model.impl.AckEventsModelImpl
 import base.entity.group.kv.GroupUserKey
 
@@ -20,14 +21,14 @@ import base.entity.group.kv.GroupUserKey
  * (i.e. validation, persistence, etc.)
  * @author rconrad
  */
-class AckEventsCommandServiceImplTest extends CommandServiceImplTest {
+class AckEventsCommandServiceImplTest extends CommandServiceImplTest[AckEventsModel] {
 
   val service = new AckEventsCommandServiceImpl()
 
   private val groupId = RandomService().uuid
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
-  private implicit val model = AckEventsModelImpl(groupId)
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth(groupId)
+  implicit val model = AckEventsModelImpl(groupId)
 
   private val groupUserKey = make[GroupUserKey]((groupId, authCtx.userId))
 
@@ -36,12 +37,6 @@ class AckEventsCommandServiceImplTest extends CommandServiceImplTest {
   override def beforeAll() {
     super.beforeAll()
     Services.register(timeMock)
-  }
-
-  test("without perms") {
-    assertPermException(channelCtx => {
-      service.execute(model)(channelCtx)
-    })
   }
 
   test("success") {

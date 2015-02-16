@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:49 PM
+ * Last modified by rconrad, 2/15/15 7:19 PM
  */
 
 package base.entity.user.impl
@@ -40,7 +40,7 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
   private val groupId1 = RandomService().uuid
   private val groupId2 = RandomService().uuid
 
-  private implicit val channelCtx = ChannelContextDataFactory.userAuth
+  private implicit val channelCtx = ChannelContextDataFactory.userAuth()
 
   test("getUser") {
     val key = mock[UserKey]

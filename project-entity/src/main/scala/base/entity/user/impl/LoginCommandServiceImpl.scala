@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:02 PM
+ * Last modified by rconrad, 2/15/15 7:32 PM
  */
 
 package base.entity.user.impl
@@ -14,16 +14,15 @@ import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.facebook.{ FacebookInfo, FacebookService }
-import base.entity.group.kv.GroupUsersKey
-import base.entity.group.{ GroupEventsService, GroupListenerService }
+import base.entity.facebook.{FacebookInfo, FacebookService}
+import base.entity.group.{GroupEventsService, GroupListenerService}
 import base.entity.question.QuestionService
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.kv._
 import base.entity.user.model.impl.LoginResponseModelBuilder
-import base.entity.user.model.{ LoginModel, LoginResponseModel, UserModel }
+import base.entity.user.model.{LoginModel, LoginResponseModel, UserModel}
 import spray.http.StatusCodes._
 
 /**
@@ -103,17 +102,17 @@ private[entity] class LoginCommandServiceImpl()
         case Right(groups) =>
           val builder = LoginResponseModelBuilder(groups = Option(groups))
           input.groupId match {
-            case Some(groupId) => groupIsMember(make[GroupUsersKey](groupId), key, userId, groupId, builder)
+            case Some(groupId) => groupIsMember(key, userId, groupId, builder)
             case None =>
               userGetLoginAttributes(key, userId, builder.copy(events = Option(None), questions = Option(None)))
           }
       }
     }
 
-    def groupIsMember(key: GroupUsersKey, userKey: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder) =
-      key.isMember(userId) flatMap {
-        case true => eventsGet(userKey, userId, groupId, builder)
-        case false => Errors.notGroupMember
+    def groupIsMember(userKey: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder) =
+      builder.groups.map(_.map(_.id).contains(groupId)) match {
+        case Some(false) => Errors.notGroupMember
+        case _ => eventsGet(userKey, userId, groupId, builder)
       }
 
     def eventsGet(key: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder): Response = {
