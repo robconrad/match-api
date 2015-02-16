@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 12:20 AM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.auth.context.impl
 
-import base.entity.auth.context.{ ChannelContext, PushChannel, AuthContext }
+import base.entity.auth.context.{ AuthContext, ChannelContext, PushChannel }
 
 /**
  * {{ Describe the high level purpose of ChannelContext here. }}

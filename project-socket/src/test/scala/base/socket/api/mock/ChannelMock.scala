@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 1:53 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.mock
@@ -10,8 +10,8 @@ package base.socket.api.mock
 import java.net.SocketAddress
 
 import io.netty.channel.local.LocalAddress
-import io.netty.channel.{ ChannelPromise, Channel }
-import io.netty.util.{ DefaultAttributeMap, Attribute, AttributeKey }
+import io.netty.channel.{ Channel, ChannelPromise }
+import io.netty.util.{ AttributeKey, DefaultAttributeMap }
 
 /**
  * {{ Describe the high level purpose of ChannelMock here. }}

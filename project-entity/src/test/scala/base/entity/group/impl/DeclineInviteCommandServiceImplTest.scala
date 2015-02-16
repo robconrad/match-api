@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:49 PM
+ * Last modified by rconrad, 2/15/15 9:12 PM
  */
 
 package base.entity.group.impl
@@ -13,7 +13,6 @@ import base.common.service.Services
 import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.command.impl.CommandServiceImplTest
-import base.entity.error.ApiErrorService
 import base.entity.group.impl.DeclineInviteCommandServiceImpl.Errors
 import base.entity.group.model._
 import base.entity.user.kv._

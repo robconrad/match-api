@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:45 PM
+ * Last modified by rconrad, 2/15/15 9:10 PM
  */
 
 package base.rest.user
 
 import akka.actor.ActorRefFactory
 import base.entity.api.ApiVersions
-import ApiVersions._
+import base.entity.api.ApiVersions._
 import base.rest.route.RouteFactory
 
 import scala.reflect.runtime.universe._

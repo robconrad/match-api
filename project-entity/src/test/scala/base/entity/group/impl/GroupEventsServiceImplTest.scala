@@ -2,18 +2,18 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:19 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.impl
 
 import base.common.random.RandomService
 import base.common.service.Services
-import base.common.time.mock.{TimeServiceMonotonicMock, TimeServiceConstantMock}
+import base.common.time.mock.TimeServiceConstantMock
 import base.entity.auth.context.ChannelContextDataFactory
 import base.entity.event.EventTypes
 import base.entity.event.model.impl.EventModelImpl
-import base.entity.group.kv.{GroupUserKey, GroupKey, GroupEventsKey}
+import base.entity.group.kv.{ GroupEventsKey, GroupKey }
 import base.entity.kv.KvTest
 import base.entity.service.EntityServiceTest
 
@@ -23,6 +23,7 @@ import base.entity.service.EntityServiceTest
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
+// scalastyle:off magic.number
 class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
 
   private val count = 2
@@ -76,7 +77,7 @@ class GroupEventsServiceImplTest extends EntityServiceTest with KvTest {
   test("setEvent / getEvents") {
     set(0)
     set(1, createIfNotExists = true)
-    mSet(2,3,4)
+    mSet(2, 3, 4)
     assert(service.getEvents(groupId).await() == Right(List(event, event)))
   }
 

@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/16/15 8:08 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.sms.impl
 
 import base.common.service.ServiceImpl
 import base.entity.sms.SmsService
-import com.twilio.sdk.{ TwilioRestException, TwilioRestClient }
+import com.twilio.sdk.{ TwilioRestClient, TwilioRestException }
 import org.apache.http.message.BasicNameValuePair
 
 import scala.collection.JavaConversions._

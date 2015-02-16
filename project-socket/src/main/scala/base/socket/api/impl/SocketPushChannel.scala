@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:52 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.impl
@@ -14,7 +14,7 @@ import base.socket.api.SocketApiHandlerService
 import io.netty.channel.{ ChannelFuture, ChannelFutureListener, ChannelHandlerContext }
 import org.json4s.native.Serialization
 
-import scala.concurrent.{ Promise, Future }
+import scala.concurrent.{ Future, Promise }
 
 /**
  * {{ Describe the high level purpose of SocketPushChannel here. }}

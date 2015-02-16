@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:19 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.impl
@@ -90,13 +90,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    val actual = service.getGroup(authCtx.userId, groupId).await()
-    val expected = Right(Option(expectedGroup))
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
 
     unregister()
   }
@@ -127,13 +121,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    val actual = service.getGroup(authCtx.userId, groupId).await()
-    val expected = Right(Option(expectedGroup))
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
 
     unregister()
   }
@@ -163,13 +151,7 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    val actual = service.getGroup(authCtx.userId, groupId).await()
-    val expected = Right(Option(expectedGroup))
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
 
     unregister()
   }

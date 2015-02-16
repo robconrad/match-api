@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:27 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.command
 
 import base.common.service.Service
 import base.entity.auth.context.ChannelContext
-import base.entity.command.model.{CommandInputModel, CommandModel}
+import base.entity.command.model.{ CommandInputModel, CommandModel }
 import base.entity.perm.Perms.Perm
 
 import scala.concurrent.Future

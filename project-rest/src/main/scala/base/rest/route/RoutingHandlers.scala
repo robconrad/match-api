@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 2:55 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.rest.route
@@ -10,8 +10,6 @@ package base.rest.route
 import base.common.logging.Loggable
 import base.entity.api.ApiStrings
 import base.entity.error.{ ApiErrorService, ApiException }
-import base.entity.perm.PermException
-import org.json4s.native.Serialization
 import spray.http.StatusCodes._
 import spray.http.{ ContentType, HttpEntity, MediaTypes, StatusCodes }
 import spray.httpx.Json4sSupport

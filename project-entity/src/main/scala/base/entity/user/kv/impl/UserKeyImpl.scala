@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:45 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.user.kv.impl
@@ -17,7 +17,7 @@ import base.entity.user.kv.impl.UserKeyImpl._
 import base.entity.user.kv.{ UserKey, UserLoginAttributes, UserNameAttributes, UserPhoneAttributes }
 import org.joda.time.DateTime
 import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
-import scredis.serialization.{UTF8StringWriter, UTF8StringReader}
+import scredis.serialization.{ UTF8StringReader, UTF8StringWriter }
 
 import scala.concurrent.Future
 

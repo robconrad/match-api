@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:22 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.impl
@@ -10,10 +10,9 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
-import base.entity.auth.context.ChannelContext
 import base.entity.event.model.EventModel
 import base.entity.group.GroupEventsService
-import base.entity.group.kv.{GroupUserKey, GroupKey, GroupEventsKey}
+import base.entity.group.kv.{ GroupEventsKey, GroupKey }
 import base.entity.json.JsonFormats
 import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable

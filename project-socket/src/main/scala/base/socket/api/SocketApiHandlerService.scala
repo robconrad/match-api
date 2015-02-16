@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:14 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api
 
 import base.common.service.{ Service, ServiceCompanion }
 import io.netty.channel.socket.SocketChannel
-import io.netty.channel.{ ChannelHandlerContext, ChannelFuture, ChannelInitializer, ChannelInboundHandler }
+import io.netty.channel.{ ChannelFuture, ChannelHandlerContext, ChannelInboundHandler, ChannelInitializer }
 
 /**
  *

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:12 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.message.model
@@ -11,7 +11,7 @@ import java.util.UUID
 
 import base.entity.api.ApiStrings.User._
 import base.entity.command.model.CommandInputModel
-import com.wordnik.swagger.annotations.{ ApiModelProperty, ApiModel }
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
 

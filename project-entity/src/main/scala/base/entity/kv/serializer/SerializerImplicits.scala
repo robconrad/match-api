@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:45 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.kv.serializer
 
 import base.entity.kv.serializer.impl._
-import scredis.serialization.{BytesWriter, BytesReader, UUIDWriter, UUIDReader}
+import scredis.serialization.{ BytesReader, BytesWriter, UUIDReader, UUIDWriter }
 
 /**
  * {{ Describe the high level purpose of SerializerImplicits here. }}

@@ -2,14 +2,14 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/31/15 9:29 AM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.user.model
 
 import base.entity.api.ApiStrings
-import ApiStrings.User._
-import com.wordnik.swagger.annotations.{ ApiModelProperty, ApiModel }
+import base.entity.api.ApiStrings.User._
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
 

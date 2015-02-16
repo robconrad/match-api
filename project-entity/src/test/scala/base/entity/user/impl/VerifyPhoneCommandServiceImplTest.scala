@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:49 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.user.impl
@@ -52,7 +52,7 @@ class VerifyPhoneCommandServiceImplTest extends CommandServiceImplTest[VerifyPho
 
   private def command(implicit input: VerifyPhoneModel) = new service.VerifyCommand(input)
 
-    test("success") {
+  test("success") {
     val groupId1 = RandomService().uuid
     val groupId2 = RandomService().uuid
     val userKey = make[UserKey](authCtx.userId)

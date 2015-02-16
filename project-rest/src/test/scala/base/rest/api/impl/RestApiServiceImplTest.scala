@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:46 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.rest.api.impl
 
-import base.common.lib.{ Actors, Dispatchable }
+import base.common.lib.Dispatchable
 import base.common.logging.Loggable
 import base.common.test.Tags
 import base.rest.api.RestApiService

@@ -2,14 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/18/15 2:58 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.rest.api
 
-import base.common.service.{ ApiService, Service, ServiceCompanion }
-
-import scala.concurrent.Future
+import base.common.service.{ ApiService, ServiceCompanion }
 
 /**
  * Responsible for configuring, starting, binding, etc. the REST API

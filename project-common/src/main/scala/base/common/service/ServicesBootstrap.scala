@@ -2,12 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/17/15 10:45 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.common.service
-
-import java.util.UUID
 
 import base.common.lib.{ BaseConfig, Currencies, Dispatchable }
 import base.common.logging.Loggable

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:37 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.kv.impl
@@ -15,9 +15,9 @@ import base.entity.group.kv.GroupKey
 import base.entity.group.kv.impl.GroupKeyImpl._
 import base.entity.kv.serializer.SerializerImplicits._
 import org.joda.time.DateTime
-import scredis.keys.{HashKey, HashKeyProp, HashKeyProps}
+import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
 import scredis.serialization.Implicits._
-import scredis.serialization.{LongReader, LongWriter}
+import scredis.serialization.{ LongReader, LongWriter }
 
 import scala.concurrent.Future
 

@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:46 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.kv.serializer.impl
 
+import base.entity.kv.OrderedIdPair
 import base.entity.kv.serializer.Serializer
-import base.entity.kv.{ IdPair, OrderedIdPair }
 import scredis.serialization.{ UUIDReader, UUIDWriter }
 
 /**

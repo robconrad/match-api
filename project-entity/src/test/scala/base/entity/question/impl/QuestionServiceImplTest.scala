@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 8:47 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.question.impl
@@ -128,14 +128,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val eventId = randomMock.nextUuid()
     val response = EventModelImpl(eventId, groupId, None, MATCH, questions(3) + " is a match")
 
-    val actual = service.answer(model).await()
-    val expected = Right(List(response))
-
-    // todo generic assert for debug actual/expected?
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.answer(model).await(), Right(List(response)))
 
     val userQuestionsKey = make[GroupUserQuestionsKey](groupId, authCtx.userId)
     assert(userQuestionsKey.isMember(composite).await())
@@ -163,13 +156,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
     val eventId = randomMock.nextUuid()
     val response = EventModelImpl(eventId, groupId, None, MATCH, questionDef + " is a match")
 
-    val actual = service.answer(model).await()
-    val expected = Right(List(response))
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.answer(model).await(), Right(List(response)))
 
     val userQuestionsKey = make[GroupUserQuestionsKey](groupId, authCtx.userId)
     assert(userQuestionsKey.isMember(composite).await())

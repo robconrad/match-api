@@ -2,13 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:14 PM
+ * Last modified by rconrad, 2/15/15 9:10 PM
  */
 
 package base.socket.api.impl
 
-import base.socket.api.mock.{ WebSocketApiHandlerServiceMock, RawSocketApiHandlerServiceMock }
-import base.socket.api.test.WebSocketClientFactory
+import base.socket.api.mock.WebSocketApiHandlerServiceMock
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
 import org.scalatest.concurrent.Eventually
 

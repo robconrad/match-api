@@ -2,15 +2,16 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 10:56 AM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.model
 
 import java.net.{ MalformedURLException, URL }
+
 import base.entity.api.ApiStrings
-import base.entity.error.model.ApiError
 import base.entity.error.ApiErrorService
+import base.entity.error.model.ApiError
 import org.json4s.CustomSerializer
 import org.json4s.JsonAST.JString
 import spray.http.StatusCodes

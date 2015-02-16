@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:21 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.auth.context
 
 import base.entity.auth.context.AuthContext.ExceptionStrings
-import base.entity.perm.{ PermSetGroups, PermException, PermSetGroup }
+import base.entity.perm.{ PermException, PermSetGroup, PermSetGroups }
 import base.entity.test.EntityBaseSuite
 
 /**

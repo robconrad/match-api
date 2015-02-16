@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:47 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.impl
@@ -85,13 +85,7 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest[AcceptIn
     val userKey = make[UserKey](authCtx.userId)
     userKey.setPhoneAttributes(UserPhoneAttributes(phone, "", verified = true)).await()
 
-    val actual = service.innerExecute(AcceptInviteModel(groupId)).await()
-    val expected = Right(response)
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.innerExecute(AcceptInviteModel(groupId)).await(), Right(response))
 
     assert(!userGroupsInvitedKey.isMember(groupId).await())
 

@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.error.impl
 
-import base.common.lib.{ Tryo, Encoding }
+import base.common.lib.{ Encoding, Tryo }
 import base.common.logging.Loggable
 import base.common.service.ServiceImpl
 import base.entity.api.ApiErrorCodes.ErrorCode

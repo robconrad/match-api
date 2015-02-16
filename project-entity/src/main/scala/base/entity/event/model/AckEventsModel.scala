@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:28 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.event.model
@@ -13,7 +13,7 @@ import base.entity.api.ApiStrings.User._
 import base.entity.command.model.CommandInputModel
 import base.entity.event.model.impl.AckEventsModelImpl
 import base.entity.model.ModelCompanion
-import com.wordnik.swagger.annotations.{ApiModel, ApiModelProperty}
+import com.wordnik.swagger.annotations.{ ApiModel, ApiModelProperty }
 
 import scala.annotation.meta.field
 

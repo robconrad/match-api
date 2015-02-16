@@ -2,18 +2,17 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:14 PM
+ * Last modified by rconrad, 2/15/15 9:10 PM
  */
 
 package base.socket.api.impl
 
-import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
-import java.net.{ ConnectException, Socket }
+import java.net.ConnectException
 
 import base.common.service.Services
 import base.common.test.Tags
 import base.socket.api.SocketApiHandlerService
-import base.socket.api.mock.{ RawSocketApiHandlerServiceMock, SocketApiStatsServiceMock }
+import base.socket.api.mock.SocketApiStatsServiceMock
 import base.socket.service.SocketServiceTest
 
 import scala.concurrent.duration._

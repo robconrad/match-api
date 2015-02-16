@@ -2,22 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:35 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.impl
 
 import java.net.InetSocketAddress
 
-import base.common.service.{ CommonService, ServiceImpl }
+import base.common.service.ServiceImpl
 import base.socket.api.{ SocketApiHandlerService, SocketApiService, SocketApiStats, SocketApiStatsService }
 import io.netty.bootstrap.ServerBootstrap
+import io.netty.channel.ChannelOption
 import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.channel.{ ChannelHandlerContext, ChannelInitializer, ChannelOption }
-import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
-import io.netty.handler.timeout.{ IdleStateEvent, IdleStateHandler }
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Future, Promise }

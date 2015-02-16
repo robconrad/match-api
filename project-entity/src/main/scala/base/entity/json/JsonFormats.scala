@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:13 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.json
@@ -12,7 +12,7 @@ import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.command.CommandNames
 import base.entity.error.model.ApiError
 import base.entity.event.EventTypes
-import base.entity.event.model.{AckEventsModel, EventModel}
+import base.entity.event.model.{ AckEventsModel, EventModel }
 import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.model._
 import base.entity.question.QuestionSides

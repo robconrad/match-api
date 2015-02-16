@@ -2,12 +2,10 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:29 PM
+ * Last modified by rconrad, 2/15/15 9:06 PM
  */
 
 package base.entity.kv
-
-import java.nio.ByteBuffer
 
 /**
  * {{ Describe the high level purpose of KeyPrefixes here. }}

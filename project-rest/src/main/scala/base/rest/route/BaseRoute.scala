@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 9:45 PM
+ * Last modified by rconrad, 2/15/15 9:10 PM
  */
 
 package base.rest.route
@@ -10,9 +10,9 @@ package base.rest.route
 import base.common.lib.Dispatchable
 import base.common.logging.Loggable
 import base.entity.api.ApiVersions
+import base.entity.api.ApiVersions._
 import base.entity.json.JsonFormats
 import base.rest.Locations._
-import ApiVersions._
 import org.json4s.Formats
 import shapeless.HNil
 import spray.httpx.Json4sSupport

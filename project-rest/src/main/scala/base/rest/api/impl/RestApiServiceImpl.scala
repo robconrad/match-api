@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/4/15 4:12 PM
+ * Last modified by rconrad, 2/15/15 9:10 PM
  */
 
 package base.rest.api.impl
@@ -13,8 +13,8 @@ import akka.pattern.ask
 import akka.util.Timeout
 import base.common.lib.Actors
 import base.common.service.ServiceImpl
-import base.rest.route.RoutingActor
 import base.rest.api.RestApiService
+import base.rest.route.RoutingActor
 import spray.can.Http
 
 import scala.concurrent.duration._

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:06 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.test
@@ -16,7 +16,7 @@ import base.entity.group.model.impl.GroupModelImpl
 import base.entity.group.model.{ GroupModel, InviteModel }
 import base.entity.user.model.UserModel
 import base.socket.api._
-import base.socket.api.test.model.{ InviteModelFactory, EventModelFactory }
+import base.socket.api.test.model.{ EventModelFactory, InviteModelFactory }
 import base.socket.api.test.util.ListUtils._
 import org.joda.time.DateTime
 
@@ -46,7 +46,7 @@ class TestGroup(private var _id: Option[UUID] = None,
 
   def model(implicit s: SocketConnection): GroupModel = {
     val eventTime = events.size > 0 match {
-      case true => Option(TimeServiceConstantMock.now)
+      case true  => Option(TimeServiceConstantMock.now)
       case false => None
     }
     GroupModelImpl(id, users, invites, eventTime, reads.get(s.userId), events.size)

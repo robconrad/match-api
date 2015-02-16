@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:32 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.user.impl
@@ -14,15 +14,15 @@ import base.entity.api.ApiErrorCodes._
 import base.entity.auth.context.ChannelContext
 import base.entity.command.Command
 import base.entity.command.impl.CommandServiceImpl
-import base.entity.facebook.{FacebookInfo, FacebookService}
-import base.entity.group.{GroupEventsService, GroupListenerService}
+import base.entity.facebook.{ FacebookInfo, FacebookService }
+import base.entity.group.{ GroupEventsService, GroupListenerService }
 import base.entity.question.QuestionService
 import base.entity.service.CrudErrorImplicits
 import base.entity.user._
 import base.entity.user.impl.LoginCommandServiceImpl.Errors
 import base.entity.user.kv._
 import base.entity.user.model.impl.LoginResponseModelBuilder
-import base.entity.user.model.{LoginModel, LoginResponseModel, UserModel}
+import base.entity.user.model.{ LoginModel, LoginResponseModel, UserModel }
 import spray.http.StatusCodes._
 
 /**
@@ -112,7 +112,7 @@ private[entity] class LoginCommandServiceImpl()
     def groupIsMember(userKey: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder) =
       builder.groups.map(_.map(_.id).contains(groupId)) match {
         case Some(false) => Errors.notGroupMember
-        case _ => eventsGet(userKey, userId, groupId, builder)
+        case _           => eventsGet(userKey, userId, groupId, builder)
       }
 
     def eventsGet(key: UserKey, userId: UUID, groupId: UUID, builder: LoginResponseModelBuilder): Response = {
@@ -171,7 +171,7 @@ object LoginCommandServiceImpl {
     private val tokenInvalidText = "The supplied Facebook token is not valid."
 
     lazy val tokenInvalid: Response = (tokenInvalidText, Unauthorized, TOKEN_INVALID)
-    lazy val notGroupMember: Response  = "not a member of this group"
+    lazy val notGroupMember: Response = "not a member of this group"
 
   }
 

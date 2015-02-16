@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/24/15 6:21 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.mock
@@ -12,8 +12,7 @@ import base.socket.api.SocketApiHandlerService
 import base.socket.api.impl.RawSocketChannelInitializer
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelHandler.Sharable
-import io.netty.channel.socket.SocketChannel
-import io.netty.channel.{ ChannelHandlerContext, ChannelInboundHandlerAdapter, ChannelInitializer }
+import io.netty.channel.{ ChannelHandlerContext, ChannelInboundHandlerAdapter }
 import io.netty.util.CharsetUtil
 
 /**

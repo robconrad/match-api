@@ -2,13 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:10 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.command
 
 import base.entity.error.model.ApiError
-import base.entity.event.model.{AckEventsModel, EventModel}
+import base.entity.event.model.{ AckEventsModel, EventModel }
 import base.entity.group.model._
 import base.entity.message.model.MessageModel
 import base.entity.question.model._

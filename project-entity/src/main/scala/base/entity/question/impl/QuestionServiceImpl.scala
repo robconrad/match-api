@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 8:18 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.question.impl
@@ -19,7 +19,6 @@ import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.kv._
 import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
-import base.entity.question.QuestionSides.QuestionSide
 import base.entity.question.impl.QuestionServiceImpl.Errors
 import base.entity.question.kv.{ QuestionKey, QuestionsKey }
 import base.entity.question.model.{ AnswerModel, QuestionModel }
@@ -50,8 +49,13 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
   Await.ready(init(), CommonService().defaultDuration)
 
   private[impl] def init() = {
-    val compositeIds_a = questions.map(q => QuestionIdComposite(q.id, QuestionSides.SIDE_A))
-    val compositeIds_b = questions.collect { case q if q.b.isDefined => QuestionIdComposite(q.id, QuestionSides.SIDE_B) }
+    val compositeIds_a = questions.map { q =>
+      QuestionIdComposite(q.id, QuestionSides.SIDE_A)
+    }
+    val compositeIds_b = questions.collect {
+      case q if q.b.isDefined =>
+        QuestionIdComposite(q.id, QuestionSides.SIDE_B)
+    }
     val compositeIds = compositeIds_a.toSet ++ compositeIds_b
     questionsKey.add(compositeIds.toSeq: _*)
   }
@@ -192,7 +196,7 @@ class QuestionServiceImpl(questions: Iterable[QuestionDef],
 
     def standardQuestionGet(userIds: Iterable[UUID]) = questionsMap.get(input.questionId) match {
       case Some(questionDef) => groupUsersQuestionYesGet(questionDef, userIds)
-      case None => questionGet(make[QuestionKey](input.questionId), userIds)
+      case None              => questionGet(make[QuestionKey](input.questionId), userIds)
     }
 
     def questionGet(key: QuestionKey, userIds: Iterable[UUID]) =

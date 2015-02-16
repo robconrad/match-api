@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/10/15 12:56 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.rest.user
 
-import base.common.random.RandomService
 import base.common.service.ServicesBeforeAndAfterAll
 import base.entity.api.ApiVersions
 import base.entity.model.ModelImplicits

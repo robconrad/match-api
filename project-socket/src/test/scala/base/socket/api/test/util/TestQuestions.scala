@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 8:25 PM
+ * Last modified by rconrad, 2/15/15 9:02 PM
  */
 
 package base.socket.api.test.util
@@ -49,8 +49,9 @@ class TestQuestions {
 
   def filteredModels(groupId: UUID, indices: List[(Int, QuestionSide)]): List[QuestionModel] =
     models(groupId).filter { model =>
-      !indices.map { case (index, side) =>
-        (defs(groupId)(index).id, side)
+      !indices.map {
+        case (index, side) =>
+          (defs(groupId)(index).id, side)
       }.contains((model.id, model.side))
     }
 

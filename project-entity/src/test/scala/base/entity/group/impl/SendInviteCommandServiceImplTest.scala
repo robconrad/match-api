@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:49 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.group.impl
@@ -11,17 +11,17 @@ import java.util.UUID
 
 import base.common.random.RandomService
 import base.common.random.mock.RandomServiceMock
-import base.common.service.{Services, TestServices}
+import base.common.service.{ Services, TestServices }
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.auth.context.{ChannelContext, ChannelContextDataFactory}
+import base.entity.auth.context.{ ChannelContext, ChannelContextDataFactory }
 import base.entity.command.impl.CommandServiceImplTest
 import base.entity.error.ApiErrorService
 import base.entity.event.model.EventModel
 import base.entity.group.impl.SendInviteCommandServiceImpl.Errors
 import base.entity.group.kv._
 import base.entity.group.model.impl.GroupModelImpl
-import base.entity.group.model.{GroupModel, SendInviteModel, SendInviteResponseModel}
-import base.entity.group.{GroupEventsService, GroupListenerService, GroupService}
+import base.entity.group.model.{ GroupModel, SendInviteModel, SendInviteResponseModel }
+import base.entity.group.{ GroupEventsService, GroupListenerService, GroupService }
 import base.entity.question.QuestionService
 import base.entity.user.kv._
 import base.entity.user.model.UserModel
@@ -80,7 +80,6 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest[SendInvite
       (*, *, *) returning Future.successful(Right(List()))
     groupEventsService.getEvents _ expects * returning Future.successful(Right(List()))
 
-
     val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
     val response = SendInviteResponseModel(group, List(), List())
 
@@ -89,13 +88,7 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest[SendInvite
       phoneKey.set(userId)
     }
 
-    val actual = service.innerExecute(model).await()
-    val expected = Right(response)
-
-    debug(actual.toString)
-    debug(expected.toString)
-
-    assert(actual == expected)
+    debugAssert(service.innerExecute(model).await(), Right(response))
 
     val userPhonesInvitedKey = make[UserPhonesInvitedKey](authCtx.userId)
     assert(userPhonesInvitedKey.isMember(phone).await())

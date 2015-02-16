@@ -2,14 +2,13 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:48 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.kv
 
 import base.common.service.{ Service, ServiceCompanion }
 import scredis.Client
-import scredis.commands._
 
 /**
  * {{ Describe the high level purpose of KvService here. }}

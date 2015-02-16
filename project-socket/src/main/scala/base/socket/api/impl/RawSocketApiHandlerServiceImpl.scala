@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:36 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.impl
@@ -10,7 +10,6 @@ package base.socket.api.impl
 import io.netty.buffer.{ ByteBuf, Unpooled }
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel._
-import io.netty.channel.socket.SocketChannel
 import io.netty.util.CharsetUtil
 
 @Sharable

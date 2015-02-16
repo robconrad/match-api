@@ -2,15 +2,15 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/10/15 5:03 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.socket.api.test.command
 
 import base.common.random.mock.RandomServiceMock
 import base.entity.group.model.{ SendInviteModel, SendInviteResponseModel }
-import base.socket.api.test.model.InviteModelFactory
 import base.socket.api._
+import base.socket.api.test.model.InviteModelFactory
 import base.socket.api.test.util.TestQuestions
 import base.socket.api.test.{ SocketConnection, TestGroup }
 

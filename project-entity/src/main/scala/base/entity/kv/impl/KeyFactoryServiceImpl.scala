@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:10 PM
+ * Last modified by rconrad, 2/15/15 9:13 PM
  */
 
 package base.entity.kv.impl
@@ -17,15 +17,15 @@ import base.entity.group.kv._
 import base.entity.group.kv.impl._
 import base.entity.kv.KeyPrefixes._
 import base.entity.kv.serializer.SerializerImplicits._
-import base.entity.kv.{ KeyPrefixes, OrderedIdPair, KeyCommandsService, KeyFactoryService }
+import base.entity.kv.{ KeyCommandsService, KeyFactoryService, KeyPrefixes, OrderedIdPair }
 import base.entity.question.QuestionIdComposite
 import base.entity.question.kv.impl.QuestionKeyImpl
-import base.entity.question.kv.{ QuestionsKey, QuestionKey }
+import base.entity.question.kv.{ QuestionKey, QuestionsKey }
 import base.entity.user.kv._
 import base.entity.user.kv.impl._
 import scredis.Client
 import scredis.keys.HashKeyProps
-import scredis.keys.impl.{ SetKeyImpl, ListKeyImpl, SimpleKeyImpl }
+import scredis.keys.impl.{ ListKeyImpl, SetKeyImpl, SimpleKeyImpl }
 import scredis.serialization.Writer
 
 /**
