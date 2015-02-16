@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:24 PM
+ * Last modified by rconrad, 2/15/15 5:08 PM
  */
 
 package base.entity.group.model
@@ -33,7 +33,7 @@ trait GroupModel extends Model {
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def invites: List[InviteModel]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastEventTime: Option[DateTime]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastReadTime: Option[DateTime]
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) def eventCount: Int
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def eventCount: Long
 
 }
 // format: ON

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 8:45 PM
+ * Last modified by rconrad, 2/15/15 5:14 PM
  */
 
 package base.entity.command
@@ -36,8 +36,8 @@ object CommandNames extends Enumeration {
   val verifyPhone = Value
   val verifyPhoneResponse = Value
 
-  val invite = Value
-  val inviteResponse = Value
+  val sendInvite = Value
+  val sendInviteResponse = Value
 
   val acceptInvite = Value
   val acceptInviteResponse = Value
@@ -68,8 +68,8 @@ object CommandNames extends Enumeration {
     manifest[RegisterPhoneResponseModel] -> registerPhoneResponse,
     manifest[VerifyPhoneModel] -> verifyPhone,
     manifest[VerifyPhoneResponseModel] -> verifyPhoneResponse,
-    manifest[SendInviteModel] -> invite,
-    manifest[SendInviteResponseModel] -> inviteResponse,
+    manifest[SendInviteModel] -> sendInvite,
+    manifest[SendInviteResponseModel] -> sendInviteResponse,
     manifest[AcceptInviteModel] -> acceptInvite,
     manifest[AcceptInviteResponseModel] -> acceptInviteResponse,
     manifest[DeclineInviteModel] -> declineInvite,

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:16 PM
+ * Last modified by rconrad, 2/15/15 5:27 PM
  */
 
 package base.entity.group.impl
@@ -78,7 +78,9 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
       (*, *, *) returning Future.successful(Right(Option(group)))
     (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List()))
-    groupEventsService.getEvents _ expects * returning Future.successful(Right(List()))
+    (groupEventsService.getEvents(_: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Right(List()))
+
 
     val unregister = TestServices.register(groupService, groupEventsService, groupListenerService, questionService)
     val response = SendInviteResponseModel(group, List(), List())
@@ -233,7 +235,8 @@ class SendInviteCommandServiceImplTest extends CommandServiceImplTest {
   test("events get returned error") {
     val groupModel = mock[GroupModel]
     val groupEventsService = mock[GroupEventsService]
-    groupEventsService.getEvents _ expects * returning Future.successful(Left(error))
+    (groupEventsService.getEvents(_: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupEventsService)
     assert(command.eventsGet(groupId, groupModel, List()).await() == Left(error))
     unregister()

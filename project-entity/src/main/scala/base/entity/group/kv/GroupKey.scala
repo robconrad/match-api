@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 7:25 PM
+ * Last modified by rconrad, 2/15/15 5:07 PM
  */
 
 package base.entity.group.kv
@@ -24,10 +24,10 @@ trait GroupKey {
 
   def getCreated: Future[Option[DateTime]]
 
-  def getLastEventAndCount: Future[(Option[DateTime], Option[Int])]
+  def getLastEventAndCount: Future[(Option[DateTime], Option[Long])]
 
-  def setLastEvent(time: DateTime = TimeService().now): Future[Boolean]
+  def setLastEventAndIncrCount(time: DateTime = TimeService().now): Future[Long]
 
-  def setEventCount(count: Int): Future[Boolean]
+  def setEventCount(count: Long): Future[Boolean]
 
 }

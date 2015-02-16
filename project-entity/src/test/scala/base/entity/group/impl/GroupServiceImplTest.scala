@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:49 PM
+ * Last modified by rconrad, 2/15/15 5:05 PM
  */
 
 package base.entity.group.impl
@@ -59,8 +59,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val unregister = TestServices.register(userService)
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
-    assert(make[GroupKey](groupId).setLastEvent(time).await())
-    assert(make[GroupKey](groupId).setEventCount(eventCount).await())
+    assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
+    assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
     assert(service.getGroup(authCtx.userId, groupId).await() == Right(Option(group)))
 
@@ -87,8 +87,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone1)).set(label).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
-    assert(make[GroupKey](groupId).setLastEvent(time).await())
-    assert(make[GroupKey](groupId).setEventCount(eventCount).await())
+    assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
+    assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
     val actual = service.getGroup(authCtx.userId, groupId).await()
     val expected = Right(Option(expectedGroup))
@@ -124,8 +124,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[PhoneKey](phone2).set(userId2).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
-    assert(make[GroupKey](groupId).setLastEvent(time).await())
-    assert(make[GroupKey](groupId).setEventCount(eventCount).await())
+    assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
+    assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
     val actual = service.getGroup(authCtx.userId, groupId).await()
     val expected = Right(Option(expectedGroup))
@@ -160,8 +160,8 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone2)).set(label).await())
 
     assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
-    assert(make[GroupKey](groupId).setLastEvent(time).await())
-    assert(make[GroupKey](groupId).setEventCount(eventCount).await())
+    assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
+    assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
     val actual = service.getGroup(authCtx.userId, groupId).await()
     val expected = Right(Option(expectedGroup))

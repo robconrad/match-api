@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 2/15/15 5:37 PM
  */
 
 package base.entity.group.kv.impl
@@ -15,8 +15,9 @@ import base.entity.group.kv.GroupKey
 import base.entity.group.kv.impl.GroupKeyImpl._
 import base.entity.kv.serializer.SerializerImplicits._
 import org.joda.time.DateTime
-import scredis.keys.{ HashKey, HashKeyProp, HashKeyProps }
+import scredis.keys.{HashKey, HashKeyProp, HashKeyProps}
 import scredis.serialization.Implicits._
+import scredis.serialization.{LongReader, LongWriter}
 
 import scala.concurrent.Future
 
@@ -36,19 +37,21 @@ class GroupKeyImpl(keyFactory: HashKeyProps => HashKey[Short, UUID])
 
   def getCreated = key.get[DateTime](CreatedProp)
 
-  def getLastEventAndCount: Future[(Option[DateTime], Option[Int])] = {
+  def getLastEventAndCount: Future[(Option[DateTime], Option[Long])] = {
     key.mGetAsMap[Array[Byte]](LastEventTimeProp, EventCountProp).map { props =>
       val time = props.get(LastEventTimeProp).map(dateTimeSerializer.read)
-      val count = props.get(EventCountProp).map(intReader.read)
+      val count = props.get(EventCountProp).map(LongReader.read)
       (time, count)
     }
   }
 
-  def setLastEvent(time: DateTime) =
-    key.set(LastEventTimeProp, TimeService().now)
+  def setLastEventAndIncrCount(time: DateTime) =
+    key.set(LastEventTimeProp, TimeService().now).flatMap { result =>
+      key.incrBy(EventCountProp, 1L)
+    }
 
-  def setEventCount(count: Int) =
-    key.set(EventCountProp, count)
+  def setEventCount(count: Long) =
+    key.set(EventCountProp, count)(LongWriter)
 
 }
 

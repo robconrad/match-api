@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 1:27 PM
+ * Last modified by rconrad, 2/15/15 5:23 PM
  */
 
 package base.entity.group.impl
@@ -10,9 +10,10 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.service.ServiceImpl
+import base.entity.auth.context.ChannelContext
 import base.entity.event.model.EventModel
 import base.entity.group.GroupEventsService
-import base.entity.group.kv.GroupEventsKey
+import base.entity.group.kv.{GroupUserKey, GroupKey, GroupEventsKey}
 import base.entity.json.JsonFormats
 import base.entity.kv.MakeKey
 import base.entity.logging.AuthLoggable
@@ -35,11 +36,19 @@ class GroupEventsServiceImpl(count: Int, store: Int, delta: Int)
 
   private val storeDelta = store + delta
 
-  def getEvents(groupId: UUID) = {
-    val key = make[GroupEventsKey](groupId)
-    key.lRange(0, count - 1).map { events =>
-      Right(events)
+  def getEvents(groupId: UUID, setLastReadTime: Boolean)(implicit channelCtx: ChannelContext) = {
+    val key = make[GroupUserKey]((groupId, authCtx.userId))
+    groupUserSetLastRead(key, setLastReadTime) flatMap { result =>
+      val key = make[GroupEventsKey](groupId)
+      key.lRange(0, count - 1).map { events =>
+        Right(events)
+      }
     }
+  }
+
+  private def groupUserSetLastRead(key: GroupUserKey, setLastReadTime: Boolean) = setLastReadTime match {
+    case false => Future.successful(true)
+    case true => key.setLastRead()
   }
 
   def setEvent(event: EventModel, createIfNotExists: Boolean) = {
@@ -49,12 +58,21 @@ class GroupEventsServiceImpl(count: Int, store: Int, delta: Int)
       case false => key.lPushX
     }
     fun(event) flatMap {
+      case 0 => Future.successful(Right(event))
       case n if n > storeDelta =>
-        key.lTrim(0, store - 1) map { result =>
+        groupSet(event.groupId) flatMap { result =>
+          key.lTrim(0, store - 1) map { result =>
+            Right(event)
+          }
+        }
+      case n =>
+        groupSet(event.groupId) map { result =>
           Right(event)
         }
-      case n => Future.successful(Right(event))
     }
   }
+
+  private def groupSet(groupId: UUID) =
+    make[GroupKey](groupId).setLastEventAndIncrCount()
 
 }
