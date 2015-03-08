@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:51 PM
+ * Last modified by rconrad, 3/7/15 4:55 PM
  */
 
 package base.entity.api
@@ -22,6 +22,8 @@ object ApiErrorCodes extends Enumeration {
   val COMMAND_NOT_HANDLED = Value
 
   val NOT_GROUP_MEMBER = Value
+  
+  val ALREADY_LOGGED_IN = Value
 
   val PHONE_RATE_LIMIT = Value
   val VERIFY_CODE_MISSING = Value

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/7/15 5:17 PM
  */
 
 package base.socket.command.impl
@@ -57,6 +57,9 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
 
   private[impl] class ProcessCommand()(implicit channelCtx: ChannelContext) {
 
+    private lazy val alreadyLoggedInError =
+      Future.successful(returnError(ALREADY_LOGGED_IN, "this socket is already authenticated"))
+
     def parseInput(input: String): FutureResponse = {
       try {
         extractCommand(JsonMethods.parse(input)) recover {
@@ -89,9 +92,10 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
 
     def processCommand(cmd: CommandName, body: JObject): FutureResponse = {
       val response: Future[Option[_]] = cmd match {
+        case CommandNames.login if authCtx.hasUser => return alreadyLoggedInError
+        case CommandNames.login          => LoginCommandService().execute(body.extract[LoginModel])
         case CommandNames.registerPhone  => RegisterPhoneCommandService().execute(body.extract[RegisterPhoneModel])
         case CommandNames.verifyPhone    => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
-        case CommandNames.login          => LoginCommandService().execute(body.extract[LoginModel])
         case CommandNames.sendInvite     => SendInviteCommandService().execute(body.extract[SendInviteModel])
         case CommandNames.acceptInvite   => AcceptInviteCommandService().execute(body.extract[AcceptInviteModel])
         case CommandNames.declineInvite  => DeclineInviteCommandService().execute(body.extract[DeclineInviteModel])

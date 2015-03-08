@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 3/7/15 5:22 PM
  */
 
 package base.socket.api.impl
@@ -84,7 +84,9 @@ abstract class SocketApiHandlerServiceImpl
             }
           case Success(Left(processingError)) =>
             warn("processing failed with %s", processingError.message)
-            ctx.channel().close(processingError.message)
+            // normally this would be a channel closing error but for development purposes we allow the channel
+            //  to remain open as well as writing the error
+            write(ApiErrorService().toJson(processingError.message))
           case Failure(t) =>
             error("processing threw", t)
             val apiError = ApiErrorService().throwable(Errors.externalErrorText, StatusCodes.InternalServerError, t)

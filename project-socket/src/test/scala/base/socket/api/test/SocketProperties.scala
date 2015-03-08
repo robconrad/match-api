@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 11:49 AM
+ * Last modified by rconrad, 3/7/15 5:05 PM
  */
 
 package base.socket.api.test
@@ -28,6 +28,7 @@ class SocketProperties(
     private var _name: Option[String] = Option("name-" + RandomService().md5),
     private var _phone: Option[String] = None,
     private var _lastLogin: Option[DateTime] = None,
+    private var _isLoggedIn: Boolean = false,
     private var _questionsAnswered: Map[UUID, List[(Int, QuestionSide)]] = Map(),
     private var _groups: List[TestGroup] = List(),
     private var _pendingGroups: List[TestGroup] = List()) {
@@ -57,6 +58,9 @@ class SocketProperties(
 
   def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
   def lastLogin = _lastLogin
+  
+  def isLoggedIn_=(isLoggedIn: Boolean) { _isLoggedIn = isLoggedIn }
+  def isLoggedIn = _isLoggedIn
 
   def answerQuestion(groupId: UUID, questionIndex: Int, questionSide: QuestionSide) {
     val qa = _questionsAnswered.getOrElse(groupId, List()) ++ List((questionIndex, questionSide))

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 6:07 PM
+ * Last modified by rconrad, 3/7/15 5:06 PM
  */
 
 package base.socket.api.test
@@ -47,6 +47,7 @@ abstract class SocketConnection(var _props: SocketProperties) {
     props.groups.foreach { group =>
       group.sockets = group.sockets.filter(_ != this)
     }
+    props.isLoggedIn = false
     _disconnect()
   }
 
