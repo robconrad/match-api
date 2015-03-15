@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/21/15 9:19 PM
+ * Last modified by rconrad, 3/15/15 10:19 AM
  */
 
 package base.socket.api.mock
@@ -11,6 +11,8 @@ import base.socket.api.impl.{ WebSocketApiHandlerServiceImpl, WebSocketChannelIn
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
  * {{ Describe the high level purpose of SocketApiHandlerServiceMock here. }}
@@ -32,6 +34,7 @@ class WebSocketApiHandlerServiceMock(channelReadResponse: Option[String] = None)
     }
   }
 
-  override def makeInitializer = new WebSocketChannelInitializer(this)
+  override def makeInitializer(idleTimeout: FiniteDuration) =
+    new WebSocketChannelInitializer(this, idleTimeout.toSeconds.toInt)
 
 }

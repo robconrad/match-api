@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 8:57 AM
+ * Last modified by rconrad, 3/15/15 10:19 AM
  */
 
 package base.socket.api.impl
@@ -15,6 +15,8 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod._
 import io.netty.handler.codec.http.websocketx._
 import spray.http.StatusCodes
+
+import scala.concurrent.duration.FiniteDuration
 
 @Sharable // scalastyle:off
 class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
@@ -52,7 +54,8 @@ class WebSocketApiHandlerServiceImpl extends SocketApiHandlerServiceImpl {
     ctx.channel.handshaker.close(ctx.channel, frame.retain)
   }
 
-  def makeInitializer = new WebSocketChannelInitializer(this)
+  def makeInitializer(idleTimeout: FiniteDuration) =
+    new WebSocketChannelInitializer(this, idleTimeout.toSeconds.toInt)
 
 }
 

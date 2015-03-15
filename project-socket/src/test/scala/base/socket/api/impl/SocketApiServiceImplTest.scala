@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:10 PM
+ * Last modified by rconrad, 3/15/15 9:59 AM
  */
 
 package base.socket.api.impl
@@ -28,8 +28,9 @@ abstract class SocketApiServiceImplTest extends SocketServiceTest {
   private val connectionsAllowed = 10
   private val stopSleep = 1.millis
   private val shutdownTimeout = 10.seconds
+  private val idleTimeout = 10.seconds
 
-  val service = new SocketApiServiceImpl(host, port, connectionsAllowed, stopSleep, shutdownTimeout)
+  val service = new SocketApiServiceImpl(host, port, connectionsAllowed, stopSleep, shutdownTimeout, idleTimeout)
 
   protected val response = "a response"
   private val connections = 1
@@ -45,10 +46,12 @@ abstract class SocketApiServiceImplTest extends SocketServiceTest {
   def assertResponse()
 
   test("isConnectionAllowed") {
-    assert(new SocketApiServiceImpl(host, port, connectionsAllowed, stopSleep, shutdownTimeout).isConnectionAllowed)
+    assert(new SocketApiServiceImpl(
+      host, port, connectionsAllowed, stopSleep, shutdownTimeout, idleTimeout).isConnectionAllowed)
 
     val noConnections = 0
-    assert(!new SocketApiServiceImpl(host, port, noConnections, stopSleep, shutdownTimeout).isConnectionAllowed)
+    assert(!new SocketApiServiceImpl(
+      host, port, noConnections, stopSleep, shutdownTimeout, idleTimeout).isConnectionAllowed)
   }
 
   test("start / stop", Tags.SLOW) {

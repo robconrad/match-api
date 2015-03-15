@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/15/15 10:16 AM
  */
 
 package base.socket.api
@@ -10,6 +10,8 @@ package base.socket.api
 import base.common.service.{ Service, ServiceCompanion }
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.{ ChannelFuture, ChannelHandlerContext, ChannelInboundHandler, ChannelInitializer }
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
  *
@@ -19,7 +21,7 @@ trait SocketApiHandlerService extends Service with ChannelInboundHandler {
 
   final val serviceManifest = manifest[SocketApiHandlerService]
 
-  def makeInitializer: ChannelInitializer[SocketChannel]
+  def makeInitializer(idleTimeout: FiniteDuration): ChannelInitializer[SocketChannel]
 
   def stop()
 

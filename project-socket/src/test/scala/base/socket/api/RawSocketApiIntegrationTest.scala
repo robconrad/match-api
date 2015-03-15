@@ -2,58 +2,19 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/15/15 10:32 AM
  */
 
 package base.socket.api
 
-import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
-import java.net.Socket
-
-import base.socket.api.impl.RawSocketApiHandlerServiceImpl
-import base.socket.api.test.{ SocketConnection, SocketProperties }
-
-import scala.language.existentials
+import base.socket.api.test.RawSocketIntegrationSuite
 
 /**
- * Responsible for testing Server startup - highest level integration test possible
+ * {{ Describe the high level purpose of RawSocketApiIntegrationTest here. }}
+ * {{ Include relevant details here. }}
+ * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class RawSocketApiIntegrationTest extends SocketApiIntegrationTest {
-
-  def handlerService = new RawSocketApiHandlerServiceImpl
-
-  def makeSocket(props: SocketProperties) =
-    new SocketConnection(props) {
-
-      private var socket: Socket = _
-      private var out: PrintWriter = _
-      private var in: BufferedReader = _
-
-      protected def _connect() = {
-        socket = new Socket(SocketApiService().host, SocketApiService().port)
-        socket.setSoTimeout(defaultTimeout.duration.toMillis.toInt)
-        out = new PrintWriter(socket.getOutputStream, true)
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream))
-        this
-      }
-
-      protected def _disconnect() = {
-        socket.close()
-        this
-      }
-
-      def read = {
-        in.readLine()
-      }
-
-      def write(json: String) {
-        out.write(json + "\r\n")
-        out.flush()
-      }
-
-      def isActive = socket.isConnected
-
-    }
+class RawSocketApiIntegrationTest extends SocketApiIntegrationTest with RawSocketIntegrationSuite {
 
 }

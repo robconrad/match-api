@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/15/15 10:16 AM
  */
 
 package base.socket.api.impl
@@ -30,7 +30,8 @@ class SocketApiServiceImpl(val host: String,
                            val port: Int,
                            connectionsAllowed: Int,
                            stopSleep: FiniteDuration,
-                           shutdownTimeout: FiniteDuration)
+                           shutdownTimeout: FiniteDuration,
+                           val idleTimeout: FiniteDuration)
     extends ServiceImpl with SocketApiService {
 
   private lazy val acceptorLoop = new NioEventLoopGroup
@@ -54,7 +55,7 @@ class SocketApiServiceImpl(val host: String,
         .childOption[java.lang.Boolean](ChannelOption.SO_KEEPALIVE, true)
         .childOption[java.lang.Boolean](ChannelOption.SO_REUSEADDR, true)
         .childOption[java.lang.Integer](ChannelOption.SO_LINGER, 0)
-        .childHandler(SocketApiHandlerService().makeInitializer)
+        .childHandler(SocketApiHandlerService().makeInitializer(idleTimeout))
       server.bind().syncUninterruptibly()
       info("Listening on %s:%s", address.getAddress.getHostAddress, address.getPort)
     } onComplete {

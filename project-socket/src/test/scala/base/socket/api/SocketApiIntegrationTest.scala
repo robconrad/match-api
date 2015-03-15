@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/7/15 5:22 PM
+ * Last modified by rconrad, 3/15/15 10:28 AM
  */
 
 package base.socket.api
@@ -109,7 +109,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
       StatusCodes.BadRequest,
       ApiErrorCodes.JSON_NOT_FOUND,
       "no json received in msg: JNothing"))
-    // not disconecting on known errors at the moment
+    // not disconnecting on known errors at the moment
     //assert(!socket.isActive)
 
     socket.disconnect()

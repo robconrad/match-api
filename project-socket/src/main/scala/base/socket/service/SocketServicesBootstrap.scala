@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/20/15 10:32 PM
+ * Last modified by rconrad, 3/15/15 9:59 AM
  */
 
 package base.socket.service
@@ -32,7 +32,8 @@ object SocketServicesBootstrap extends ServicesBootstrap {
       Keys(SOCKET, "port"),
       Keys(SOCKET, "connectionsAllowed"),
       Keys(SOCKET, "stopSleep"),
-      Keys(SOCKET, "shutdownTimeout")))
+      Keys(SOCKET, "shutdownTimeout"),
+      Keys(SOCKET, "idleTimeout")))
 
     Services.register(new WebSocketApiHandlerServiceImpl())
 

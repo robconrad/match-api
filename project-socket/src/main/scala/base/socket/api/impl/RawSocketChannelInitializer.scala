@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/1/15 3:00 PM
+ * Last modified by rconrad, 3/15/15 10:19 AM
  */
 
 package base.socket.api.impl
@@ -17,7 +17,8 @@ import io.netty.handler.codec.{ DelimiterBasedFrameDecoder, Delimiters }
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class RawSocketChannelInitializer(commandHandler: ChannelHandler) extends SocketChannelInitializer {
+class RawSocketChannelInitializer(commandHandler: ChannelHandler,
+                                  protected val allIdleTime: Int) extends SocketChannelInitializer {
 
   val maxFrameLength = 8192
 
