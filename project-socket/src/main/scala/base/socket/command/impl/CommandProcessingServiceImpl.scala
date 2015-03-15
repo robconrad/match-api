@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/7/15 5:17 PM
+ * Last modified by rconrad, 3/15/15 10:46 AM
  */
 
 package base.socket.command.impl
@@ -90,21 +90,22 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
       }
     }
 
+    // scalastyle:off return
     def processCommand(cmd: CommandName, body: JObject): FutureResponse = {
       val response: Future[Option[_]] = cmd match {
         case CommandNames.login if authCtx.hasUser => return alreadyLoggedInError
-        case CommandNames.login          => LoginCommandService().execute(body.extract[LoginModel])
-        case CommandNames.registerPhone  => RegisterPhoneCommandService().execute(body.extract[RegisterPhoneModel])
-        case CommandNames.verifyPhone    => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
-        case CommandNames.sendInvite     => SendInviteCommandService().execute(body.extract[SendInviteModel])
-        case CommandNames.acceptInvite   => AcceptInviteCommandService().execute(body.extract[AcceptInviteModel])
-        case CommandNames.declineInvite  => DeclineInviteCommandService().execute(body.extract[DeclineInviteModel])
-        case CommandNames.questions      => QuestionsCommandService().execute(body.extract[QuestionsModel])
-        case CommandNames.message        => MessageCommandService().execute(body.extract[MessageModel])
-        case CommandNames.answer         => AnswerCommandService().execute(body.extract[AnswerModel])
-        case CommandNames.createQuestion => CreateQuestionCommandService().execute(body.extract[CreateQuestionModel])
-        case CommandNames.ackEvents      => AckEventsCommandService().execute(body.extract[AckEventsModel])
-        case CommandNames.heartbeat      => Future.successful(None)
+        case CommandNames.login                    => LoginCommandService().execute(body.extract[LoginModel])
+        case CommandNames.registerPhone            => RegisterPhoneCommandService().execute(body.extract[RegisterPhoneModel])
+        case CommandNames.verifyPhone              => VerifyPhoneCommandService().execute(body.extract[VerifyPhoneModel])
+        case CommandNames.sendInvite               => SendInviteCommandService().execute(body.extract[SendInviteModel])
+        case CommandNames.acceptInvite             => AcceptInviteCommandService().execute(body.extract[AcceptInviteModel])
+        case CommandNames.declineInvite            => DeclineInviteCommandService().execute(body.extract[DeclineInviteModel])
+        case CommandNames.questions                => QuestionsCommandService().execute(body.extract[QuestionsModel])
+        case CommandNames.message                  => MessageCommandService().execute(body.extract[MessageModel])
+        case CommandNames.answer                   => AnswerCommandService().execute(body.extract[AnswerModel])
+        case CommandNames.createQuestion           => CreateQuestionCommandService().execute(body.extract[CreateQuestionModel])
+        case CommandNames.ackEvents                => AckEventsCommandService().execute(body.extract[AckEventsModel])
+        case CommandNames.heartbeat                => Future.successful(None)
       }
       addAuthContext(cmd, response)
     }

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/7/15 5:17 PM
+ * Last modified by rconrad, 3/15/15 10:39 AM
  */
 
 package base.socket.api.test.command
@@ -10,7 +10,7 @@ package base.socket.api.test.command
 import base.common.random.mock.RandomServiceMock
 import base.common.service.TestServices
 import base.common.time.mock.TimeServiceConstantMock
-import base.entity.api.{ApiErrorCodes, ApiVersions}
+import base.entity.api.{ ApiErrorCodes, ApiVersions }
 import base.entity.auth.context.ChannelContext
 import base.entity.device.model.DeviceModel
 import base.entity.error.ApiErrorService
@@ -62,7 +62,7 @@ class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
     val unregister = registerFacebookService(Option(fbInfo))
 
     s.isLoggedIn match {
-      case true => executor(loginModel, Option(errorResponseModel))
+      case true  => executor(loginModel, Option(errorResponseModel))
       case false => executor(loginModel, Option(loginResponseModel))
     }
 

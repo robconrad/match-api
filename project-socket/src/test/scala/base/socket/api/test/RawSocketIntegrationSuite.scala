@@ -2,12 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/15/15 10:31 AM
+ * Last modified by rconrad, 3/15/15 10:39 AM
  */
 
 package base.socket.api.test
 
-import java.io.{BufferedReader, InputStreamReader, PrintWriter}
+import java.io.{ BufferedReader, InputStreamReader, PrintWriter }
 import java.net.Socket
 
 import base.socket.api.SocketApiService

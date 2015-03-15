@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/7/15 5:05 PM
+ * Last modified by rconrad, 3/15/15 10:39 AM
  */
 
 package base.socket.api.test
@@ -58,7 +58,7 @@ class SocketProperties(
 
   def lastLogin_=(lastLogin: DateTime) { _lastLogin = Option(lastLogin) }
   def lastLogin = _lastLogin
-  
+
   def isLoggedIn_=(isLoggedIn: Boolean) { _isLoggedIn = isLoggedIn }
   def isLoggedIn = _isLoggedIn
 
