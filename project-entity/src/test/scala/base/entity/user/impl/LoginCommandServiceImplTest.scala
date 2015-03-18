@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/17/15 10:31 PM
  */
 
 package base.entity.user.impl
@@ -113,7 +113,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest[LoginModel] {
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), None, None, None)
+      List(), List(), None, None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -123,7 +123,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest[LoginModel] {
     assert(make[FacebookUserKey](fbId).set(userId).await())
     val myModel = model.copy(groupId = None)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(), None, None, None)
+      List(), List(), None, None, None, None)
     testSuccess(userId, myModel, response)
   }
 
@@ -136,7 +136,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest[LoginModel] {
     assert(make[GroupUsersKey](groupId).add(userId).await() == 1L)
     assert(make[UserGroupsKey](userId).add(groupId).await() == 1L)
     val response = LoginResponseModelImpl(userModel, None, phoneVerified = false,
-      List(), List(groupModel), Option(List()), Option(List()), None)
+      List(), List(groupModel), Option(groupId), Option(List()), Option(List()), None)
     testSuccess(userId, model, response)
   }
 

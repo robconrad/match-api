@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/15/15 10:50 AM
+ * Last modified by rconrad, 3/17/15 10:36 PM
  */
 
 package base.socket.api.test.command
@@ -52,6 +52,7 @@ class LoginCommandHandler(implicit s: SocketConnection) extends CommandHandler {
       s.phoneOpt.isDefined,
       List(),
       sortGroups(s.groups.map(_.model)),
+      group.map(_.id),
       group.map(_.events.reverse),
       group.map(group => questions.filteredModels(group.id, s.questionsAnswered(group.id))),
       s.lastLogin)

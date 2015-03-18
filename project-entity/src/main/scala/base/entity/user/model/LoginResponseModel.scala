@@ -2,10 +2,12 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/7/15 3:24 PM
+ * Last modified by rconrad, 3/17/15 10:27 PM
  */
 
 package base.entity.user.model
+
+import java.util.UUID
 
 import base.entity.api.ApiStrings.User._
 import base.entity.event.model.EventModel
@@ -33,6 +35,7 @@ trait LoginResponseModel extends Model {
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def phoneVerified: Boolean
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def pendingGroups: List[GroupModel]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def groups: List[GroupModel]
+  @(ApiModelProperty @field)(required = false, value = passwordDesc) def groupId: Option[UUID]
   @(ApiModelProperty @field)(required = false, value = passwordDesc) def events: Option[List[EventModel]]
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  def questions: Option[List[QuestionModel]]
   @(ApiModelProperty @field)(required = true, value = passwordDesc)  def lastLoginTime: Option[DateTime]

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/15/15 10:50 AM
+ * Last modified by rconrad, 3/17/15 10:34 PM
  */
 
 package base.socket.command.impl
@@ -91,6 +91,7 @@ class CommandProcessingServiceImpl extends ServiceImpl with CommandProcessingSer
     }
 
     // scalastyle:off return
+    // scalastyle:off line.size.limit
     def processCommand(cmd: CommandName, body: JObject): FutureResponse = {
       val response: Future[Option[_]] = cmd match {
         case CommandNames.login if authCtx.hasUser => return alreadyLoggedInError

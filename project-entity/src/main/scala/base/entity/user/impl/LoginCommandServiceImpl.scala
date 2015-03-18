@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/17/15 10:30 PM
  */
 
 package base.entity.user.impl
@@ -100,7 +100,7 @@ private[entity] class LoginCommandServiceImpl()
       UserService().getGroups(userId).flatMap {
         case Left(error) => error
         case Right(groups) =>
-          val builder = LoginResponseModelBuilder(groups = Option(groups))
+          val builder = LoginResponseModelBuilder(groups = Option(groups), groupId = Option(input.groupId))
           input.groupId match {
             case Some(groupId) => groupIsMember(key, userId, groupId, builder)
             case None =>
