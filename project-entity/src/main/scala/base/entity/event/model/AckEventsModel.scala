@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 5:03 PM
  */
 
 package base.entity.event.model
@@ -27,6 +27,7 @@ import scala.annotation.meta.field
 trait AckEventsModel extends CommandInputModel {
 
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def groupId: UUID
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastReadEventCount: Long
 
 }
 // format: ON

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:52 PM
+ * Last modified by rconrad, 3/22/15 5:10 PM
  */
 
 package base.entity.group.kv.impl
@@ -27,8 +27,8 @@ class GroupUserKeyImpl(keyFactory: HashKeyProps => HashKey[Short, OrderedIdPair]
 
   private lazy val key = keyFactory(props)
 
-  def getLastRead = key.get[DateTime](LastReadTimeProp)
-  def setLastRead(time: DateTime) = key.set(LastReadTimeProp, time)
+  def getLastReadEventCount = key.get[Long](LastReadTimeProp)
+  def setLastReadEventCount(eventCount: Long) = key.set(LastReadTimeProp, eventCount)
 
 }
 

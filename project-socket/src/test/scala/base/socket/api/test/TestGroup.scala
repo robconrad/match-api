@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 7:45 PM
  */
 
 package base.socket.api.test
@@ -31,7 +31,7 @@ class TestGroup(private var _id: Option[UUID] = None,
                 private var _users: List[UserModel] = List(),
                 private var _invites: List[InviteModel] = List(),
                 private var _events: List[EventModel] = List(),
-                private var _reads: Map[UUID, DateTime] = Map()) {
+                private var _reads: Map[UUID, Long] = Map()) {
 
   def set(randomMock: RandomServiceMock, socket1: SocketConnection, socket2: SocketConnection) {
     id = randomMock.nextUuid()
@@ -41,15 +41,16 @@ class TestGroup(private var _id: Option[UUID] = None,
       case Some(userId) => List(socket2.inviteModel)
       case None         => List(InviteModelFactory(socket2.phoneString))
     }
-    events = List(EventModelFactory.welcome(randomMock.nextUuid(1), randomMock.nextUuid()))
+    events = List(EventModelFactory.welcome(randomMock.nextUuid(1), None, randomMock.nextUuid()))
   }
 
-  def model(implicit s: SocketConnection): GroupModel = {
-    val eventTime = events.size > 0 match {
-      case true  => Option(TimeServiceConstantMock.now)
-      case false => None
-    }
-    GroupModelImpl(id, users, invites, eventTime, reads.get(s.userId), events.size)
+  def model(hydrate: Boolean = false)(implicit s: SocketConnection): GroupModel = {
+    GroupModelImpl(
+      id,
+      if (hydrate) Option(users) else None,
+      if (hydrate) Option(invites) else None,
+      reads.get(s.userId),
+      events.size)
   }
 
   def id_=(id: UUID) { _id = Option(id) }
@@ -67,7 +68,7 @@ class TestGroup(private var _id: Option[UUID] = None,
   def events_=(events: List[EventModel]) { _events = events }
   def events = _events
 
-  def reads_=(reads: Map[UUID, DateTime]) { _reads = reads }
+  def reads_=(reads: Map[UUID, Long]) { _reads = reads }
   def reads = _reads
 
 }

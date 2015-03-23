@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 8:22 PM
  */
 
 package base.socket.api.test.command
@@ -57,11 +57,10 @@ class AnswerCommandHandler(implicit socket: SocketConnection) extends CommandHan
     otherSocket.answerQuestion(group.id, index, otherSide)
 
     val answerModel = AnswerModel(question.id, group.id, side, answer)
-    val eventModel = EventModelFactory.`match`(answerEventId, group.id, answerBody)
     executor(answerModel, None)
-    group.sockets.foreach { socket =>
+    group.sockets.foreach { implicit socket =>
       debug("expect response for %s", socket.hashCode())
-      executor.assertResponse(eventModel)(manifest[EventModel], socket)
+      executor.assertResponse(EventModelFactory.`match`(answerEventId, Option(group.model()), group.id, answerBody))
     }
   }
 

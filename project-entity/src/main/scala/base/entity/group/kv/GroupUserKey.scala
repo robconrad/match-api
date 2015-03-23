@@ -2,12 +2,11 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/12/15 8:53 PM
+ * Last modified by rconrad, 3/22/15 5:10 PM
  */
 
 package base.entity.group.kv
 
-import base.common.time.TimeService
 import org.joda.time.DateTime
 
 import scala.concurrent.Future
@@ -20,7 +19,7 @@ import scala.concurrent.Future
  */
 trait GroupUserKey {
 
-  def getLastRead: Future[Option[DateTime]]
-  def setLastRead(time: DateTime = TimeService().now): Future[Boolean]
+  def getLastReadEventCount: Future[Option[Long]]
+  def setLastReadEventCount(eventCount: Long): Future[Boolean]
 
 }

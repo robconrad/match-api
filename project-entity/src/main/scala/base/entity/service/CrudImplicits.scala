@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:11 PM
+ * Last modified by rconrad, 3/22/15 5:52 PM
  */
 
 package base.entity.service
@@ -21,7 +21,8 @@ import scala.concurrent.Future
  */
 private[entity] trait CrudImplicits[T] {
 
-  type Response = Future[Either[ApiError, T]]
+  type EitherResponse = Either[ApiError, T]
+  type Response = Future[EitherResponse]
 
   /**
    * Convenience implicits for wrapping responses in Either[] and formatting EntityError

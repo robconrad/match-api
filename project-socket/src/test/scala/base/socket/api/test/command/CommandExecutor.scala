@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:34 PM
+ * Last modified by rconrad, 3/22/15 7:47 PM
  */
 
 package base.socket.api.test.command
@@ -52,7 +52,8 @@ class CommandExecutor extends SocketBaseSuite with Loggable {
     debug(socket.hashCode() + "   actual: " + extractedResponse.toString)
     debug(socket.hashCode() + " expected: " + expectedResponse.toString)
 
-    assert(extractedResponse == expectedResponse)
+    //assert(extractedResponse == expectedResponse)
+    assert(rawResponse == Serialization.write(expectedResponse))
   }
 
 }

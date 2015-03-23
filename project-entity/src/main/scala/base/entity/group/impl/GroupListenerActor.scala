@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 12:55 PM
+ * Last modified by rconrad, 3/22/15 8:34 PM
  */
 
 package base.entity.group.impl
@@ -10,9 +10,12 @@ package base.entity.group.impl
 import java.util.UUID
 
 import base.common.lib.BaseActor
-import base.entity.auth.context.PushChannel
+import base.entity.auth.context.impl.ChannelContextImpl
+import base.entity.auth.context.{ ChannelContext, NoAuthContext, PushChannel }
 import base.entity.command.model.CommandModel
 import base.entity.event.model.EventModel
+import base.entity.event.model.impl.EventModelImpl
+import base.entity.group.GroupService
 import base.entity.group.impl.GroupListenerActor.{ Publish, Register, Unregister }
 
 import scala.collection.mutable
@@ -75,12 +78,18 @@ class GroupListenerActor extends BaseActor {
       case Some(userIds) =>
         val futures = userIds.map { userId =>
           userChannels get userId map { channel =>
-            // The reason we future this off is that we can't have expensive operations tying up this actor
-            //  since it's a choke point for the whole app. Who knows what's happening inside publish!
-            //  (json serialization for one)
-            Future {
-              channel push msg.command
-            } flatMap identity
+            hydrateGroup(userId, msg.command) flatMap {
+              case Some(command) =>
+                try {
+                  debug(s"channel push $command")
+                  channel push command
+                } catch {
+                  case e: Throwable =>
+                    error("channel push threw ", e)
+                    throw e
+                }
+              case None => Future.successful(false)
+            }
           }
         }.collect {
           case Some(future) => future
@@ -90,6 +99,29 @@ class GroupListenerActor extends BaseActor {
           s ! Unit
         }
       case None => sender ! Unit
+    }
+  }
+
+  private implicit val channelCtx: ChannelContext = ChannelContextImpl(NoAuthContext, None)
+  private def hydrateGroup(userId: UUID, command: CommandModel[EventModel]) = {
+    val event = command.body
+    GroupService().getGroup(userId, command.body.groupId) map {
+      case Right(Some(group)) =>
+        val newEvent = EventModelImpl(
+          event.id,
+          Option(group),
+          event.groupId,
+          userId = event.userId,
+          `type` = event.`type`,
+          body = event.body,
+          time = event.time)
+        Option(command.copy(body = newEvent))
+      case Right(None) =>
+        error("no group found")
+        None
+      case Left(e) =>
+        error(e.toString)
+        None
     }
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 6:03 PM
  */
 
 package base.entity.group.impl
@@ -67,8 +67,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest[AcceptIn
     groupEventsService.setEvent _ expects (*, *) returning Future.successful(Right(eventModel))
     (groupListenerService.register(_: UUID, _: Set[UUID])(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Unit)
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(groupModel)))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(groupModel)))
     (questionService.getQuestions(_: UUID, _: UUID)(_: ChannelContext)) expects
       (*, *, *) returning Future.successful(Right(List()))
     groupEventsService.getEvents _ expects * returning Future.successful(Right(List()))
@@ -135,8 +135,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest[AcceptIn
 
   test("group get returned error") {
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(error))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error))
     val unregister = TestServices.register(groupService)
     assert(command.groupGet().await() == Left(error))
     unregister()
@@ -144,8 +144,8 @@ class AcceptInviteCommandServiceImplTest extends CommandServiceImplTest[AcceptIn
 
   test("group get failed") {
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(None))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(None))
     val unregister = TestServices.register(groupService)
     assert(command.groupGet().await() == Errors.groupGetFailed.await())
     unregister()

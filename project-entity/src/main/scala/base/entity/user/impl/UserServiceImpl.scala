@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:25 PM
+ * Last modified by rconrad, 3/22/15 6:00 PM
  */
 
 package base.entity.user.impl
@@ -82,7 +82,7 @@ class UserServiceImpl extends ServiceImpl with UserService with MakeKey {
   private[impl] def getGroupsFromIds(userId: UUID,
                                      groupIds: Set[UUID])(implicit channelCtx: ChannelContext): GetGroups = {
     val futures = groupIds.map { groupId =>
-      GroupService().getGroup(userId, groupId)
+      GroupService().getGroup(userId, groupId, hydrate = true)
     }
     Future.sequence(futures).map { eithers =>
       lazy val errors = eithers.collect { case Left(error) => error }

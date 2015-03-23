@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 3/22/15 8:29 PM
  */
 
 package base.socket.api.test.command
@@ -22,12 +22,14 @@ import base.socket.api.test.{ SocketConnection, TestGroup }
 class MessageCommandHandler(implicit socket: SocketConnection) extends CommandHandler {
 
   def apply(group: TestGroup)(implicit executor: CommandExecutor, randomMock: RandomServiceMock) = {
-    val event = EventModelFactory.message(randomMock.nextUuid(), group.id, socket)
+    val eventId = randomMock.nextUuid()
+    val event = EventModelFactory.message(eventId, None, group.id, socket)
     group.events ++= List(event)
     val messageModel = MessageModel(group.id, event.body)
     executor(messageModel, None)
-    group.sockets.foreach { socket =>
-      executor.assertResponse(event)(manifest[EventModel], socket)
+    group.sockets.foreach { currentSocket =>
+      val event = EventModelFactory.message(eventId, Option(group.model()(currentSocket)), group.id, socket)
+      executor.assertResponse(event)(manifest[EventModel], currentSocket)
     }
     event
   }

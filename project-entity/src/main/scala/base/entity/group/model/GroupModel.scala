@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 5:08 PM
+ * Last modified by rconrad, 3/22/15 5:03 PM
  */
 
 package base.entity.group.model
@@ -29,10 +29,9 @@ import scala.annotation.meta.field
 trait GroupModel extends Model {
 
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def id: UUID
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) def users: List[UserModel]
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) def invites: List[InviteModel]
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastEventTime: Option[DateTime]
-  @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastReadTime: Option[DateTime]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def users: Option[List[UserModel]]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def invites: Option[List[InviteModel]]
+  @(ApiModelProperty @field)(required = true, value = passwordDesc) def lastReadEventCount: Option[Long]
   @(ApiModelProperty @field)(required = true, value = passwordDesc) def eventCount: Long
 
 }

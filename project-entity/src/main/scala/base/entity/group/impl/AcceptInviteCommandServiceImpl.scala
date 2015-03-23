@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 8:32 PM
  */
 
 package base.entity.group.impl
@@ -103,7 +103,7 @@ private[entity] class AcceptInviteCommandServiceImpl(joinMessage: String)
       }
 
     def groupGet(): Response =
-      GroupService().getGroup(authCtx.userId, input.groupId).flatMap {
+      GroupService().getGroup(authCtx.userId, input.groupId, hydrate = true).flatMap {
         case Right(Some(group)) => questionsGet(group)
         case Right(None)        => Errors.groupGetFailed
         case Left(error)        => error

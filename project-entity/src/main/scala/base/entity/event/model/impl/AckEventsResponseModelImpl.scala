@@ -7,16 +7,13 @@
 
 package base.entity.event.model.impl
 
-import java.util.UUID
-
-import base.entity.event.model.AckEventsModel
+import base.entity.event.model.AckEventsResponseModel
+import base.entity.group.model.GroupModel
 
 /**
  * API describable model
  * @author rconrad
  */
-case class AckEventsModelImpl(groupId: UUID, lastReadEventCount: Long) extends AckEventsModel {
-
-  lazy val assertGroupId = Option(groupId)
+case class AckEventsResponseModelImpl(group: GroupModel) extends AckEventsResponseModel {
 
 }

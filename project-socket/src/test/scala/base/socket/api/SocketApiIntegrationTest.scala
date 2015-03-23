@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/15/15 10:28 AM
+ * Last modified by rconrad, 3/22/15 7:38 PM
  */
 
 package base.socket.api
@@ -86,6 +86,7 @@ abstract class SocketApiIntegrationTest extends IntegrationSuite {
     socket1.createQuestion(group1)
     socket1.questions(group1)
     socket1.message(group1)
+    socket1.ackEvents(group1)
     socket1.answer(group1, socket2)
     socket2.createQuestion(group1)
     socket2.questions(group1)

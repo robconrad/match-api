@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 6:27 PM
  */
 
 package base.socket.api.test.command
@@ -32,7 +32,7 @@ class SendInviteCommandHandler(implicit socket: SocketConnection) extends Comman
     invitedSocket.pendingGroups ++= List(group)
 
     val inviteModel = SendInviteModel(invitedSocket.phoneString, InviteModelFactory.label)
-    val inviteResponseModel = SendInviteResponseModel(group.model, group.events, questions.models(group.id))
+    val inviteResponseModel = SendInviteResponseModel(group.model(), group.events, questions.models(group.id))
     executor(inviteModel, Option(inviteResponseModel))
     group
   }

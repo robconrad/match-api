@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/8/15 6:57 PM
+ * Last modified by rconrad, 3/22/15 6:30 PM
  */
 
 package base.socket.api.test.command
@@ -29,7 +29,7 @@ class VerifyCommandHandler(implicit s: SocketConnection) extends CommandHandler 
     }
     val code = "code!"
     val verifyModel = VerifyPhoneModel(s.phone, code)
-    val verifyResponseModel = VerifyPhoneResponseModel(s.phone, s.pendingGroups.map(_.model))
+    val verifyResponseModel = VerifyPhoneResponseModel(s.phone, s.pendingGroups.map(_.model(hydrate = true)))
     executor(verifyModel, Option(verifyResponseModel))
   }
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 5:05 PM
  */
 
 package base.entity.group.model.impl
@@ -18,25 +18,22 @@ import org.joda.time.DateTime
  * @author rconrad
  */
 case class GroupModelImpl(id: UUID,
-                          users: List[UserModel],
-                          invites: List[InviteModel],
-                          lastEventTime: Option[DateTime],
-                          lastReadTime: Option[DateTime],
+                          users: Option[List[UserModel]],
+                          invites: Option[List[InviteModel]],
+                          lastReadEventCount: Option[Long],
                           eventCount: Long) extends GroupModel
 
 case class GroupModelBuilder(id: Option[UUID] = None,
-                             users: Option[List[UserModel]] = None,
-                             invites: Option[List[InviteModel]] = None,
-                             lastEventTime: Option[Option[DateTime]] = None,
-                             lastReadTime: Option[Option[DateTime]] = None,
+                             users: Option[Option[List[UserModel]]] = None,
+                             invites: Option[Option[List[InviteModel]]] = None,
+                             lastReadEventCount: Option[Option[Long]] = None,
                              eventCount: Option[Long] = None) {
 
   def build = GroupModelImpl(
     id = id.get,
     users = users.get,
     invites = invites.get,
-    lastEventTime = lastEventTime.get,
-    lastReadTime = lastReadTime.get,
+    lastReadEventCount = lastReadEventCount.get,
     eventCount = eventCount.get)
 
 }

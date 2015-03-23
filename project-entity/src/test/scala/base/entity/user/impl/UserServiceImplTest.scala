@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 7:19 PM
+ * Last modified by rconrad, 3/22/15 6:03 PM
  */
 
 package base.entity.user.impl
@@ -71,15 +71,15 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroups - success") {
     val groups = Set(groupId1, groupId2)
-    val group1 = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
+    val group1 = GroupModelImpl(groupId1, Option(List()), Option(List()), None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group1)))
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group2)))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group1)))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group2)))
     val unregister = TestServices.register(groupService)
     assert(service.getGroupsFromKey(userId, key).await() == Right(List(group1, group2)))
     unregister()
@@ -91,8 +91,8 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
     key.members _ expects () returning Future.successful(groups)
     val error = ApiErrorService().badRequest("whatever")
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Left(error)) twice ()
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Left(error)) twice ()
     val unregister = TestServices.register(groupService)
     assert(service.getGroupsFromKey(userId, key).await() == Left(error))
     unregister()
@@ -100,12 +100,12 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroups - not all groups returned") {
     val groups = Set(groupId1, groupId2)
-    val group = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
+    val group = GroupModelImpl(groupId1, Option(List()), Option(List()), None, eventCount = 0)
     val key = mock[UserGroupsKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group))) twice ()
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group))) twice ()
     val unregister = TestServices.register(groupService)
     assert(service.getGroupsFromKey(userId, key).await() == Errors.notAllGroupsReturned)
     unregister()
@@ -113,15 +113,15 @@ class UserServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getPendingGroups - success") {
     val groups = Set(groupId1, groupId2)
-    val group1 = GroupModelImpl(groupId1, List(), List(), None, None, eventCount = 0)
+    val group1 = GroupModelImpl(groupId1, Option(List()), Option(List()), None, eventCount = 0)
     val group2 = group1.copy(id = groupId2)
     val key = mock[UserGroupsInvitedKey]
     key.members _ expects () returning Future.successful(groups)
     val groupService = mock[GroupService]
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group1)))
-    (groupService.getGroup(_: UUID, _: UUID)(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(Option(group2)))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group1)))
+    (groupService.getGroup(_: UUID, _: UUID, _: Boolean)(_: ChannelContext)) expects
+      (*, *, *, *) returning Future.successful(Right(Option(group2)))
     val unregister = TestServices.register(groupService)
     assert(service.getPendingGroupsFromKey(userId, key).await() == Right(List(group1, group2)))
     unregister()

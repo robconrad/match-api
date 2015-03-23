@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 5:56 PM
  */
 
 package base.entity.question.impl
@@ -126,7 +126,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
     val model = AnswerModel(questionDef.id, groupId, side, questionResponse)
     val eventId = randomMock.nextUuid()
-    val response = EventModelImpl(eventId, groupId, None, MATCH, questions(3) + " is a match")
+    val response = EventModelImpl(eventId, None, groupId, None, MATCH, questions(3) + " is a match")
 
     debugAssert(service.answer(model).await(), Right(List(response)))
 
@@ -154,7 +154,7 @@ class QuestionServiceImplTest extends EntityServiceTest with KvTest {
 
     val model = AnswerModel(questionId, groupId, side, questionResponse)
     val eventId = randomMock.nextUuid()
-    val response = EventModelImpl(eventId, groupId, None, MATCH, questionDef + " is a match")
+    val response = EventModelImpl(eventId, None, groupId, None, MATCH, questionDef + " is a match")
 
     debugAssert(service.answer(model).await(), Right(List(response)))
 

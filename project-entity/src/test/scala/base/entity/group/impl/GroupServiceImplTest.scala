@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/15/15 9:13 PM
+ * Last modified by rconrad, 3/22/15 6:20 PM
  */
 
 package base.entity.group.impl
@@ -30,7 +30,7 @@ import scala.concurrent.Future
  * {{ Do not skip writing good doc! }}
  * @author rconrad
  */
-class GroupServiceImplTest extends EntityServiceTest with KvTest {
+abstract class GroupServiceImplTest(hydrate: Boolean) extends EntityServiceTest with KvTest {
 
   val service = new GroupServiceImpl()
 
@@ -41,9 +41,14 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
   private val users = List[UserModel]()
   private val eventCount = 101
   private val groupId = RandomService().uuid
-  private val group = GroupModelImpl(groupId, users, List(), Option(time), Option(time), eventCount)
+  private val group = GroupModelImpl(
+    groupId,
+    if (hydrate) Option(users) else None,
+    if (hydrate) Option(List()) else None,
+    Option(eventCount),
+    eventCount)
 
-  private val method = new service.GetGroupMethod(channelCtx.authCtx.userId, groupId)
+  private val method = new service.GetGroupMethod(channelCtx.authCtx.userId, groupId, hydrate)
 
   override def beforeAll() {
     super.beforeAll()
@@ -52,45 +57,53 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
 
   test("getGroup - no invites - success") {
     val userService = mock[UserService]
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(users))
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List()))
+    if (hydrate) {
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(users))
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(List()))
+    }
     val unregister = TestServices.register(userService)
 
-    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
+    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastReadEventCount(eventCount).await())
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    assert(service.getGroup(authCtx.userId, groupId).await() == Right(Option(group)))
+    assert(service.getGroup(authCtx.userId, groupId, hydrate).await() == Right(Option(group)))
 
     unregister()
   }
 
   test("getGroup - phone invites - success") {
     val userService = mock[UserService]
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(users))
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(List()))
+    if (hydrate) {
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(users))
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(List()))
+    }
     val unregister = TestServices.register(userService)
 
     val phone1 = "555-1234"
     val phone2 = "555-1235"
     val label = "bob"
 
-    val expectedGroup = group.copy(invites = List(
-      InviteModelImpl(phone2, None, None),
-      InviteModelImpl(phone1, None, Option(label))))
+    val expectedGroup = hydrate match {
+      case false => group
+      case true =>
+        group.copy(invites = Option(List(
+          InviteModelImpl(phone2, None, None),
+          InviteModelImpl(phone1, None, Option(label)))))
+    }
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone1)).set(label).await())
 
-    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
+    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastReadEventCount(eventCount).await())
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
+    debugAssert(service.getGroup(authCtx.userId, groupId, hydrate).await(), Right(Option(expectedGroup)))
 
     unregister()
   }
@@ -103,25 +116,30 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val label = "bob"
     val invitedUsers = List(UserModel(userId1, None, Option(label)), UserModel(userId2, None, None))
     val userService = mock[UserService]
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(users))
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(invitedUsers))
+    if (hydrate) {
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(users))
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(invitedUsers))
+    }
     val unregister = TestServices.register(userService)
 
-    val expectedGroup = group.copy(invites = List(
-      InviteModelImpl(phone1, None, Option(label)),
-      InviteModelImpl(phone2, None, None)))
+    val expectedGroup = hydrate match {
+      case false => group
+      case true => group.copy(invites = Option(List(
+        InviteModelImpl(phone1, None, Option(label)),
+        InviteModelImpl(phone2, None, None))))
+    }
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(make[PhoneKey](phone1).set(userId1).await())
     assert(make[PhoneKey](phone2).set(userId2).await())
 
-    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
+    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastReadEventCount(eventCount).await())
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
+    debugAssert(service.getGroup(authCtx.userId, groupId, hydrate).await(), Right(Option(expectedGroup)))
 
     unregister()
   }
@@ -133,25 +151,30 @@ class GroupServiceImplTest extends EntityServiceTest with KvTest {
     val label = "bob"
     val invitedUsers = List(UserModel(userId1, None, Option(label)))
     val userService = mock[UserService]
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(users))
-    (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
-      (*, *, *) returning Future.successful(Right(invitedUsers))
+    if (hydrate) {
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(users))
+      (userService.getUsers(_: UUID, _: List[UUID])(_: ChannelContext)) expects
+        (*, *, *) returning Future.successful(Right(invitedUsers))
+    }
     val unregister = TestServices.register(userService)
 
-    val expectedGroup = group.copy(invites = List(
-      InviteModelImpl(phone2, None, Option(label)),
-      InviteModelImpl(phone1, None, Option(label))))
+    val expectedGroup = hydrate match {
+      case false => group
+      case true => group.copy(invites = Option(List(
+        InviteModelImpl(phone2, None, Option(label)),
+        InviteModelImpl(phone1, None, Option(label)))))
+    }
 
     assert(make[GroupPhonesInvitedKey](groupId).add(phone1, phone2).await() == 2L)
     assert(make[PhoneKey](phone1).set(userId1).await())
     assert(make[UserPhoneLabelKey](UserPhone(authCtx.userId, phone2)).set(label).await())
 
-    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastRead(time).await())
+    assert(make[GroupUserKey](groupId, channelCtx.authCtx.userId).setLastReadEventCount(eventCount).await())
     assert(make[GroupKey](groupId).setLastEventAndIncrCount(time).await() == 1L)
     assert(!make[GroupKey](groupId).setEventCount(eventCount).await())
 
-    debugAssert(service.getGroup(authCtx.userId, groupId).await(), Right(Option(expectedGroup)))
+    debugAssert(service.getGroup(authCtx.userId, groupId, hydrate).await(), Right(Option(expectedGroup)))
 
     unregister()
   }

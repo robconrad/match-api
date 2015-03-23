@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 3/17/15 10:31 PM
+ * Last modified by rconrad, 3/22/15 5:59 PM
  */
 
 package base.entity.user.impl
@@ -131,7 +131,7 @@ class LoginCommandServiceImplTest extends CommandServiceImplTest[LoginModel] {
     registerQuestionMock()
     val userId = RandomService().uuid
     val userModel = UserModel(userId, Option(pictureUrl), Option(name))
-    val groupModel = GroupModelImpl(groupId, List(userModel), List(), None, None, 0)
+    val groupModel = GroupModelImpl(groupId, Option(List(userModel)), Option(List()), None, 0)
     assert(make[FacebookUserKey](fbId).set(userId).await())
     assert(make[GroupUsersKey](groupId).add(userId).await() == 1L)
     assert(make[UserGroupsKey](userId).add(groupId).await() == 1L)

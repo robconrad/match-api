@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 2/11/15 10:25 PM
+ * Last modified by rconrad, 3/22/15 7:07 PM
  */
 
 package base.entity.group.impl
@@ -30,29 +30,36 @@ import scala.concurrent.Future
  */
 class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
 
-  def getGroup(userId: UUID, groupId: UUID)(implicit channelCtx: ChannelContext) = {
-    new GetGroupMethod(userId, groupId).execute()
+  def getGroup(userId: UUID, groupId: UUID, hydrate: Boolean)(implicit channelCtx: ChannelContext) = {
+    new GetGroupMethod(userId, groupId, hydrate).execute()
   }
 
-  private[impl] class GetGroupMethod(userId: UUID, groupId: UUID)(implicit channelCtx: ChannelContext)
+  private[impl] class GetGroupMethod(userId: UUID, groupId: UUID, hydrate: Boolean)(implicit channelCtx: ChannelContext)
       extends CrudImplicits[Option[GroupModel]] {
 
     def execute(): Response = {
       val key = make[GroupUserKey](groupId, userId)
-      groupUserGetSetLastRead(key, GroupModelBuilder(id = Option(groupId)))
+      groupUserGetLastRead(key, GroupModelBuilder(id = Option(groupId)))
     }
 
-    def groupUserGetSetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
-      key.getLastRead.flatMap { lastRead =>
+    def groupUserGetLastRead(key: GroupUserKey, builder: GroupModelBuilder): Response =
+      key.getLastReadEventCount.flatMap { lastRead =>
         val key = make[GroupKey](groupId)
-        groupGet(key, builder.copy(lastReadTime = Option(lastRead)))
+        groupGet(key, builder.copy(lastReadEventCount = Option(lastRead)))
       }
 
     def groupGet(key: GroupKey, builder: GroupModelBuilder): Response =
       key.getLastEventAndCount.flatMap {
         case (lastEvent, count) =>
-          val key = make[GroupUsersKey](groupId)
-          groupUsersGet(key, builder.copy(lastEventTime = Option(lastEvent), eventCount = Option(count.getOrElse(0))))
+          val updatedBuilder = builder.copy(eventCount = Option(count.getOrElse(0)))
+          // when hydration is not requested we don't bother executing the expensive task of getting users and invites
+          hydrate match {
+            case true =>
+              val key = make[GroupUsersKey](groupId)
+              groupUsersGet(key, updatedBuilder)
+            case false =>
+              Right(Option(updatedBuilder.copy(users = Option(None), invites = Option(None)).build))
+          }
       }
 
     def groupUsersGet(key: GroupUsersKey, builder: GroupModelBuilder): Response =
@@ -64,7 +71,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
       UserService().getUsers(userId, userIds).flatMap {
         case Left(error) => error
         case Right(users) =>
-          groupPhonesInvitedGet(make[GroupPhonesInvitedKey](groupId), builder.copy(users = Option(users)))
+          groupPhonesInvitedGet(make[GroupPhonesInvitedKey](groupId), builder.copy(users = Option(Option(users))))
       }
     }
 
@@ -105,7 +112,7 @@ class GroupServiceImpl extends ServiceImpl with GroupService with MakeKey {
       }
       Future.sequence(phoneLabels) map { phoneLabels =>
         val invites = phoneLabels.toMap ++ users
-        Right(Option(builder.copy(invites = Option(invites.values.toList)).build))
+        Right(Option(builder.copy(invites = Option(Option(invites.values.toList))).build))
       }
     }
 

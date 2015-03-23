@@ -2,7 +2,7 @@
  * Copyright (c) 2015 Robert Conrad - All Rights Reserved.
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * This file is proprietary and confidential.
- * Last modified by rconrad, 1/25/15 11:21 AM
+ * Last modified by rconrad, 3/22/15 7:28 PM
  */
 
 package base.entity.group.impl
@@ -19,6 +19,7 @@ import base.entity.event.EventTypes
 import base.entity.event.model.EventModel
 import base.entity.event.model.impl.EventModelImpl
 import base.entity.group.impl.GroupListenerActor.{ Publish, Register, Unregister }
+import base.entity.group.model.impl.GroupModelImpl
 import base.entity.test.EntityBaseSuite
 
 import scala.concurrent.Future
@@ -35,7 +36,7 @@ class GroupListenerActorTest extends EntityBaseSuite with ActorTestHelper with L
     val channel = mock[PushChannel]
     val userId = RandomService().uuid
     val groupId = RandomService().uuid
-    val event: EventModel = EventModelImpl(RandomService().uuid, groupId, None, EventTypes.MESSAGE, "")
+    val event: EventModel = EventModelImpl(RandomService().uuid, None, groupId, None, EventTypes.MESSAGE, "")
     val command = CommandModel(event)
 
     actor ? Register(Set(groupId), userId, channel) await ()
@@ -50,9 +51,15 @@ class GroupListenerActorTest extends EntityBaseSuite with ActorTestHelper with L
     val n = 10
     val channels = List.fill(n)(register) map {
       case (userId, channel, command) =>
+        val event = command.body
+        val group = GroupModelImpl(event.groupId, None, None, None, 0L)
+        val newEvent: EventModel = EventModelImpl(
+          event.id, Option(group), event.groupId, event.userId, event.`type`, event.body, event.time)
+        val hydratedCommand = command.copy(body = newEvent)
+
         // expect user to receive each command twice
-        (channel.push[T](_: T)(_: Manifest[T])) expects (command, *) returning Future.successful(true)
-        (channel.push[T](_: T)(_: Manifest[T])) expects (command, *) returning Future.successful(true)
+        (channel.push[T](_: T)(_: Manifest[T])) expects (hydratedCommand, *) returning Future.successful(true)
+        (channel.push[T](_: T)(_: Manifest[T])) expects (hydratedCommand, *) returning Future.successful(true)
         // send the command the first time
         actor ? Publish(command) await ()
         (userId, channel, command)
